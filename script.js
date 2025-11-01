@@ -26,32 +26,43 @@ const MobileDebugger = {
     },
 
     addMobileTouchHandlers() {
-        // More robust mobile touch handling
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Force mobile touch handling for Chrome DevTools simulation
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         navigator.maxTouchPoints > 0 || 
+                         'ontouchstart' in window;
         
-        if (isMobile) {
-            console.log('📱 Mobile device detected, adding touch handlers');
+        console.log('� Checking mobile:', {
+            userAgent: navigator.userAgent,
+            maxTouchPoints: navigator.maxTouchPoints,
+            ontouchstart: 'ontouchstart' in window,
+            isMobile: isMobile
+        });
+        
+        // Always add touch handlers for DevTools testing
+        console.log('📱 Adding touch handlers for mobile compatibility');
+        
+        // Handle option buttons with better detection
+        const addOptionHandlers = () => {
+            const optionButtons = document.querySelectorAll('.option-btn');
+            console.log('🎯 Found option buttons:', optionButtons.length);
             
-            // Handle option buttons with better detection
-            setTimeout(() => {
-                const optionButtons = document.querySelectorAll('.option-btn');
-                console.log('🎯 Found option buttons:', optionButtons.length);
+            optionButtons.forEach((button, index) => {
+                // Add touch event listener
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📱 Touch detected on option', index);
+                    selectOption(button, index);
+                }, { passive: false });
                 
-                optionButtons.forEach((button, index) => {
-                    // Multiple event types for better compatibility
-                    ['touchstart', 'touchend', 'click'].forEach(eventType => {
-                        button.addEventListener(eventType, (e) => {
-                            if (eventType === 'touchend') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('📱 Touch detected on option', index);
-                                selectOption(button, index);
-                            }
-                        }, { passive: false });
-                    });
-                });
-            }, 1000); // Wait for game to load
-        }
+                console.log('✅ Added touch handler to button', index);
+            });
+        };
+        
+        // Try immediately and also after delay
+        addOptionHandlers();
+        setTimeout(addOptionHandlers, 1000);
+        setTimeout(addOptionHandlers, 3000); // Extra delay for game load
     }
 
 };
