@@ -1,4 +1,4 @@
-﻿// 🏷️ Version Management System
+// 🏷️ Version Management System
 const APP_VERSION = {
     version: "2.0.1",
     buildDate: "2025-11-01",
@@ -10,7 +10,7 @@ const APP_VERSION = {
 };
 
 // 🐛 SIMPLIFIED ERROR LOGGING
-const MobileDebugger = {
+const Mobile = {
     init() {
         // Only log critical errors - no spam
         window.addEventListener('error', (e) => {
@@ -22,7 +22,7 @@ const MobileDebugger = {
             this.addMobileTouchHandlers();
         });
         
-        console.log('✅ Error monitoring active');
+        
     },
 
     addMobileTouchHandlers() {
@@ -31,27 +31,21 @@ const MobileDebugger = {
                          navigator.maxTouchPoints > 0 || 
                          'ontouchstart' in window;
         
-        console.log('� Checking mobile:', {
-            userAgent: navigator.userAgent,
-            maxTouchPoints: navigator.maxTouchPoints,
-            ontouchstart: 'ontouchstart' in window,
-            isMobile: isMobile
-        });
-        
+                
         // Always add touch handlers for DevTools testing
-        console.log('📱 Adding touch handlers for mobile compatibility');
+        
         
         // Handle option buttons with better detection
         const addOptionHandlers = () => {
             const optionButtons = document.querySelectorAll('.option-btn');
-            console.log('🎯 Found option buttons:', optionButtons.length);
+            
             
             optionButtons.forEach((button, index) => {
                 // Multiple event types for better compatibility
                 const handleSelection = (eventType, e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log(`📱 ${eventType} detected on option`, index);
+                    
                     selectOption(button, index);
                 };
                 
@@ -65,7 +59,7 @@ const MobileDebugger = {
                     }
                 }, { passive: false });
                 
-                console.log('✅ Added touch/pointer/mouse handlers to button', index);
+                
             });
         };
         
@@ -76,20 +70,20 @@ const MobileDebugger = {
         
         // Also add a global touch test
         document.addEventListener('touchstart', () => {
-            console.log('🔥 Global touchstart detected!');
+            
         }, { passive: true });
         
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('option-btn')) {
-                console.log('🖱️ Click detected on option button via delegation');
+                
             }
         });
     }
 
 };
 
-// Initialize mobile debugger immediately
-MobileDebugger.init();
+// Initialize mobile  immediately
+Mobile.init();
 
 // Update version info in UI
 function updateVersionInfo() {
@@ -528,7 +522,7 @@ class ArabicLearningGame {
         this.initializeLeaderboard();
         
         // init() DOMContentLoaded'da çağrılacak
-        console.log('🎯 ArabicLearningGame constructor tamamlandı');
+        
     }
     
     // Türkçe difficulty değerlerini İngilizce'ye migrate et
@@ -1001,7 +995,7 @@ class ArabicLearningGame {
             }
         }
         
-        console.log('🔧 Achievement yapıları düzeltildi!');
+        
     }
     
     initializeDailyMissions() {
@@ -1207,6 +1201,13 @@ class ArabicLearningGame {
     }
     
     updateDailyProgress(action, value = 1) {
+        // modesPlayed her zaman Set olsun
+        if (this.dailyProgress.modesPlayed && Array.isArray(this.dailyProgress.modesPlayed)) {
+            this.dailyProgress.modesPlayed = new Set(this.dailyProgress.modesPlayed);
+        } else if (!this.dailyProgress.modesPlayed) {
+            this.dailyProgress.modesPlayed = new Set();
+        }
+
         const today = new Date().toDateString();
         if (this.dailyProgress.date !== today) {
             this.initializeDailyMissions(); // Reset for new day
@@ -1361,7 +1362,7 @@ class ArabicLearningGame {
             haseneDisplay.textContent = this.totalHasene;
         }
         
-        console.log('💰 Total Hasene updated:', this.totalHasene);
+        
     }
     
     getDailyMissionsSummary() {
@@ -1457,12 +1458,12 @@ class ArabicLearningGame {
             this.initializeEscKeySupport();
         } catch (error) {
             console.error('❌ Game initialization failed:', error);
-            alert('Oyun yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.\n\nHata: ' + error.message);
+            
         }
     }
     
     async loadWordData() {
-        console.log('� Kelime verilerini yüklemeye başlıyor...');
+        
         
         // JSON dosyaları listesi ve yükleme durumu
         const jsonFiles = [
@@ -1498,12 +1499,12 @@ class ArabicLearningGame {
                 if (!rawText.startsWith('[')) {
                     const bracketIndex = rawText.indexOf('[');
                     if (bracketIndex > 0 && bracketIndex < 20) {
-                        console.log(`🔧 ${fileInfo.name} - İlk [ bulundu: pozisyon ${bracketIndex}`);
+                        
                         rawText = rawText.substring(bracketIndex);
                     }
                 }
                 
-                console.log(`📝 ${fileInfo.name} temizlenmiş ilk 30 karakter:`, rawText.substring(0, 30));
+                
                 
                 const parsedData = JSON.parse(rawText);
                 
@@ -1512,9 +1513,9 @@ class ArabicLearningGame {
                     fileInfo.loaded = true;
                     combinedData = combinedData.concat(parsedData);
                     totalLoaded++;
-                    console.log(`✅ ${fileInfo.name} başarılı: ${parsedData.length} öğe yüklendi`);
+                    
                 } else {
-                    console.log(`⚠️ ${fileInfo.name} geçersiz format veya boş`);
+                    
                 }
                 
             } catch (error) {
@@ -1528,7 +1529,7 @@ class ArabicLearningGame {
             const ayetokuFile = jsonFiles.find(f => f.name === 'ayetoku.json' && f.loaded);
             if (ayetokuFile && ayetokuFile.data) {
                 this.ayetData = ayetokuFile.data;
-                console.log(`📿 Ayet verileri ayrıldı: ${this.ayetData.length} ayet`);
+                
                 
                 // ayetoku verilerini wordData'dan çıkar (sadece kelime verileri kalsın)
                 const nonAyetData = combinedData.filter(item => !item.ayet_kimligi);
@@ -1537,14 +1538,14 @@ class ArabicLearningGame {
                 this.wordData = combinedData;
             }
             
-            console.log(`🎉 BAŞARILI! ${totalLoaded}/4 dosya yüklendi`);
-            console.log(`📚 Kelime verileri: ${this.wordData.length} öğe`);
-            console.log(`📿 Ayet verileri: ${this.ayetData ? this.ayetData.length : 0} öğe`);
-            console.log('📊 Yüklenen dosyalar:', jsonFiles.filter(f => f.loaded).map(f => f.name).join(', '));
+            
+            
+            
+            
             return;
         }
         
-        console.log('⚠️ Hiçbir JSON dosyası yüklenemedi, fallback data kullanılıyor...');
+        
         
         // Fallback data - Comprehensive test data for all difficulties
         this.wordData = [
@@ -1570,7 +1571,7 @@ class ArabicLearningGame {
             {"id": "test:15", "sure_adi": "Test Sûresi", "kelime": "غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ", "anlam": "gazaba uğrayanların değil", "ses_dosyasi": "", "difficulty": 16}
         ];
         
-        console.log(`🛡️ Fallback data yüklendi: ${this.wordData.length} test kelimesi`);
+        
     }
     
     async loadOldWordData() {
@@ -1584,7 +1585,7 @@ class ArabicLearningGame {
                     const rawAyetData = JSON.parse(cleanAyetText);
                     if (Array.isArray(rawAyetData) && rawAyetData.length > 0) {
                         this.ayetData = rawAyetData;
-                        console.log('✅ Ayet verileri yüklendi:', this.ayetData.length, 'ayet');
+                        
                     } else {
                         throw new Error('Invalid ayet data format');
                     }
@@ -1636,7 +1637,7 @@ class ArabicLearningGame {
                 {"id": "test:15", "sure_adi": "Test Sûresi", "kelime": "غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ", "anlam": "gazaba uğrayanların değil", "ses_dosyasi": "", "difficulty": 16}
             ];
             
-            console.log('✅ Fallback word data loaded:', this.wordData.length, 'kelime');
+            
             
             this.ayetData = [
                 {
@@ -1659,7 +1660,7 @@ class ArabicLearningGame {
                 }
             ];
             
-            console.log('✅ Fallback ayet data loaded:', this.ayetData.length, 'ayet');
+            
             
         }
     }
@@ -1881,7 +1882,7 @@ class ArabicLearningGame {
     }
     
     updateUI() {
-        console.log('🖼️ updateUI() çalışıyor...');
+        
         // Safety checks for DOM elements
         const safeUpdateElement = (id, value) => {
             const element = document.getElementById(id);
@@ -1937,7 +1938,7 @@ class ArabicLearningGame {
         // Veri yüklenip yüklenmediğini kontrol et
         if (!this.wordData || this.wordData.length === 0) {
             console.error('Kelime verisi yüklenmemiş!');
-            alert('Kelime verisi henüz yüklenmedi. Lütfen bekleyiniz...');
+            
             return;
         }
         
@@ -1954,10 +1955,10 @@ class ArabicLearningGame {
         document.body.className = document.body.className.replace(/\s*(translation|listening|speed|fillblank|writing)-mode/g, '');
         if (mode === 'translation') {
             document.body.classList.add('translation-mode');
-            console.log('🌙 Dark theme activated for translation mode');
-            console.log('Body classes:', document.body.className);
+            
+            
         } else {
-            console.log('🌞 Normal theme for mode:', mode);
+            
         }
         
         // Hız modu için timer ayarları
@@ -2268,7 +2269,7 @@ class ArabicLearningGame {
         // Track game mode for daily missions (only once per game)
         if (this.currentQuestion === 0) {
             this.updateDailyProgress('mode', this.gameMode);
-            console.log('📝 Daily progress updated: game mode', this.gameMode);
+            
         }
         
         // Update progress
@@ -2387,11 +2388,11 @@ class ArabicLearningGame {
             button.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📱 Mobile touch on option', index);
+                
                 this.selectOption(button, index);
             }, { passive: false });
             
-            console.log('✅ Button created with mobile support:', index);
+            
             optionsContainer.appendChild(button);
         });
         
@@ -2554,11 +2555,11 @@ class ArabicLearningGame {
             button.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📱 Mobile touch on fillblank option', index);
+                
                 this.selectOption(button, index);
             }, { passive: false });
             
-            console.log('✅ Fillblank button created with mobile support:', index);
+            
             optionsContainer.appendChild(button);
         });
         
@@ -2627,7 +2628,7 @@ class ArabicLearningGame {
         
         // Update daily progress for missions (question answered)
         this.updateDailyProgress('question');
-        console.log('📝 Daily progress updated: question answered');
+        
         
         if (isCorrect) {
             this.score++;
@@ -2635,7 +2636,7 @@ class ArabicLearningGame {
             
             // Update daily progress for missions
             this.updateDailyProgress('correct');
-            console.log('📝 Daily progress updated: correct answer');
+            
             
             // Calculate hasene based on game mode
             let earnedHasene = 0;
@@ -3248,7 +3249,7 @@ class ArabicLearningGame {
         // 🎵 Başarı seviyesine göre fanfar çal
         this.playEndGameFanfare();
         
-        alert('Oyun bitti! Tekrar deneyin.');
+        
         this.returnToMenu();
     }
 
@@ -3992,7 +3993,7 @@ class ArabicLearningGame {
         
         // Wait a bit then show main menu
         setTimeout(() => {
-            console.log('🏠 Ana menüye geçiliyor...');
+            
             this.showScreen('mainMenu');
             // Setup event listeners after DOM is ready
             setTimeout(() => this.setupAchievementListeners(), 200);
@@ -4019,7 +4020,7 @@ class ArabicLearningGame {
 
     // 🏆 Modern Achievement Modal
     showAchievements() {
-        console.log('🏆 Achievement modal açılıyor...');
+        
         
         // 🔄 Güvenli modal açma (diğerlerini kapat)
         if (!this.openModalSafely('achievementsModal')) {
@@ -4038,7 +4039,7 @@ class ArabicLearningGame {
         // Update progress bars
         this.updateProgressBars();
         
-        console.log('✅ Achievement modal başarıyla açıldı');
+        
     }
 
     // 📊 Update Achievement Stats
@@ -4340,7 +4341,7 @@ class ArabicLearningGame {
             }
             document.body.style.overflow = '';
             
-            console.log('🏆 Achievements modal closed successfully on Samsung M33');
+            
         }
     }
     
@@ -4356,7 +4357,7 @@ class ArabicLearningGame {
             }
             document.body.style.overflow = '';
             
-            console.log('📅 Calendar modal closed successfully on Samsung M33');
+            
         }
     }
     
@@ -4381,15 +4382,15 @@ class ArabicLearningGame {
         }
         
         // Samsung M33: Visual feedback during navigation
-        console.log(`📅 Calendar navigated to ${this.currentCalendarMonth + 1}/${this.currentCalendarYear} on Samsung M33`);
+        
         
         this.renderCalendar();
-        console.log(`📅 Calendar month changed: ${direction}`);
+        
     }
     
     // �🔄 Modal Senkronizasyon Sistemi
     closeAllModals() {
-        console.log('🔄 Tüm modaller kapatılıyor...');
+        
         
         const modalIds = [
             'achievementsModal',
@@ -4424,17 +4425,17 @@ class ArabicLearningGame {
     initializeEscKeySupport() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' || e.keyCode === 27) {
-                console.log('⌨️ ESC key pressed, closing modals...');
+                
                 this.closeAllModals();
             }
         });
         
-        console.log('⌨️ ESC key support initialized');
+        
     }
     
     // 🎛️ Güvenli Modal Açma (Diğerlerini otomatik kapat)
     openModalSafely(modalId) {
-        console.log(`🎛️ Modal açılıyor: ${modalId}`);
+        
         
         // Önce tüm modalleri kapat
         this.closeAllModals();
@@ -4470,7 +4471,7 @@ class ArabicLearningGame {
         const overlayClickHandler = (e) => {
             // Sadece modal background'a (overlay) tıklanırsa kapat
             if (e.target === modal) {
-                console.log('🖱️ Overlay clicked, closing modal...');
+                
                 this.closeAllModals();
             }
         };
@@ -4478,7 +4479,7 @@ class ArabicLearningGame {
         modal.addEventListener('click', overlayClickHandler);
         modal.setAttribute('data-overlay-listener', 'true');
         
-        console.log(`🖱️ Overlay click support added to ${modal.id}`);
+        
     }
 
     isRecentlyUnlocked(achievementId) {
@@ -4662,7 +4663,7 @@ class ArabicLearningGame {
     }
 
     showStats() {
-        console.log('📊 Stats modal açılıyor...');
+        
         
         // 🔄 Güvenli modal açma (diğerlerini kapat)
         if (!this.openModalSafely('statsModal')) {
@@ -4688,7 +4689,7 @@ class ArabicLearningGame {
         this.updateWeeklyChart();
         this.updateGameModeStats();
         
-        console.log('✅ Stats modal başarıyla açıldı');
+        
     }
     
     // 📊 Samsung M33 Stats Modal Close
@@ -4703,7 +4704,7 @@ class ArabicLearningGame {
             }
             document.body.style.overflow = '';
             
-            console.log('📊 Stats modal closed successfully on Samsung M33');
+            
         }
     }
     
@@ -4719,7 +4720,7 @@ class ArabicLearningGame {
             }
             document.body.style.overflow = '';
             
-            console.log('✅ Daily missions modal closed successfully on Samsung M33');
+            
         }
     }
 
@@ -4866,7 +4867,7 @@ class ArabicLearningGame {
         
         modal.style.display = 'flex';
         
-        console.log('📅 Calendar modal opened successfully on Samsung M33');
+        
     }
     
     // 🔧 LEGACY setDifficulty - şimdi normalize ediyor
@@ -5176,7 +5177,7 @@ let game = null;
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌟 DOM yüklendi, oyun başlatılıyor...');
+    
     
     // 🏷️ Update version info in UI
     updateVersionInfo();
@@ -5186,31 +5187,31 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Her zaman yeni bir game instance oluştur
     try {
-        console.log('🎮 ArabicLearningGame instance oluşturuluyor...');
+        
         game = new ArabicLearningGame();
         
         // 🌍 Global erişim için window'a da ekle
         window.game = game;
         window.arabicLearningGame = game;
         
-        console.log('✅ Game instance oluşturuldu:', !!game);
+        
         
         // 📚 Hadis verilerini yükle
         loadHadisData();
         
         // 🎮 Oyunu initialize et
-        console.log('🚀 Oyun initialize ediliyor...');
+        
         game.init().then(() => {
-            console.log('✅ Oyun hazır!');
+            
             
             // 📱 CRITICAL MOBILE FIX: Re-initialize touch events after game load
-            console.log('📱 Mobile touch events re-initializing...');
+            
             setTimeout(() => {
                 try {
                     initializeAllModalTouchEvents();
                     initializeAllCloseButtonTouchEvents(); 
                     initializeGameModeButtonTouchEvents();
-                    console.log('✅ Mobile touch events re-initialized');
+                    
                 } catch (e) {
                     console.error('❌ Touch re-init failed:', e);
                 }
@@ -5219,12 +5220,12 @@ document.addEventListener('DOMContentLoaded', () => {
             enableGameButtons();
         }).catch(error => {
             console.error('❌ Oyun initialize hatası:', error);
-            alert('Oyun başlatılamadı: ' + error.message);
+            
         });
         
     } catch (error) {
         console.error('❌ Game instance oluşturulamadı:', error);
-        alert('Oyun yüklenemedi: ' + error.message);
+        
     }
     
     // 🛍️ Shop UI'ını başlangıçta güncelle
@@ -5255,7 +5256,7 @@ function initializeBackgroundMusic() {
 
     // Müzik buton kontrolü zaten HTML'de mevcut playMusic() fonksiyonu ile yapılıyor
     // Bu fonksiyon sadece element kontrolü yapıyor
-    console.log('Background music initialized successfully');
+    
     
 }
 
@@ -5282,29 +5283,29 @@ function enableGameButtons() {
 
 // Global functions for HTML onclick events
 function startGame(mode = 'translation') {
-    console.log('🎮 startGame çağırıldı, mode:', mode);
+    
     
     // Simple game start - no blocking
     
     if (game && game.wordData && game.wordData.length > 0) {
-        console.log('✅ Oyun başlatılıyor...');
+        
         try {
             game.startGame(mode);
         } catch (error) {
             console.error('❌ Oyun başlatma hatası:', error);
-            alert('Oyun başlatılamadı: ' + error.message);
+            
         }
     } else {
         console.error('❌ Oyun hazır değil!');
         
         // Try to reinitialize game
         if (!game) {
-            console.log('🔄 Game yeniden yükleniyor...');
+            
             setTimeout(() => {
                 location.reload();
             }, 1000);
         } else {
-            alert('Oyun henüz yükleniyor, lütfen bekleyiniz...');
+            
         }
     }
 }
@@ -5327,7 +5328,7 @@ function resetGame() {
 }
 
 function selectOption(button, index) {
-    console.log('🎯 selectOption called with:', button, index);
+    
     if (game) {
         game.selectOption(button, index);
     }
@@ -5401,6 +5402,20 @@ function showAchievements() {
     }
 }
 
+// Oyun Modu İstatistikleri Yüzde Barlarını Güncelle
+function updateGameModeStats(stats) {
+    // stats: { translation: %, word: %, ayet: %, dua: %, hadis: % }
+    const modes = ['translation', 'word', 'ayet', 'dua', 'hadis'];
+    modes.forEach(mode => {
+        const bar = document.getElementById(`${mode}-mode-bar`);
+        const percent = stats[mode] || 0;
+        if (bar) {
+            bar.style.width = percent + '%';
+            bar.textContent = percent + '%';
+        }
+    });
+}
+
 function showStats() {
     if (game) {
         game.showStats();
@@ -5453,7 +5468,7 @@ function closeStreakModal() {
 
 // 📅 Samsung M33 Calendar Navigation Fix
 function changeMonth(direction) {
-    console.log(`📅 Month change: ${direction}`);
+    
     if (game && game.changeCalendarMonth) {
         game.changeCalendarMonth(direction);
     } else if (game) {
@@ -5474,7 +5489,7 @@ function changeMonth(direction) {
 
 // 📅 Samsung M33 Calendar Modal Close Fix  
 function closeCalendarModal() {
-    console.log('📅 Calendar modal closing...');
+    
     if (game && game.closeCalendarModal) {
         game.closeCalendarModal();
     } else {
@@ -5676,7 +5691,7 @@ function showStreakShop() {
     
     document.getElementById('streakShopModal').style.display = 'block';
     
-    console.log('🛡️ Streak shop modal opened successfully on Samsung M33');
+    
 }
 
 // 🛡️ Samsung M33 Streak Shop Modal Close Fix
@@ -5691,7 +5706,7 @@ function closeStreakShop() {
         }
         document.body.style.overflow = '';
         
-        console.log('🛡️ Streak shop modal closed successfully on Samsung M33');
+        
     }
 }
 
@@ -5760,7 +5775,7 @@ function buyItem(itemType, buttonElement) {
         console.error('❌ Game objesi bulunamadı!');
         
         // Kullanıcıya hata göster
-        alert('❌ Oyun başlatılmadı! Sayfayı yenileyin.');
+        
     }
 }
 
@@ -6270,7 +6285,7 @@ function closeHadisModal() {
         }
         document.body.style.overflow = '';
         
-        console.log('📜 Hadis modal closed successfully on Samsung M33');
+        
     }
 }
 
@@ -6316,7 +6331,7 @@ function showDailyMissions() {
 
 // 📱 Samsung M33 Daily Missions Modal Close Fix
 function closeDailyMissionsModal() {
-    console.log('📝 Daily missions modal closing...');
+    
     if (game && game.closeDailyMissionsModal) {
         game.closeDailyMissionsModal();
     } else {
@@ -6357,7 +6372,7 @@ ArabicLearningGame.prototype.showDailyMissions = function() {
     
     modal.style.display = 'flex';
     
-    console.log('📝 Daily missions modal opened with Samsung M33 optimizations');
+    
 };
 
 ArabicLearningGame.prototype.createMissionCard = function(mission) {
@@ -6453,7 +6468,7 @@ ArabicLearningGame.prototype.shareAchievement = function(achievementId) {
                 this.addHasene(5); // Bonus for sharing
             })
             .catch((error) => {
-                console.log('Share failed:', error);
+                
                 this.fallbackShare(shareData);
             });
     } else {
@@ -6718,7 +6733,7 @@ ArabicLearningGame.prototype.optimizeAnimations = function() {
 
 // 🧼 Memory Cleanup
 ArabicLearningGame.prototype.performMemoryCleanup = function() {
-    console.log('🧹 Performing memory cleanup...');
+    
     
     // Clear cached DOM elements that might be stale
     this.cachedElements = {};
@@ -6742,7 +6757,7 @@ ArabicLearningGame.prototype.performMemoryCleanup = function() {
         window.gc();
     }
     
-    console.log('✅ Memory cleanup completed');
+    
 };
 
 // 📦 Data Compression for Storage
@@ -6839,7 +6854,7 @@ function closeSoundSettings() {
 
 // 🔍 Filter By Rarity (Global Function)
 function filterByRarity(rarity) {
-    console.log(`🏆 Filter by rarity: ${rarity}`);
+    
     if (window.game) {
         window.game.filterAchievements(rarity);
         
@@ -6928,7 +6943,7 @@ function initializeMobileMissionsModal() {
             isScrolling = false;
         }, { passive: true });
         
-        console.log('📝 Samsung M33 missions modal touch scroll initialized');
+        
     }
 }
 
@@ -6949,7 +6964,7 @@ function initializeMobileAchievementsModal() {
             isScrolling = false;
         }, { passive: true });
         
-        console.log('🏆 Samsung M33 achievements modal touch scroll initialized');
+        
     }
 }
 
@@ -6988,7 +7003,7 @@ function initializeAllModalTouchEvents() {
         });
     });
     
-    console.log('📱 Samsung M33 universal modal touch scroll initialized for all areas');
+    
 }
 
 // ❌ Samsung M33 Universal Close Button Touch Events - ALL X BUTTONS
@@ -7015,7 +7030,7 @@ function initializeAllCloseButtonTouchEvents() {
         }, { passive: false });
     });
     
-    console.log('❌ Samsung M33 universal close button touch events initialized for all X buttons');
+    
 }
 
 // 🎮 Samsung M33 Game Mode Button Touch Events - ALL GAME BUTTONS
@@ -7042,7 +7057,7 @@ function initializeGameModeButtonTouchEvents() {
         }, { passive: false });
     });
     
-    console.log('🎮 Samsung M33 game mode button touch events initialized for all game buttons');
+    
 }
 
 // 🔊 Update Master Volume
