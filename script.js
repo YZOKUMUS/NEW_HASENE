@@ -26,22 +26,32 @@ const MobileDebugger = {
     },
 
     addMobileTouchHandlers() {
-        // Handle option buttons specifically
-        const addTouchToButtons = (selector, handler) => {
-            const buttons = document.querySelectorAll(selector);
-            buttons.forEach((button, index) => {
-                button.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handler(button, index);
+        // More robust mobile touch handling
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            console.log('📱 Mobile device detected, adding touch handlers');
+            
+            // Handle option buttons with better detection
+            setTimeout(() => {
+                const optionButtons = document.querySelectorAll('.option-btn');
+                console.log('🎯 Found option buttons:', optionButtons.length);
+                
+                optionButtons.forEach((button, index) => {
+                    // Multiple event types for better compatibility
+                    ['touchstart', 'touchend', 'click'].forEach(eventType => {
+                        button.addEventListener(eventType, (e) => {
+                            if (eventType === 'touchend') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('📱 Touch detected on option', index);
+                                selectOption(button, index);
+                            }
+                        }, { passive: false });
+                    });
                 });
-            });
-        };
-
-        // Option buttons
-        addTouchToButtons('.option-btn', (button, index) => {
-            selectOption(button, index);
-        });
+            }, 1000); // Wait for game to load
+        }
     }
 
 };
