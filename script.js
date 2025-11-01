@@ -1343,6 +1343,19 @@ class ArabicLearningGame {
             missions: this.dailyMissions
         }));
     }
+
+    updateTotalHasene() {
+        // Save to localStorage and update UI
+        localStorage.setItem('totalHasene', this.totalHasene.toString());
+        
+        // Update UI if hasene display exists
+        const haseneDisplay = document.getElementById('haseneCount');
+        if (haseneDisplay) {
+            haseneDisplay.textContent = this.totalHasene;
+        }
+        
+        console.log('💰 Total Hasene updated:', this.totalHasene);
+    }
     
     getDailyMissionsSummary() {
         const completed = this.dailyMissions.filter(m => m.completed).length;
