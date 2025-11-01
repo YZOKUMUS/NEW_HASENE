@@ -1377,7 +1377,7 @@
             console.log("================================================");
             
             return testResults;
-        }
+        
 
     </script>
 
@@ -1387,92 +1387,6 @@
     </script>
 
     <!-- 🎵 Sound Settings Modal -->
-            console.log("🎯 SPESİFİK ROZET TETİKLEME TESTİ...");
-            
-            if (!window.game) {
-                console.error("❌ Game instance not found!");
-                return;
-            }
-            
-            // Test senaryoları
-            const testScenarios = [
-                {
-                    name: "First Game Test",
-                    action: () => {
-                        game.hasene = 50;
-                        game.currentStreak = 1;
-                        game.checkAchievements();
-                    }
-                },
-                {
-                    name: "Streak Test",
-                    action: () => {
-                        game.currentStreak = 3;
-                        game.checkAchievements();
-                        setTimeout(() => {
-                            game.currentStreak = 7;
-                            game.checkAchievements();
-                        }, 1000);
-                    }
-                },
-                {
-                    name: "Hasene Test", 
-                    action: () => {
-                        game.hasene = 100;
-                        game.checkAchievements();
-                        setTimeout(() => {
-                            game.hasene = 500;
-                            game.checkAchievements();
-                        }, 1500);
-                        setTimeout(() => {
-                            game.hasene = 1000;
-                            game.checkAchievements();
-                        }, 3000);
-                    }
-                },
-                {
-                    name: "Perfect Score Test",
-                    action: () => {
-                        // 10 perfect game simülasyonu
-                        for (let i = 0; i < 10; i++) {
-                            game.stats.perfectGames = (game.stats.perfectGames || 0) + 1;
-                        }
-                        game.checkAchievements();
-                    }
-                }
-            ];
-            
-            testScenarios.forEach((scenario, index) => {
-                setTimeout(() => {
-                    console.log(`🧪 Running: ${scenario.name}`);
-                    scenario.action();
-                }, index * 4000);
-            });
-            
-            // Final özet
-            setTimeout(() => {
-                console.log("🎉 Tüm spesifik testler tamamlandı!");
-                console.log("📊 Rozet durumu kontrol ediliyor...");
-                game.showAchievements();
-            }, testScenarios.length * 4000);
-        }
-
-        // 🔄 ROZET SİSTEMİ RESET - Test için rozetleri sıfırla
-        function resetAchievementsForTesting() {
-            console.log("🔄 ROZET SİSTEMİ TEST İÇİN SIFIRLANYOR...");
-            
-            if (!window.game) {
-                console.error("❌ Game instance not found!");
-                return;
-            }
-            
-            // Tüm rozetleri locked yap
-            Object.keys(game.achievements).forEach(id => {
-                game.achievements[id].unlocked = false;
-            });
-            
-            // Stats'ları sıfırla
-            game.hasene = 0;
             game.currentStreak = 0;
             game.stats = {
                 totalHasene: 0,
