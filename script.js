@@ -2523,6 +2523,16 @@ class ArabicLearningGame {
             button.className = 'option-btn fillblank-option';
             button.textContent = option;
             button.onclick = () => this.selectOption(button, index);
+            
+            // Add mobile touch events for fillblank mode
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📱 Mobile touch on fillblank option', index);
+                this.selectOption(button, index);
+            }, { passive: false });
+            
+            console.log('✅ Fillblank button created with mobile support:', index);
             optionsContainer.appendChild(button);
         });
         
