@@ -387,6 +387,27 @@ body {
 
 /* Decoration styles removed for cleaner compact design */
 
+/* 📱 Loading Screen Version Badge */
+.loading-version {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+}
+
+.version-badge {
+    background: rgba(255, 255, 255, 0.95);
+    color: #667eea;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    letter-spacing: 0.5px;
+}
+
 /* 🌊 Background Effects */
 .duo-background-effects {
     position: absolute;
@@ -958,6 +979,25 @@ body {
     max-width: 600px;
     margin: 0 auto;
     width: 100%;
+}
+
+/* 📱 Menu Version Footer */
+.menu-version-footer {
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.menu-version-footer .version-text {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .welcome-section {
