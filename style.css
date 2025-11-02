@@ -2693,15 +2693,10 @@ input:focus {
     width: 95%;
     max-height: 85vh;
     padding: 0;
-    /* Enable scrolling */
-    display: flex;
-    flex-direction: column;
-    touch-action: pan-y !important;
-    overscroll-behavior: contain;
-    overflow-y: auto !important;
+    /* Simple scroll like game-modes */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    /* Hide scrollbar */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -2728,7 +2723,6 @@ input:focus {
     color: white;
     border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    flex-shrink: 0; /* Keep header fixed */
 }
 
 .modal-header h2 {
@@ -2898,14 +2892,7 @@ input:focus {
 /* Stats Modal */
 .stats-content {
     padding: 25px;
-    /* Allow scrolling within modal */
     position: relative;
-    flex: 1; /* Take remaining space */
-    overflow-y: auto; /* This section scrolls */
-    min-height: 0; /* Important for flex scroll */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 
 .stats-content::-webkit-scrollbar {
@@ -6039,14 +6026,10 @@ body.translation-mode .skip-btn:hover {
 .missions-modal {
     max-width: 800px;
     max-height: 90vh;
-    /* Enable scrolling */
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto !important;
+    /* Simple scroll like game-modes */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y !important;
     scroll-behavior: smooth;
-    /* Hide scrollbar */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -6058,13 +6041,6 @@ body.translation-mode .skip-btn:hover {
 
 .missions-content {
     padding: 20px 0;
-    /* Allow scrolling within modal */
-    flex: 1; /* Take remaining space */
-    overflow-y: auto; /* This section scrolls */
-    min-height: 0; /* Important for flex scroll */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 
 .missions-content::-webkit-scrollbar {
@@ -7030,15 +7006,7 @@ input:checked + .toggle-slider:before {
 .achievements-container {
     background: white;
     padding: 30px;
-    /* Allow scrolling within modal */
     position: relative;
-    flex: 1; /* Take remaining space */
-    overflow-y: auto; /* This section scrolls */
-    min-height: 0; /* Important for flex scroll */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    /* Scroll rules in global section */
 }
 
 .achievements-container::-webkit-scrollbar {
