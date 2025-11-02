@@ -1,12 +1,19 @@
 // 🏷️ Version Management System
 const APP_VERSION = {
-    version: "2.0.1",
-    buildDate: "2025-11-01",
-    buildTime: "15:30",
-    buildNumber: "1101-1530",
-    codeStatus: "Mobile Debug",
+    version: "2.0.6",
+    buildDate: new Date().toISOString().split('T')[0],
+    buildTime: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+    buildNumber: (() => {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${day}${month}-${hours}${minutes}`;
+    })(),
+    codeStatus: "Production",
     copyright: "© 2025 YZOKUMUS",
-    features: ["Mobile Debug", "Touch Events", "Samsung M33 Fix", "Error Logging"]
+    features: ["Dynamic Build Time", "Touch Events", "Mobile Optimized", "Real-time Updates"]
 };
 
 // 🐛 SIMPLIFIED ERROR LOGGING
