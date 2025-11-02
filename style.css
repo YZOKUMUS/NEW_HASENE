@@ -2890,7 +2890,6 @@ input:focus {
     padding: 25px;
     /* Show all stats - modal handles scroll */
     position: relative;
-    overflow: visible;
 }
 
 .stats-content::-webkit-scrollbar {
@@ -3230,7 +3229,6 @@ input:focus {
     border-radius: var(--border-radius-small);
     border: 1px solid #e5e7eb;
     /* Show all calendar - modal handles scroll */
-    overflow: visible;
 }
 
 .calendar-grid::-webkit-scrollbar {
@@ -5933,8 +5931,6 @@ body.translation-mode .skip-btn:hover {
     gap: 10px;
     padding: 15px;
     /* Show all achievements - modal handles scroll */
-    overflow: visible;
-    scroll-behavior: smooth;
 }
 
 /* Rarity Badge in Corner */
@@ -6085,7 +6081,6 @@ body.translation-mode .skip-btn:hover {
     gap: 16px;
     padding: 0 20px;
     /* Show all missions - modal handles scroll */
-    overflow: visible;
 }
 
 .mission-card {.mission-card {
