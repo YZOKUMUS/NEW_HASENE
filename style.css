@@ -2885,6 +2885,7 @@ input:focus {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    touch-action: pan-y; /* Enable vertical scroll on mobile */
     /* Scroll rules in global section */
 }
 
@@ -3229,6 +3230,7 @@ input:focus {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    touch-action: pan-y; /* Enable vertical scroll on mobile */
 }
 
 .calendar-grid::-webkit-scrollbar {
@@ -5933,6 +5935,7 @@ body.translation-mode .skip-btn:hover {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    touch-action: pan-y; /* Enable vertical scroll on mobile */
     /* Scrollbar gizle */
     scrollbar-width: none;
     -ms-overflow-style: none;
