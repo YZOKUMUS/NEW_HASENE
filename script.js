@@ -4779,53 +4779,47 @@ class ArabicLearningGame {
         const listeningGames = parseInt(localStorage.getItem('listeningGames')) || 0;
         const speedGames = parseInt(localStorage.getItem('speedGames')) || 0;
         const fillblankGames = parseInt(localStorage.getItem('fillblankGames')) || 0;
-        const ayetListens = parseInt(localStorage.getItem('listenedDuaCount')) || 0;
+        const ayetListens = parseInt(localStorage.getItem('ayetListens')) || 0;
         const duaListens = parseInt(localStorage.getItem('duaListens')) || 0;
         
         const totalGames = translationGames + listeningGames + speedGames + fillblankGames + ayetListens + duaListens || 1; // 0'a bölme hatası önleme
         
         const modes = [
             { 
-                name: 'Çeviri', 
-                class: 'translation', 
+                id: 'translation',
                 percentage: Math.round((translationGames / totalGames) * 100),
                 count: translationGames
             },
             { 
-                name: 'Dinleme', 
-                class: 'listening', 
+                id: 'listening',
                 percentage: Math.round((listeningGames / totalGames) * 100),
                 count: listeningGames
             },
             { 
-                name: 'Hız', 
-                class: 'speed', 
+                id: 'speed',
                 percentage: Math.round((speedGames / totalGames) * 100),
                 count: speedGames
             },
             { 
-                name: 'Boşluk Doldur', 
-                class: 'fillblank', 
+                id: 'fillblank',
                 percentage: Math.round((fillblankGames / totalGames) * 100),
                 count: fillblankGames
             },
             { 
-                name: 'Ayet Dinleme', 
-                class: 'ayet', 
+                id: 'ayet',
                 percentage: Math.round((ayetListens / totalGames) * 100),
                 count: ayetListens
             },
             { 
-                name: 'Dua Dinleme', 
-                class: 'dua', 
+                id: 'dua',
                 percentage: Math.round((duaListens / totalGames) * 100),
                 count: duaListens
             }
         ];
         
-        modes.forEach((mode, index) => {
-            const progressBar = document.querySelectorAll('.mode-bar')[index];
-            const percentageSpan = document.querySelectorAll('.mode-percentage')[index];
+        modes.forEach(mode => {
+            const progressBar = document.getElementById(`${mode.id}Bar`);
+            const percentageSpan = document.getElementById(`${mode.id}Percent`);
             
             if (progressBar && percentageSpan) {
                 progressBar.style.width = `${mode.percentage}%`;
