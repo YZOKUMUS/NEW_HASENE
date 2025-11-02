@@ -1135,9 +1135,10 @@ body {
     gap: 20px;
     /* 📱 Samsung M33 Touch Optimization */
     -webkit-tap-highlight-color: transparent;
-    touch-action: auto;
+    touch-action: pan-y;
     user-select: none;
     min-height: 44px;
+    pointer-events: auto;
 }
 
 .game-mode-btn:hover {
@@ -1197,6 +1198,9 @@ body {
 .game-mode-btn p {
     color: var(--text-light);
     font-size: 0.9rem;
+    display: block;
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Difficulty Section */
@@ -2892,7 +2896,7 @@ input:focus {
     align-items: center;
     gap: 15px;
     box-shadow: var(--shadow-medium);
-    touch-action: auto;
+    touch-action: pan-y;
     pointer-events: auto;
 }
 
@@ -5653,7 +5657,7 @@ body.translation-mode .skip-btn:hover {
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
     cursor: pointer;
-    touch-action: auto;
+    touch-action: pan-y;
     pointer-events: auto;
 }
 
@@ -6060,7 +6064,7 @@ body.translation-mode .skip-btn:hover {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    touch-action: auto;
+    touch-action: pan-y;
     pointer-events: auto;
 }
 
