@@ -2695,8 +2695,18 @@ input:focus {
     padding: 0;
     touch-action: pan-y;
     overscroll-behavior: contain;
-    overflow-y: auto; /* Modal itself scrolls */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* Hide scrollbar like game-modes */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.achievements-modal::-webkit-scrollbar,
+.stats-modal::-webkit-scrollbar,
+.calendar-modal::-webkit-scrollbar {
+    display: none;
 }
 
 .modal-header {
@@ -2878,16 +2888,9 @@ input:focus {
 /* Stats Modal */
 .stats-content {
     padding: 25px;
-    /* Show all stats without scroll */
+    /* Show all stats - modal handles scroll */
     position: relative;
-    /* 📱 Mobile touch scroll */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    touch-action: pan-y; /* Enable vertical scroll on mobile */
-    /* Scroll rules in global section */
+    overflow: visible;
 }
 
 .stats-content::-webkit-scrollbar {
@@ -3226,12 +3229,8 @@ input:focus {
     background: #fafbfc;
     border-radius: var(--border-radius-small);
     border: 1px solid #e5e7eb;
-    /* Show all calendar days without scroll */
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    touch-action: pan-y; /* Enable vertical scroll on mobile */
+    /* Show all calendar - modal handles scroll */
+    overflow: visible;
 }
 
 .calendar-grid::-webkit-scrollbar {
@@ -5927,23 +5926,15 @@ body.translation-mode .skip-btn:hover {
 }
 
 /* Achievement Grid Layout */
+/* Achievement Grid Layout */
 .achievements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 10px;
     padding: 15px;
-    /* Show all achievements without scroll */
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
+    /* Show all achievements - modal handles scroll */
+    overflow: visible;
     scroll-behavior: smooth;
-    touch-action: pan-y; /* Enable vertical scroll on mobile */
-    /* Scrollbar gizle */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.achievements-grid::-webkit-scrollbar {
-    display: none;
 }
 
 /* Rarity Badge in Corner */
@@ -6032,9 +6023,18 @@ body.translation-mode .skip-btn:hover {
 .missions-modal {
     max-width: 800px;
     max-height: 90vh;
-    overflow-y: auto; /* Modal itself scrolls */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
+    scroll-behavior: smooth;
+    /* Hide scrollbar like game-modes */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.missions-modal::-webkit-scrollbar {
+    display: none;
+}
 }
 
 .missions-content {
@@ -6084,22 +6084,11 @@ body.translation-mode .skip-btn:hover {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 0 20px;
-    /* 📱 Show all content without scroll */
-    touch-action: pan-y;
-    scroll-behavior: smooth;
-    overflow-y: visible; /* Show all missions */
-    /* max-height removed - show everything */
-    -webkit-overflow-scrolling: touch;
-    /* Scrollbar gizle */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    /* Show all missions - modal handles scroll */
+    overflow: visible;
 }
 
-.missions-grid::-webkit-scrollbar {
-    display: none;
-}
-
-.mission-card {
+.mission-card {.mission-card {
     background: var(--card-bg);
     border-radius: 16px;
     padding: 20px;
