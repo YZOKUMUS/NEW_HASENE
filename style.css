@@ -5003,16 +5003,56 @@ input:focus {
 /* Responsive Design */
 @media (max-width: 768px) {
     .achievement-card {
-        padding: 30px 20px;
-        margin: 10px;
+        padding: 15px 12px;
+        margin: 8px 5px;
+        min-height: 100px;
     }
     
     .achievement-icon {
-        font-size: 3rem;
+        font-size: 2rem;
     }
     
     .achievement-title {
-        font-size: 1.5rem;
+        font-size: 0.95rem;
+        line-height: 1.3;
+    }
+    
+    .achievement-description {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    /* Mobile: Kompakt achievement kartları */
+    .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    /* Rarity tabs mobilde daha kompakt */
+    .rarity-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .rarity-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .rarity-tab {
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .rarity-tab i {
+        font-size: 1rem;
+    }
+    
+    .rarity-tab span {
+        font-size: 0.75rem;
     }
     
     .mini-achievement {
@@ -5020,6 +5060,27 @@ input:focus {
         top: 10px;
         max-width: 250px;
         padding: 12px 15px;
+    }
+    
+    /* Achievement modal header mobilde daha küçük */
+    .achievements-header {
+        padding: 12px 10px;
+    }
+    
+    .achievements-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .achievements-stats {
+        font-size: 0.8rem;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
     }
 }
 
@@ -7085,11 +7146,29 @@ input:checked + .toggle-slider:before {
         touch-action: pan-y;
         scroll-behavior: smooth;
         overscroll-behavior: contain;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .achievements-container::-webkit-scrollbar {
+        display: none;
     }
     
     .achievements-grid {
         grid-template-columns: 1fr;
         gap: 15px;
+        padding: 5px;
+        /* Mobil kaydırma iyileştirmesi */
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Achievement kartları mobilde tam genişlik */
+    .achievement-card {
+        margin: 0;
+        width: 100%;
+        min-height: 110px;
     }
     
     .progress-bars {
