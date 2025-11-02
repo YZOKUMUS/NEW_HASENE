@@ -1,6 +1,6 @@
 // HASENE Service Worker for offline functionality
 
-const CACHE_NAME = 'hasene-v2.0.8-scroll-fix';
+const CACHE_NAME = 'hasene-v2.0.9-network-first';
 const urlsToCache = [
   './',
   './index.html',
@@ -47,18 +47,28 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache when offline
+// Fetch event - network first, then cache (for latest updates)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request).catch(() => {
-          // If both cache and network fail, return offline page for documents
+        // Clone the response before caching
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+        return response;
+      })
+      .catch(() => {
+        // If network fails, try cache
+        return caches.match(event.request).then((response) => {
+          if (response) {
+            return response;
+          }
+          // If both fail, return offline message
           if (event.request.destination === 'document') {
             return caches.match('./index.html');
           }
-          // For other resources, return a simple response
           return new Response('Offline - Resource not available', {
             status: 503,
             statusText: 'Service Unavailable'
