@@ -5550,10 +5550,15 @@ function watchAdForHearts() {
             </div>
         `;
         
-        // 2 saniye sonra oyuna dön
+        // 2 saniye sonra oyuna dön ve devam et
         setTimeout(() => {
             document.getElementById('heartsDepleted').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
+            
+            // Oyunu devam ettir - yeni soru göster
+            if (game) {
+                game.nextQuestion();
+            }
         }, 2000);
     }, 3000);
 }
@@ -5615,10 +5620,15 @@ function buyUnlimitedHearts() {
         
         showNotification('♾️ Sınırsız kalp aktifleştirildi!', 'success');
         
-        // Oyuna dön
+        // Oyuna dön ve devam et
         setTimeout(() => {
             document.getElementById('heartsDepleted').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
+            
+            // Oyunu devam ettir - yeni soru göster
+            if (game) {
+                game.nextQuestion();
+            }
         }, 2000);
     } else {
         showNotification('❌ Yeterli Hasene yok! (100 Hasene gerekli)', 'error');
