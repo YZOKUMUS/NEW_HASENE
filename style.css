@@ -5835,20 +5835,37 @@ body.translation-mode .skip-btn:hover {
 
 /* Locked Achievement Styling */
 .achievement-card.locked {
-    opacity: 0.6;
-    filter: grayscale(0.8);
-    --rarity-gradient: linear-gradient(135deg, #ddd, #f0f0f0, #ddd);
+    opacity: 0.4;
+    filter: grayscale(1) brightness(0.7);
+    --rarity-gradient: linear-gradient(135deg, #555, #777, #555);
     --rarity-glow: none;
-    --rarity-text: #999;
+    --rarity-text: #666;
+    border: 2px solid #555 !important;
+    background: rgba(0, 0, 0, 0.3) !important;
 }
 
 .achievement-card.locked:hover {
     transform: none;
     box-shadow: none;
+    opacity: 0.5;
 }
 
 .achievement-card.locked .achievement-icon {
-    opacity: 0.7;
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+.achievement-card.locked .achievement-title {
+    color: #888 !important;
+}
+
+.achievement-card.locked::before {
+    content: "🔒";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 1.2rem;
+    opacity: 0.8;
 }
 
 /* Recently Unlocked Animation */
