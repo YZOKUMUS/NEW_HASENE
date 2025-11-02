@@ -1907,6 +1907,8 @@ body {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     animation: scaleIn 0.3s ease;
 }
 
@@ -2614,6 +2616,8 @@ input:focus {
     width: 95%;
     max-height: 85vh;
     padding: 0;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .modal-header {
@@ -2682,6 +2686,8 @@ input:focus {
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .achievement-item {
@@ -5860,6 +5866,8 @@ body.translation-mode .skip-btn:hover {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .missions-content::-webkit-scrollbar {
