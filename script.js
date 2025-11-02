@@ -4104,6 +4104,10 @@ class ArabicLearningGame {
         // Update progress bars
         this.updateProgressBars();
         
+        // ✅ Re-init touch events for achievement cards
+        setTimeout(() => {
+            initializePanelCardsTouchEvents();
+        }, 100);
         
     }
 
@@ -4754,6 +4758,10 @@ class ArabicLearningGame {
         this.updateWeeklyChart();
         this.updateGameModeStats();
         
+        // ✅ Re-init touch events for stat items
+        setTimeout(() => {
+            initializePanelCardsTouchEvents();
+        }, 100);
         
     }
     
@@ -5274,6 +5282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     initializeAllModalTouchEvents();
                     initializeAllCloseButtonTouchEvents(); 
                     initializeGameModeButtonTouchEvents();
+                    initializePanelCardsTouchEvents(); // ✅ Panel kartları için scroll fix
                     
                 } catch (e) {
                     console.error('❌ Touch re-init failed:', e);
@@ -6445,6 +6454,10 @@ ArabicLearningGame.prototype.showDailyMissions = function() {
     
     modal.style.display = 'flex';
     
+    // ✅ Re-init touch events for mission cards
+    setTimeout(() => {
+        initializePanelCardsTouchEvents();
+    }, 100);
     
 };
 
@@ -7140,8 +7153,31 @@ function initializeGameModeButtonTouchEvents() {
             }, 150);
         });
     });
+}
+
+// 📱 Apply same scroll logic to all panel cards (missions, achievements, stats)
+function initializePanelCardsTouchEvents() {
+    const selectors = ['.mission-card', '.achievement-card', '.stat-item'];
     
-    
+    selectors.forEach(selector => {
+        const cards = document.querySelectorAll(selector);
+        cards.forEach(card => {
+            let startY = 0;
+            let scrolling = false;
+            
+            card.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+                scrolling = false;
+            }, { passive: true });
+            
+            card.addEventListener('touchmove', function(e) {
+                const moveY = e.touches[0].clientY;
+                if (Math.abs(moveY - startY) > 10) {
+                    scrolling = true;
+                }
+            }, { passive: true });
+        });
+    });
 }
 
 // 🔊 Update Master Volume
