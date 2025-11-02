@@ -2693,6 +2693,9 @@ input:focus {
     width: 95%;
     max-height: 85vh;
     padding: 0;
+    /* Enable scrolling */
+    display: flex;
+    flex-direction: column;
     touch-action: pan-y;
     overscroll-behavior: contain;
     overflow-y: scroll !important; /* Force scroll - temporarily show scrollbar for testing */
@@ -2719,6 +2722,7 @@ input:focus {
     color: white;
     border-radius: var(--border-radius-large) var(--border-radius-large) 0 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    flex-shrink: 0; /* Keep header fixed */
 }
 
 .modal-header h2 {
@@ -2888,8 +2892,11 @@ input:focus {
 /* Stats Modal */
 .stats-content {
     padding: 25px;
-    /* Show all stats - modal handles scroll */
+    /* Allow scrolling within modal */
     position: relative;
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* This section scrolls */
+    min-height: 0; /* Important for flex scroll */
 }
 
 .stats-content::-webkit-scrollbar {
@@ -6019,6 +6026,9 @@ body.translation-mode .skip-btn:hover {
 .missions-modal {
     max-width: 800px;
     max-height: 90vh;
+    /* Enable scrolling */
+    display: flex;
+    flex-direction: column;
     overflow-y: scroll !important; /* Force scroll - temporarily show scrollbar for testing */
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
@@ -6031,14 +6041,10 @@ body.translation-mode .skip-btn:hover {
 
 .missions-content {
     padding: 20px 0;
-    max-height: 70vh;
-    overflow: hidden;
-    -webkit-overflow-scrolling: touch;
-    /* Scroll rules in global section */
-}
-
-.missions-content::-webkit-scrollbar {
-    display: none;
+    /* Allow scrolling within modal */
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* This section scrolls */
+    min-height: 0; /* Important for flex scroll */
 }
 
 .missions-summary {
@@ -7000,9 +7006,11 @@ input:checked + .toggle-slider:before {
 .achievements-container {
     background: white;
     padding: 30px;
-    /* Show all achievements */
+    /* Allow scrolling within modal */
     position: relative;
-    overflow: visible; /* No scroll here - modal handles it */
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* This section scrolls */
+    min-height: 0; /* Important for flex scroll */
     /* Scroll rules in global section */
 }
 
