@@ -594,28 +594,26 @@
 <body>
     <div class="container">
         <!-- Başlık -->
-        <div class="header">
-            <h1>🕌 Hasene Arapça</h1>
-            <button class="settings-btn" id="settingsBtn" style="display: none;">⚙️</button>
+        <div class="header" style="border: 2px dashed #ccc; min-height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <!-- Burası başka bir şey için kullanılacak -->
         </div>
 
         <!-- Ana Menü -->
         <div class="main-menu" id="mainMenu">
-            <h2 style="text-align: center; color: #2D5F3F; margin-bottom: 10px;">Zorluk Seç</h2>
+            <div style="border: 2px dashed #ccc; min-height: 40px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center;">
+                <!-- Burası başka bir şey için kullanılacak -->
+            </div>
             
             <!-- Zorluk Butonları -->
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
-                <button class="diff-btn" id="mainDiffKolay" style="flex: 1; min-width: 100px; max-width: 130px; margin: 0; padding: 12px; font-size: 0.9em;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: nowrap; justify-content: center;">
+                <button class="diff-btn active" id="mainDiffKolay" style="flex: 1; min-width: 90px; max-width: 120px; margin: 0; padding: 10px; font-size: 0.85em;">
                     <strong>😊 Kolay</strong>
                 </button>
-                <button class="diff-btn" id="mainDiffOrta" style="flex: 1; min-width: 100px; max-width: 130px; margin: 0; padding: 12px; font-size: 0.9em;">
+                <button class="diff-btn" id="mainDiffOrta" style="flex: 1; min-width: 90px; max-width: 120px; margin: 0; padding: 10px; font-size: 0.85em;">
                     <strong>😐 Orta</strong>
                 </button>
-                <button class="diff-btn" id="mainDiffZor" style="flex: 1; min-width: 100px; max-width: 130px; margin: 0; padding: 12px; font-size: 0.9em;">
+                <button class="diff-btn" id="mainDiffZor" style="flex: 1; min-width: 90px; max-width: 120px; margin: 0; padding: 10px; font-size: 0.85em;">
                     <strong>😤 Zor</strong>
-                </button>
-                <button class="diff-btn active" id="mainDiffKarisik" style="flex: 1; min-width: 100px; max-width: 130px; margin: 0; padding: 12px; font-size: 0.9em;">
-                    <strong>🎲 Karışık</strong>
                 </button>
             </div>
 
@@ -1134,28 +1132,27 @@
 
         // ============ ANA MENÜ ZORLUK BUTONLARI ============
         function initMainMenuDifficultyButtons() {
+            console.log('🔧 initMainMenuDifficultyButtons çağrıldı');
+            
             document.getElementById('mainDiffKolay').onclick = () => {
+                console.log('✅ KOLAY seçildi');
                 currentDifficulty = 'kolay';
                 document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
                 document.getElementById('mainDiffKolay').classList.add('active');
             };
             
             document.getElementById('mainDiffOrta').onclick = () => {
+                console.log('✅ ORTA seçildi');
                 currentDifficulty = 'orta';
                 document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
                 document.getElementById('mainDiffOrta').classList.add('active');
             };
             
             document.getElementById('mainDiffZor').onclick = () => {
+                console.log('✅ ZOR seçildi');
                 currentDifficulty = 'zor';
                 document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
                 document.getElementById('mainDiffZor').classList.add('active');
-            };
-            
-            document.getElementById('mainDiffKarisik').onclick = () => {
-                currentDifficulty = 'karisik';
-                document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
-                document.getElementById('mainDiffKarisik').classList.add('active');
             };
         }
 
