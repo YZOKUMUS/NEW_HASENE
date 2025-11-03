@@ -1501,14 +1501,53 @@
             sessionCorrect = 0;
             sessionWrong = 0;
             
-            // Local Storage'ı temizle
+            // Rozetleri sıfırla
+            badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
+            
+            // Streak verilerini sıfırla
+            streakData = {
+                currentStreak: 0,
+                playDates: [],
+                dailyGoal: 5,
+                dailyCorrect: 0
+            };
+            
+            // Daily tasks sıfırla
+            dailyTasks = {
+                lastTaskDate: null,
+                tasks: [],
+                bonusTasks: [],
+                completedTasks: [],
+                rewardsClaimed: false,
+                todayStats: {
+                    kelimeCevir: 0,
+                    dinleBul: 0,
+                    boslukDoldur: 0,
+                    ayetOku: 0,
+                    duaOgre: 0,
+                    hadisOku: 0,
+                    toplamDogru: 0,
+                    toplamPuan: 0,
+                    perfectStreak: 0,
+                    farklıZorluk: new Set()
+                }
+            };
+            
+            // Local Storage'ı tamamen temizle
             localStorage.removeItem('hasene_totalPoints');
+            localStorage.removeItem('hasene_badges');
+            localStorage.removeItem('hasene_streak');
+            localStorage.removeItem('hasene_dailyTasks');
+            
+            // Yeni günlük görevler oluştur
+            generateDailyTasks(new Date().toISOString().split('T')[0]);
             
             // Ekranı güncelle
             updateStatsBar();
             updateUI();
             
-            console.log('✅ Tüm istatistikler sıfırlandı!');
+            console.log('✅ Tüm veriler sıfırlandı! Fresh start hazır!');
+            alert('🔄 Tüm veriler sıfırlandı! Oyuna sıfırdan başlayabilirsin.');
         }
 
         function updateStatsBar() {
@@ -3252,6 +3291,9 @@
         };
 
         // ============ OYUNU BAŞLAT ============
+        // TEK SEFERLIK TEST: Tüm verileri sıfırla
+        resetAllStats();
+        
         loadData();
         updateStatsBar(); // İstatistik barını initialize et
             // Global debug fonksiyonu - console'dan çağırılabilir
@@ -3302,6 +3344,7 @@
                 saveStats(); 
                 console.log('🔄 Puanlar sıfırlandı'); 
             };
+            window.resetAllStats = resetAllStats;
 
             // Modal fonksiyonlarını global hale getir
             window.showBadgesModal = showBadgesModal;
