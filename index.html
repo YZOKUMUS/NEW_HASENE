@@ -2274,7 +2274,8 @@
             }
             elements.mainMenu.style.display = 'none';
             elements.duaMode.style.display = 'block';
-            currentDuaIndex = 0;
+            // Rastgele dua ile başla
+            currentDuaIndex = Math.floor(Math.random() * duaData.length);
             showDua();
         };
 
@@ -2286,7 +2287,8 @@
             }
             elements.mainMenu.style.display = 'none';
             elements.ayetMode.style.display = 'block';
-            currentAyetIndex = 0;
+            // Rastgele ayet ile başla
+            currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
             showAyet();
         };
 
@@ -2298,7 +2300,8 @@
             }
             elements.mainMenu.style.display = 'none';
             elements.hadisMode.style.display = 'block';
-            currentHadisIndex = 0;
+            // Rastgele hadis ile başla
+            currentHadisIndex = Math.floor(Math.random() * hadisData.length);
             showHadis();
         };
 
