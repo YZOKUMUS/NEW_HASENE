@@ -1208,6 +1208,8 @@
             rewardsClaimed: false, // Ödül toplandı mı?
             todayStats: {        // Bugünkü oyun istatistikleri
                 kelimeCevir: 0,
+                dinleBul: 0,
+                boslukDoldur: 0,
                 ayetOku: 0,
                 duaOgre: 0,
                 hadisOku: 0,
@@ -1846,7 +1848,9 @@
             const bonusTasksList = [
                 { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 soru çöz', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
                 { id: 'allDiff', name: '3 farklı zorlukta oyna', target: 3, current: 0, type: 'farklıZorluk', reward: 2 },
-                { id: 'hadis1', name: '1 hadis dinle', target: 1, current: 0, type: 'hadisOku', reward: 2 }
+                { id: 'hadis1', name: '1 hadis dinle', target: 1, current: 0, type: 'hadisOku', reward: 2 },
+                { id: 'dinle3', name: '3 kelime dinle', target: 3, current: 0, type: 'dinleBul', reward: 2 },
+                { id: 'bosluk2', name: '2 boşluk doldur', target: 2, current: 0, type: 'boslukDoldur', reward: 2 }
             ];
 
             // Rastgele 2 bonus görev seç
@@ -1859,6 +1863,8 @@
             dailyTasks.rewardsClaimed = false;
             dailyTasks.todayStats = {
                 kelimeCevir: 0,
+                dinleBul: 0,
+                boslukDoldur: 0,
                 ayetOku: 0,
                 duaOgre: 0,
                 hadisOku: 0,
@@ -2356,6 +2362,9 @@
                 console.log(`✅ ${mode.questionsPerLevel} soru tamamlandı!`);
                 console.log(`📊 Final session score: ${sessionScore}`);
                 
+                // Günlük görev ilerlemesini güncelle
+                updateTaskProgress('kelimeCevir', sessionCorrect);
+                
                 // Session puanlarını global'e aktar
                 console.log(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
                 addToGlobalPoints(sessionScore, sessionCorrect);
@@ -2499,6 +2508,9 @@
                 console.log(`💰 Puan hesaplama: ${currentQuestion.difficulty} × ${diffLevel.pointsMultiplier} = ${points} puan`);
                 console.log(`📊 addSessionPoints(${points}) çağrılıyor...`);
                 addSessionPoints(points); // Session puanına ekle
+                
+                // Daily task progress - her doğru cevap için
+                updateTaskProgress('kelimeCevir', 1);
                 console.log(`✅ Doğru cevap işlemi tamamlandı!`);
                 
                 updateUI();
@@ -2681,6 +2693,9 @@
                 console.log(`📊 Final oyun skorları: dinleScore=${dinleScore}, dinleCorrect=${dinleCorrect}, dinleWrong=${dinleWrong}`);
                 console.log(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
                 
+                // Günlük görev ilerlemesini güncelle
+                updateTaskProgress('dinleBul', sessionCorrect);
+                
                 console.log(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
                 // Session puanlarını global'e aktar
                 addToGlobalPoints(sessionScore, sessionCorrect);
@@ -2815,6 +2830,9 @@
                 
                 console.log(`📊 addSessionPoints(${points}) çağrılıyor...`);
                 addSessionPoints(points); // Session puanına ekle
+                
+                // Daily task progress - her doğru cevap için
+                updateTaskProgress('dinleBul', 1);
                 console.log(`✅ Doğru cevap işlemi tamamlandı!`);
                 console.log(`📊 Sonra - session score: ${sessionScore}, session correct: ${sessionCorrect}`);
             } else {
@@ -2891,6 +2909,9 @@
                 console.log(`✅ ${BOSLUK_MAX_QUESTIONS} soru tamamlandı!`);
                 console.log(`📊 Final oyun skorları: boslukScore=${boslukScore}, boslukCorrect=${boslukCorrect}, boslukWrong=${boslukWrong}`);
                 console.log(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
+                
+                // Günlük görev ilerlemesini güncelle
+                updateTaskProgress('boslukDoldur', sessionCorrect);
                 
                 console.log(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
                 // Session puanlarını global'e aktar
@@ -3034,6 +3055,9 @@
                 
                 console.log(`📊 addSessionPoints(10) çağrılıyor...`);
                 addSessionPoints(10); // Session puanına ekle
+                
+                // Daily task progress - her doğru cevap için
+                updateTaskProgress('boslukDoldur', 1);
                 console.log(`✅ Doğru cevap işlemi tamamlandı!`);
 
                 // Tam ayeti göster
@@ -3108,6 +3132,8 @@
             if (currentDuaIndex > 0) {
                 currentDuaIndex--;
                 showDua();
+                // Daily task progress - dua öğrenme
+                updateTaskProgress('duaOgre', 1);
             }
         };
 
@@ -3115,6 +3141,8 @@
             if (currentDuaIndex < duaData.length - 1) {
                 currentDuaIndex++;
                 showDua();
+                // Daily task progress - dua öğrenme
+                updateTaskProgress('duaOgre', 1);
             }
         };
 
@@ -3159,10 +3187,14 @@
 
         elements.prevAyetBtn.onclick = () => {
             showAyet(); // Rastgele önceki ayet
+            // Daily task progress - ayet okuma
+            updateTaskProgress('ayetOku', 1);
         };
 
         elements.nextAyetBtn.onclick = () => {
             showAyet(); // Rastgele sonraki ayet
+            // Daily task progress - ayet okuma
+            updateTaskProgress('ayetOku', 1);
         };
 
         elements.ayetAudioBtn.onclick = () => {
@@ -3188,10 +3220,14 @@
 
         elements.prevHadisBtn.onclick = () => {
             showHadis(); // Rastgele önceki hadis
+            // Daily task progress - hadis okuma
+            updateTaskProgress('hadisOku', 1);
         };
 
         elements.nextHadisBtn.onclick = () => {
             showHadis(); // Rastgele sonraki hadis
+            // Daily task progress - hadis okuma
+            updateTaskProgress('hadisOku', 1);
         };
 
         // ============ OYUNU BAŞLAT ============
