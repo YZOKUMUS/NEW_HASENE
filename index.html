@@ -627,9 +627,9 @@
             width: 100%;
             background: #F4C430;
             border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.1em;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
             cursor: pointer;
         }
     </style>
@@ -713,8 +713,6 @@
                 </button>
             </div>
 
-            <h2 style="text-align: center; color: #2D5F3F; margin-bottom: 15px;">Oyun Modu Seç</h2>
-            
             <button class="menu-item" id="kelimeCevirBtn" style="margin-bottom: 10px; padding: 12px; background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%); color: #8b4513; box-shadow: 0 4px 15px rgba(255,215,0,0.4); border: 2px solid #daa520;">
                 <div class="menu-icon" style="font-size: 1.8em; margin-bottom: 3px;">📚</div>
                 <div class="menu-title" style="font-size: 1em; font-weight: bold;">Kelime Çevir</div>
@@ -756,7 +754,6 @@
         <div class="mode-selector" id="modeSelector" style="display: none;">
             <button class="back-btn" id="backToMenuBtn">← Geri</button>
             
-            <h3>📚 Kelime Çevir - Oyun Modu Seç</h3>
             <div id="modeButtons"></div>
             
             <button class="start-btn" id="startBtn">Oyunu Başlat</button>
@@ -943,37 +940,37 @@
         <div class="modal-content" style="max-width: 400px; max-height: 80vh; overflow-y: auto;">
             <h3 style="margin: 15px 0 10px 0; font-size: 1.3em;">🏆 Başarılarınız</h3>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
                 <!-- Elmas -->
-                <div style="text-align: center; padding: 15px; border-radius: 12px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);">
-                    <div style="font-size: 2em;">💎</div>
-                    <div style="font-weight: bold; margin: 5px 0;">Elmas</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
-                    <div style="font-size: 0.8em; color: #666;">5 Altın = 1 Elmas</div>
+                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);">
+                    <div style="font-size: 1.2em;">💎</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Elmas</div>
+                    <div style="font-size: 1em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Altın = 1 Elmas</div>
                 </div>
                 
                 <!-- Altın -->
-                <div style="text-align: center; padding: 15px; border-radius: 12px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
-                    <div style="font-size: 2em;">🥇</div>
-                    <div style="font-weight: bold; margin: 5px 0;">Altın</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
-                    <div style="font-size: 0.8em; color: #666;">5 Gümüş = 1 Altın</div>
+                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
+                    <div style="font-size: 1.2em;">🥇</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Altın</div>
+                    <div style="font-size: 1em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Gümüş = 1 Altın</div>
                 </div>
                 
                 <!-- Gümüş -->
-                <div style="text-align: center; padding: 15px; border-radius: 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);">
-                    <div style="font-size: 2em;">🥈</div>
-                    <div style="font-weight: bold; margin: 5px 0;">Gümüş</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
-                    <div style="font-size: 0.8em; color: #666;">5 Bronz = 1 Gümüş</div>
+                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);">
+                    <div style="font-size: 1.2em;">🥈</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Gümüş</div>
+                    <div style="font-size: 1em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Bronz = 1 Gümüş</div>
                 </div>
                 
                 <!-- Bronz -->
-                <div style="text-align: center; padding: 15px; border-radius: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);">
-                    <div style="font-size: 2em;">🥉</div>
-                    <div style="font-weight: bold; margin: 5px 0;">Bronz</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
-                    <div style="font-size: 0.8em; color: #666;">5 Yıldız = 1 Bronz</div>
+                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);">
+                    <div style="font-size: 1.2em;">🥉</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Bronz</div>
+                    <div style="font-size: 1em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Yıldız = 1 Bronz</div>
                 </div>
             </div>
             
@@ -1025,7 +1022,7 @@
                 <div style="font-weight: bold; margin-bottom: 4px; color: #2e7d2e; font-size: 0.8em;">🎯 Bugünkü Hedefin</div>
                 <div style="font-size: 0.7em; color: #666;">5 doğru cevap vererek günü tamamla!</div>
                 <div style="margin-top: 4px; font-size: 0.8em;">
-                    <span id="todayProgress">0</span>/5 ✅
+                    <span id="todayProgress">0</span>/5 <span id="todayProgressIcon">⏳</span>
                 </div>
             </div>
             
@@ -1925,6 +1922,28 @@
             // Günlük ilerleme güncelle
             streakData.todayProgress += correctAnswers;
             
+            // Takvim açıksa bugünkü hedefi gerçek zamanlı güncelle
+            const todayProgressElement = document.getElementById('todayProgress');
+            const todayProgressIconElement = document.getElementById('todayProgressIcon');
+            
+            if (todayProgressElement) {
+                const currentProgress = Math.min(streakData.todayProgress, streakData.dailyGoal);
+                todayProgressElement.textContent = currentProgress;
+                
+                // İlerlemeye göre dinamik emoji
+                if (todayProgressIconElement) {
+                    if (currentProgress >= 5) {
+                        todayProgressIconElement.textContent = '✅'; // Tamamlandı
+                    } else if (currentProgress >= 3) {
+                        todayProgressIconElement.textContent = '🔥'; // İyi gidiyor  
+                    } else if (currentProgress >= 1) {
+                        todayProgressIconElement.textContent = '💪'; // Başlamış
+                    } else {
+                        todayProgressIconElement.textContent = '⏳'; // Henüz başlamamış
+                    }
+                }
+            }
+            
             // Günlük hedef tamamlandı mı?
             if (streakData.todayProgress >= streakData.dailyGoal && streakData.lastPlayDate !== today) {
                 // İlk defa bugün hedefi tamamladı
@@ -1959,7 +1978,23 @@
             document.getElementById('currentStreak').textContent = streakData.currentStreak;
             document.getElementById('totalPlayDays').textContent = streakData.totalPlayDays;
             document.getElementById('bestStreak').textContent = streakData.bestStreak;
-            document.getElementById('todayProgress').textContent = Math.min(streakData.todayProgress, streakData.dailyGoal);
+            
+            const currentProgress = Math.min(streakData.todayProgress, streakData.dailyGoal);
+            document.getElementById('todayProgress').textContent = currentProgress;
+            
+            // İlerlemeye göre dinamik emoji
+            const todayProgressIconElement = document.getElementById('todayProgressIcon');
+            if (todayProgressIconElement) {
+                if (currentProgress >= 5) {
+                    todayProgressIconElement.textContent = '✅'; // Tamamlandı
+                } else if (currentProgress >= 3) {
+                    todayProgressIconElement.textContent = '🔥'; // İyi gidiyor  
+                } else if (currentProgress >= 1) {
+                    todayProgressIconElement.textContent = '💪'; // Başlamış
+                } else {
+                    todayProgressIconElement.textContent = '⏳'; // Henüz başlamamış
+                }
+            }
             
             // Takvimi oluştur
             generateCalendar();
