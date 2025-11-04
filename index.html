@@ -987,41 +987,41 @@
 
     <!-- Takvim Modal -->
     <div class="modal" id="calendarModal">
-        <div class="modal-content" style="max-width: 400px; max-height: 85vh; overflow-y: auto;">
-            <h3 style="margin: 12px 0 8px 0; font-size: 1.1em;">📅 Günlük Takip</h3>
+        <div class="modal-content" style="max-width: 320px; max-height: 80vh; overflow-y: auto; padding: 20px;">
+            <h3 style="margin: 10px 0 6px 0; font-size: 1em;">📅 Günlük Takip</h3>
             
             <!-- Streak Bilgisi -->
-            <div style="text-align: center; margin: 12px 0; padding: 8px; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-radius: 6px; color: white;">
-                <span style="font-size: 1em;">🔥</span>
-                <span style="font-size: 1.1em; font-weight: bold; margin: 0 6px;" id="currentStreak">0</span>
-                <span style="font-size: 0.75em;">Ardışık Gün</span>
+            <div style="text-align: center; margin: 10px 0; padding: 6px; background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%); border-radius: 5px; color: white;">
+                <span style="font-size: 0.9em;">🔥</span>
+                <span style="font-size: 1em; font-weight: bold; margin: 0 5px;" id="currentStreak">0</span>
+                <span style="font-size: 0.7em;">Ardışık Gün</span>
             </div>
             
             <!-- İstatistikler -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0;">
-                <div style="text-align: center; padding: 8px; background: #f5f5f5; border-radius: 6px;">
-                    <div style="font-size: 1em; font-weight: bold; color: #4caf50;" id="totalPlayDays">0</div>
-                    <div style="font-size: 0.7em; color: #666;">Toplam Oyun Günü</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0;">
+                <div style="text-align: center; padding: 6px; background: #f5f5f5; border-radius: 5px;">
+                    <div style="font-size: 0.9em; font-weight: bold; color: #4caf50;" id="totalPlayDays">0</div>
+                    <div style="font-size: 0.65em; color: #666;">Toplam Oyun Günü</div>
                 </div>
-                <div style="text-align: center; padding: 8px; background: #f5f5f5; border-radius: 6px;">
-                    <div style="font-size: 1em; font-weight: bold; color: #2196f3;" id="bestStreak">0</div>
-                    <div style="font-size: 0.7em; color: #666;">En İyi Streak</div>
+                <div style="text-align: center; padding: 6px; background: #f5f5f5; border-radius: 5px;">
+                    <div style="font-size: 0.9em; font-weight: bold; color: #2196f3;" id="bestStreak">0</div>
+                    <div style="font-size: 0.65em; color: #666;">En İyi Streak</div>
                 </div>
             </div>
             
             <!-- Mini Takvim -->
-            <div style="background: white; border: 2px solid #e0e0e0; border-radius: 8px; padding: 12px; margin: 12px 0;">
-                <div style="text-align: center; font-weight: bold; margin-bottom: 8px; font-size: 0.9em;" id="calendarMonth">Kasım 2025</div>
-                <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;">
+            <div style="background: white; border: 2px solid #e0e0e0; border-radius: 6px; padding: 10px; margin: 10px 0;">
+                <div style="text-align: center; font-weight: bold; margin-bottom: 6px; font-size: 0.85em;" id="calendarMonth">Kasım 2025</div>
+                <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;">
                     <!-- Takvim günleri buraya eklenecek -->
                 </div>
             </div>
             
             <!-- Bugünkü Hedef -->
-            <div style="background: #e8f5e8; border-radius: 6px; padding: 8px; margin: 12px 0;">
-                <div style="font-weight: bold; margin-bottom: 4px; color: #2e7d2e; font-size: 0.8em;">🎯 Bugünkü Hedefin</div>
-                <div style="font-size: 0.7em; color: #666;">5 doğru cevap vererek günü tamamla!</div>
-                <div style="margin-top: 4px; font-size: 0.8em;">
+            <div style="background: #e8f5e8; border-radius: 5px; padding: 6px; margin: 10px 0;">
+                <div style="font-weight: bold; margin-bottom: 3px; color: #2e7d2e; font-size: 0.75em;">🎯 Bugünkü Hedefin</div>
+                <div style="font-size: 0.65em; color: #666;">5 doğru cevap vererek günü tamamla!</div>
+                <div style="margin-top: 3px; font-size: 0.75em;">
                     <span id="todayProgress">0</span>/5 <span id="todayProgressIcon">⏳</span>
                 </div>
             </div>
