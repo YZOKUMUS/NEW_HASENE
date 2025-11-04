@@ -3570,14 +3570,14 @@
                 console.log('🚀 Veri sistemi başlatılıyor...');
                 
                 // IndexedDB başlat (çerez engellemelerinden etkilenmez)
-                initIndexedDB().then(() => {
+                initIndexedDB().then(async () => {
                     console.log('✅ IndexedDB hazır!');
-                    loadStats(); // Verileri yükle (IndexedDB öncelikli)
+                    await loadStats(); // Verileri yükle (IndexedDB öncelikli) - AWAIT EKLENDİ!
                     updateStatsBar();
                     console.log('💾 Veriler yüklendi:', totalPoints, 'puan');
-                }).catch(error => {
+                }).catch(async (error) => {
                     console.error('❌ IndexedDB hatası, localStorage kullanılıyor:', error);
-                    loadStats(); // Fallback olarak localStorage
+                    await loadStats(); // Fallback olarak localStorage - AWAIT EKLENDİ!
                     updateStatsBar();
                 });
             } catch (error) {
