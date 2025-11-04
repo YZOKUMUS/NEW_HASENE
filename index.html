@@ -379,7 +379,7 @@
         .options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;  /* Azaltıldı: 10px → 6px */
         }
 
         .option {   /* Tek bir seçenek butonu */
@@ -663,10 +663,14 @@
             }
 
             /* Seçenekler mobilde daha rahat */
+            .options {
+                gap: 8px;  /* Mobilde biraz daha fazla boşluk */
+            }
+
             .option {
                 font-size: 18px;
                 padding: 18px 15px;
-                margin: 8px 0;
+                margin: 0;  /* Gap kullandığımız için margin kaldırıldı */
             }
 
             /* Butonlar mobilde daha büyük */
@@ -707,6 +711,10 @@
             .arabic {
                 font-size: 32px;  /* Çok küçük ekranlarda daha da büyük */
                 margin: 30px 0;
+            }
+
+            .options {
+                gap: 10px;  /* Çok küçük ekranlarda normale yakın boşluk */
             }
 
             .option {
