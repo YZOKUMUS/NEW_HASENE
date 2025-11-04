@@ -689,7 +689,7 @@
                     Başarılar
                 </button>
                 
-                <button class="top-btn" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border: none; border-radius: 12px; padding: 12px; font-size: 0.9em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 3px 10px rgba(168,237,234,0.4); cursor: pointer;" onclick="alert('İstatistikler - Yakında!')">
+                <button class="top-btn" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border: none; border-radius: 12px; padding: 12px; font-size: 0.9em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 3px 10px rgba(168,237,234,0.4); cursor: pointer;" onclick="showStatsModal()">
                     <span style="font-size: 1.2em;">📊</span>
                     İstatistikler
                 </button>
@@ -1074,6 +1074,183 @@
             </div>
 
             <button class="modal-btn" onclick="closeDailyTasksModal()">Kapat</button>
+        </div>
+    </div>
+
+    <!-- İstatistikler Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content" style="max-width: 500px; max-height: 85vh; overflow-y: auto;">
+            <h3 style="margin: 15px 0 12px 0; font-size: 1.2em; text-align: center;">📊 Oyun İstatistikleri</h3>
+            
+            <!-- Genel Özet -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin: 12px 0; text-align: center;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center; margin-bottom: 15px;">
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold;" id="statsLevel">1</div>
+                        <div style="font-size: 0.8em; opacity: 0.9;">Seviye</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold;" id="statsPoints">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.9;">Toplam Puan</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.8em; font-weight: bold;" id="statsStars">0</div>
+                        <div style="font-size: 0.8em; opacity: 0.9;">⭐ Yıldız</div>
+                    </div>
+                </div>
+                
+                <!-- Seviye İlerleme Barı -->
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 6px; opacity: 0.9;">
+                        <span>Seviye <span id="statsCurrentLevel">1</span></span>
+                        <span>Seviye <span id="statsNextLevel">2</span></span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="statsLevelProgress" style="background: rgba(255,255,255,0.9); height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                    </div>
+                    <div style="font-size: 0.75em; margin-top: 4px; opacity: 0.8;">
+                        <span id="statsLevelPointsNeeded">0</span> puan daha
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rozet Sistemi -->
+            <div style="background: #f8f9ff; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #2d5f3f; font-size: 1em;">🏆 Rozetler</h4>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+                    <div style="padding: 8px; background: white; border-radius: 6px; border: 2px solid #f1c40f;">
+                        <div style="font-size: 1.5em;">🥉</div>
+                        <div style="font-size: 0.7em; color: #666;">Bronz</div>
+                        <div style="font-weight: bold; font-size: 0.9em;" id="statsBronze">0</div>
+                    </div>
+                    <div style="padding: 8px; background: white; border-radius: 6px; border: 2px solid #95a5a6;">
+                        <div style="font-size: 1.5em;">🥈</div>
+                        <div style="font-size: 0.7em; color: #666;">Gümüş</div>
+                        <div style="font-weight: bold; font-size: 0.9em;" id="statsSilver">0</div>
+                    </div>
+                    <div style="padding: 8px; background: white; border-radius: 6px; border: 2px solid #f39c12;">
+                        <div style="font-size: 1.5em;">🥇</div>
+                        <div style="font-size: 0.7em; color: #666;">Altın</div>
+                        <div style="font-weight: bold; font-size: 0.9em;" id="statsGold">0</div>
+                    </div>
+                    <div style="padding: 8px; background: white; border-radius: 6px; border: 2px solid #9b59b6;">
+                        <div style="font-size: 1.5em;">💎</div>
+                        <div style="font-size: 0.7em; color: #666;">Elmas</div>
+                        <div style="font-weight: bold; font-size: 0.9em;" id="statsDiamond">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Başarı Analizi -->
+            <div style="background: #f0f8ff; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #2980b9; font-size: 1em;">📈 Başarı Analizi</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #27ae60;" id="statsSuccessRate">0%</div>
+                        <div style="font-size: 0.8em; color: #666;">Başarı Oranı</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #3498db;" id="statsAvgPointsPerDay">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Günlük Ort. Puan</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsPlayConsistency">0%</div>
+                        <div style="font-size: 0.8em; color: #666;">Oyun Tutarlılığı</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #9b59b6;" id="statsLevelProgress">0%</div>
+                        <div style="font-size: 0.8em; color: #666;">Seviye İlerlemesi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streak Bilgileri -->
+            <div style="background: #fff7e6; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #d68910; font-size: 1em;">🔥 Streak İstatistikleri</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsCurrentStreak">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Mevcut Streak</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsBestStreak">0</div>
+                        <div style="font-size: 0.8em; color: #666;">En İyi Streak</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #27ae60;" id="statsTotalDays">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Toplam Oyun Günü</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #3498db;" id="statsTodayProgress">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Bugünkü İlerleme</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oyun Türü İstatistikleri -->
+            <div style="background: #f0fff4; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #27ae60; font-size: 1em;">🎮 Oyun Türü İstatistikleri (Bugün)</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.85em;">
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>📚 Kelime Çevir:</span>
+                        <strong id="statsKelimeCevir">0</strong>
+                    </div>
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>🎧 Dinle & Bul:</span>
+                        <strong id="statsDinleBul">0</strong>
+                    </div>
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>📝 Boşluk Doldur:</span>
+                        <strong id="statsBoslukDoldur">0</strong>
+                    </div>
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>📖 Ayet Oku:</span>
+                        <strong id="statsAyetOku">0</strong>
+                    </div>
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>🤲 Dua Öğren:</span>
+                        <strong id="statsDuaOgre">0</strong>
+                    </div>
+                    <div style="padding: 6px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
+                        <span>📜 Hadis Oku:</span>
+                        <strong id="statsHadisOku">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bugünkü Toplam İstatistikler -->
+            <div style="background: #fef9e7; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                <h4 style="margin: 0 0 8px 0; color: #b7950b; font-size: 1em;">⚡ Bugünkü Performans</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #27ae60;" id="statsTodayCorrect">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Toplam Doğru</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #f39c12;" id="statsTodayPoints">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Toplam Puan</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #e74c3c;" id="statsPerfectStreak">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Mükemmel Seri</div>
+                    </div>
+                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+                        <div style="font-size: 1.3em; font-weight: bold; color: #8e44ad;" id="statsDifficultyCount">0</div>
+                        <div style="font-size: 0.8em; color: #666;">Farklı Zorluk</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İstatistik Sıfırlama Uyarısı -->
+            <div style="background: #ffebee; padding: 10px; border-radius: 6px; margin: 12px 0; border-left: 4px solid #f44336;">
+                <div style="font-size: 0.85em; color: #c62828; margin-bottom: 8px;">⚠️ Dikkat: Tüm istatistikleri sıfırlamak istiyorsan:</div>
+                <button onclick="confirmResetStats()" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; cursor: pointer;">
+                    🔄 Tüm İstatistikleri Sıfırla
+                </button>
+            </div>
+
+            <!-- Kapat Butonu -->
+            <button class="modal-btn" onclick="closeStatsModal()">Kapat</button>
         </div>
     </div>
 
@@ -1889,6 +2066,120 @@
         function closeBadgesModal() {
             document.getElementById('badgesModal').style.display = 'none';
         }
+
+        // ============ İSTATİSTİKLER SİSTEMİ ============
+        function showStatsModal() {
+            // Genel istatistikleri güncelle
+            document.getElementById('statsLevel').textContent = level;
+            document.getElementById('statsPoints').textContent = totalPoints.toLocaleString();
+            document.getElementById('statsStars').textContent = starPoints;
+            
+            // Seviye ilerleme barını hesapla
+            let currentLevelStart, nextLevelStart;
+            const nextLevel = level + 1;
+            
+            if (level === 1) {
+                currentLevelStart = 0;
+                nextLevelStart = 1000;
+            } else if (level <= 10) {
+                const thresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
+                currentLevelStart = thresholds[level - 1];
+                nextLevelStart = thresholds[level] || (58000 + ((level - 10) * 15000));
+            } else {
+                // Level 10'dan sonra
+                currentLevelStart = 58000 + ((level - 11) * 15000);
+                nextLevelStart = 58000 + ((level - 10) * 15000);
+            }
+            
+            const currentLevelPoints = totalPoints - currentLevelStart;
+            const levelRequiredPoints = nextLevelStart - currentLevelStart;
+            const progressPercentage = Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100));
+            const pointsNeeded = Math.max(0, nextLevelStart - totalPoints);
+            
+            document.getElementById('statsCurrentLevel').textContent = level;
+            document.getElementById('statsNextLevel').textContent = nextLevel;
+            document.getElementById('statsLevelProgress').style.width = progressPercentage + '%';
+            document.getElementById('statsLevelPointsNeeded').textContent = pointsNeeded.toLocaleString();
+            
+            // Rozet sayılarını güncelle
+            document.getElementById('statsBronze').textContent = badges.bronze;
+            document.getElementById('statsSilver').textContent = badges.silver;
+            document.getElementById('statsGold').textContent = badges.gold;
+            document.getElementById('statsDiamond').textContent = badges.diamond;
+            
+            // Başarı analizi hesapla
+            const totalGameActions = dailyTasks.todayStats.kelimeCevir + dailyTasks.todayStats.dinleBul + 
+                                   dailyTasks.todayStats.boslukDoldur + dailyTasks.todayStats.ayetOku + 
+                                   dailyTasks.todayStats.duaOgre + dailyTasks.todayStats.hadisOku;
+            
+            const successRate = totalGameActions > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalGameActions) * 100) : 0;
+            const avgPointsPerDay = streakData.totalPlayDays > 0 ? Math.round(totalPoints / streakData.totalPlayDays) : totalPoints;
+            const playConsistency = Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100);
+            const levelProgressPercent = Math.round(progressPercentage);
+            
+            document.getElementById('statsSuccessRate').textContent = successRate + '%';
+            document.getElementById('statsAvgPointsPerDay').textContent = avgPointsPerDay.toLocaleString();
+            document.getElementById('statsPlayConsistency').textContent = Math.min(100, playConsistency) + '%';
+            document.getElementById('statsLevelProgress').textContent = levelProgressPercent + '%';
+            
+            // Streak bilgilerini güncelle
+            document.getElementById('statsCurrentStreak').textContent = streakData.currentStreak;
+            document.getElementById('statsBestStreak').textContent = streakData.bestStreak;
+            document.getElementById('statsTotalDays').textContent = streakData.totalPlayDays;
+            document.getElementById('statsTodayProgress').textContent = Math.min(streakData.todayProgress, streakData.dailyGoal) + '/' + streakData.dailyGoal;
+            
+            // Bugünkü oyun türü istatistikleri
+            document.getElementById('statsKelimeCevir').textContent = dailyTasks.todayStats.kelimeCevir;
+            document.getElementById('statsDinleBul').textContent = dailyTasks.todayStats.dinleBul;
+            document.getElementById('statsBoslukDoldur').textContent = dailyTasks.todayStats.boslukDoldur;
+            document.getElementById('statsAyetOku').textContent = dailyTasks.todayStats.ayetOku;
+            document.getElementById('statsDuaOgre').textContent = dailyTasks.todayStats.duaOgre;
+            document.getElementById('statsHadisOku').textContent = dailyTasks.todayStats.hadisOku;
+            
+            // Bugünkü performans
+            document.getElementById('statsTodayCorrect').textContent = dailyTasks.todayStats.toplamDogru;
+            document.getElementById('statsTodayPoints').textContent = dailyTasks.todayStats.toplamPuan;
+            document.getElementById('statsPerfectStreak').textContent = dailyTasks.todayStats.perfectStreak;
+            document.getElementById('statsDifficultyCount').textContent = dailyTasks.todayStats.farklıZorluk.size;
+            
+            // Modal'ı göster
+            document.getElementById('statsModal').style.display = 'flex';
+            
+            console.log('📊 İstatistikler modalı açıldı');
+        }
+
+        function getDaysFromFirstPlay() {
+            if (streakData.playDates.length === 0) return 1;
+            
+            const firstPlayDate = new Date(streakData.playDates[0]);
+            const today = new Date();
+            const diffTime = Math.abs(today - firstPlayDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return Math.max(1, diffDays);
+        }
+        
+        function closeStatsModal() {
+            document.getElementById('statsModal').style.display = 'none';
+        }
+        
+        function confirmResetStats() {
+            const confirmed = confirm('🚨 DİKKAT!\n\nTüm oyun verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm rozetler (silinir)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük görevler (yenilenir)\n• Tüm istatistikler (temizlenir)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
+            
+            if (confirmed) {
+                // İkinci onay
+                const doubleConfirmed = confirm('🔥 SON UYARI!\n\nGerçekten TÜM VERİLERİ sıfırlamak istiyor musun?\n\nBu işlemden sonra oyuna sıfırdan başlayacaksın!\n\n✅ EVET = Sıfırla\n❌ HAYIR = İptal et');
+                
+                if (doubleConfirmed) {
+                    closeStatsModal(); // Modal'ı kapat
+                    resetAllStats(); // Mevcut fonksiyonu kullan
+                }
+            }
+        }
+
+        // Global fonksiyonlar (window'a ekle)
+        window.showStatsModal = showStatsModal;
+        window.closeStatsModal = closeStatsModal;
+        window.confirmResetStats = confirmResetStats;
 
         // ============ TAKVİM SİSTEMİ ============
         function checkDailyProgress() {
