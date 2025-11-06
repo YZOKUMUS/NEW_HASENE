@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hasene Arapça Oyunu</title>
     
     <!-- PWA Manifest -->
@@ -41,6 +41,10 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             padding: 10px;
+            padding-top: max(10px, env(safe-area-inset-top));
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            padding-left: max(10px, env(safe-area-inset-left));
+            padding-right: max(10px, env(safe-area-inset-right));
             position: relative;
             overflow-x: hidden;
             display: flex;
@@ -100,13 +104,14 @@
             width: 180px;
             height: 180px;
             margin-bottom: 30px;
-            animation: pulse 2s ease-in-out infinite;
+            animation: pulse 3s ease-in-out infinite;
             filter: drop-shadow(0 0 30px rgba(244, 196, 48, 0.5));
+            will-change: transform;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.02); }
         }
 
         .loading-title {
@@ -1334,13 +1339,28 @@
                 transform: scale(1); 
             }
             50% { 
-                box-shadow: 0 0 20px rgba(52,152,219,0.8); 
-                transform: scale(1.05); 
+                box-shadow: 0 0 16px rgba(52,152,219,0.7); 
+                transform: scale(1.02); 
             }
             100% { 
                 box-shadow: 0 0 8px rgba(52,152,219,0.5); 
                 transform: scale(1); 
             }
+        }
+
+        /* GPU hızlandırması için animasyonlu elementler */
+        [style*="animation"] {
+            will-change: transform, box-shadow;
+            transform: translateZ(0); /* Hardware acceleration trigger */
+        }
+
+        /* Performans optimizasyonu */
+        * {
+            scroll-behavior: auto !important; /* Smooth scroll'u devre dışı bırak */
+        }
+
+        body {
+            overflow-anchor: auto; /* Chrome'da scroll anchor'ı optimize et */
         }
         
         @keyframes slideDown {
@@ -1843,18 +1863,18 @@
             </div>
             
             <!-- Haftalık Streak Gösterimi -->
-            <div id="weeklyStreakDisplay" style="margin: 20px 0;">
+            <div id="weeklyStreakDisplay" style="margin: 15px 0; padding: 0 5px;">
                 <!-- Bu alan JavaScript ile doldurulacak -->
             </div>
             
             <!-- Aylık Takvim Bölümü -->
-            <div style="margin: 25px 0; background: rgba(44, 62, 80, 0.3); border-radius: 12px; padding: 20px;">
+            <div style="margin: 20px 0; background: rgba(44, 62, 80, 0.3); border-radius: 12px; padding: 15px;">
                 <!-- Başlık kaldırıldı -->
                 
                 <!-- Mini Takvim -->
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 15px;">
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 0.9em; color: #ecf0f1;" id="calendarMonth">Kasım 2025</div>
-                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center;">
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px;">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 1em; color: #ecf0f1;" id="calendarMonth">Kasım 2025</div>
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; max-width: 100%;">
                         <!-- Takvim günleri buraya eklenecek -->
                     </div>
                     
@@ -2739,7 +2759,7 @@
                 return;
             }
             
-            console.log('✅ Kelime listesi gösteriliyor, toplam:', filteredStats.length, 'kelime');
+            // console.log('✅ Kelime listesi gösteriliyor, toplam:', filteredStats.length, 'kelime');
             listContainer.innerHTML = filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
                 const masteryColor = item.masteryLevel >= 3 ? '#27ae60' : item.masteryLevel >= 1.5 ? '#f39c12' : '#e74c3c';
                 const masteryText = item.masteryLevel >= 3 ? 'Öğrenildi' : item.masteryLevel >= 1.5 ? 'Öğreniliyor' : 'Zorlanıyor';
@@ -2801,7 +2821,7 @@
         function saveWordStats(wordStats) {
             try {
                 localStorage.setItem('hasene_wordStats', JSON.stringify(wordStats));
-                console.log('💾 Kelime istatistikleri kaydedildi');
+                // console.log('💾 Kelime istatistikleri kaydedildi');
             } catch (error) {
                 console.error('📊 Kelime istatistikleri kaydedilirken hata:', error);
             }
@@ -2898,7 +2918,7 @@
             for (const item of wordsWithPriority) {
                 random -= item.priority;
                 if (random <= 0) {
-                    console.log(`🎯 Seçilen kelime: ${item.word.kelime} (öncelik: ${item.priority.toFixed(2)})`);
+                    // console.log(`🎯 Seçilen kelime: ${item.word.kelime} (öncelik: ${item.priority.toFixed(2)})`);
                     return item.word;
                 }
             }
@@ -2911,7 +2931,7 @@
         
         // DOM yüklendikten sonra çalıştır
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM yüklendi, oyun başlatılıyor...');
+            // console.log('🚀 DOM yüklendi, oyun başlatılıyor...');
             
             // Daily Goal'u başlat
             if (!localStorage.getItem('dailyGoalXP')) {
@@ -3954,7 +3974,14 @@
                 const comboBonus = 5;
                 totalPoints += comboBonus;
                 dailyTasks.todayStats.toplamPuan += comboBonus; // Bugünkü puana da ekle!
+                
+                // COMBO BONUSUNU DAILY XP'YE DE EKLE
+                addDailyXP(comboBonus);
+                
                 log.game(`🔥 Combo bonusu: +${comboBonus} XP`);
+                
+                // COMBO BONUS SONRASI HEMEN UI GÜNCELLE
+                updateStatsBar(); // Üst barı hemen güncelle
             }
             
             // Geriye uyumluluk için eski değişkenleri de güncelle
@@ -4322,7 +4349,7 @@
             // Son 7 günü hesapla
             const today = new Date();
             const weekDays = [];
-            const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+            const dayNames = ['Pz', 'Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct'];
             
             // Son 7 günü geriye doğru hesapla
             for (let i = 6; i >= 0; i--) {
@@ -4342,16 +4369,19 @@
             // HTML oluştur
             let html = '';
             
+            // Container wrapper
+            html += '<div style="display: flex; flex-direction: column; gap: 8px; max-width: 100%; margin: 0 auto;">';
+            
             // Gün isimleri
-            html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">';
+            html += '<div style="display: flex; justify-content: space-evenly; align-items: center;">';
             weekDays.forEach(day => {
                 const dayColor = day.isToday ? '#f39c12' : '#7f8c8d';
-                html += `<div style="text-align: center; font-size: 0.9em; color: ${dayColor}; font-weight: ${day.isToday ? 'bold' : 'normal'}; min-width: 50px;">${day.dayName}</div>`;
+                html += `<div style="text-align: center; font-size: 0.75em; color: ${dayColor}; font-weight: ${day.isToday ? 'bold' : 'normal'}; width: 42px;">${day.dayName}</div>`;
             });
             html += '</div>';
             
             // Streak gösterimi
-            html += '<div style="display: flex; justify-content: space-between; gap: 8px;">';
+            html += '<div style="display: flex; justify-content: space-evenly; align-items: center;">';
             weekDays.forEach(day => {
                 const hasPlayed = playDatesSet.has(day.dateStr);
                 let circleStyle = '';
@@ -4360,30 +4390,31 @@
                 if (day.isToday) {
                     if (hasPlayed) {
                         // Bugün oynandı - mavi arka plan, beyaz tick
-                        circleStyle = 'width: 50px; height: 50px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; position: relative;';
+                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
                         iconContent = '✓';
                     } else {
                         // Bugün oynanmadı - gri arka plan
-                        circleStyle = 'width: 50px; height: 50px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; position: relative;';
+                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
                         iconContent = '';
                     }
                 } else {
                     if (hasPlayed) {
                         // Geçmiş günler oynandı - turuncu arka plan, beyaz tick
-                        circleStyle = 'width: 50px; height: 50px; border-radius: 50%; background: #f39c12; display: flex; align-items: center; justify-content: center; position: relative;';
+                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #f39c12; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
                         iconContent = '✓';
                     } else {
                         // Geçmiş günler oynanmadı - gri arka plan
-                        circleStyle = 'width: 50px; height: 50px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; position: relative;';
+                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
                         iconContent = '';
                     }
                 }
                 
                 html += `<div style="${circleStyle}">
-                    <span style="color: white; font-size: 1.4em; font-weight: bold;">${iconContent}</span>
+                    <span style="color: white; font-size: 1.3em; font-weight: bold;">${iconContent}</span>
                 </div>`;
             });
-            html += '</div>';
+            html += '</div>'; // Streak gösterimi kapanış
+            html += '</div>'; // Container wrapper kapanış
             
             // HTML'i yerleştir
             document.getElementById('weeklyStreakDisplay').innerHTML = html;
@@ -4411,7 +4442,7 @@
             // Haftanın günlerini ekle (daha kısa isimler + küçük font)
             const dayNames = ['Pz', 'Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct'];
             dayNames.forEach(day => {
-                html += `<div style="font-weight: 600; font-size: 0.7em; color: #95a5a6; padding: 4px; text-align: center;">${day}</div>`;
+                html += `<div style="font-weight: 600; font-size: 0.65em; color: #95a5a6; padding: 3px; text-align: center; height: 20px; display: flex; align-items: center; justify-content: center;">${day}</div>`;
             });
             
             // Ayın ilk gününün haftanın hangi günü olduğunu bul
@@ -4443,7 +4474,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 
-                let style = 'padding: 8px 4px; border-radius: 50%; cursor: pointer; font-size: 0.75em; min-height: 32px; display: flex; align-items: center; justify-content: center; color: #ecf0f1;';
+                let style = 'padding: 6px 3px; border-radius: 50%; cursor: pointer; font-size: 0.7em; min-height: 28px; max-height: 32px; display: flex; align-items: center; justify-content: center; color: #ecf0f1; flex-direction: column;';
                 
                 let dayContent = day;
                 let tooltip = dateStr;
@@ -4455,7 +4486,7 @@
                         dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.2em;">✅</div>`;
                         tooltip = `${dateStr} - Bugün tamamlandı!`;
                     } else {
-                        style += ' background: #3498db; color: white; font-weight: bold; box-shadow: 0 0 8px rgba(52,152,219,0.5); animation: pulse 2s infinite;';
+                        style += ' background: #3498db; color: white; font-weight: bold; box-shadow: 0 0 8px rgba(52,152,219,0.5); animation: pulse 3s infinite;';
                         dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.2em;">🎯</div>`;
                         tooltip = `${dateStr} - Bugün (henüz oynanmadı)`;
                     }
@@ -5493,11 +5524,19 @@
         function startTimer(seconds) {
             stopTimer();
             timeLeft = seconds;
-            elements.timer.textContent = timeLeft;
+            
+            // Timer elementini kontrol et
+            if (elements.timer) {
+                elements.timer.textContent = timeLeft;
+            }
             
             timer = setInterval(() => {
                 timeLeft--;
-                elements.timer.textContent = timeLeft;
+                
+                // Timer elementini sadece varsa güncelle
+                if (elements.timer) {
+                    elements.timer.textContent = timeLeft;
+                }
                 
                 if (timeLeft <= 0) {
                     stopTimer();
@@ -6397,7 +6436,7 @@
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContainer = document.getElementById('mainContainer');
             
-            // 10 saniye sonra loading sayfasını kaldır
+            // 3 saniye sonra loading sayfasını kaldır
             setTimeout(() => {
                 loadingScreen.classList.add('fade-out');
                 
@@ -6405,8 +6444,8 @@
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     mainContainer.style.display = 'block';
-                }, 800); // fade-out süresi
-            }, 10000); // 10 saniye
+                }, 500); // fade-out süresi
+            }, 3000); // 3 saniye
         });
 
 
