@@ -356,7 +356,7 @@ html, body {
     border: 2px solid #E5E5E7;
     border-radius: 16px;
     background: var(--surface);
-    color: var(--text-primary);
+    color: #000000;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
