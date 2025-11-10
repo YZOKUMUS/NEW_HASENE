@@ -25,10 +25,10 @@
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192-v4-RED-MUSHAF.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512-v4-RED-MUSHAF.png">
     
-    <!-- Osmanlı Hafs Hattı Font -->
+    <!-- Uthmani Kur'an Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Material Icons - Preload for better performance -->
     <link rel="preload" href="https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2" as="font" type="font/woff2" crossorigin>
@@ -38,6 +38,15 @@
     <link rel="stylesheet" href="flutter_modern.css">
     
     <style>
+        /* ============ UTHMANI FONT DEFINITION ============ */
+        @font-face {
+            font-family: 'Uthmani';
+            src: url('KFGQPC Uthmanic Script HAFS Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         /* ============ MATERIAL ICONS FALLBACK ============ */
         .material-icons {
             font-family: 'Material Icons', 'Material Icons Fallback', Arial, sans-serif;
@@ -94,130 +103,259 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ============ LOADING SAYFASI ============ */
+        /* ============ LOADING SAYFASI - MODERN GLASS MORPHISM ============ */
         .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, 
+                rgba(183, 28, 28, 0.95) 0%, 
+                rgba(244, 67, 54, 0.98) 25%, 
+                rgba(255, 87, 34, 0.95) 50%,
+                rgba(255, 152, 0, 0.98) 75%,
+                rgba(255, 235, 59, 0.95) 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        .loading-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: particleFloat 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(20px) translateY(-20px) rotate(90deg); }
+            50% { transform: translateX(0) translateY(-40px) rotate(180deg); }
+            75% { transform: translateX(-20px) translateY(-20px) rotate(270deg); }
+            100% { transform: translateX(0) translateY(0) rotate(360deg); }
         }
 
         .loading-screen.fade-out {
-            animation: fadeOut 0.8s ease-out forwards;
+            animation: fadeOut 1.2s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { 
+                opacity: 0; 
+                transform: scale(0.9);
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1);
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            to { 
+                opacity: 0; 
+                transform: scale(1.05);
+            }
         }
 
         .loading-logo {
-            width: 180px;
-            height: 180px;
-            margin-bottom: 30px;
-            animation: pulse 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 30px rgba(244, 196, 48, 0.5));
+            width: 200px;
+            height: 200px;
+            margin-bottom: 40px;
+            animation: logoFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 10px 40px rgba(255, 255, 255, 0.3));
             will-change: transform;
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        @keyframes logoFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+                filter: drop-shadow(0 10px 40px rgba(255, 255, 255, 0.3));
+            }
+            50% { 
+                transform: translateY(-15px) rotate(2deg) scale(1.05);
+                filter: drop-shadow(0 20px 60px rgba(255, 255, 255, 0.5));
+            }
         }
 
         .loading-title {
-            font-family: 'Amiri Quran', 'Scheherazade New', serif;
-            font-size: 3em;
+            font-family: 'Reem Kufi', serif;
+            font-size: 3.5em;
             font-weight: 700;
-            color: #FFD700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            margin-bottom: 40px;
-            letter-spacing: 12px;
-            animation: glow 2s ease-in-out infinite;
+            background: linear-gradient(45deg, #FF3D00, #FF5722, #FF9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 5px 15px rgba(255, 61, 0, 0.4);
+            margin-bottom: 50px;
+            letter-spacing: 16px;
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
         }
 
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-            50% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.6); }
+        @keyframes titleGlow {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(255, 61, 0, 0.6));
+            }
+            50% { 
+                transform: scale(1.02);
+                filter: drop-shadow(0 0 40px rgba(255, 61, 0, 1));
+            }
         }
 
         .hadis-box {
-            max-width: 500px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            backdrop-filter: blur(10px);
-            margin-bottom: 40px;
+            max-width: 550px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            margin-bottom: 50px;
+            animation: boxFloat 6s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes boxFloat {
+            0%, 100% { 
+                transform: translateY(0) rotateX(0deg);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            }
+            50% { 
+                transform: translateY(-8px) rotateX(1deg);
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            }
         }
 
         .hadis-arabic {
-            font-size: 24px;
-            color: #FFD700;
+            font-size: 26px;
+            background: linear-gradient(45deg, #FF3D00, #FFFFFF, #FF9800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-align: center;
-            font-family: 'Amiri Quran', 'Scheherazade New', serif;
-            line-height: 2;
-            margin-bottom: 20px;
+            font-family: 'Uthmani', 'Amiri Quran', serif;
+            line-height: 2.2;
+            margin-bottom: 25px;
             direction: rtl;
+            animation: textShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .hadis-turkish {
-            font-size: 16px;
-            color: #ffffff;
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.95);
             text-align: center;
-            line-height: 1.8;
+            line-height: 1.9;
             font-style: italic;
-            opacity: 0.9;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 215, 0, 0.2);
-            border-top: 4px solid #FFD700;
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top: 5px solid #FF3D00;
+            border-right: 5px solid #FF5722;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            animation: modernSpin 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes modernSpin {
+            0% { 
+                transform: rotate(0deg) scale(1);
+                box-shadow: 0 0 30px rgba(255, 61, 0, 0.4);
+            }
+            50% { 
+                transform: rotate(180deg) scale(1.1);
+                box-shadow: 0 0 50px rgba(255, 61, 0, 0.7);
+            }
+            100% { 
+                transform: rotate(360deg) scale(1);
+                box-shadow: 0 0 30px rgba(255, 61, 0, 0.4);
+            }
         }
 
         .loading-text {
-            color: #FFD700;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 50px;
-            animation: blink 1.5s ease-in-out infinite;
+            background: linear-gradient(45deg, #FF3D00, #FF7043, #FFAB91);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            animation: textPulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+            letter-spacing: 2px;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @keyframes textPulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.05);
+            }
         }
 
         .copyright {
             position: absolute;
-            bottom: 60px;
-            color: rgba(255, 255, 255, 0.6);
+            bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 2px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            animation: copyrightFloat 5s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes copyrightFloat {
+            0%, 100% { 
+                transform: translateY(0);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: translateY(-5px);
+                opacity: 1;
+            }
         }
 
         /* ============ KONTEYNER ============ */
@@ -468,24 +606,319 @@
             border-color: #ffc107 !important;
         }
 
-        /* ============ GAME MODE CARDS - SPECIAL GRADIENTS ============ */
-        #kelimeCevirBtn {
-            background: linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%) !important;
+        /* ============ GAME MODE CARDS - MODERN GLASS MORPHISM ============ */
+        .flutter-game-card {
+            background: rgba(255, 255, 255, 0.25) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            transform: translateY(0) !important;
         }
 
-        #dinleBulBtn {
-            background: linear-gradient(135deg, #e6f3ff 0%, #cce5ff 100%) !important;
-            color: #1e4d7b !important;
+        .flutter-game-card:hover {
+            transform: translateY(-8px) scale(1.02) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+            backdrop-filter: blur(25px) !important;
         }
 
-        #boslukDoldurBtn {
-            background: linear-gradient(135deg, #f0e6ff 0%, #e0ccff 100%) !important;
-            color: #5b3a9d !important;
+        .flutter-game-card:active {
+            transform: translateY(-4px) scale(0.98) !important;
         }
 
-        #duaEtBtn {
-            background: linear-gradient(135deg, #e6ffe6 0%, #ccffcc 100%) !important;
-            color: #2d5f3f !important;
+        /* Özel renk overlayleri */
+        #kelimeCevirBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 179, 71, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        #dinleBulBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2) 0%, rgba(52, 152, 219, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        #boslukDoldurBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(142, 68, 173, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        #duaEtBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(39, 174, 96, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        #ayetOkuBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, rgba(230, 126, 34, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        #hadisOkuBtn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2) 0%, rgba(192, 57, 43, 0.1) 100%) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        /* İçerik z-index ayarı */
+        .flutter-game-card .game-card-icon,
+        .flutter-game-card .game-card-title,
+        .flutter-game-card .game-card-desc {
+            position: relative !important;
+            z-index: 2 !important;
+        }
+
+        /* Parlama efekti */
+        .flutter-game-card::after {
+            content: '' !important;
+            position: absolute !important;
+            top: -50% !important;
+            left: -50% !important;
+            width: 200% !important;
+            height: 200% !important;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent) !important;
+            transform: rotate(45deg) !important;
+            transition: all 0.5s ease !important;
+            opacity: 0 !important;
+            z-index: 3 !important;
+        }
+
+        .flutter-game-card:hover::after {
+            animation: shine 0.8s ease-in-out !important;
+        }
+
+        @keyframes shine {
+            0% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg) !important;
+                opacity: 0 !important;
+            }
+            50% { 
+                opacity: 1 !important;
+            }
+            100% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg) !important;
+                opacity: 0 !important;
+            }
+        }
+
+        /* ============ BOTTOM NAVIGATION - MODERN GLASS MORPHISM ============ */
+        .flutter-bottom-nav {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 1000 !important;
+            height: 70px !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(30px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 25px 25px 0 0 !important;
+            box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.1), 
+                        0 -5px 15px rgba(0, 0, 0, 0.05) !important;
+            display: flex !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+            padding: 0 20px !important;
+            overflow: hidden !important;
+        }
+
+        /* Animated gradient overlay */
+        .flutter-bottom-nav::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent) !important;
+            animation: navShimmer 3s infinite !important;
+            pointer-events: none !important;
+        }
+
+        @keyframes navShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .flutter-nav-item {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 8px 12px !important;
+            border-radius: 16px !important;
+            cursor: pointer !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            color: #666666 !important;
+            text-decoration: none !important;
+            min-width: 60px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: transparent !important;
+        }
+
+        .flutter-nav-item:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            transform: translateY(-4px) scale(1.1) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+            backdrop-filter: blur(15px) !important;
+        }
+
+        .flutter-nav-item:active {
+            transform: translateY(-2px) scale(1.05) !important;
+        }
+
+        .flutter-nav-item.active {
+            background: linear-gradient(135deg, 
+                rgba(98, 0, 234, 0.2), 
+                rgba(147, 112, 219, 0.1)) !important;
+            color: #6200EA !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(98, 0, 234, 0.3) !important;
+        }
+
+        /* Özel buton renkleri */
+        .flutter-nav-item:nth-child(1) {
+            color: #2196F3 !important;
+        }
+
+        .flutter-nav-item:nth-child(1):hover {
+            background: linear-gradient(135deg, 
+                rgba(33, 150, 243, 0.2), 
+                rgba(33, 150, 243, 0.05)) !important;
+            color: #1976D2 !important;
+        }
+
+        .flutter-nav-item:nth-child(2) {
+            color: #4CAF50 !important;
+        }
+
+        .flutter-nav-item:nth-child(2):hover {
+            background: linear-gradient(135deg, 
+                rgba(76, 175, 80, 0.2), 
+                rgba(76, 175, 80, 0.05)) !important;
+            color: #388E3C !important;
+        }
+
+        .flutter-nav-item:nth-child(3) {
+            color: #FFC107 !important;
+        }
+
+        .flutter-nav-item:nth-child(3):hover {
+            background: linear-gradient(135deg, 
+                rgba(255, 193, 7, 0.3), 
+                rgba(255, 193, 7, 0.1)) !important;
+            color: #F57C00 !important;
+            transform: translateY(-6px) scale(1.15) !important;
+        }
+
+        .flutter-nav-item:nth-child(3):hover i {
+            animation: trophy-glow 0.8s ease-in-out infinite !important;
+            text-shadow: 0 0 15px rgba(255, 193, 7, 0.8) !important;
+        }
+
+        @keyframes trophy-glow {
+            0%, 100% {
+                transform: scale(1) !important;
+                text-shadow: 0 0 15px rgba(255, 193, 7, 0.8) !important;
+            }
+            50% {
+                transform: scale(1.2) !important;
+                text-shadow: 0 0 25px rgba(255, 215, 0, 1), 
+                            0 0 35px rgba(255, 215, 0, 0.8) !important;
+            }
+        }
+
+        .flutter-nav-item:nth-child(4) {
+            color: #FF6B6B !important;
+        }
+
+        .flutter-nav-item:nth-child(4):hover {
+            background: linear-gradient(135deg, 
+                rgba(255, 107, 107, 0.2), 
+                rgba(255, 107, 107, 0.05)) !important;
+            color: #E53935 !important;
+        }
+
+        .flutter-nav-item i {
+            font-size: 24px !important;
+            margin-bottom: 4px !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+
+        .flutter-nav-item span {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+            position: relative !important;
+            z-index: 2 !important;
+        }
+
+        /* Ripple efekti */
+        .flutter-nav-item::after {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.4) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: width 0.4s ease, height 0.4s ease !important;
+            pointer-events: none !important;
+        }
+
+        .flutter-nav-item:active::after {
+            width: 80px !important;
+            height: 80px !important;
         }
 
         /* ============ GAME SCREEN ============ */
@@ -671,15 +1104,60 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        /* ============ OYUN ALANI ============ */
+        /* ============ OYUN ALANI - MODERN GLASS MORPHISM ============ */
         .game-box {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.9) 100%);
-            padding: 15px 8px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-            backdrop-filter: blur(10px);
-            border: none;
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(25px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 25px !important;
+            padding: 25px 20px !important;
+            margin-bottom: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 
+                        0 5px 15px rgba(0, 0, 0, 0.05),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            animation: gameBoxFloat 6s ease-in-out infinite !important;
+        }
+
+        .game-box:hover {
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 
+                        0 10px 25px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+            backdrop-filter: blur(30px) !important;
+        }
+
+        @keyframes gameBoxFloat {
+            0%, 100% { 
+                transform: translateY(0) rotateX(0deg);
+            }
+            50% { 
+                transform: translateY(-3px) rotateX(0.5deg);
+            }
+        }
+
+        /* Game box shimmer effect */
+        .game-box::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -50% !important;
+            left: -50% !important;
+            width: 200% !important;
+            height: 200% !important;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent) !important;
+            transform: rotate(45deg) !important;
+            animation: gameBoxShimmer 8s linear infinite !important;
+            pointer-events: none !important;
+        }
+
+        @keyframes gameBoxShimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .sure-info {
@@ -698,7 +1176,7 @@
             font-weight: bold;
             margin: 15px 0;
             direction: rtl;
-            font-family: 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', 'Arabic Typesetting', serif;
+            font-family: 'Uthmani', 'Traditional Arabic', 'Arabic Typesetting', serif;
             font-weight: 400;
             line-height: 1.6;
             letter-spacing: 0;
@@ -780,52 +1258,106 @@
             cursor: not-allowed;
         }
 
-        /* ============ SEÇENEKLER ============ */
+        /* ============ SEÇENEKLER - MODERN GLASS MORPHISM ============ */
         .options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin: 10px 0;
+            gap: 12px !important;
+            margin: 15px 0 !important;
         }
 
         .option {
-            background: linear-gradient(90deg, rgba(130, 219, 216, 0.3) 0%, rgba(255, 182, 193, 0.3) 100%);
-            border: none;
-            padding: 16px 12px;
-            border-radius: 12px;
-            font-size: 16px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            font-weight: 500;
-            color: #1c1c1c;
-            line-height: 1.4;
+            background: rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 18px !important;
+            padding: 20px 16px !important;
+            font-size: 16px !important;
+            cursor: pointer !important;
+            text-align: center !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1), 
+                        0 3px 10px rgba(0, 0, 0, 0.05),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            font-weight: 600 !important;
+            color: #2c3e50 !important;
+            line-height: 1.5 !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
 
         .option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 
+                        0 5px 15px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+            backdrop-filter: blur(25px) !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* Hover için haptic feedback tetikleme */
+        .option:hover::before {
+            content: '' !important;
         }
 
         .option:active {
-            transform: translateX(2px);
+            transform: translateY(-2px) scale(0.98) !important;
         }
 
-        /* Arapça seçenekler için özel stil */
+        /* Option button ripple effect */
+        .option::after {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: rgba(255, 255, 255, 0.4) !important;
+            border-radius: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            transition: width 0.4s ease, height 0.4s ease !important;
+            pointer-events: none !important;
+        }
+
+        .option:active::after {
+            width: 200px !important;
+            height: 200px !important;
+        }
+
+        /* Arapça seçenekler için modern glass morphism stil */
         .option.arabic-option {
-            font-size: 22px;
-            font-family: 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', 'Arabic Typesetting', serif;
-            direction: ltr;
-            text-align: center;
-            font-weight: 400;
-            line-height: 1.4;
-            color: #1c1c1c;
+            font-size: 24px !important;
+            font-family: 'Uthmani', 'Traditional Arabic', 'Arabic Typesetting', serif !important;
+            direction: ltr !important;
+            text-align: center !important;
+            font-weight: 600 !important;
+            line-height: 1.8 !important;
+            color: #1a365d !important;
+            background: linear-gradient(135deg, 
+                        rgba(255, 215, 0, 0.25), 
+                        rgba(173, 216, 230, 0.25),
+                        rgba(255, 182, 193, 0.15)) !important;
+            border: 2px solid rgba(255, 215, 0, 0.4) !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+            position: relative !important;
+        }
+
+        .option.arabic-option:hover {
+            background: linear-gradient(135deg, 
+                        rgba(255, 215, 0, 0.35), 
+                        rgba(173, 216, 230, 0.35),
+                        rgba(255, 182, 193, 0.25)) !important;
+            border-color: rgba(255, 215, 0, 0.6) !important;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.4) !important;
+            color: #0f2a44 !important;
         }
 
         /* Arapça seçeneklerdeki metin için RTL */
         .option.arabic-option span[style*="direction: rtl"] {
-            font-family: 'Amiri Quran', 'Scheherazade New', 'Traditional Arabic', 'Arabic Typesetting', serif;
+            font-family: 'Uthmani', 'Traditional Arabic', 'Arabic Typesetting', serif !important;
+            position: relative !important;
+            z-index: 2 !important;
         }
 
         .option.correct {
@@ -847,26 +1379,194 @@
             opacity: 0.7;
         }
 
+        /* ============ ARAPÇA HAREKE RENKLERİ ============ */
+        /* Arapça hareke karakterleri için kırmızı renk */
+        .arabic-text,
+        .option.arabic-option,
+        .arabic-text span,
+        [style*="direction: rtl"] {
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                transparent 100%
+            );
+            background-size: 100% 100%;
+        }
+
+        /* Unicode hareke karakterleri için kırmızı renk */
+        .arabic-text::after,
+        .option.arabic-option::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Arapça metinlerdeki hareke karakterleri */
+        .arabic-text,
+        .option.arabic-option,
+        [dir="rtl"],
+        [style*="direction: rtl"] {
+            position: relative;
+        }
+
+        /* Arapça metinleri kömür karası renkte yapmak için CSS - Altın sarısı hariç */
+        .arabic-text,
+        .arabic-large,
+        .hadis-arabic,
+        .option.arabic-option,
+        [dir="rtl"],
+        [style*="direction: rtl"],
+        .arabic:not(:has(.golden-highlight)),
+        [class*="arabic"]:not(:has(.golden-highlight)) {
+            color: #2C2C2C !important;
+        }
+        
+        /* Altın sarısı içeren elementlerin çocukları için özel kural */
+        .arabic .golden-highlight,
+        [class*="arabic"] .golden-highlight {
+            color: #FFD700 !important;
+        }
+
+        /* Hareke karakterleri için özel stil - Unicode aralığı */
+        .arabic-text:has-text([\u064B-\u065F]),
+        .option.arabic-option:has-text([\u064B-\u065F]) {
+            background-image: linear-gradient(
+                to right,
+                #2c3e50 0%,
+                #e74c3c 0%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        /* Boşluk doldur oyununda doğru kelimenin altın sarısı vurgusu - Çok yüksek öncelik */
+        .golden-highlight,
+        span.golden-highlight,
+        div span.golden-highlight,
+        .arabic span.golden-highlight,
+        [class*="arabic"] span.golden-highlight {
+            color: #FFD700 !important;
+            font-weight: bold !important;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.8) !important;
+            background-color: rgba(255, 215, 0, 0.1) !important;
+            padding: 0 2px !important;
+            border-radius: 2px !important;
+            font-family: 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif !important;
+        }
+
+        /* JavaScript ile hareke renklerini işleyeceğiz */
+        .hareke-red {
+            color: #e74c3c !important;
+        }
+
         /* ============ GERİ BİLDİRİM ============ */
+        /* FEEDBACK - MODERN GLASS MORPHISM */
         .feedback {
-            text-align: center;
-            font-size: 1em;
-            font-weight: 700;
-            min-height: 25px;
-            margin: 10px 0;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            text-align: center !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            min-height: 50px !important;
+            margin: 20px 0 !important;
+            padding: 18px 25px !important;
+            border-radius: 20px !important;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(15px) !important;
+            border: 2px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            position: relative !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         .feedback.correct {
-            color: #4CAF50;
-            background: rgba(76, 175, 80, 0.1);
+            color: #00695c !important;
+            background: linear-gradient(135deg, 
+                        rgba(76, 175, 80, 0.25), 
+                        rgba(129, 199, 132, 0.25)) !important;
+            border-color: rgba(76, 175, 80, 0.4) !important;
+            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.2),
+                        0 5px 15px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            animation: feedbackPulse 0.6s ease-out !important;
         }
 
         .feedback.wrong {
-            color: #f44336;
-            background: rgba(244, 67, 54, 0.1);
+            color: #c62828 !important;
+            background: linear-gradient(135deg, 
+                        rgba(244, 67, 54, 0.25), 
+                        rgba(239, 83, 80, 0.25)) !important;
+            border-color: rgba(244, 67, 54, 0.4) !important;
+            box-shadow: 0 15px 30px rgba(244, 67, 54, 0.2),
+                        0 5px 15px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            animation: feedbackShake 0.6s ease-out !important;
+        }
+
+        @keyframes feedbackPulse {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes feedbackShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        /* 🎆 SUCCESS ANIMATIONS - CONFETTI & PARTICLES */
+        .confetti-container {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            pointer-events: none !important;
+            z-index: 9999 !important;
+            overflow: hidden !important;
+        }
+
+        .confetti-piece {
+            position: absolute !important;
+            width: 10px !important;
+            height: 10px !important;
+            background: #ff6b6b !important;
+            animation: confettiFall 3s ease-out forwards !important;
+        }
+
+        .confetti-piece:nth-child(2n) { background: #4ecdc4 !important; }
+        .confetti-piece:nth-child(3n) { background: #45b7d1 !important; }
+        .confetti-piece:nth-child(4n) { background: #f9ca24 !important; }
+        .confetti-piece:nth-child(5n) { background: #6c5ce7 !important; }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg) !important;
+                opacity: 1 !important;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg) !important;
+                opacity: 0 !important;
+            }
+        }
+
+        .success-burst {
+            animation: successBurst 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        @keyframes successBurst {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         /* ============ SONRAKİ BUTON ============ */
@@ -1377,15 +2077,91 @@
             }
         }
 
+        /* ⚡ SPEED ANIMATIONS - ULTRA FAST TRANSITIONS */
+        .speed-fade-in {
+            animation: speedFadeIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        }
+
+        .speed-slide-up {
+            animation: speedSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        .speed-zoom-in {
+            animation: speedZoomIn 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+        }
+
+        .speed-bounce-in {
+            animation: speedBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+        }
+
+        @keyframes speedFadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes speedSlideUp {
+            0% { transform: translateY(100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes speedZoomIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes speedBounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* GPU hızlandırması için animasyonlu elementler */
         [style*="animation"] {
             will-change: transform, box-shadow;
             transform: translateZ(0); /* Hardware acceleration trigger */
         }
 
+        /* 📱 HAPTIC FEEDBACK SUPPORT */
+        .haptic-light { --haptic-intensity: 'light'; }
+        .haptic-medium { --haptic-intensity: 'medium'; }
+        .haptic-heavy { --haptic-intensity: 'heavy'; }
+
         /* Performans optimizasyonu */
         * {
             scroll-behavior: auto !important; /* Smooth scroll'u devre dışı bırak */
+        }
+
+        /* 🎮 GESTURE CONTROLS - SWIPE INDICATORS */
+        .swipe-indicator {
+            position: fixed !important;
+            bottom: 100px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            font-size: 12px !important;
+            z-index: 1000 !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s ease !important;
+        }
+
+        .swipe-indicator.show {
+            opacity: 1 !important;
+            animation: swipePulse 2s infinite !important;
+        }
+
+        @keyframes swipePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        .swipe-zone {
+            position: relative !important;
+            touch-action: pan-y !important; /* Vertical scroll'a izin ver, horizontal'ı kontrol et */
         }
 
         body {
@@ -1514,19 +2290,19 @@
                         <span style="font-size: 16px;">🎯</span>
                     </button>
                     
-                    <!-- Stats -->
+                    <!-- Stats - İslami Terminoloji -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; padding-right: 32px;">
                         <div style="text-align: center;">
                             <div style="color: #FF8F00; font-weight: 700; font-size: 16px;" id="gamePoints">0</div>
-                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">PUAN</div>
+                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">HASENE</div>
                         </div>
                         <div style="text-align: center;">
                             <div style="color: #FFC107; font-weight: 700; font-size: 16px;" id="starPoints">0</div>
                             <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">YILDIZ</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="color: #9C27B0; font-weight: 700; font-size: 16px;" id="playerLevel">Lv 1</div>
-                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">LEVEL</div>
+                            <div style="color: #9C27B0; font-weight: 700; font-size: 16px;" id="playerLevel">1. Mertebe</div>
+                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">MERTEBE</div>
                         </div>
                     </div>
                     
@@ -1535,17 +2311,17 @@
                         <div id="dailyGoalProgress" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.5s;"></div>
                     </div>
                     <div style="text-align: center; margin-top: 4px; color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">
-                        <span id="dailyGoalText">Günlük Hedef: 2700 XP</span> • <span id="dailyGoalProgressText">0 / 2700 XP</span>
+                        <span id="dailyGoalText">Günlük Vird: 2700 Hasene</span> • <span id="dailyGoalProgressText">0 / 2700 Hasene</span>
                     </div>
                 </div>
             </div>
 
             
-            <!-- XP Bilgi Butonu -->
+            <!-- Hasene Bilgi Butonu -->
             <div style="margin: 0 20px 3px 20px;">
                 <button id="xpInfoBtn" style="width: 100%; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; border: none; border-radius: 8px; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 6px rgba(251,191,36,0.3); transition: all 0.3s; font-weight: 600; font-size: 0.8em;">
-                    <span style="font-size: 1em;">�</span>
-                    <div>XP Nasıl Kazanılır?</div>
+                    <span style="font-size: 1em;">📿</span>
+                    <div>Hasene Nasıl Kazanılır?</div>
                     <span style="font-size: 0.8em;">ℹ️</span>
                 </button>
             </div>
@@ -1566,7 +2342,7 @@
             <!-- Flutter Oyun Kartları -->
             <div class="flutter-game-grid">
                 <button class="flutter-game-card kelime" id="kelimeCevirBtn">
-                    <div class="game-card-icon">�</div>
+                    <div class="game-card-icon">🔄</div>
                     <div class="game-card-title">Kelime Çevir</div>
                     <div class="game-card-desc">Arapça kelimeleri Türkçe'ye çevir</div>
                 </button>
@@ -1574,7 +2350,7 @@
                 <button class="flutter-game-card dinle" id="dinleBulBtn">
                     <div class="game-card-icon">🎧</div>
                     <div class="game-card-title">Dinle ve Bul</div>
-                    <div class="game-card-desc">Kelimeyi dinle ve doğru kelimeyi seç</div>
+                    <div class="game-card-desc">Kelimeyi dinle ve sahih kelimeyi seç</div>
                 </button>
 
                 <button class="flutter-game-card bosluk" id="boslukDoldurBtn">
@@ -1600,6 +2376,20 @@
                     <div class="game-card-title">Hadis Oku</div>
                     <div class="game-card-desc">Hadis-i şerifleri oku ve öğren</div>
                 </button>
+            </div>
+
+            <!-- 🔍 STREAK DEBUG PANEL (DEV MODE) -->
+            <div style="margin: 10px 20px; padding: 10px; background: rgba(255,193,7,0.1); border: 2px dashed #ffc107; border-radius: 8px; font-size: 0.8em;" id="streakDebugPanel">
+                <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">🔧 Streak Debug Araçları</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                    <button onclick="analyzeStreak()" style="padding: 5px; font-size: 0.7em; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;">📊 Analiz Et</button>
+                    <button onclick="testStreak()" style="padding: 5px; font-size: 0.7em; background: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer;">🧪 Test Et</button>
+                    <button onclick="showCalendarModal()" style="padding: 5px; font-size: 0.7em; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">📅 Takvim</button>
+                    <button onclick="console.log('Streak Verisi:', streakData)" style="padding: 5px; font-size: 0.7em; background: #fd7e14; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 Veri</button>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.65em; color: #6c757d;">
+                    Console'u açık tutarak butonlara basın. F12 → Console
+                </div>
             </div>
         </div>
 
@@ -1681,15 +2471,15 @@
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 4px;">
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="boslukScore" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">PUAN</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
                 </div>
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="boslukCorrect" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">DOĞRU</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
                 </div>
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="boslukWrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">YANLIŞ</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
                 </div>
             </div>
 
@@ -1713,15 +2503,15 @@
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 4px;">
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="dinleScore" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">PUAN</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
                 </div>
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="dinleCorrect" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">DOĞRU</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
                 </div>
                 <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                     <div class="flutter-stat-value" id="dinleWrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">YANLIŞ</div>
+                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
                 </div>
             </div>
 
@@ -1749,19 +2539,19 @@
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin: 4px;">
             <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                 <div class="flutter-stat-value" id="score" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">PUAN</div>
+                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
             </div>
             <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                 <div class="flutter-stat-value" id="level" style="font-size: 0.95em; margin-bottom: 1px;">1</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SEVİYE</div>
+                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">MERTEBE</div>
             </div>
             <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                 <div class="flutter-stat-value" id="correct" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">DOĞRU</div>
+                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
             </div>
             <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
                 <div class="flutter-stat-value" id="wrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">YANLIŞ</div>
+                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
             </div>
         </div>
 
@@ -1771,10 +2561,10 @@
                 🔥 COMBO <span id="comboCount">3</span>x 🔥
             </div>
             <div style="font-size: 0.9em; color: rgba(255,255,255,0.9); margin-top: 4px;">
-                +<span id="comboBonus">5</span> Bonus XP!
+                +<span id="comboBonus">5</span> Bonus Hasene!
             </div>
             <div style="font-size: 0.7em; color: rgba(255,255,255,0.7); margin-top: 2px;">
-                (Her 3 combo = +5 XP)
+                (Her 3 combo = +5 Hasene)
             </div>
         </div>
 
@@ -1816,59 +2606,59 @@
     <div class="modal" id="modal">
         <div class="modal-content">
             <h2>🎉 Tebrikler!</h2>
-            <p>Seviye <span id="newLevel"></span>'e yükseldiniz!</p>
+            <p><span id="newLevel"></span>. Mertebeye yükseldiniz!</p>
             <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
-                Toplam Puanınız: <strong id="modalTotalPoints">0</strong><br>
-                Bir sonraki seviye için: <strong id="modalNextLevelPoints">0</strong> puan gerekli
+                Toplam Haseneleriniz: <strong id="modalTotalPoints">0</strong><br>
+                Bir sonraki mertebe için: <strong id="modalNextLevelPoints">0</strong> hasene gerekli
             </p>
             <button class="modal-btn" id="modalBtn">Devam Et</button>
         </div>
     </div>
 
-    <!-- Başarılar Modal -->
+    <!-- Müjdeler Modal -->
     <div class="modal" id="badgesModal">
         <div class="modal-content" style="max-width: 400px; max-height: 80vh; overflow-y: auto;">
-            <h3 style="margin: 15px 0 10px 0; font-size: 1.3em;">🏆 Başarılarınız</h3>
+            <h3 style="margin: 15px 0 10px 0; font-size: 1.3em;">🏆 Kazanımlarınız</h3>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-                <!-- Elmas -->
+                <!-- Mütebahhir -->
                 <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);">
                     <div style="font-size: 1.2em;">💎</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Elmas</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mütebahhir</div>
                     <div style="font-size: 1em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Altın = 1 Elmas</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Mütecaviz = 1 Mütebahhir</div>
                 </div>
                 
-                <!-- Altın -->
+                <!-- Mütecaviz -->
                 <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
                     <div style="font-size: 1.2em;">🥇</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Altın</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mütecaviz</div>
                     <div style="font-size: 1em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Gümüş = 1 Altın</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Müterakki = 1 Mütecaviz</div>
                 </div>
                 
-                <!-- Gümüş -->
+                <!-- Müterakki -->
                 <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);">
                     <div style="font-size: 1.2em;">🥈</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Gümüş</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Müterakki</div>
                     <div style="font-size: 1em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Bronz = 1 Gümüş</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Mübtedi = 1 Müterakki</div>
                 </div>
                 
-                <!-- Bronz -->
+                <!-- Mübtedi -->
                 <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);">
                     <div style="font-size: 1.2em;">🥉</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Bronz</div>
+                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mübtedi</div>
                     <div style="font-size: 1em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Yıldız = 1 Bronz</div>
+                    <div style="font-size: 0.6em; color: #666;">5 Yıldız = 1 Mübtedi</div>
                 </div>
             </div>
             
             <div style="text-align: center; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 8px;">
-                <div style="font-size: 1.1em; margin-bottom: 5px;">📊 İlerlemeniz</div>
+                <div style="font-size: 1.1em; margin-bottom: 5px;">📊 Terakkiniz</div>
                 <div>⭐ <span id="badgesModalStars">0</span> Yıldız</div>
-                <div>📈 <span id="badgesModalLevel">1</span>. Seviye</div>
-                <div>🎯 <span id="badgesModalPoints">0</span> Puan</div>
+                <div>📈 <span id="badgesModalLevel">1</span>. Mertebe</div>
+                <div>📿 <span id="badgesModalPoints">0</span> Hasene</div>
             </div>
             
             <button id="closeBadgesBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">Kapat</button>
@@ -1993,64 +2783,64 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-bottom: 10px;">
                     <div>
                         <div style="font-size: 1.4em; font-weight: bold;" id="statsLevel">1</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">Seviye</div>
+                        <div style="font-size: 0.7em; opacity: 0.9;">Mertebe</div>
                     </div>
                     <div>
                         <div style="font-size: 1.4em; font-weight: bold;" id="statsPoints">0</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">XP (Ana Puan)</div>
+                        <div style="font-size: 0.7em; opacity: 0.9;">Hasene (Ana Sevap)</div>
                     </div>
                     <div>
                         <div style="font-size: 1.4em; font-weight: bold;" id="statsStars">0</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">⭐ Yıldız (100 XP)</div>
+                        <div style="font-size: 0.7em; opacity: 0.9;">⭐ Yıldız (100 Hasene)</div>
                     </div>
                 </div>
                 
                 <!-- Seviye İlerleme Barı -->
                 <div style="margin-top: 10px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.75em; margin-bottom: 5px; opacity: 0.9;">
-                        <span>Seviye <span id="statsCurrentLevel">1</span></span>
-                        <span>Seviye <span id="statsNextLevel">2</span></span>
+                        <span>Mertebe <span id="statsCurrentLevel">1</span></span>
+                        <span>Mertebe <span id="statsNextLevel">2</span></span>
                     </div>
                     <div style="background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; overflow: hidden;">
                         <div id="statsLevelProgress" style="background: rgba(255,255,255,0.9); height: 100%; width: 0%; border-radius: 3px; transition: width 0.3s ease;"></div>
                     </div>
                     <div style="font-size: 0.75em; margin-top: 4px; opacity: 0.8;">
-                        <span id="statsLevelPointsNeeded">0</span> XP daha
+                        <span id="statsLevelPointsNeeded">0</span> hasene daha
                     </div>
                 </div>
             </div>
 
             <!-- Rozet Sistemi -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 12px; margin: 12px 0; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
-                <h4 style="margin: 0 0 10px 0; color: white; font-size: 1em; text-align: center;">🏆 XP Bazlı Rozet Sistemi</h4>
+                <h4 style="margin: 0 0 10px 0; color: white; font-size: 1em; text-align: center;">🏆 Hasene Bazlı Rozet Sistemi</h4>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center;">
                     <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #cd7f32;">
                         <div style="font-size: 1.3em;">🥉</div>
                         <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Bronz</div>
                         <div style="font-weight: bold; font-size: 0.85em; color: #cd7f32;" id="statsBronze">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">2K XP</div>
+                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">2K Hasene</div>
                     </div>
                     <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #c0c0c0;">
                         <div style="font-size: 1.3em;">🥈</div>
                         <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Gümüş</div>
                         <div style="font-weight: bold; font-size: 0.85em; color: #c0c0c0;" id="statsSilver">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">8.5K XP</div>
+                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">8.5K Hasene</div>
                     </div>
                     <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #ffd700;">
                         <div style="font-size: 1.3em;">🥇</div>
                         <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Altın</div>
                         <div style="font-weight: bold; font-size: 0.85em; color: #ffd700;" id="statsGold">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">25.5K XP</div>
+                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">25.5K Hasene</div>
                     </div>
                     <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #b9f2ff;">
                         <div style="font-size: 1.3em;">💎</div>
                         <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Elmas</div>
                         <div style="font-weight: bold; font-size: 0.85em; color: #00d9ff;" id="statsDiamond">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">85K XP</div>
+                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">85K Hasene</div>
                     </div>
                 </div>
                 <div style="margin-top: 10px; padding: 8px; background: rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 0.75em; text-align: center;">
-                    💡 1 saat oyun = ~8500 XP (1 Gümüş)
+                    💡 1 saat oyun = ~8500 Hasene (1 Müterakki)
                 </div>
             </div>
 
@@ -2064,38 +2854,38 @@
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #3498db;" id="statsAvgPointsPerDay">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Günlük Ort. Puan</div>
+                        <div style="font-size: 0.7em; color: #666;">Günlük Ort. Hasene</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #e67e22;" id="statsPlayConsistency">0%</div>
-                        <div style="font-size: 0.7em; color: #666;">Oyun Tutarlılığı</div>
+                        <div style="font-size: 0.7em; color: #666;">Talim Tutarlılığı</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #9b59b6;" id="statsLevelProgress">0%</div>
-                        <div style="font-size: 0.7em; color: #666;">Seviye İlerlemesi</div>
+                        <div style="font-size: 0.7em; color: #666;">Mertebe İlerlemesi</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Streak Bilgileri -->
+            <!-- Devam (Streak) Bilgileri -->
             <div style="background: #fff7e6; padding: 12px; border-radius: 8px; margin: 12px 0;">
-                <h4 style="margin: 0 0 8px 0; color: #d68910; font-size: 1em;">🔥 Streak İstatistikleri</h4>
+                <h4 style="margin: 0 0 8px 0; color: #d68910; font-size: 1em;">🔥 Muvazebet İstatistikleri</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
                         <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsCurrentStreak">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Mevcut Streak</div>
+                        <div style="font-size: 0.8em; color: #666;">Mevcut Devam</div>
                     </div>
                     <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
                         <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsBestStreak">0</div>
-                        <div style="font-size: 0.8em; color: #666;">En İyi Streak</div>
+                        <div style="font-size: 0.8em; color: #666;">En İyi Devam</div>
                     </div>
                     <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
                         <div style="font-size: 1.3em; font-weight: bold; color: #27ae60;" id="statsTotalDays">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Toplam Oyun Günü</div>
+                        <div style="font-size: 0.8em; color: #666;">Toplam Amel Günü</div>
                     </div>
                     <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
                         <div style="font-size: 1.3em; font-weight: bold; color: #3498db;" id="statsTodayProgress">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Bugünkü İlerleme</div>
+                        <div style="font-size: 0.8em; color: #666;">Bugünkü Amel</div>
                     </div>
                 </div>
             </div>
@@ -2137,11 +2927,11 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #27ae60;" id="statsTodayCorrect">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Toplam Doğru</div>
+                        <div style="font-size: 0.7em; color: #666;">Toplam Sahih</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #f39c12;" id="statsTodayPoints">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Toplam Puan</div>
+                        <div style="font-size: 0.7em; color: #666;">Toplam Hasene</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
                         <div style="font-size: 1.1em; font-weight: bold; color: #e74c3c;" id="statsPerfectStreak">0</div>
@@ -2237,7 +3027,7 @@
                         <span style="font-size: 1.8em;">🌱</span>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95em;">Rahat</div>
-                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 1,300 XP - ~10 dakika</div>
+                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 1,300 Hasene - ~10 dakika</div>
                         </div>
                     </div>
                 </button>
@@ -2247,7 +3037,7 @@
                         <span style="font-size: 1.8em;">🎯</span>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95em;">Normal</div>
-                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 2,700 XP - ~20 dakika</div>
+                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 2,700 Hasene - ~20 dakika</div>
                         </div>
                     </div>
                 </button>
@@ -2257,7 +3047,7 @@
                         <span style="font-size: 1.8em;">🔥</span>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95em;">Ciddi</div>
-                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 6,000 XP - ~45 dakika</div>
+                            <div style="font-size: 0.75em; opacity: 0.9;">Günde 6,000 Hasene - ~45 dakika</div>
                         </div>
                     </div>
                 </button>
@@ -2269,51 +3059,51 @@
         </div>
     </div>
 
-    <!-- XP Info Modal -->
+    <!-- Hasene Info Modal -->
     <div class="modal" id="xpInfoModal">
         <div class="modal-content" style="max-width: 400px;">
-            <h3 style="margin: 0 0 15px 0; font-size: 1.1em; text-align: center; color: #667eea;">💎 XP Sistemi</h3>
+            <h3 style="margin: 0 0 15px 0; font-size: 1.1em; text-align: center; color: #667eea;">� Hasene Sistemi</h3>
             
             <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-                <div style="font-size: 0.8em; color: #555; font-weight: 600;">1 Saat Oyun = ~8,500 XP</div>
+                <div style="font-size: 0.8em; color: #555; font-weight: 600;">1 Saat Amel = ~8,500 Hasene</div>
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">⭐ Yıldız Sistemi</h4>
                 <div style="font-size: 0.75em; color: #555; line-height: 1.6;">
-                    <strong>100 XP = 1 Yıldız</strong><br>
-                    Sık geri bildirim için. Her soruda ilerleme görürsün!
+                    <strong>100 Hasene = 1 Yıldız</strong><br>
+                    Her sahih cevabın mükâfatı. Sürekli ilerleme görürsün!
                 </div>
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">🏆 Rozet Sistemi</h4>
+                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">🏆 Mertebe Sistemi</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.75em; color: #555;">
-                    <div>🥉 <strong>2,000 XP</strong><br><span style="font-size: 0.85em; color: #888;">Bronz (~15 dk)</span></div>
-                    <div>🥈 <strong>8,500 XP</strong><br><span style="font-size: 0.85em; color: #888;">Gümüş (~1 saat)</span></div>
-                    <div>🥇 <strong>25,500 XP</strong><br><span style="font-size: 0.85em; color: #888;">Altın (~3 gün)</span></div>
-                    <div>💎 <strong>85,000 XP</strong><br><span style="font-size: 0.85em; color: #888;">Elmas (~10 gün)</span></div>
+                    <div>🥉 <strong>2,000 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mübtedi (~15 dk)</span></div>
+                    <div>🥈 <strong>8,500 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Müterakki (~1 saat)</span></div>
+                    <div>🥇 <strong>25,500 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mütecaviz (~3 gün)</span></div>
+                    <div>💎 <strong>85,000 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mütebahhir (~10 gün)</span></div>
                 </div>
             </div>
             
             <div style="background: #fff7e6; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 8px 0; color: #f97316; font-size: 0.9em;">🔥 Combo Bonusu</h4>
+                <h4 style="margin: 0 0 8px 0; color: #f97316; font-size: 0.9em;">🔥 Silsile Bonusu</h4>
                 <div style="font-size: 0.75em; color: #555;">
-                    <strong>Her 3 doğru cevap = +5 XP bonus!</strong><br>
-                    Combo yap, ekstra XP kazan!
+                    <strong>Her 3 sahih cevap = +5 Hasene bonus!</strong><br>
+                    Tevali yap, ilave mükâfat kazan!
                 </div>
             </div>
             
             <div style="background: #f0f9ff; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 0.9em;">🎯 Günlük Hedef Bonusu</h4>
+                <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 0.9em;">🎯 Günlük Vird Bonusu</h4>
                 <div style="font-size: 0.75em; color: #555;">
-                    Günlük hedefini tamamla:<br>
-                    <strong style="color: #3b82f6; font-size: 1.1em;">+1,000 XP Bonus!</strong>
+                    Günlük virdini tamamla:<br>
+                    <strong style="color: #3b82f6; font-size: 1.1em;">+1,000 Hasene Müjdesi!</strong>
                 </div>
             </div>
             
             <button id="closeXPInfoBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">
-                Anladım! 🚀
+                Bâreke'llahu fîke! 🤲
             </button>
         </div>
     </div>
@@ -2323,7 +3113,7 @@
         <div class="modal-content">
             <h2 id="gameOverTitle">😢 Oyun Bitti</h2>
             <p id="gameOverText"></p>
-            <p>Toplam Puan: <strong id="finalScore">0</strong></p>
+            <p>Toplam Hasene: <strong id="finalScore">0</strong></p>
             <button class="modal-btn" id="restartBtn">Yeniden Başla</button>
         </div>
     </div>
@@ -2579,21 +3369,21 @@
         }
         
         function setDailyGoal(level) {
-            // 1 saat oyun = ~8000 XP
-            // Kolay: 10 dakika (~1300 XP)
-            // Normal: 20 dakika (~2700 XP)  
-            // Ciddi: 45 dakika (~6000 XP)
+            // 1 saat oyun = ~8000 Hasene
+            // Kolay: 10 dakika (~1300 Hasene)
+            // Normal: 20 dakika (~2700 Hasene)  
+            // Ciddi: 45 dakika (~6000 Hasene)
             const goals = {
-                easy: { xp: 1300, name: 'Rahat', icon: '🌱' },
-                normal: { xp: 2700, name: 'Normal', icon: '🎯' },
-                serious: { xp: 6000, name: 'Ciddi', icon: '🔥' }
+                easy: { hasene: 1300, name: 'Rahat', icon: '🌱' },
+                normal: { hasene: 2700, name: 'Normal', icon: '🎯' },
+                serious: { hasene: 6000, name: 'Ciddi', icon: '🔥' }
             };
             
             const goal = goals[level];
             localStorage.setItem('dailyGoalLevel', level);
-            localStorage.setItem('dailyGoalXP', goal.xp);
+            localStorage.setItem('dailyGoalHashene', goal.hasene);
             
-            // Günlük XP'yi sıfırla (her gün başta)
+            // Günlük Hasene'yi sıfırla (her gün başta)
             const today = new Date().toDateString();
             const lastDate = localStorage.getItem('lastDailyGoalDate');
             if (lastDate !== today) {
@@ -2632,8 +3422,8 @@
             }
             
             progressEl.style.width = progressPercent + '%';
-            progressTextEl.textContent = dailyXP + ' / ' + goalXP + ' XP';
-            goalTextEl.textContent = goalXP + ' XP hedefine ulaş! (' + goals[goalLevel].name + ')';
+            progressTextEl.textContent = dailyXP + ' / ' + goalXP + ' Hasene';
+            goalTextEl.textContent = goalXP + ' hasene hedefine ulaş! (' + goals[goalLevel].name + ')';
             
             // Hedef tamamlandıysa
             if (dailyXP >= goalXP) {
@@ -2660,8 +3450,8 @@
             // Hedef tamamlandıysa
             if (currentXP < goalXP && newXP >= goalXP) {
                 setTimeout(() => {
-                    showSuccessMessage('🎉 Günlük hedefini tamamladın! +1000 bonus XP!');
-                    // Bonus XP ekle (puan sistemine direkt ekle)
+                    showSuccessMessage('🎉 Günlük hedefini tamamladın! +1000 bonus Hasene!');
+                    // Bonus Hasene ekle (puan sistemine direkt ekle)
                     totalPoints += 1000;
                     updateStatsBar();
                     saveStats();
@@ -3107,8 +3897,8 @@
             // console.log('🚀 DOM yüklendi, oyun başlatılıyor...');
             
             // Daily Goal'u başlat
-            if (!localStorage.getItem('dailyGoalXP')) {
-                localStorage.setItem('dailyGoalXP', '2700');
+            if (!localStorage.getItem('dailyGoalHashene')) {
+                localStorage.setItem('dailyGoalHashene', '2700');
                 localStorage.setItem('dailyGoalLevel', 'normal');
             }
             updateDailyGoalDisplay();
@@ -3158,7 +3948,7 @@
                 }
             },
 
-            // ZORLUK SEVİYELERİ (1 saat oyun = ~8000 XP hedefli)
+            // ZORLUK SEVİYELERİ (1 saat oyun = ~8000 Hasene hedefli)
             // Ortalama: ~22 XP/soru (360 soru/saat = 7920 XP + combolar)
             difficultyLevels: {
                 kolay: {
@@ -3237,7 +4027,7 @@
         // ============ ACHIEVEMENT SİSTEMİ (DOMContentLoaded İÇİNDE) ============
         function checkAchievements() {
             const achievements = [
-                { id: 'first_win', name: 'İlk Zafer', desc: 'İlk doğru cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
+                { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
                 { id: 'combo_master', name: 'Combo Ustası', desc: '5x combo yap', icon: '🔥', condition: () => comboCount >= 5 },
                 { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük hedefini tamamla', icon: '⭐', condition: () => {
                     const dailyXP = parseInt(localStorage.getItem('dailyXP')) || 0;
@@ -3279,6 +4069,51 @@
                 });
             }
         }
+
+        // ============ ARAPÇA HAREKE RENKLENDİRME ============
+        function colorizeArabicDiacritics(text) {
+            if (!text) return text;
+            
+            // Arapça hareke karakterleri (Unicode: U+064B - U+065F)
+            const diacritics = /[\u064B-\u065F]/g;
+            
+            return text.replace(diacritics, function(match) {
+                return `<span style="color: #e74c3c; font-weight: 600;">${match}</span>`;
+            });
+        }
+
+        function applyDiacriticColoring(element) {
+            if (!element) return;
+            
+            // Eğer element bir text node ise
+            if (element.nodeType === Node.TEXT_NODE) {
+                const colorizedText = colorizeArabicDiacritics(element.textContent);
+                if (colorizedText !== element.textContent) {
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = colorizedText;
+                    element.parentNode.replaceChild(wrapper, element);
+                }
+                return;
+            }
+            
+            // Element ise, child node'ları kontrol et
+            if (element.childNodes) {
+                Array.from(element.childNodes).forEach(child => {
+                    applyDiacriticColoring(child);
+                });
+            }
+        }
+
+        function updateArabicTextColoring() {
+            // Tüm Arapça text elementlerini bul ve hareke renklerini uygula
+            const arabicElements = document.querySelectorAll('.arabic-option, .arabic-text, .hadis-arabic, [dir="rtl"], [style*="direction: rtl"], [class*="arabic"]');
+            
+            arabicElements.forEach(element => {
+                // Arapça metinleri kömür karası yap
+                element.style.color = '#2C2C2C';
+                applyDiacriticColoring(element);
+            });
+        }
         
         function showAchievementUnlock(achievement) {
             const notification = document.createElement('div');
@@ -3300,7 +4135,7 @@
             
             notification.innerHTML = `
                 <div style="font-size: 3em; margin-bottom: 10px;">${achievement.icon}</div>
-                <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">Başarım Kazanıldı!</div>
+                <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">Müjde Kazanıldı!</div>
                 <div style="font-size: 1em; font-weight: 600; margin-bottom: 3px;">${achievement.name}</div>
                 <div style="font-size: 0.85em; opacity: 0.9;">${achievement.desc}</div>
             `;
@@ -4291,19 +5126,19 @@
             // Rozet seviye kontrolü ve modal gösterimi (önce en yüksek rozetleri kontrol et)
             if (newDiamond > badges.diamond) {
                 badges.diamond = newDiamond;
-                showBadgeUpModal('diamond', '💎 Elmas');
+                showBadgeUpModal('diamond', '💎 Mütebahhir');
                 playSound('levelup'); // Elmas çok önemli, levelup sesi çal
             } else if (newGold > badges.gold) {
                 badges.gold = newGold;
-                showBadgeUpModal('gold', '🥇 Altın');
+                showBadgeUpModal('gold', '🥇 Mütecaviz');
                 playSound('levelup');
             } else if (newSilver > badges.silver) {
                 badges.silver = newSilver;
-                showBadgeUpModal('silver', '🥈 Gümüş');
+                showBadgeUpModal('silver', '🥈 Müterakki');
                 playSound('correct');
             } else if (newBronze > badges.bronze) {
                 badges.bronze = newBronze;
-                showBadgeUpModal('bronze', '🥉 Bronz');
+                showBadgeUpModal('bronze', '🥉 Mübtedi');
                 playSound('correct');
             }
             
@@ -4470,16 +5305,13 @@
             
             // Eğer bugün ilk defa açılıyorsa
             if (streakData.todayDate !== today) {
-                // Önceki gün kontrolü
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toISOString().split('T')[0];
+                console.log(`🕐 Gün değişikliği algılandı: ${streakData.todayDate} → ${today}`);
                 
-                // Streak kontrolü - sadece kırılma durumunu kontrol et
-                if (streakData.lastPlayDate !== yesterdayStr && streakData.lastPlayDate !== today && streakData.lastPlayDate !== '') {
-                    // Streak kırıldı (dün oynamadı ve bugün de henüz oynamadı)
-                    console.log(`🔴 Streak kırıldı! Son oyun: ${streakData.lastPlayDate}, dün: ${yesterdayStr}`);
-                    streakData.currentStreak = 0;
+                // Gelişmiş streak kontrolü
+                const streakValidation = validateCurrentStreak(today);
+                if (!streakValidation.isValid) {
+                    console.log(`🔴 Streak tutarsızlığı: ${streakValidation.reason}`);
+                    streakData.currentStreak = streakValidation.correctStreak;
                 }
                 
                 // Bugünün verilerini sıfırla
@@ -4488,6 +5320,71 @@
                 
                 console.log(`📅 Yeni gün başladı: ${today}, mevcut streak: ${streakData.currentStreak}`);
             }
+        }
+
+        // 🔍 Streak doğruluğunu kapsamlı kontrol eden fonksiyon
+        function validateCurrentStreak(today) {
+            if (streakData.playDates.length === 0) {
+                return { isValid: true, correctStreak: 0, reason: 'Hiç oyun oynammış' };
+            }
+
+            // Tarihleri sırala (en yeniden eskiye)
+            const sortedDates = [...streakData.playDates].sort().reverse();
+            
+            // Bugünden başlayarak geriye doğru ardışık günleri say
+            let consecutiveDays = 0;
+            let currentDate = today;
+            
+            for (let i = 0; i < sortedDates.length; i++) {
+                if (sortedDates[i] === currentDate) {
+                    consecutiveDays++;
+                    // Bir önceki günü hesapla
+                    const prevDate = new Date(currentDate);
+                    prevDate.setDate(prevDate.getDate() - 1);
+                    currentDate = prevDate.toISOString().split('T')[0];
+                } else {
+                    // Ardışık olmayan tarih bulundu, streak burada bitiyor
+                    break;
+                }
+            }
+
+            const isValid = consecutiveDays === streakData.currentStreak;
+            const reason = isValid ? 'Streak doğru' : 
+                          `Hesaplanan: ${consecutiveDays}, kayıtlı: ${streakData.currentStreak}`;
+
+            return { 
+                isValid, 
+                correctStreak: consecutiveDays, 
+                reason: reason
+            };
+        }
+
+        // 📅 Mevcut streak'in gerçek tarihlerini hesapla
+        function calculateCurrentStreakDates() {
+            if (streakData.playDates.length === 0 || streakData.currentStreak === 0) {
+                return [];
+            }
+
+            // Son oyun tarihinden başlayarak geriye doğru ardışık tarihleri bul
+            const sortedDates = [...streakData.playDates].sort().reverse();
+            const streakDates = [];
+            let currentDate = sortedDates[0]; // En son oyun tarihi
+
+            for (let i = 0; i < sortedDates.length && streakDates.length < streakData.currentStreak; i++) {
+                if (sortedDates[i] === currentDate) {
+                    streakDates.push(currentDate);
+                    // Bir önceki günü hesapla
+                    const prevDate = new Date(currentDate);
+                    prevDate.setDate(prevDate.getDate() - 1);
+                    currentDate = prevDate.toISOString().split('T')[0];
+                } else {
+                    // Ardışık olmayan tarih, streak burada bitiyor
+                    break;
+                }
+            }
+
+            console.log(`🔥 Streak tarihleri hesaplandı: [${streakDates.join(', ')}]`);
+            return streakDates;
         }
 
         function updateDailyProgress(correctAnswers) {
@@ -4551,6 +5448,13 @@
                 
                 console.log(`🔥 Streak güncellendi: ${streakData.currentStreak} gün (en iyi: ${streakData.bestStreak})`);
                 
+                // Streak doğruluğunu kontrol et
+                const validation = validateCurrentStreak(today);
+                if (!validation.isValid) {
+                    console.log(`⚠️ Streak otomatik düzeltme: ${streakData.currentStreak} → ${validation.correctStreak}`);
+                    streakData.currentStreak = validation.correctStreak;
+                }
+
                 // Veriyi kaydet
                 saveStats();
                 
@@ -4686,16 +5590,8 @@
                 html += '<div></div>';
             }
             
-            // Mevcut streak'in tarih aralığını hesapla
-            const currentStreakDates = [];
-            if (streakData.currentStreak > 0 && streakData.lastPlayDate) {
-                const lastPlayDate = new Date(streakData.lastPlayDate);
-                for (let i = 0; i < streakData.currentStreak; i++) {
-                    const streakDate = new Date(lastPlayDate);
-                    streakDate.setDate(lastPlayDate.getDate() - i);
-                    currentStreakDates.push(streakDate.toISOString().split('T')[0]);
-                }
-            }
+            // Mevcut streak'in gerçek tarih aralığını hesapla (doğru algoritma)
+            const currentStreakDates = calculateCurrentStreakDates();
             const currentStreakSet = new Set(currentStreakDates);
 
             // playDates array'ini Set'e çevir
@@ -4752,6 +5648,103 @@
         // Global fonksiyonlar (window'a ekle ki HTML onclick çalışsın)
         window.showCalendarModal = showCalendarModal;
         window.closeCalendarModal = closeCalendarModal;
+
+        // 🔍 STREAK ANALİZ SİSTEMİ - DEBUG TOOLS
+        function analyzeStreakSystem() {
+            console.log('🔍 STREAK SİSTEMİ ANALİZ RAPORU');
+            console.log('=====================================');
+            
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            // Mevcut streak verilerini analiz et
+            console.log('📊 Mevcut Veriler:');
+            console.log(`├── Bugün: ${today}`);
+            console.log(`├── Dün: ${yesterdayStr}`);
+            console.log(`├── Son oyun tarihi: ${streakData.lastPlayDate}`);
+            console.log(`├── Mevcut streak: ${streakData.currentStreak} gün`);
+            console.log(`├── En iyi streak: ${streakData.bestStreak} gün`);
+            console.log(`├── Bugünkü ilerleme: ${streakData.todayProgress}/${streakData.dailyGoal}`);
+            console.log(`├── Toplam oyun günü: ${streakData.totalPlayDays}`);
+            console.log(`└── Oyun tarihleri: [${streakData.playDates.join(', ')}]`);
+            
+            // Streak mantık kontrolü
+            console.log('\n🧠 Streak Mantık Kontrolü:');
+            const streakShouldBreak = streakData.lastPlayDate !== yesterdayStr && 
+                                     streakData.lastPlayDate !== today && 
+                                     streakData.lastPlayDate !== '';
+            
+            console.log(`├── Streak kırılmalı mı? ${streakShouldBreak ? '✅ EVET' : '❌ HAYIR'}`);
+            console.log(`├── Bugün oynanmış mı? ${streakData.playDates.includes(today) ? '✅ EVET' : '❌ HAYIR'}`);
+            console.log(`├── Dün oynanmış mı? ${streakData.playDates.includes(yesterdayStr) ? '✅ EVET' : '❌ HAYIR'}`);
+            
+            // Ardışık gün analizi (gelişmiş)
+            console.log('\n📅 Ardışık Gün Analizi:');
+            const validation = validateCurrentStreak(today);
+            console.log(`├── Hesaplanan ardışık gün: ${validation.correctStreak}`);
+            console.log(`├── Kayıtlı streak: ${streakData.currentStreak}`);
+            console.log(`├── Tutarlılık: ${validation.isValid ? '✅ DOĞRU' : '❌ YANLIŞ'}`);
+            console.log(`└── Açıklama: ${validation.reason}`);
+            
+            // Takvim görünümü kontrolü
+            console.log('\n📆 Takvim Görünümü Test:');
+            const currentStreakDates = calculateCurrentStreakDates();
+            console.log(`├── Streak tarih aralığı: [${currentStreakDates.join(', ')}]`);
+            console.log(`├── Takvimde 🔥 gösterilecek günler: ${currentStreakDates.length}`);
+            
+            // Öneriler
+            console.log('\n💡 Öneriler:');
+            if (consecutiveDays !== streakData.currentStreak) {
+                console.log('├── ⚠️ Streak hesaplaması düzeltilmeli');
+                console.log(`├── 🔧 Doğru değer: ${consecutiveDays} olmalı`);
+            } else {
+                console.log('├── ✅ Streak hesaplaması doğru');
+            }
+            
+            if (streakData.playDates.includes(today) && streakData.todayProgress < streakData.dailyGoal) {
+                console.log('├── ⚠️ Bugün oynanmış ama hedef tamamlanmamış - veri tutarsızlığı');
+            }
+            
+            console.log('\n=====================================');
+            console.log('🔍 Analiz tamamlandı!');
+        }
+
+        // Test fonksiyonları
+        function testStreakScenarios() {
+            console.log('🧪 STREAK TEST SENARYOLARİ');
+            console.log('=============================');
+            
+            // Backup mevcut veri
+            const backup = {
+                currentStreak: streakData.currentStreak,
+                bestStreak: streakData.bestStreak,
+                lastPlayDate: streakData.lastPlayDate,
+                totalPlayDays: streakData.totalPlayDays,
+                todayProgress: streakData.todayProgress,
+                playDates: [...streakData.playDates]
+            };
+            
+            console.log('Test 1: Streak kırılması simülasyonu');
+            streakData.lastPlayDate = '2025-11-08'; // 2 gün önce
+            checkDailyProgress();
+            console.log(`├── Streak kırıldı mı? ${streakData.currentStreak === 0 ? '✅ EVET' : '❌ HAYIR'}`);
+            
+            console.log('\nTest 2: Hedef tamamlama simülasyonu');
+            streakData.todayProgress = 0;
+            updateDailyProgress(5); // 5 doğru cevap ekle
+            console.log(`├── Hedef tamamlandı mı? ${streakData.todayProgress >= streakData.dailyGoal ? '✅ EVET' : '❌ HAYIR'}`);
+            
+            // Restore backup
+            Object.assign(streakData, backup);
+            console.log('\n🔄 Veriler geri yüklendi');
+            console.log('=============================');
+        }
+
+        // Geliştirici araçları - console'da çağırılabilir
+        window.analyzeStreak = analyzeStreakSystem;
+        window.testStreak = testStreakScenarios;
 
         // ============ GÜNLİK GÖREVLER SİSTEMİ ============
         function checkDailyTasks() {
@@ -5522,6 +6515,13 @@
             // Ekranları değiştir - Sadece Kelime Çevir oyunu başlat
             elements.modeSelector.style.display = 'none';
             elements.gameScreen.style.display = 'block';
+            
+            // 🎮 Gesture sistemini başlat
+            initGameGestures();
+            
+            // ⚡ Speed animation ile yeni soruyu yükle
+            addSpeedAnimation(elements.gameScreen, 'slide-up');
+            
             loadQuestion();
         };
 
@@ -5652,6 +6652,11 @@
             if (mode.timeLimit > 0) {
                 startTimer(mode.timeLimit);
             }
+
+            // Arapça hareke renklerini uygula
+            setTimeout(() => {
+                updateArabicTextColoring();
+            }, 100);
         }
 
         // ============ YANLIŞ CEVAPLAR ============
@@ -5705,10 +6710,21 @@
             updateWordStats(currentQuestion.id, isCorrect);
 
             if (isCorrect) {
-                console.log(`✅ === DOĞRU CEVAP İŞLEMİ ===`);
+                console.log(`✅ === SAHİH CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.feedback.textContent = '✅ Doğru!';
+                elements.feedback.textContent = '✅ Mâşâallah!';
                 elements.feedback.className = 'feedback correct';
+                
+                // 🎆 SUCCESS ANIMATIONS & FEEDBACK
+                triggerSuccessBurst(button);
+                triggerHaptic('success');
+                addSpeedAnimation(elements.feedback, 'bounce-in');
+                
+                // Combo sistemi için confetti
+                if (comboCount >= 2) {
+                    triggerConfetti();
+                    triggerHaptic('combo');
+                }
                 
                 const points = currentQuestion.difficulty * diffLevel.pointsMultiplier;
                 console.log(`💰 Puan hesaplama: ${currentQuestion.difficulty} × ${diffLevel.pointsMultiplier} = ${points} puan`);
@@ -5728,10 +6744,14 @@
                 
                 updateUI();
             } else {
-                console.log(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
+                console.log(`❌ === HATA CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.feedback.textContent = `❌ Yanlış! Doğru: ${currentQuestion.anlam}`;
+                elements.feedback.textContent = `❌ Hatalı! Sahih: ${currentQuestion.anlam}`;
                 elements.feedback.className = 'feedback wrong';
+                
+                // 📱 ERROR FEEDBACK
+                triggerHaptic('error');
+                addSpeedAnimation(elements.feedback, 'zoom-in');
                 
                 console.log(`📊 addSessionWrong() çağrılıyor...`);
                 addSessionWrong(); // Session yanlış sayısını artır
@@ -5776,6 +6796,10 @@
 
         // ============ SONRAKİ SORU ============
         elements.nextBtn.onclick = () => {
+            // ⚡ Speed animation ve haptic feedback
+            addSpeedAnimation(elements.gameScreen, 'fade-in');
+            triggerHaptic('light');
+            
             loadQuestion();
         };
 
@@ -6075,6 +7099,11 @@
             if (currentDinleQuestion.ses_dosyasi) {
                 playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
             }
+
+            // Arapça hareke renklerini uygula
+            setTimeout(() => {
+                updateArabicTextColoring();
+            }, 100);
         }
 
         function checkDinleAnswer(button, isCorrect) {
@@ -6094,9 +7123,9 @@
             allBtns.forEach(btn => btn.disabled = true);
 
             if (isCorrect) {
-                console.log(`✅ === DOĞRU CEVAP İŞLEMİ ===`);
+                console.log(`✅ === SAHİH CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.dinleFeedback.textContent = '✅ Doğru!';
+                elements.dinleFeedback.textContent = '✅ Mâşâallah!';
                 elements.dinleFeedback.className = 'feedback correct';
                 
                 const points = currentDinleQuestion.difficulty * 2;
@@ -6125,7 +7154,7 @@
             } else {
                 console.log(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.dinleFeedback.textContent = `❌ Yanlış! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
+                elements.dinleFeedback.textContent = `❌ Hatalı! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
                 elements.dinleFeedback.className = 'feedback wrong';
                 
                 console.log(`📊 Dinle wrong güncelleniyor: ${dinleWrong} + 1 = ${dinleWrong + 1}`);
@@ -6342,7 +7371,7 @@
             if (isCorrect) {
                 console.log(`✅ === DOĞRU CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.boslukFeedback.textContent = '✅ Doğru!';
+                elements.boslukFeedback.textContent = '✅ Mâşâallah!';
                 elements.boslukFeedback.className = 'feedback correct';
                 
                 console.log(`💰 Boşluk Doldur sabit puan: 10 puan ekleniyor`);
@@ -6364,12 +7393,12 @@
                 
                 console.log(`✅ Doğru cevap işlemi tamamlandı!`);
 
-                // Tam ayeti göster
-                elements.boslukAyetText.textContent = currentBoslukQuestion.ayet_metni;
+                // Tam ayeti doğru kelimeyi altın sarısı ile vurgulayarak göster
+                showAnswerWithGoldenHighlight();
             } else {
                 console.log(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.boslukFeedback.textContent = `❌ Yanlış! Doğru kelime: ${missingWord}`;
+                elements.boslukFeedback.textContent = `❌ Hatalı! Doğru kelime: ${missingWord}`;
                 elements.boslukFeedback.className = 'feedback wrong';
                 
                 console.log(`📊 Boşluk wrong güncelleniyor: ${boslukWrong} + 1 = ${boslukWrong + 1}`);
@@ -6393,8 +7422,8 @@
                     console.log(`⚠️ Doğru buton bulunamadı! Aranan: "${missingWord}"`);
                 }
 
-                // Tam ayeti göster
-                elements.boslukAyetText.textContent = currentBoslukQuestion.ayet_metni;
+                // Tam ayeti doğru kelimeyi altın sarısı ile vurgulayarak göster
+                showAnswerWithGoldenHighlight();
             }
 
             console.log(`📊 Soru sayacı artırılıyor: ${boslukQuestionCount} + 1 = ${boslukQuestionCount + 1}`);
@@ -6417,6 +7446,31 @@
             elements.boslukCorrect.textContent = boslukCorrect;
             elements.boslukWrong.textContent = boslukWrong;
             console.log(`✅ BoslukUI güncellendi!`);
+        }
+
+        function showAnswerWithGoldenHighlight() {
+            // Doğru kelimeyi altın sarısı renkte vurgulayarak tam ayeti göster
+            const fullText = currentBoslukQuestion.ayet_metni;
+            const highlightedText = fullText.replace(
+                new RegExp(`\\b${missingWord}\\b`, 'g'), 
+                `<span class="golden-highlight" style="color: #FFD700 !important; font-weight: bold !important; text-shadow: 0 0 5px rgba(255, 215, 0, 0.8) !important; background-color: rgba(255, 215, 0, 0.15) !important; padding: 1px 3px !important; border-radius: 3px !important; font-family: 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', serif !important;">${missingWord}</span>`
+            );
+            elements.boslukAyetText.innerHTML = highlightedText;
+            
+            console.log(`🌟 Doğru kelime "${missingWord}" altın sarısı ile vurgulandı!`);
+            console.log(`📄 Tam metin: ${highlightedText}`);
+            
+            // Ekstra güvenlik için direct style da uygula
+            setTimeout(() => {
+                const goldenSpans = elements.boslukAyetText.querySelectorAll('.golden-highlight');
+                goldenSpans.forEach(span => {
+                    span.style.color = '#FFD700';
+                    span.style.fontWeight = 'bold';
+                    span.style.textShadow = '0 0 5px rgba(255, 215, 0, 0.8)';
+                    span.style.backgroundColor = 'rgba(255, 215, 0, 0.1)';
+                });
+                console.log(`✨ ${goldenSpans.length} altın span bulundu ve stil uygulandı!`);
+            }, 100);
         }
 
         // ============ DUA ET MODU ============
@@ -7080,11 +8134,11 @@
                     <span id="confirmCorrect">0</span>
                 </div>
                 <div class="confirm-stat">
-                    <span>❌ Yanlış cevap:</span>
+                    <span>❌ Hatalı cevap:</span>
                     <span id="confirmWrong">0</span>
                 </div>
                 <div class="confirm-stat">
-                    <span>💰 Kazanılan XP:</span>
+                    <span>� Kazanılan Hasene:</span>
                     <span id="confirmXP">0</span>
                 </div>
             </div>
@@ -7140,6 +8194,160 @@
                 item.classList.toggle('active', i === index);
             });
         }
+
+        // ⚡ SPEED ANIMATIONS SYSTEM
+        function addSpeedAnimation(element, type = 'fade-in') {
+            if (!element) return;
+            element.classList.add(`speed-${type}`);
+            setTimeout(() => element.classList.remove(`speed-${type}`), 600);
+        }
+
+        // 🎆 SUCCESS ANIMATIONS - CONFETTI SYSTEM
+        function triggerConfetti() {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+
+            // 50 konfeti parçası oluştur
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                container.appendChild(confetti);
+            }
+
+            // 3 saniye sonra temizle
+            setTimeout(() => {
+                if (container.parentNode) {
+                    container.parentNode.removeChild(container);
+                }
+            }, 3000);
+        }
+
+        function triggerSuccessBurst(element) {
+            if (!element) return;
+            element.classList.add('success-burst');
+            setTimeout(() => element.classList.remove('success-burst'), 800);
+        }
+
+        // 📱 HAPTIC FEEDBACK SYSTEM
+        function triggerHaptic(type = 'medium') {
+            try {
+                // Modern haptic feedback API
+                if ('vibrate' in navigator) {
+                    const patterns = {
+                        light: [50],
+                        medium: [100],
+                        heavy: [200],
+                        success: [100, 30, 100],
+                        error: [200, 100, 200],
+                        combo: [50, 25, 50, 25, 100]
+                    };
+                    navigator.vibrate(patterns[type] || patterns.medium);
+                }
+            } catch (error) {
+                console.log('Haptic feedback not supported');
+            }
+        }
+
+        // 🎮 GESTURE CONTROLS SYSTEM
+        class SwipeGestureHandler {
+            constructor(element, onSwipeLeft, onSwipeRight) {
+                this.element = element;
+                this.onSwipeLeft = onSwipeLeft;
+                this.onSwipeRight = onSwipeRight;
+                this.startX = 0;
+                this.startY = 0;
+                this.threshold = 100; // Minimum swipe distance
+
+                this.init();
+            }
+
+            init() {
+                this.element.addEventListener('touchstart', (e) => {
+                    this.startX = e.touches[0].clientX;
+                    this.startY = e.touches[0].clientY;
+                });
+
+                this.element.addEventListener('touchend', (e) => {
+                    if (!this.startX || !this.startY) return;
+
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+                    
+                    const diffX = this.startX - endX;
+                    const diffY = this.startY - endY;
+
+                    // Horizontal swipe kontrolü
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
+                        if (diffX > 0) {
+                            // Sol swipe (sonraki soru)
+                            triggerHaptic('light');
+                            this.onSwipeLeft && this.onSwipeLeft();
+                        } else {
+                            // Sağ swipe (önceki/geri)
+                            triggerHaptic('light');
+                            this.onSwipeRight && this.onSwipeRight();
+                        }
+                    }
+
+                    this.startX = 0;
+                    this.startY = 0;
+                });
+            }
+        }
+
+        // Swipe indicator göster/gizle
+        function showSwipeIndicator(text = '👈 Kaydır: Sonraki Soru') {
+            let indicator = document.querySelector('.swipe-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.className = 'swipe-indicator';
+                document.body.appendChild(indicator);
+            }
+            indicator.textContent = text;
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+
+        // Oyun başladığında swipe sistemini başlat
+        let gameSwipeHandler = null;
+
+        function initGameGestures() {
+            const gameScreen = document.getElementById('gameScreen');
+            if (gameScreen && !gameSwipeHandler) {
+                gameScreen.classList.add('swipe-zone');
+                
+                gameSwipeHandler = new SwipeGestureHandler(
+                    gameScreen,
+                    () => {
+                        // Sol swipe: Sonraki soru
+                        const nextBtn = document.getElementById('nextBtn');
+                        if (nextBtn && nextBtn.style.display !== 'none') {
+                            addSpeedAnimation(nextBtn, 'zoom-in');
+                            nextBtn.click();
+                        }
+                    },
+                    () => {
+                        // Sağ swipe: Geri
+                        const backBtn = document.getElementById('backFromGameBtn');
+                        if (backBtn) {
+                            addSpeedAnimation(backBtn, 'slide-up');
+                            triggerHaptic('medium');
+                        }
+                    }
+                );
+
+                // İlk oyun başladığında swipe rehberi göster
+                setTimeout(() => showSwipeIndicator(), 2000);
+            }
+        }
+
     </script>
 
 </body>
