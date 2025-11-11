@@ -3381,7 +3381,7 @@
             
             const goal = goals[level];
             localStorage.setItem('dailyGoalLevel', level);
-            localStorage.setItem('dailyGoalHashene', goal.hasene);
+            localStorage.setItem('dailyGoalHasene', goal.hasene);
             
             // Günlük Hasene'yi sıfırla (her gün başta)
             const today = new Date().toDateString();
@@ -3399,8 +3399,8 @@
         }
         
         function updateDailyGoalDisplay() {
-            const goalXP = parseInt(localStorage.getItem('dailyGoalXP')) || 2700;
-            const dailyXP = parseInt(localStorage.getItem('dailyXP')) || 0;
+            const goalXP = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+            const dailyXP = parseInt(localStorage.getItem('dailyHasene')) || 0;
             const goalLevel = localStorage.getItem('dailyGoalLevel') || 'normal';
             
             const goals = {
@@ -3441,11 +3441,11 @@
                 localStorage.setItem('lastDailyGoalDate', today);
             }
             
-            const currentXP = parseInt(localStorage.getItem('dailyXP')) || 0;
-            const goalXP = parseInt(localStorage.getItem('dailyGoalXP')) || 2700;
+            const currentXP = parseInt(localStorage.getItem('dailyHasene')) || 0;
+            const goalXP = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
             const newXP = currentXP + xp;
             
-            localStorage.setItem('dailyXP', newXP.toString());
+            localStorage.setItem('dailyHasene', newXP.toString());
             
             // Hedef tamamlandıysa
             if (currentXP < goalXP && newXP >= goalXP) {
@@ -3897,8 +3897,8 @@
             // console.log('🚀 DOM yüklendi, oyun başlatılıyor...');
             
             // Daily Goal'u başlat
-            if (!localStorage.getItem('dailyGoalHashene')) {
-                localStorage.setItem('dailyGoalHashene', '2700');
+            if (!localStorage.getItem('dailyGoalHasene')) {
+                localStorage.setItem('dailyGoalHasene', '2700');
                 localStorage.setItem('dailyGoalLevel', 'normal');
             }
             updateDailyGoalDisplay();
@@ -4030,9 +4030,9 @@
                 { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
                 { id: 'combo_master', name: 'Combo Ustası', desc: '5x combo yap', icon: '🔥', condition: () => comboCount >= 5 },
                 { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük hedefini tamamla', icon: '⭐', condition: () => {
-                    const dailyXP = parseInt(localStorage.getItem('dailyXP')) || 0;
-                    const goalXP = parseInt(localStorage.getItem('dailyGoalXP')) || 2700;
-                    return dailyXP >= goalXP;
+                    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                    return dailyHasene >= goalHasene;
                 }},
                 { id: 'streak_7', name: '7 Gün Streak', desc: '7 gün üst üste oyna', icon: '🔥', condition: () => streakData.currentStreak >= 7 },
                 { id: 'level_5', name: 'Seviye 5', desc: 'Seviye 5\'e ulaş', icon: '🏆', condition: () => level >= 5 },
@@ -7868,10 +7868,10 @@
                 console.log('\n📅 5. GÜNLÜK GÖREV KONTROLÜ:');
                 console.log('   Bugünkü toplam puan:', dailyTasks.todayStats.toplamPuan);
                 console.log('   Günlük hedef:', dailyTasks.hedefler.toplamPuan);
-                const dailyXP = parseInt(localStorage.getItem('dailyXP')) || 0;
-                const goalXP = parseInt(localStorage.getItem('dailyGoalXP')) || 2700;
-                console.log('   Daily XP:', dailyXP, '/', goalXP);
-                console.log('   Günlük hedef tamamlandı mı?', dailyXP >= goalXP ? '✅ EVET' : '❌ HAYIR');
+                const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                console.log('   Daily Hasene:', dailyHasene, '/', goalHasene);
+                console.log('   Günlük hedef tamamlandı mı?', dailyHasene >= goalHasene ? '✅ EVET' : '❌ HAYIR');
                 
                 // 6. SEVIYE HESAPLAMA KONTROLÜ
                 console.log('\n⬆️ 6. SEVİYE SİSTEMİ KONTROLÜ:');
