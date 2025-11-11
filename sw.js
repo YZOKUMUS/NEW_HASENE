@@ -1,15 +1,15 @@
 const CACHE_NAME = 'hasene-arabic-v1.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192-v4-RED-MUSHAF.png',
-  '/icon-512-v4-RED-MUSHAF.png',
-  '/KFGQPC Uthmanic Script HAFS Regular.otf',
-  '/kelimebul.json',
-  '/ayetoku_formatted.json',
-  '/duaet.json',
-  '/hadisoku.json'
+  '/HASENE/',
+  '/HASENE/index.html',
+  '/HASENE/manifest.json',
+  '/HASENE/icon-192-v4-RED-MUSHAF.png',
+  '/HASENE/icon-512-v4-RED-MUSHAF.png',
+  '/HASENE/KFGQPC Uthmanic Script HAFS Regular.otf',
+  '/HASENE/kelimebul.json',
+  '/HASENE/ayetoku_formatted.json',
+  '/HASENE/duaet.json',
+  '/HASENE/hadisoku.json'
 ];
 
 // Install event - cache files
@@ -82,7 +82,7 @@ self.addEventListener('fetch', event => {
       .catch(() => {
         // Offline fallback
         if (event.request.destination === 'document') {
-          return caches.match('/HASENE-ARABIC-GAME-MAIN/index.html');
+          return caches.match('/HASENE/index.html');
         }
       })
   );
@@ -106,8 +106,8 @@ self.addEventListener('push', event => {
   if (event.data) {
     const options = {
       body: event.data.text(),
-      icon: '/HASENE-ARABIC-GAME-MAIN/icon-192-v4-RED-MUSHAF.png',
-      badge: '/HASENE-ARABIC-GAME-MAIN/icon-192-v4-RED-MUSHAF.png',
+      icon: '/HASENE/icon-192-v4-RED-MUSHAF.png',
+      badge: '/HASENE/icon-192-v4-RED-MUSHAF.png',
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
