@@ -2,12 +2,12 @@
   "name": "Hasene Arapça Oyunu",
   "short_name": "Hasene Arabic",
   "description": "İslami Arapça öğrenme oyunu - Kelime çeviri, ayet okuma ve daha fazlası",
-  "start_url": "/HASENE-ARABIC-GAME-MAIN/",
+  "start_url": "/HASENE/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#764ba2",
   "orientation": "portrait-primary",
-  "scope": "/HASENE-ARABIC-GAME-MAIN/",
+  "scope": "/HASENE/",
   "lang": "tr",
   "icons": [
     {
@@ -38,14 +38,14 @@
       "name": "Kelime Çevir",
       "short_name": "Kelime",
       "description": "Arapça kelimeleri Türkçe'ye çevir",
-      "url": "/HASENE-ARABIC-GAME-MAIN/?mode=kelime",
+      "url": "/HASENE/?mode=kelime",
       "icons": [{ "src": "icon-192-v4-RED-MUSHAF.png", "sizes": "192x192" }]
     },
     {
       "name": "Günlük Görevler",
       "short_name": "Görevler",
       "description": "Günlük görevlerini kontrol et",
-      "url": "/HASENE-ARABIC-GAME-MAIN/?mode=tasks",
+      "url": "/HASENE/?mode=tasks",
       "icons": [{ "src": "icon-192-v4-RED-MUSHAF.png", "sizes": "192x192" }]
     }
   ],
