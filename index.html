@@ -4888,7 +4888,7 @@
             if (window.history.pushState) {
                 window.history.pushState({gameData: encoded}, '', newUrl);
             }
-            console.log('🔗 URL\'ye kaydedildi:', totalPoints, 'puan');
+            log.debug('🔗 URL\'ye kaydedildi:', totalPoints, 'puan');
         }
         
         function loadFromURL() {
@@ -4913,11 +4913,11 @@
                         streakData.currentStreak = parseInt(decoded.s) || 0;
                     }
                     
-                    console.log('🔗 URL\'den yüklendi:', totalPoints, 'puan');
+                    log.debug('🔗 URL\'den yüklendi:', totalPoints, 'puan');
                     return true;
                 }
             } catch(e) {
-                console.log('URL yükleme hatası:', e);
+                log.error('URL yükleme hatası:', e);
             }
             return false;
         }
@@ -4990,23 +4990,23 @@
             const savedMode = savedModeIndexedDB || localStorage.getItem('hasene_currentMode');
             if (savedMode && CONFIG.gameModes[savedMode]) {
                 currentMode = savedMode;
-                console.log(`🎮 Kaydedilen mod yüklendi: ${currentMode}`);
+                log.debug(`🎮 Kaydedilen mod yüklendi: ${currentMode}`);
             }
             
             const savedDifficultyIndexedDB = await loadFromIndexedDB('hasene_currentDifficulty');
             const savedDifficulty = savedDifficultyIndexedDB || localStorage.getItem('hasene_currentDifficulty');
             if (savedDifficulty && CONFIG.difficultyLevels[savedDifficulty]) {
                 currentDifficulty = savedDifficulty;
-                console.log(`🎯 Kaydedilen zorluk yüklendi: ${currentDifficulty}`);
+                log.debug(`🎯 Kaydedilen zorluk yüklendi: ${currentDifficulty}`);
             }
             
-            console.log('📋 Günlük görevler yüklendi:', {
+            log.debug('📋 Günlük görevler yüklendi:', {
                 completedTasks: dailyTasks.completedTasks.length,
                 todayStats: dailyTasks.todayStats,
                 lastTaskDate: dailyTasks.lastTaskDate
             });
             
-            console.log('🎮 Oyun ayarları yüklendi:', {
+            log.debug('🎮 Oyun ayarları yüklendi:', {
                 currentMode: currentMode,
                 currentDifficulty: currentDifficulty
             });
