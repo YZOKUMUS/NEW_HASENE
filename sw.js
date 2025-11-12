@@ -13,16 +13,19 @@ const urlsToCache = [
 ];
 
 // Install event - cache files
+// Toggle this to true if you need SW logs during debugging
+const SW_DEBUG = false;
+
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker installing...');
+  if (SW_DEBUG) console.debug('🔧 Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('📦 Caching app shell');
+        if (SW_DEBUG) console.debug('📦 Caching app shell');
         return cache.addAll(urlsToCache);
       })
       .then(() => {
-        console.log('✅ Service Worker installed successfully');
+        if (SW_DEBUG) console.debug('✅ Service Worker installed successfully');
         return self.skipWaiting();
       })
       .catch(error => {
@@ -33,19 +36,19 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('🚀 Service Worker activating...');
+  if (SW_DEBUG) console.debug('🚀 Service Worker activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('🗑️ Deleting old cache:', cacheName);
+            if (SW_DEBUG) console.debug('🗑️ Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('✅ Service Worker activated');
+      if (SW_DEBUG) console.debug('✅ Service Worker activated');
       return self.clients.claim();
     })
   );
@@ -58,11 +61,11 @@ self.addEventListener('fetch', event => {
       .then(response => {
         // Return cached version or fetch from network
         if (response) {
-          console.log('📱 Serving from cache:', event.request.url);
+          if (SW_DEBUG) console.debug('📱 Serving from cache:', event.request.url);
           return response;
         }
         
-        console.log('🌐 Fetching from network:', event.request.url);
+        if (SW_DEBUG) console.debug('🌐 Fetching from network:', event.request.url);
         return fetch(event.request).then(response => {
           // Don't cache non-successful responses
           if (!response || response.status !== 200 || response.type !== 'basic') {
@@ -91,14 +94,14 @@ self.addEventListener('fetch', event => {
 // Background sync for offline actions
 self.addEventListener('sync', event => {
   if (event.tag === 'background-sync') {
-    console.log('🔄 Background sync triggered');
+    if (SW_DEBUG) console.debug('🔄 Background sync triggered');
     event.waitUntil(doBackgroundSync());
   }
 });
 
 async function doBackgroundSync() {
   // Handle offline actions when back online
-  console.log('📡 Performing background sync...');
+  if (SW_DEBUG) console.debug('📡 Performing background sync...');
 }
 
 // Push notifications (future feature)
@@ -121,4 +124,4 @@ self.addEventListener('push', event => {
   }
 });
 
-console.log('🎮 Hasene Arabic Game Service Worker loaded!');
+if (SW_DEBUG) console.debug('🎮 Hasene Arabic Game Service Worker loaded!');

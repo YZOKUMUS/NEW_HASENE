@@ -56,7 +56,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}/`);
-    console.log(`🎮 Main Game: http://localhost:${PORT}/index.html`);
-    console.log('🔧 Ctrl+C ile durdurabilirsiniz');
+    console.info(`🚀 Server running at http://localhost:${PORT}/`);
+    console.info(`🎮 Main Game: http://localhost:${PORT}/index.html`);
+    console.info('🔧 Ctrl+C ile durdurabilirsiniz');
 });
