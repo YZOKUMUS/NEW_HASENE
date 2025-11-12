@@ -30,8 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Material Icons - Preload for better performance -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Material Icons (served via Google Fonts). Preconnect is sufficient; remove explicit preload to avoid unused-preload warnings. -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
     
     <!-- Flutter Modern CSS -->
@@ -373,7 +372,7 @@
             z-index: 1;
             max-height: 100vh;
             overflow-y: auto;
-            padding-top: 95px !important;
+            padding-top: 95px;
         }
 
         /* Scrollbar styling */
@@ -743,6 +742,39 @@
             }
         }
 
+        /* ============ MODE PANES FIX - prevent visual bleed/overlap ========= */
+        /* Make mode panes opaque and higher in stacking order so translucent
+           game cards underneath don't show through when a mode is active */
+        .hadis-mode,
+        .dinle-mode,
+        .bosluk-mode,
+        .mode-selector {
+            position: relative;
+            /* Put mode panes above bottom nav which uses z-index:1000 */
+            z-index: 3000;
+            background: rgba(255,255,255,0.98);
+            border-radius: 14px;
+            padding: 8px 8px 96px 8px; /* add bottom padding so Next button isn't covered */
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        /* Keep internal cards visually consistent */
+        .hadis-card {
+            background: rgba(255,255,255,1);
+            backdrop-filter: none;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        /* Keep Next buttons in the document flow so they push content instead of floating
+           above it. This prevents them from visually overlapping the option buttons. */
+        #dinleNextBtn, #boslukNextBtn, #nextBtn {
+            position: relative;
+            width: 100%;
+            display: none; /* shown by JS when needed */
+            margin-top: 12px;
+            box-sizing: border-box;
+        }
+
         /* ============ BOTTOM NAVIGATION - MODERN GLASS MORPHISM ============ */
         .flutter-bottom-nav {
             position: fixed !important;
@@ -1110,15 +1142,66 @@
             backdrop-filter: blur(25px) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             border-radius: 25px !important;
+            /* Restore original padding so no visible bottom strip appears before the button shows */
             padding: 25px 20px !important;
             margin-bottom: 20px !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 
                         0 5px 15px rgba(0, 0, 0, 0.05),
                         inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
             position: relative !important;
+            /* Keep overflow hidden to avoid stray visuals; next button will be positioned fixed */
             overflow: hidden !important;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
             animation: gameBoxFloat 6s ease-in-out infinite !important;
+        }
+
+        /* Normalize game-box sizing across modes so Dinle/Bosluk match Kelime layout
+           and content appears higher on the screen (prevents content from being pushed
+           too far down on smaller viewports). Responsive: uses a sensible min-height. */
+        .game-screen .game-box,
+        .dinle-mode .game-box,
+        .bosluk-mode .game-box {
+            /* Bosluk oyununda ayet metni yer kaplayabilir; azaltılmış padding ve
+               daha alçak min-height ile içeriği yukarı çekiyoruz */
+            min-height: 420px;
+            padding-top: 10px;
+            padding-bottom: 12px;
+        }
+        .game-screen .game-box,
+        .dinle-mode .game-box {
+            min-height: 480px;
+            padding-top: 12px;
+            padding-bottom: 18px;
+        }
+
+        /* Reduce the large top margin used for dinle-mode icon container so the
+           visual icon doesn't push content down unnecessarily. */
+        .dinle-mode .game-box > div:first-child {
+            margin: 12px 0;
+        }
+
+        /* Bosluk: küçük üst boşluk ve ayet metni marjinlerini küçült */
+        .bosluk-mode .game-box .arabic,
+        .bosluk-mode .game-box .arabic-large {
+            margin: 8px 0;
+            line-height: 1.25;
+            /* Make ayet text a bit smaller in the Bosluk (fill-the-gap) mode so long
+               ayets don't push the option containers and Next button off the screen. */
+            font-size: 22px;
+            padding: 6px 8px;
+        }
+        .bosluk-mode .game-box .options {
+            margin-top: 10px;
+        }
+
+        /* Prevent very long ayets from pushing controls off-screen: limit the
+           height of the Bosluk game-box to the viewport minus header/nav so the
+           content becomes scrollable instead of overflowing the visible area. */
+        .bosluk-mode .game-box {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            /* slightly reduce vertical padding on small screens */
+            padding-bottom: 12px;
         }
 
         .game-box:hover {
@@ -1127,6 +1210,65 @@
                         0 10px 25px rgba(0, 0, 0, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
             backdrop-filter: blur(30px) !important;
+        }
+
+        /* ===== Canonical game layout (use Bosluk's layout/style across all modes) ===== */
+        /* Apply Bosluk-style question placement, option containers, feedback and Next button
+           to all .game-box instances so Kelime and Dinle match the same UX. */
+        .game-box {
+            background: rgba(255,255,255,0.98);
+            border-radius: 14px;
+            padding: 18px;
+            margin: 10px 0;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-box .arabic,
+        .game-box .arabic-large,
+        .game-box .arabic-text,
+        .game-box #arabicWord,
+        .game-box #boslukAyetText {
+            text-align: center;
+            margin: 12px 0 8px 0;
+            font-size: 22px;
+            line-height: 1.4;
+            padding: 6px 8px;
+        }
+
+        /* Center the audio/hint icons under the question like Bosluk */
+        .game-box .audio-btn,
+        .game-box .hint-btn {
+            display: block;
+            margin: 12px auto;
+        }
+
+        /* Options container: centered, constrained width and stacked vertically */
+        .game-box .options {
+            width: 100%;
+            max-width: 760px;
+            margin: 12px auto 6px auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--option-gap, 12px);
+        }
+
+        /* Ensure Next/primary buttons inside game-box follow Bosluk sizing */
+        .game-box > .flutter-btn,
+        .game-box button.flutter-btn,
+        .game-box #nextBtn,
+        .game-box #dinleNextBtn,
+        .game-box #boslukNextBtn {
+            width: 100%;
+            margin-top: 12px;
+            box-sizing: border-box;
+            border-radius: 10px;
+        }
+
+        /* Feedback area consistent placement */
+        .game-box .feedback {
+            margin-top: 8px;
         }
 
         @keyframes gameBoxFloat {
@@ -1259,41 +1401,76 @@
         }
 
         /* ============ SEÇENEKLER - MODERN GLASS MORPHISM ============ */
+        :root {
+            /* Centralized option sizing for consistent look across modes */
+            --option-max-width: 760px;
+            --option-gap: 12px;
+            --option-padding-vertical: 16px;
+            --option-padding-horizontal: 16px;
+            --option-font-size: 16px;
+            /* Increase slightly to accommodate larger Arabic glyph metrics */
+            --option-min-height: 72px;
+            --option-radius: 18px;
+            --option-bg: rgba(255, 255, 255, 0.18);
+            --option-border: rgba(255, 255, 255, 0.25);
+            /* Arabic-specific size (can be tuned) */
+            --option-arabic-font-size: 22px;
+            /* Next button canonical height used for spacing on small screens */
+            --next-height: 64px;
+        }
+
         .options {
             display: flex;
             flex-direction: column;
-            gap: 12px !important;
-            margin: 15px 0 !important;
+            gap: var(--option-gap);
+            margin: 15px 0;
+            width: 100%;
+            max-width: var(--option-max-width);
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
         }
 
-        .option {
-            background: rgba(255, 255, 255, 0.2) !important;
-            backdrop-filter: blur(20px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 18px !important;
-            padding: 20px 16px !important;
-            font-size: 16px !important;
-            cursor: pointer !important;
-            text-align: center !important;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1), 
-                        0 3px 10px rgba(0, 0, 0, 0.05),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-            font-weight: 600 !important;
-            color: #2c3e50 !important;
-            line-height: 1.5 !important;
-            position: relative !important;
-            overflow: hidden !important;
+        /* Canonical option style applied to all modes. Use variables above
+           so changing the canonical Kelime size propagates to Dinle & Bosluk. */
+    .option {
+            background: var(--option-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--option-border);
+            border-radius: var(--option-radius);
+            padding: var(--option-padding-vertical) var(--option-padding-horizontal);
+            font-size: var(--option-font-size);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08),
+                        0 3px 10px rgba(0, 0, 0, 0.04),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            font-weight: 600;
+            color: #2c3e50;
+            line-height: 1.4;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: var(--option-min-height);
+            /* vertically center contents so different line-heights don't change visual height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .option:hover {
-            transform: translateY(-5px) scale(1.02) !important;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 
-                        0 5px 15px rgba(0, 0, 0, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-            backdrop-filter: blur(25px) !important;
-            border-color: rgba(255, 255, 255, 0.4) !important;
-            background: rgba(255, 255, 255, 0.25) !important;
+            /* Reduce hover lift to avoid visual overlap on small screens */
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 
+                        0 4px 12px rgba(0, 0, 0, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(22px);
+            border-color: rgba(255, 255, 255, 0.36);
+            background: rgba(255, 255, 255, 0.24);
         }
 
         /* Hover için haptic feedback tetikleme */
@@ -1327,20 +1504,24 @@
 
         /* Arapça seçenekler için modern glass morphism stil */
         .option.arabic-option {
-            font-size: 24px !important;
-            font-family: 'Uthmani', 'Traditional Arabic', 'Arabic Typesetting', serif !important;
-            direction: ltr !important;
-            text-align: center !important;
-            font-weight: 600 !important;
-            line-height: 1.8 !important;
-            color: #1a365d !important;
+            /* Keep Arabic styling but use shared sizing/padding so height matches other modes */
+            font-size: var(--option-arabic-font-size);
+            font-family: 'Uthmani', 'Traditional Arabic', 'Arabic Typesetting', serif;
+            direction: ltr;
+            text-align: center;
+            font-weight: 600;
+            /* reduce line-height so it fits within the canonical min-height while remaining readable */
+            line-height: 1.35;
+            color: #1a365d;
             background: linear-gradient(135deg, 
                         rgba(255, 215, 0, 0.25), 
                         rgba(173, 216, 230, 0.25),
-                        rgba(255, 182, 193, 0.15)) !important;
-            border: 2px solid rgba(255, 215, 0, 0.4) !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-            position: relative !important;
+                        rgba(255, 182, 193, 0.15));
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* ensure Arabic buttons use the same padding so box heights line up */
+            padding: var(--option-padding-vertical) var(--option-padding-horizontal);
         }
 
         .option.arabic-option:hover {
@@ -1971,12 +2152,16 @@
             /* Seçenekler mobilde daha rahat */
             .options {
                 gap: 8px;  /* Mobilde biraz daha fazla boşluk */
+                max-width: 680px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .option {
                 font-size: 18px;  /* Daha büyük */
                 padding: 18px 16px;
                 margin: 0;  /* Gap kullandığımız için margin kaldırıldı */
+                min-height: 60px;
             }
 
             /* Mobilde Arapça seçenekler */
@@ -1989,6 +2174,95 @@
                 padding: 15px;
                 font-size: 1em;
                 margin: 12px 0;
+            }
+
+            /* ===== Mobile: make game area fit viewport and keep controls visible =====
+               Approach:
+               - Make .game-box a column flex container sized to the viewport height
+               - Let the Arabic/question area grow and scroll if it's long
+               - Keep .options and Next button non-scrolling (sticky) so they remain visible */
+            .game-box {
+                display: flex;
+                flex-direction: column;
+                /* Reserve space for header/nav (approx). This keeps the game-box within the viewport */
+                height: calc(100vh - 120px);
+                /* On mobile make the game-box the scroll container so sticky positioning
+                   of the Next button works reliably across modes. Remove !important and
+                   rely on more specific mode-scoped selectors below instead. */
+                overflow: auto;
+            }
+
+            /* Make the Arabic/question elements flexible and scrollable when content is long */
+            .game-box > .arabic,
+            .game-box > .arabic-text,
+            .game-box > .arabic-large {
+                flex: 1 1 auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-right: 6px; /* avoid text touching the edge when scrolled */
+            }
+
+            /* Generic rule: any direct child of .game-box that isn't the options,
+               feedback, or the specific Next buttons should become the scrollable
+               content area. This handles modes with slightly different markup
+               (e.g., Kelime) so options are not pushed off-screen. */
+            .game-box > *:not(.options):not(.feedback):not(#nextBtn):not(#dinleNextBtn):not(#boslukNextBtn) {
+                flex: 1 1 auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Keep options and feedback area fixed at the bottom of the game-box flow */
+            .game-box .options,
+            .game-box .feedback {
+                flex: 0 0 auto;
+            }
+
+            /* Make the options container scrollable on small screens so long option lists
+               do not get clipped. This keeps every option reachable and preserves the
+               sticky Next button visibility. */
+            .game-box .options {
+                /* Give more vertical space for options so 4th choice is visible on most phones */
+                max-height: calc(50vh);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-right: 6px;
+            }
+
+            /* Make the Next button sticky inside the game-box so it is always reachable */
+            /* More permissive and higher-priority sticky rules that explicitly
+               include the mode-specific Next buttons. Use !important to override
+               any inline or other competing rules so the button remains visible. */
+            /* Mode-scoped sticky rules: higher specificity so we can remove !important
+               and avoid global overrides. These ensure the Next buttons remain sticky
+               inside the active mode without floating over other UI. */
+            .hadis-mode .game-box > .flutter-btn,
+            .hadis-mode .game-box > button.flutter-btn,
+            .hadis-mode .game-box #nextBtn,
+            .hadis-mode .game-box #dinleNextBtn,
+            .hadis-mode .game-box #boslukNextBtn,
+            .dinle-mode .game-box > .flutter-btn,
+            .dinle-mode .game-box > button.flutter-btn,
+            .dinle-mode .game-box #nextBtn,
+            .dinle-mode .game-box #dinleNextBtn,
+            .dinle-mode .game-box #boslukNextBtn,
+            .bosluk-mode .game-box > .flutter-btn,
+            .bosluk-mode .game-box > button.flutter-btn,
+            .bosluk-mode .game-box #nextBtn,
+            .bosluk-mode .game-box #dinleNextBtn,
+            .bosluk-mode .game-box #boslukNextBtn {
+                position: sticky;
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+                z-index: 4000; /* ensure it sits above bottom nav and overlays */
+                margin-top: 8px;
+            }
+
+            /* Reserve space inside the game-box for the sticky Next button so the last
+               option is not hidden behind it */
+            .game-box {
+                /* Reserve more space for the sticky Next button on mobile */
+                --next-height: 80px;
+                padding-bottom: calc(var(--next-height) + env(safe-area-inset-bottom, 12px));
             }
 
             /* Modal mobilde tam ekran */
@@ -2026,11 +2300,15 @@
 
             .options {
                 gap: 8px;  /* Daha kompakt */
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .option {
                 font-size: 16px;  /* Daha uygun boyut */
                 padding: 16px 12px;
+                min-height: 56px;
             }
 
             /* Küçük ekranlarda Arapça seçenekler */
@@ -2133,36 +2411,7 @@
             scroll-behavior: auto !important; /* Smooth scroll'u devre dışı bırak */
         }
 
-        /* 🎮 GESTURE CONTROLS - SWIPE INDICATORS */
-        .swipe-indicator {
-            position: fixed !important;
-            bottom: 100px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            background: rgba(0, 0, 0, 0.8) !important;
-            color: white !important;
-            padding: 8px 16px !important;
-            border-radius: 20px !important;
-            font-size: 12px !important;
-            z-index: 1000 !important;
-            opacity: 0 !important;
-            transition: opacity 0.3s ease !important;
-        }
-
-        .swipe-indicator.show {
-            opacity: 1 !important;
-            animation: swipePulse 2s infinite !important;
-        }
-
-        @keyframes swipePulse {
-            0%, 100% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.1); }
-        }
-
-        .swipe-zone {
-            position: relative !important;
-            touch-action: pan-y !important; /* Vertical scroll'a izin ver, horizontal'ı kontrol et */
-        }
+        /* Swipe gestures removed per user request */
 
         body {
             overflow-anchor: auto; /* Chrome'da scroll anchor'ı optimize et */
@@ -2379,16 +2628,12 @@
             </div>
 
             <!-- 🔍 STREAK DEBUG PANEL (DEV MODE) -->
-            <div style="margin: 10px 20px; padding: 10px; background: rgba(255,193,7,0.1); border: 2px dashed #ffc107; border-radius: 8px; font-size: 0.8em;" id="streakDebugPanel">
-                <div style="font-weight: bold; color: #856404; margin-bottom: 8px;">🔧 Streak Debug Araçları</div>
+            
+                
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <button onclick="analyzeStreak()" style="padding: 5px; font-size: 0.7em; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer;">📊 Analiz Et</button>
-                    <button onclick="testStreak()" style="padding: 5px; font-size: 0.7em; background: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer;">🧪 Test Et</button>
-                    <button onclick="showCalendarModal()" style="padding: 5px; font-size: 0.7em; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">📅 Takvim</button>
-                    <button onclick="console.log('Streak Verisi:', streakData)" style="padding: 5px; font-size: 0.7em; background: #fd7e14; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 Veri</button>
-                </div>
-                <div style="margin-top: 8px; font-size: 0.65em; color: #6c757d;">
-                    Console'u açık tutarak butonlara basın. F12 → Console
+                    
+                
+                   
                 </div>
             </div>
         </div>
@@ -4428,6 +4673,19 @@
                 currentAudio.onplay = null;
             }
         }
+
+        // Hide all mode containers so only the requested mode is visible
+        function hideAllModes() {
+            const modeKeys = ['dinleMode','hadisMode','boslukMode','ayetMode','duaMode','modeSelector','gameScreen','mainMenu'];
+            modeKeys.forEach(k => {
+                try {
+                    const el = elements[k];
+                    if (el && el.style) el.style.display = 'none';
+                } catch (e) {
+                    // ignore missing elements
+                }
+            });
+        }
         
         function playAudio(audioUrl, button) {
             // Eğer ses çalıyorsa durdur
@@ -6148,7 +6406,7 @@
             console.log(`🎯 Mevcut zorluk: ${currentDifficulty}`);
             
             console.log('📋 2. Mode Selector açılıyor...');
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.modeSelector) elements.modeSelector.style.display = 'block';
             if (elements.settingsBtn) elements.settingsBtn.style.display = 'block';
             console.log('✅ Mode Selector açıldı!');
@@ -6171,7 +6429,7 @@
             console.log(`🎯 Zorluk config:`, CONFIG.difficultyLevels[currentDifficulty]);
             
             console.log('📋 3. UI değiştiriliyor...');
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.dinleMode) elements.dinleMode.style.display = 'block';
             console.log('✅ UI değişikliği tamamlandı');
             
@@ -6219,7 +6477,7 @@
             console.log(`🎯 Mevcut zorluk: ${currentDifficulty}`);
             
             console.log('📋 2. UI değiştiriliyor...');
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.boslukMode) elements.boslukMode.style.display = 'block';
             console.log('✅ UI değişikliği tamamlandı');
             
@@ -6242,7 +6500,7 @@
                 showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.duaMode) elements.duaMode.style.display = 'block';
             // Rastgele dua ile başla
             currentDuaIndex = Math.floor(Math.random() * duaData.length);
@@ -6255,7 +6513,7 @@
                 showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.ayetMode) elements.ayetMode.style.display = 'block';
             // Rastgele ayet ile başla
             currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
@@ -6268,7 +6526,7 @@
                 showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            hideAllModes();
             if (elements.hadisMode) elements.hadisMode.style.display = 'block';
             // Rastgele hadis ile başla
             currentHadisIndex = Math.floor(Math.random() * hadisData.length);
@@ -6277,9 +6535,10 @@
 
         // Geri butonları
         elements.backToMenuBtn.onclick = () => {
-            elements.modeSelector.style.display = 'none';
-            elements.mainMenu.style.display = 'block';
-            elements.settingsBtn.style.display = 'none';
+            // Ensure all modes are hidden and return to main menu
+            hideAllModes();
+            if (elements.mainMenu) elements.mainMenu.style.display = 'block';
+            if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
         };
 
         elements.backFromGameBtn.onclick = async () => {
@@ -6325,9 +6584,7 @@
         if (elements.backFromAyetBtn) {
             elements.backFromAyetBtn.onclick = () => {
                 stopCurrentAudio(); // Mevcut ses varsa durdur
-                if (elements.ayetMode) elements.ayetMode.style.display = 'none';
-                if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-                if (elements.gameScreen) elements.gameScreen.style.display = 'none';
+                hideAllModes();
                 if (elements.mainMenu) {
                     elements.mainMenu.removeAttribute('style');
                     elements.mainMenu.style.display = 'block';
@@ -6340,17 +6597,12 @@
             elements.backFromDuaBtn.onclick = () => {
                 console.log('⬅️ Dua geri butonuna tıklandı');
                 stopCurrentAudio(); // Mevcut ses varsa durdur
-                
-                // Null check'ler ekle
-                if (elements.duaMode) elements.duaMode.style.display = 'none';
-                if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-                if (elements.gameScreen) elements.gameScreen.style.display = 'none';
+                hideAllModes();
                 if (elements.mainMenu) {
                     elements.mainMenu.removeAttribute('style');
                     elements.mainMenu.style.display = 'block';
                 }
                 if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-                
                 console.log('✅ Ana menüye döndü');
             };
         }
@@ -6358,9 +6610,7 @@
         if (elements.backFromHadisBtn) {
             elements.backFromHadisBtn.onclick = () => {
                 stopCurrentAudio(); // Mevcut ses varsa durdur
-                if (elements.hadisMode) elements.hadisMode.style.display = 'none';
-                if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-                if (elements.gameScreen) elements.gameScreen.style.display = 'none';
+                hideAllModes();
                 if (elements.mainMenu) {
                     elements.mainMenu.removeAttribute('style');
                     elements.mainMenu.style.display = 'block';
@@ -6396,10 +6646,8 @@
                 comboCount = 0;
             }
             
-            // Güvenli element erişimi
-            if (elements.boslukMode) elements.boslukMode.style.display = 'none';
-            if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-            if (elements.gameScreen) elements.gameScreen.style.display = 'none';
+            // Hide all modes and return to main menu
+            hideAllModes();
             if (elements.mainMenu) {
                 elements.mainMenu.removeAttribute('style');
                 elements.mainMenu.style.display = 'block';
@@ -6434,9 +6682,8 @@
                 comboCount = 0;
             }
             
-            elements.dinleMode.style.display = 'none';
-            elements.modeSelector.style.display = 'none';
-            elements.gameScreen.style.display = 'none';
+            // Hide all modes and return to main menu
+            hideAllModes();
             if (elements.mainMenu) {
                 elements.mainMenu.removeAttribute('style');
                 elements.mainMenu.style.display = 'block';
@@ -6517,7 +6764,9 @@
             elements.gameScreen.style.display = 'block';
             
             // 🎮 Gesture sistemini başlat
-            initGameGestures();
+            // Swipes disabled per user request (button exists). Keep init call
+            // commented so gestures won't be active but code remains for future.
+            // initGameGestures();
             
             // ⚡ Speed animation ile yeni soruyu yükle
             addSpeedAnimation(elements.gameScreen, 'slide-up');
@@ -6784,6 +7033,7 @@
             }
 
             questionCount++;
+            // Show the next button (Kelime)
             elements.nextBtn.style.display = 'block';
         }
 
@@ -7187,6 +7437,7 @@
             console.log(`🚨 === CEVAP KONTROLÜ BİTTİ ===`);
             console.log(`🎨 UI güncelleniyor ve Next butonu gösteriliyor...`);
             updateDinleUI();
+            // Show the Dinle 'Next' button
             elements.dinleNextBtn.style.display = 'block';
             console.log(`✅ Cevap işlemi tamamen tamamlandı!`);
         }
@@ -7432,6 +7683,7 @@
             console.log(`📊 FINAL - boşluk: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}, questionCount=${boslukQuestionCount}`);
             console.log(`🚨 === BOŞLUK DOLDUR CEVAP KONTROLÜ BİTTİ ===`);
             updateBoslukUI();
+            // Show the Bosluk 'Next' button
             elements.boslukNextBtn.style.display = 'block';
         }
 
@@ -8256,101 +8508,7 @@
             }
         }
 
-        // 🎮 GESTURE CONTROLS SYSTEM
-        class SwipeGestureHandler {
-            constructor(element, onSwipeLeft, onSwipeRight) {
-                this.element = element;
-                this.onSwipeLeft = onSwipeLeft;
-                this.onSwipeRight = onSwipeRight;
-                this.startX = 0;
-                this.startY = 0;
-                this.threshold = 100; // Minimum swipe distance
-
-                this.init();
-            }
-
-            init() {
-                this.element.addEventListener('touchstart', (e) => {
-                    this.startX = e.touches[0].clientX;
-                    this.startY = e.touches[0].clientY;
-                });
-
-                this.element.addEventListener('touchend', (e) => {
-                    if (!this.startX || !this.startY) return;
-
-                    const endX = e.changedTouches[0].clientX;
-                    const endY = e.changedTouches[0].clientY;
-                    
-                    const diffX = this.startX - endX;
-                    const diffY = this.startY - endY;
-
-                    // Horizontal swipe kontrolü
-                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > this.threshold) {
-                        if (diffX > 0) {
-                            // Sol swipe (sonraki soru)
-                            triggerHaptic('light');
-                            this.onSwipeLeft && this.onSwipeLeft();
-                        } else {
-                            // Sağ swipe (önceki/geri)
-                            triggerHaptic('light');
-                            this.onSwipeRight && this.onSwipeRight();
-                        }
-                    }
-
-                    this.startX = 0;
-                    this.startY = 0;
-                });
-            }
-        }
-
-        // Swipe indicator göster/gizle
-        function showSwipeIndicator(text = '👈 Kaydır: Sonraki Soru') {
-            let indicator = document.querySelector('.swipe-indicator');
-            if (!indicator) {
-                indicator = document.createElement('div');
-                indicator.className = 'swipe-indicator';
-                document.body.appendChild(indicator);
-            }
-            indicator.textContent = text;
-            indicator.classList.add('show');
-            
-            setTimeout(() => {
-                indicator.classList.remove('show');
-            }, 3000);
-        }
-
-        // Oyun başladığında swipe sistemini başlat
-        let gameSwipeHandler = null;
-
-        function initGameGestures() {
-            const gameScreen = document.getElementById('gameScreen');
-            if (gameScreen && !gameSwipeHandler) {
-                gameScreen.classList.add('swipe-zone');
-                
-                gameSwipeHandler = new SwipeGestureHandler(
-                    gameScreen,
-                    () => {
-                        // Sol swipe: Sonraki soru
-                        const nextBtn = document.getElementById('nextBtn');
-                        if (nextBtn && nextBtn.style.display !== 'none') {
-                            addSpeedAnimation(nextBtn, 'zoom-in');
-                            nextBtn.click();
-                        }
-                    },
-                    () => {
-                        // Sağ swipe: Geri
-                        const backBtn = document.getElementById('backFromGameBtn');
-                        if (backBtn) {
-                            addSpeedAnimation(backBtn, 'slide-up');
-                            triggerHaptic('medium');
-                        }
-                    }
-                );
-
-                // İlk oyun başladığında swipe rehberi göster
-                setTimeout(() => showSwipeIndicator(), 2000);
-            }
-        }
+        // Swipe gestures removed per user request. All swipe-related JS deleted.
 
     </script>
 
