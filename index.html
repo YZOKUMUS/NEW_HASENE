@@ -7034,7 +7034,26 @@
 
             questionCount++;
             // Show the next button (Kelime)
-            elements.nextBtn.style.display = 'block';
+            try {
+                if (elements && elements.nextBtn) {
+                    elements.nextBtn.style.display = 'block';
+                    elements.nextBtn.style.visibility = 'visible';
+                    elements.nextBtn.removeAttribute('hidden');
+                    elements.nextBtn.setAttribute('aria-hidden', 'false');
+                    // Ensure it's visible on small viewports by scrolling it into view
+                    setTimeout(() => {
+                        try {
+                            elements.nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        } catch (e) {
+                            console.warn('scrollIntoView failed:', e);
+                        }
+                    }, 60);
+                } else {
+                    console.warn('elements.nextBtn is not available to show');
+                }
+            } catch (err) {
+                console.error('Error while showing nextBtn for Kelime:', err);
+            }
         }
 
         // ============ SES ÇALMA ============
