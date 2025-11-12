@@ -3999,7 +3999,7 @@
                 return;
             }
             
-            // console.log('✅ Kelime listesi gösteriliyor, toplam:', filteredStats.length, 'kelime');
+            // (commented) Kelime listesi log removed during cleanup
             listContainer.innerHTML = filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
                 // Kelime verisi yoksa veya geçersizse bu kartı gösterme
                 if (!item.wordData || !item.wordData.kelime || item.wordData.kelime.includes('undefined') || item.wordData.kelime.includes('bosluk')) {
@@ -4066,7 +4066,7 @@
         function saveWordStats(wordStats) {
             try {
                 localStorage.setItem('hasene_wordStats', JSON.stringify(wordStats));
-                // console.log('💾 Kelime istatistikleri kaydedildi');
+                // (commented) Kelime istatistikleri kaydedildi
             } catch (error) {
                 console.error('📊 Kelime istatistikleri kaydedilirken hata:', error);
             }
@@ -4163,7 +4163,7 @@
             for (const item of wordsWithPriority) {
                 random -= item.priority;
                 if (random <= 0) {
-                    // console.log(`🎯 Seçilen kelime: ${item.word.kelime} (öncelik: ${item.priority.toFixed(2)})`);
+                    // (commented) Seçilen kelime log removed during cleanup
                     return item.word;
                 }
             }
@@ -4176,7 +4176,7 @@
         
         // DOM yüklendikten sonra çalıştır
         document.addEventListener('DOMContentLoaded', function() {
-            // console.log('🚀 DOM yüklendi, oyun başlatılıyor...');
+            // (commented) DOM yüklendi log removed during cleanup
             
             // Daily Goal'u başlat
             if (!localStorage.getItem('dailyGoalHasene')) {
@@ -4803,19 +4803,19 @@
                 
                 // Kelime verilerini yükle (Kelime Çevir ve Dinle ve Bul için) - 3x retry
                 kelimeBulData = await fetchWithRetry('kelimebul.json');
-                // console.log(`${kelimeBulData.length} kelime yüklendi`);
+                // (commented) kelimeBulData length log removed during cleanup
                 
                 // Ayet verilerini yükle (Boşluk Doldur ve Ayet Oku için) - 3x retry
                 ayetOkuData = await fetchWithRetry('ayetoku_formatted.json');
-                // console.log(`${ayetOkuData.length} ayet yüklendi`);
+                // (commented) ayetOkuData length log removed during cleanup
                 
                 // Dua verilerini yükle (Dua Et için) - 3x retry
                 duaData = await fetchWithRetry('duaet.json');
-                // console.log(`${duaData.length} dua yüklendi`);
+                // (commented) duaData length log removed during cleanup
                 
                 // Hadis verilerini yükle (Hadis Oku için) - 3x retry
                 hadisData = await fetchWithRetry('hadisoku.json');
-                // console.log(`${hadisData.length} hadis yüklendi`);
+                // (commented) hadisData length log removed during cleanup
                 
                 // Mod seçiciyi başlat
                 initModeSelector();
@@ -6371,7 +6371,7 @@
 
         // ============ ANA MENÜ ZORLUK BUTONLARI ============
         function initMainMenuDifficultyButtons() {
-            // console.log('🔧 initMainMenuDifficultyButtons çağrıldı');
+            // (commented) initMainMenuDifficultyButtons called log removed during cleanup
             
             // Kaydedilen zorluk seviyesini UI'da göster
             updateDifficultyUI();
