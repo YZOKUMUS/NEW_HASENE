@@ -6964,30 +6964,30 @@
 
         // ============ CEVAP KONTROL ============
         function checkAnswer(button, isCorrect) {
-            console.log(`🚨 === KELİME ÇEVİR CEVAP KONTROLÜ ===`);
-            console.log(`👆 Tıklanan buton: "${button.textContent}"`);
-            console.log(`✅/❌ isCorrect parametresi: ${isCorrect}`);
-            console.log(`📊 Mevcut soru: #${questionCount + 1}`);
-            console.log(`📊 Önce - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
-            console.log(`📊 Önce - kelime çevir: score=${score}, correct=${correct}, wrong=${wrong}`);
+            log.game(`🚨 === KELİME ÇEVİR CEVAP KONTROLÜ ===`);
+            log.game(`👆 Tıklanan buton: "${button.textContent}"`);
+            log.game(`✅/❌ isCorrect parametresi: ${isCorrect}`);
+            log.game(`📊 Mevcut soru: #${questionCount + 1}`);
+            log.game(`📊 Önce - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
+            log.game(`📊 Önce - kelime çevir: score=${score}, correct=${correct}, wrong=${wrong}`);
             
             stopTimer();
             
             // Tüm butonları kapat
             const allBtns = document.querySelectorAll('.option');
-            console.log(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
+            log.game(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
             allBtns.forEach(btn => btn.disabled = true);
 
             const mode = CONFIG.gameModes[currentMode];
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-            console.log(`🎯 Mod: ${currentMode}, Zorluk: ${currentDifficulty}`);
+            log.game(`🎯 Mod: ${currentMode}, Zorluk: ${currentDifficulty}`);
 
             // KELİME İSTATİSTİKLERİNİ GÜNCELLE
-            console.log(`📊 Kelime istatistiği güncelleniyor: ${currentQuestion.kelime} (ID: ${currentQuestion.id})`);
+            log.game(`📊 Kelime istatistiği güncelleniyor: ${currentQuestion.kelime} (ID: ${currentQuestion.id})`);
             updateWordStats(currentQuestion.id, isCorrect);
 
             if (isCorrect) {
-                console.log(`✅ === SAHİH CEVAP İŞLEMİ ===`);
+                log.game(`✅ === SAHİH CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
                 elements.feedback.textContent = '✅ Mâşâallah!';
                 elements.feedback.className = 'feedback correct';
@@ -7004,8 +7004,8 @@
                 }
                 
                 const points = currentQuestion.difficulty * diffLevel.pointsMultiplier;
-                console.log(`💰 Puan hesaplama: ${currentQuestion.difficulty} × ${diffLevel.pointsMultiplier} = ${points} puan`);
-                console.log(`📊 addSessionPoints(${points}) çağrılıyor...`);
+                log.game(`💰 Puan hesaplama: ${currentQuestion.difficulty} × ${diffLevel.pointsMultiplier} = ${points} puan`);
+                log.game(`📊 addSessionPoints(${points}) çağrılıyor...`);
                 addSessionPoints(points); // Session puanına ekle
                 
                 // Daily task progress - her doğru cevap için
@@ -7014,14 +7014,14 @@
                 // Perfect streak kontrolü - hiç yanlış yapmamışsak perfect streak artır
                 if (sessionWrong === 0) {
                     updateTaskProgress('perfectStreak', 1);
-                    console.log(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
+                    log.game(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
                 }
                 
-                console.log(`✅ Doğru cevap işlemi tamamlandı!`);
+                log.game(`✅ Doğru cevap işlemi tamamlandı!`);
                 
                 updateUI();
             } else {
-                console.log(`❌ === HATA CEVAP İŞLEMİ ===`);
+                log.game(`❌ === HATA CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
                 elements.feedback.textContent = `❌ Hatalı! Sahih: ${currentQuestion.anlam}`;
                 elements.feedback.className = 'feedback wrong';
@@ -7030,18 +7030,18 @@
                 triggerHaptic('error');
                 addSpeedAnimation(elements.feedback, 'zoom-in');
                 
-                console.log(`📊 addSessionWrong() çağrılıyor...`);
+                log.game(`📊 addSessionWrong() çağrılıyor...`);
                 addSessionWrong(); // Session yanlış sayısını artır
                 
-                console.log(`💸 Puan cezası uygulanıyor: ${CONFIG.wrongAnswerPenalty} puan`);
-                console.log(`📊 Eski score: ${score}`);
+                log.game(`💸 Puan cezası uygulanıyor: ${CONFIG.wrongAnswerPenalty} puan`);
+                log.game(`📊 Eski score: ${score}`);
                 // Puan cezası
                 score = Math.max(0, score - CONFIG.wrongAnswerPenalty);
-                console.log(`📊 Yeni score: ${score}`);
+                log.game(`📊 Yeni score: ${score}`);
                 
                 // Can kaybı
                 if (mode.lives > 0) {
-                    console.log(`💀 Can kaybı: ${lives} - 1 = ${lives - 1}`);
+                    log.game(`💀 Can kaybı: ${lives} - 1 = ${lives - 1}`);
                     lives--;
                     elements.lives.textContent = lives;
                     
@@ -7073,14 +7073,14 @@
                         try {
                             elements.nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         } catch (e) {
-                            console.warn('scrollIntoView failed:', e);
+                            log.warn('scrollIntoView failed:', e);
                         }
                     }, 60);
                 } else {
-                    console.warn('elements.nextBtn is not available to show');
+                    log.warn('elements.nextBtn is not available to show');
                 }
             } catch (err) {
-                console.error('Error while showing nextBtn for Kelime:', err);
+                log.error('Error while showing nextBtn for Kelime:', err);
             }
         }
 
@@ -7235,10 +7235,7 @@
             }
         }
 
-        // Eski levelUp fonksiyonu artık kullanılmıyor
-        function levelUp() {
-            // Bu fonksiyon artık kullanılmıyor - yeni puan bazlı sistem kullanıyoruz
-        }
+        // NOTE: eski levelUp fonksiyonu kaldırıldı (unused)
 
         // ============ OYUN BİTTİ ============
         function gameOver(reason) {
