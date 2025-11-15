@@ -1,47 +1,49 @@
-/* 🎨 FLUTTER MATERIAL DESIGN - MODERN OYUN STILI */
+/* 🎨 FLUTTER MATERIAL DESIGN - MODERN DUOLINGO STİLİ */
 
-/* ============ MOBILE SCROLL FIX ============ */
+/* ============ GLOBAL ============ */
 html, body {
-    height: 100vh;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
     margin: 0;
     padding: 0;
-    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--background);
+    overflow-x: hidden;
 }
 
-/* Sadece oyun içeriği scroll edilebilir */
+/* Tüm içerik ortada kayabilir */
 .flutter-app {
-    height: 100vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    padding-top: 70px;   /* Üst app bar yüksekliği */
+    padding-bottom: 80px;/* Alt nav yüksekliği */
+    min-height: 100vh;
 }
 
+/* ============ THEME ============ */
 :root {
-    /* Flutter Light Theme */
     --primary: #6200EA;
     --primary-light: #9C47FF;
     --surface: #FFFFFF;
     --background: #F7F7F7;
     --text-primary: #1C1C1E;
     --text-secondary: #6B7280;
-    
-    /* Game Mode Colors */
+
     --kelime-color: #FF6B6B;
     --dinle-color: #4ECDC4;
     --bosluk-color: #45B7D1;
     --dua-color: #96CEB4;
     --ayet-color: #FECA57;
     --hadis-color: #FF9FF3;
-    
-    /* Shadows */
+
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* ============ FLUTTER APP BAR ============ */
+/* ============ APP BAR (SABİT) ============ */
 .flutter-app-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
     background: var(--surface);
     padding: 16px 20px;
     display: flex;
@@ -49,528 +51,138 @@ html, body {
     justify-content: space-between;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     border-bottom: 1px solid #E5E5E7;
+    z-index: 9999;
 }
 
 .flutter-app-bar h1 {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-primary);
 }
 
-.flutter-app-bar .back-btn {
-    background: none;
-    border: none;
-    color: var(--primary);
-    padding: 8px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-weight: 500;
-}
-
-.flutter-app-bar .back-btn .material-icons {
-    font-size: 20px;
-}
-
-.flutter-app-bar .back-btn:hover {
-    background: rgba(98, 0, 234, 0.1);
-    transform: translateX(-2px);
-}
-
-.flutter-app-bar .back-btn:active {
-    transform: translateX(-1px) scale(0.95);
-}
-
-/* ============ FLUTTER GAME CARDS ============ */
-.flutter-game-grid {
-    padding-bottom: 60px !important;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 12px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.flutter-game-card {
-    min-height: 80px;
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    box-shadow: var(--shadow);
-    border: none;
-    position: relative;
-    overflow: hidden;
-    gap: 12px;
-}
-
-.flutter-game-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--shadow-hover);
-}
-
-.flutter-game-card:active {
-    transform: translateY(-2px) scale(0.98);
-}
-
-/* Game Card Colors */
-.flutter-game-card.kelime { background: linear-gradient(135deg, var(--kelime-color), #FF5252); }
-.flutter-game-card.dinle { background: linear-gradient(135deg, var(--dinle-color), #26C6DA); }
-.flutter-game-card.bosluk { background: linear-gradient(135deg, var(--bosluk-color), #2196F3); }
-.flutter-game-card.dua { background: linear-gradient(135deg, var(--dua-color), #4CAF50); }
-.flutter-game-card.ayet { background: linear-gradient(135deg, var(--ayet-color), #FFC107); }
-.flutter-game-card.hadis { background: linear-gradient(135deg, var(--hadis-color), #E91E63); }
-
-.game-card-icon {           /* İkon stili BUYUTMEK*/
-    font-size: 60px;
-    margin: 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-    flex-shrink: 0;
-}
-
-.game-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #2c2c2c;
-    margin-bottom: 2px;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.3);
-}
-
-.game-card-desc {
-    font-size: 11px;
-    color: #444444;
-    line-height: 1.3;
-    text-shadow: 0 1px 2px rgba(255,255,255,0.2);
-}
-
-/* ============ STATS SECTION ============ */
-.flutter-stats-section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 20px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.flutter-stat-card {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 16px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    transition: transform 0.2s ease;
-}
-
-.flutter-stat-card:hover {
-    transform: translateY(-2px);
-}
-
-.flutter-stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 4px;
-}
-
-.flutter-stat-label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* ============ FLOATING ACTION BUTTON ============ */
-.flutter-fab {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    transition: all 0.3s ease;
-}
-
-.flutter-fab:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-hover);
-}
-
-/* ============ BOTTOM NAVIGATION ============ */
+/* ============ BOTTOM NAV (SABİT) ============ */
 .flutter-bottom-nav {
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
-    background: #FFFFFF !important;
-    border-bottom: 2px solid #CCCCCC;
-    padding: 12px 0;
-    display: flex !important;
-    justify-content: space-around;
-    z-index: 1000;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     height: 70px;
+    background: #ffffff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 9999;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
 }
 
 .flutter-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 8px 12px;
-    border-radius: 12px;
+    gap: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    color: #666666 !important;
-    text-decoration: none;
-    min-width: 60px;
-}
-
-.flutter-nav-item.active {
-    background: rgba(98, 0, 234, 0.15);
-    color: #6200EA !important;
-}
-
-.flutter-nav-item:hover {
-    background: rgba(0, 0, 0, 0.05);
-    transform: scale(1.1);
-}
-
-/* İstatistik butonu - Mavi */
-.flutter-nav-item:nth-child(1) {
-    color: #2196F3 !important;
-}
-
-.flutter-nav-item:nth-child(1):hover {
-    background: rgba(33, 150, 243, 0.1);
-}
-
-/* Görevler butonu - Yeşil */
-.flutter-nav-item:nth-child(2) {
-    color: #4CAF50 !important;
-}
-
-.flutter-nav-item:nth-child(2):hover {
-    background: rgba(76, 175, 80, 0.1);
-}
-
-/* Başarılar butonu - Sarı/Altın */
-.flutter-nav-item:nth-child(3) {
-    color: #FFC107 !important;
-}
-
-.flutter-nav-item:nth-child(3):hover {
-    background: rgba(255, 193, 7, 0.2);
-    transform: scale(1.05);
-}
-
-.flutter-nav-item:nth-child(3):hover i {
-    animation: glowPulse 0.8s ease-in-out infinite;
-    color: #FFD700;
-}
-
-@keyframes glowPulse {
-    0%, 100% {
-        transform: scale(1);
-        text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
-    }
-    50% {
-        transform: scale(1.2);
-        text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.8);
-    }
-}
-
-/* Takvim butonu - Kırmızı */
-.flutter-nav-item:nth-child(4) {
-    color: #FF6B6B !important;
-}
-
-.flutter-nav-item:nth-child(4):hover {
-    background: rgba(255, 107, 107, 0.1);
+    color: #777;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .flutter-nav-item i {
-    font-size: 24px;
-    margin-bottom: 4px;
-    color: inherit !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    font-size: 22px;
 }
 
-.flutter-nav-item span {
-    font-size: 12px;
-    font-weight: 600;
-    color: inherit !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+.flutter-nav-item.active {
+    color: var(--primary);
+    transform: scale(1.05);
+}
+
+/* ============ GAME GRID ============ */
+.flutter-game-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.flutter-game-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.flutter-game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.game-card-icon {
+    font-size: 52px;
+}
+
+.game-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c2c2c;
+}
+
+.game-card-desc {
+    font-size: 11px;
+    color: #555;
 }
 
 /* ============ ARABIC TEXT ============ */
 .arabic-text {
-    font-family: 'Amiri Quran', 'Scheherazade New', serif;
-    direction: rtl;
-    text-align: center;
-    line-height: 1.8;
+    font-family: 'Amiri Quran', serif;
     font-size: 32px;
-    color: #2D3748;
+    text-align: center;
     margin: 20px 0;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* ============ GAME SCREEN ============ */
-.game-screen {
-    padding-bottom: 80px;
-    background: var(--background);
-}
-
-.flutter-card {
-    background: var(--surface);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 24px;
-    margin: 20px;
-    border: none;
-}
-
-/* ============ OPTIONS BUTTONS ============ */
-.option {
+/* ============ OPTIONS ============ */
+.option, .flutter-option-btn {
     width: 100%;
-    padding: 16px 20px;
-    margin: 2px 0;
-    border: 2px solid #E5E5E7;
-    border-radius: 16px;
-    background: var(--surface);
-    color: #000000;
-    font-size: 16px;
-    font-weight: 500;
+    padding: 16px;
+    margin: 6px 0;
+    border-radius: 14px;
+    border: 2px solid #e0e0e0;
+    background: #fff;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: 0.25s;
 }
 
-.option:hover {
-    background: #F0F0F0;
+.option:hover,
+.flutter-option-btn:hover {
+    background: #f0f0f0;
     border-color: var(--primary);
     transform: translateY(-2px);
-    box-shadow: var(--shadow);
 }
 
-.option.correct {
+/* Sonuç renkleri */
+.option.correct,
+.flutter-option-btn.correct {
     background: #E8F5E8;
     border-color: #4CAF50;
     color: #2E7D32;
 }
 
-.option.wrong {
+.option.wrong,
+.flutter-option-btn.wrong {
     background: #FFEBEE;
     border-color: #F44336;
     color: #C62828;
-    animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-}
-
-/* ============ BUTTONS ============ */
-.flutter-btn {
-    border: none;
-    border-radius: 16px;
-    padding: 14px 28px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: none;
-}
-
-.flutter-btn-primary {
-    background: var(--primary);
-    color: white;
-    box-shadow: var(--shadow);
-}
-
-.flutter-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-}
-
-/* ============ MODAL BUTTONS ============ */
-.modal-btn {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 8px;
-    font-size: 0.9em;
-    font-weight: bold;
-    cursor: pointer;
-    width: auto;
-    max-width: 200px;
-    display: block;
-    margin: 20px auto 0;
-    transition: all 0.3s ease;
-}
-
-.modal-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-    background: #c0392b;
 }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 480px) {
-    /* Mobile scroll ayarı - scroll kilitleme yerine daha yumuşak kontrol */
-    html, body {
-        min-height: 100vh;
-        overflow-x: hidden;
-        /* overflow-y varsayılan kalsın ki sayfa gerektiği gibi kayabilsin */
-        position: relative;
-        width: 100%;
-    }
-
-    .flutter-app {
-        min-height: 100vh;
-        overflow-y: auto;
-        padding-bottom: 0;
-    }
-
-    /* Main menu mobilde daha kompakt */
-    .main-menu {
-        min-height: auto !important;
-        height: 100vh !important;
-        padding-bottom: 20px !important;
-        overflow-y: auto !important;
-    }
-    
-    .flutter-game-grid {
-    padding-bottom: 60px !important;
-        padding: 16px;
-        gap: 12px;
-        margin-bottom: 0 !important;
-    }
-    
-    .game-card-icon {
-        font-size: 60px;
-    }
-    
-    .game-card-title {
-        font-size: 14px;
-    }
-    
-    .game-card-desc {
-        font-size: 11px;
-    }
-    
-    .arabic-text {
-        font-size: 28px;
-    }
-    
-    /* Daily goal section mobile */
-    .daily-goal-section {
-        margin: 0 !important;
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-}
-
-/* ============ MAIN MENU ============ */
-.main-menu {
-    padding-bottom: 80px;
-    background: var(--background);
-    min-height: 100vh;
-    box-sizing: border-box;
-}
-
-/* ============ DAILY GOAL SECTION ============ */
-.daily-goal-section {
-    background: transparent;
-    margin: 0;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
-    max-width: 100%;
-}
-
-/* ============ LOADING ============ */
-.loading-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: var(--background);
-}
-
-
-/* ============ FLUTTER OPTION BUTTONS ============ */
-.flutter-option-btn {
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    border: 2px solid rgba(168, 237, 234, 0.5);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin: 2px 0;
-    width: 100%;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 500;
-    color: #2d3436;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(168, 237, 234, 0.4);
-    position: relative;
-    overflow: hidden;
-}
-
-.flutter-option-btn:hover {
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    box-shadow: 0 8px 25px rgba(250, 112, 154, 0.5);
-    transform: translateY(-5px) scale(1.03);
-    border-color: rgba(250, 112, 154, 0.6);
-    color: white;
-}
-
-.flutter-option-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.flutter-option-btn.correct {
-    background: linear-gradient(135deg, #4CAF50, #66BB6A);
-    color: white;
-    border-color: #4CAF50;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-}
-
-.flutter-option-btn.wrong {
-    background: linear-gradient(135deg, #F44336, #EF5350);
-    color: white;
-    border-color: #F44336;
-    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-}
-
-.flutter-option-btn.arabic-option {
-    font-family: 'Amiri Quran', 'Scheherazade New', serif;
-    font-size: 18px;
-    line-height: 1.6;
+    .arabic-text { font-size: 26px; }
+    .game-card-icon { font-size: 50px; }
 }
