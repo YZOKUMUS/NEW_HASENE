@@ -4326,38 +4326,7 @@
 
         
 
-        function applyDiacriticColoring(element) {
-            if (!element) return;
-            
-            // Eğer element bir text node ise
-            if (element.nodeType === Node.TEXT_NODE) {
-                const colorizedText = colorizeArabicDiacritics(element.textContent);
-                if (colorizedText !== element.textContent) {
-                    const wrapper = document.createElement('span');
-                    wrapper.innerHTML = colorizedText;
-                    element.parentNode.replaceChild(wrapper, element);
-                }
-                return;
-            }
-            
-            // Element ise, child node'ları kontrol et
-            if (element.childNodes) {
-                Array.from(element.childNodes).forEach(child => {
-                    applyDiacriticColoring(child);
-                });
-            }
-        }
-
-        function updateArabicTextColoring() {
-            // Tüm Arapça text elementlerini bul ve hareke renklerini uygula
-            const arabicElements = document.querySelectorAll('.arabic-option, .arabic-text, .hadis-arabic, [dir="rtl"], [style*="direction: rtl"], [class*="arabic"]');
-            
-            arabicElements.forEach(element => {
-                // Arapça metinleri kömür karası yap
-                element.style.color = '#2C2C2C';
-                applyDiacriticColoring(element);
-            });
-        }
+        
         
         function showAchievementUnlock(achievement) {
             const notification = document.createElement('div');
@@ -8387,6 +8356,12 @@
     </script>
 
     <!-- Özel Onay Pop-up -->
+        <script>
+        // Arapça hareke renklendirme fonksiyonu artık boş
+        function updateArabicTextColoring() {
+            // Hareke renklendirme yapılmıyor, oyun akışı için boş bırakıldı.
+        }
+        </script>
     <div class="custom-confirm" id="customConfirm">
         <div class="confirm-content">
             <div class="confirm-title">🎮 Oyundan Çıkış</div>
