@@ -3134,7 +3134,7 @@
                         <div style="font-size: 0.7em; color: #666;">Talim Tutarlılığı</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #9b59b6;" id="statsLevelProgress">0%</div>
+                        <div style="font-size: 1.1em; font-weight: bold; color: #9b59b6;" id="statsLevelProgressText">0%</div>
                         <div style="font-size: 0.7em; color: #666;">Mertebe İlerlemesi</div>
                     </div>
                 </div>
@@ -5530,7 +5530,7 @@
             document.getElementById('statsSuccessRate').textContent = successRate + '%';
             document.getElementById('statsAvgPointsPerDay').textContent = avgPointsPerDay.toLocaleString();
             document.getElementById('statsPlayConsistency').textContent = Math.min(100, playConsistency) + '%';
-            document.getElementById('statsLevelProgress').textContent = levelProgressPercent + '%';
+            document.getElementById('statsLevelProgressText').textContent = levelProgressPercent + '%';
             
             // Streak bilgilerini güncelle
             document.getElementById('statsCurrentStreak').textContent = streakData.currentStreak;

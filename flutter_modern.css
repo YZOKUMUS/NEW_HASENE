@@ -89,6 +89,7 @@ html, body {
 
 /* ============ FLUTTER GAME CARDS ============ */
 .flutter-game-grid {
+    padding-bottom: 60px !important;
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
@@ -133,8 +134,8 @@ html, body {
 .flutter-game-card.ayet { background: linear-gradient(135deg, var(--ayet-color), #FFC107); }
 .flutter-game-card.hadis { background: linear-gradient(135deg, var(--hadis-color), #E91E63); }
 
-.game-card-icon {
-    font-size: 40px;
+.game-card-icon {           /* İkon stili BUYUTMEK*/
+    font-size: 60px;
     margin: 0;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     flex-shrink: 0;
@@ -439,20 +440,21 @@ html, body {
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 480px) {
-    /* Mobile scroll fix */
+    /* Mobile scroll ayarı - scroll kilitleme yerine daha yumuşak kontrol */
     html, body {
-        height: 100vh !important;
-        overflow: hidden !important;
-        position: fixed !important;
-        width: 100% !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+        /* overflow-y varsayılan kalsın ki sayfa gerektiği gibi kayabilsin */
+        position: relative;
+        width: 100%;
     }
-    
+
     .flutter-app {
-        height: 100vh !important;
-        overflow-y: auto !important;
-        padding-bottom: 0 !important;
+        min-height: 100vh;
+        overflow-y: auto;
+        padding-bottom: 0;
     }
-    
+
     /* Main menu mobilde daha kompakt */
     .main-menu {
         min-height: auto !important;
@@ -462,13 +464,14 @@ html, body {
     }
     
     .flutter-game-grid {
+    padding-bottom: 60px !important;
         padding: 16px;
         gap: 12px;
         margin-bottom: 0 !important;
     }
     
     .game-card-icon {
-        font-size: 36px;
+        font-size: 60px;
     }
     
     .game-card-title {
@@ -519,16 +522,6 @@ html, body {
     background: var(--background);
 }
 
-.loading-logo {
-    width: 120px;
-    height: 120px;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
 
 /* ============ FLUTTER OPTION BUTTONS ============ */
 .flutter-option-btn {
