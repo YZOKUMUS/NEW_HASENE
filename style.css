@@ -1,0 +1,625 @@
+/* ================================================
+   HASENE ARAPÇA OYUNU – MODERN CLEAN STYLE V1.0
+   ================================================ */
+
+/* ----- GLOBAL RESET ----- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: #f4f4f4;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #222;
+}
+
+/* ----- CONTAINER ----- */
+.container {
+    max-width: 600px;
+    margin: 75px auto 90px auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+}
+
+/* ----- HEADER ----- */
+.header {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    padding: 15px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.header h1 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #8B4513;
+}
+
+/* ----- TOP NAV SHORTCUT BUTTONS ----- */
+.top-btn {
+    background: #fff;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.top-btn:hover {
+    background: #fafafa;
+}
+
+/* ----- MAIN MENU ----- */
+.main-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu-item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: 0.25s;
+}
+
+.menu-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+}
+
+.menu-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.menu-desc {
+    font-size: 0.9em;
+    opacity: 0.7;
+}
+
+/* ----- MODE SELECTOR ----- */
+.mode-selector {
+    background: #fff;
+    padding: 15px;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.mode-btn,
+.diff-btn {
+    width: 100%;
+    padding: 14px;
+    background: #fafafa;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.mode-btn.active {
+    background: #8B4513;
+    border-color: #8B4513;
+    color: #fff;
+}
+
+/* ----- GAME INFO BAR ----- */
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+}
+
+.game-info div {
+    font-weight: 600;
+}
+
+/* ----- ARABIC TEXT ----- */
+.arabic,
+.arabic-text {
+    font-family: 'Uthmani', serif;
+    direction: rtl;
+    text-align: center;
+    font-size: 32px;
+    margin: 10px 0;
+    color: #2c2c2c;
+}
+
+/* ----- AUDIO & HINT BUTTONS ----- */
+.audio-btn,
+.hint-btn {
+    width: 50px;
+    height: 50px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.audio-btn {
+    background-image: url('hoparlor.png');
+}
+
+.hint-btn {
+    background-image: url('clue.png');
+}
+
+/* ----- GAME BOX ----- */
+.game-box {
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    margin-bottom: 15px;
+}
+
+/* ----- OPTIONS ----- */
+.options {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option {
+    padding: 16px;
+    background: #fafafa;
+    border: 2px solid #eee;
+    border-radius: 14px;
+    font-size: 18px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+}
+
+.option:hover {
+    background: #f2f2f2;
+}
+
+.option.correct {
+    background: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+    color: #fff !important;
+}
+
+.option.wrong {
+    background: #e53935 !important;
+    border-color: #e53935 !important;
+    color: #fff !important;
+}
+
+/* ----- FEEDBACK ----- */
+.feedback {
+    text-align: center;
+    font-size: 18px;
+    padding: 12px;
+    min-height: 40px;
+}
+
+/* ----- NEXT BUTTON ----- */
+.next-btn,
+#nextBtn,
+#dinleNextBtn,
+#boslukNextBtn {
+    width: 100%;
+    background: #8B4513;
+    color: #fff;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    margin-top: 12px;
+    display: none;
+}
+
+.next-btn:hover {
+    background: #7a3f11;
+}
+
+/* ----- BOTTOM NAV ----- */
+.flutter-top-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 70px;
+    background: #fff;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+}
+
+.flutter-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #888;
+    cursor: pointer;
+}
+
+.flutter-nav-item.active {
+    color: #8B4513;
+}
+
+/* ----- MODAL ----- */
+.modal {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.7);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background:#fff;
+    padding:25px;
+    border-radius:20px;
+    width:85%;
+    max-width:350px;
+    text-align:center;
+}
+
+.modal-btn {
+    width:100%;
+    background:#F4C430;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:700;
+    margin-top:15px;
+}
+
+/* ----- RESPONSIVE ----- */
+@media(max-width:480px){
+    .arabic{
+        font-size:28px;
+    }
+    .option{
+        font-size:16px;
+        padding:14px;
+    }
+}
+/* =============================
+   GAME MODE CARDS – FLUTTER STYLE
+   ============================= */
+
+.mode-card {
+    width: 100%;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mode-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+}
+
+.mode-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mode-card-desc {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.3;
+}
+
+/* İKONLAR STİL */
+.mode-icon {
+    font-size: 20px;
+}
+
+/* KOLAY – ORTA – ZOR tuşları */
+.level-btn {
+    padding: 10px 18px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    font-weight: 600;
+}
+
+.level-easy {
+    background: rgba(0, 200, 83, 0.15);
+    border-color: #00C853;
+    color: #008f3b;
+}
+
+.level-medium {
+    background: rgba(255, 160, 0, 0.15);
+    border-color: #FFA000;
+    color: #b06b00;
+}
+
+.level-hard {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: #F44336;
+    color: #ae0000;
+}
+/* ============================================
+   🎨 GLASS GAME CARDS — PREMIUM TASARIM
+============================================ */
+.flutter-game-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 12px;
+}
+
+.game-card {
+    padding: 18px 14px;
+    border-radius: 18px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    backdrop-filter: blur(14px);
+    background: rgba(255,255,255,0.55);
+    transition: 0.25s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+}
+
+.card-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+}
+
+.card-desc {
+    font-size: 12px;
+    color: #444;
+    margin-top: 4px;
+}
+
+/* ========== RENK TEMALARI ========== */
+.game-card.kelime { border-left: 5px solid #ff6b6b; }
+.game-card.dinle  { border-left: 5px solid #4ecdc4; }
+.game-card.bosluk { border-left: 5px solid #45b7d1; }
+.game-card.dua    { border-left: 5px solid #96ceb4; }
+.game-card.ayet   { border-left: 5px solid #feca57; }
+.game-card.hadis  { border-left: 5px solid #ff9ff3; }
+
+/* ========== MOBİL ========== */
+@media (max-width: 480px) {
+    .flutter-game-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+
+/* ============================================
+   🔥 ANA MENÜ DÜZENLEMESİ (Resim 1 Fix)
+   ============================================ */
+
+/* ÜST BÖLÜM: Hasene – Yıldız – Mertebe */
+.top-stats-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto 12px auto;
+    padding: 10px 0;
+    max-width: 620px;
+}
+
+/* “Hasene Nasıl Kazanılır?” butonu */
+.top-info-btn {
+    background: linear-gradient(90deg, #ffb703, #ff9100);
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+    margin: 8px auto;
+    display: block;
+    width: fit-content;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Kolay – Orta – Zor */
+.difficulty-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 10px 0 16px 0;
+}
+
+.difficulty-btn {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.difficulty-btn.green { border-color:#55c57a; color:#2e8b57; }
+.difficulty-btn.orange { border-color:#f4a261; color:#d26700; }
+.difficulty-btn.red { border-color:#e63946; color:#9b2226; }
+
+/* 6’lı oyun kartları */
+.flutter-game-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 0 14px;
+    margin: 10px auto;
+    max-width: 620px;
+}
+
+.flutter-game-card {
+    background: #ffffffcc;
+    border-radius: 14px;
+    padding: 18px 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    border-left: 4px solid transparent;
+    cursor: pointer;
+}
+
+.flutter-game-card.kelime { border-color:#6a89cc; }
+.flutter-game-card.dinle { border-color:#38ada9; }
+.flutter-game-card.bosluk { border-color:#fa983a; }
+.flutter-game-card.dua    { border-color:#78e08f; }
+.flutter-game-card.ayet   { border-color:#82ccdd; }
+.flutter-game-card.hadis  { border-color:#b8e994; }
+
+.game-card-icon {
+    font-size: 34px;
+}
+
+/* OYUN BİTİNCE ÇIKAN POPUP’ın gizli olması */
+#customConfirm {
+    display: none !important;
+}
+
+/* ============================
+   ✔ LOADING SCREEN – CENTER FIX
+   ============================ */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #f5f5f5;
+    padding: 20px;
+    text-align: center;
+
+    z-index: 99999;
+}
+
+/* Logo boyutu */
+.loading-logo {
+    width: 180px;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+/* Başlık */
+.loading-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    color: #444;
+}
+
+/* Hadis kutusu */
+.hadis-box {
+    max-width: 380px;
+    margin-bottom: 25px;
+}
+
+.hadis-arabic {
+    font-family: 'Amiri Quran', serif;
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.hadis-turkish {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Yükleniyor animasyonu */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ccc;
+    border-top-color: #ffbb00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Telif yazısı */
+.loading-screen .copyright {
+    font-size: 12px;
+    color: #888;
+    margin-top: 10px;
+}
