@@ -9,16 +9,10 @@
     <link rel="icon" type="image/png" href="icon-192-v4-RED-MUSHAF.png">
     
     <script>
-        const isLocal =
-            location.hostname === "127.0.0.1" ||
-            location.hostname === "localhost";
+    const manifestPath = "manifest.json";
+    document.write(`<link rel="manifest" href="${manifestPath}">`);
+</script>
 
-        const manifestPath = isLocal
-            ? "manifest.json" 
-            : "/NEW_HASENE/manifest.json";
-
-        document.write(`<link rel="manifest" href="${manifestPath}">`);
-    </script>
 
 
     
@@ -2202,6 +2196,26 @@
             }
         }
 
+
+function hideAllGameScreens() {
+    const screens = [
+        'kelimeCevirScreen',
+        'dinleBulScreen',
+        'boslukDoldurScreen',
+        'ayetOkuScreen',
+        'hadisOkuScreen',
+        'duaOgrenScreen'
+    ];
+
+    screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+}
+
+
+
+
         // Hide all mode containers so only the requested mode is visible
         function hideAllModes() {
             const modeKeys = ['dinleMode','hadisMode','boslukMode','ayetMode','duaMode','modeSelector','gameScreen','mainMenu'];
@@ -2285,6 +2299,10 @@
                 }
             }
         }
+
+
+
+
 
         // ============ VERİ YÜKLEME ============
         async function loadData() {
@@ -2610,95 +2628,124 @@
         }
 
         function resetAllStats() {
-            // Tüm istatistikleri sıfırla
-            totalPoints = 0;
-            starPoints = 0;
-            level = 1;
-            sessionScore = 0;
-            sessionCorrect = 0;
-            sessionWrong = 0;
-            comboCount = 0;
-            
-            // Rozetleri sıfırla
-            badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
-            
-            // Streak verilerini sıfırla
-            streakData = {
-                currentStreak: 0,
-                playDates: [],
-                dailyGoal: 5,
-                dailyCorrect: 0
-            };
-            
-            // Daily tasks sıfırla
-            dailyTasks = {
-                lastTaskDate: null,
-                tasks: [],
-                bonusTasks: [],
-                completedTasks: [],
-                rewardsClaimed: false,
-                todayStats: {
-                    kelimeCevir: 0,
-                    dinleBul: 0,
-                    boslukDoldur: 0,
-                    ayetOku: 0,
-                    duaOgre: 0,
-                    hadisOku: 0,
-                    toplamDogru: 0,
-                    toplamPuan: 0,
-                    perfectStreak: 0,
-                    farklıZorluk: new Set()
-                }
-            };
-            
-            // ÜÇ SİSTEMİ DE TAMAMEN TEMİZLE!
-            
-            // 1. IndexedDB'yi temizle (ANA SİSTEM)
-            if (db) {
-                try {
-                    const transaction = db.transaction(['gameData'], 'readwrite');
-                    const store = transaction.objectStore('gameData');
-                    store.clear(); // Tüm IndexedDB verilerini sil
-                    log.debug('🗑️ IndexedDB temizlendi');
-                } catch(e) { 
-                    log.error('IndexedDB temizleme hatası:', e); 
-                }
-            }
-            
-            // 2. localStorage'ı tamamen temizle
-            localStorage.removeItem('hasene_totalPoints');
-            localStorage.removeItem('hasene_badges');
-            localStorage.removeItem('hasene_streak');
-            localStorage.removeItem('hasene_dailyTasks');
-            localStorage.removeItem('hasene_currentMode');
-            localStorage.removeItem('hasene_currentDifficulty');
-            localStorage.removeItem('hasene_wordStats'); // KELİME PANELİ İSTATİSTİKLERİ TEMİZLE!
-            localStorage.removeItem('dailyXP'); // GÜNLÜK XP'Yİ SIFIRLA!
-            localStorage.removeItem('dailyGoalLevel'); // GÜNLÜK HEDEF SEVİYESİNİ SIFIRLA!
-            localStorage.removeItem('lastDailyXPReset'); // GÜNLÜK XP RESET TARİHİNİ TEMİZLE!
-            log.debug('🗑️ localStorage tamamen temizlendi (kelime paneli + günlük XP dahil)');
-            
-            // 3. URL geçmişini temizle (mümkünse)
-                try {
-                if (window.history.replaceState) {
-                    window.history.replaceState({}, '', window.location.pathname);
-                }
-                log.debug('🗑️ URL geçmişi temizlendi');
-            } catch(e) { 
-                log.error('URL temizleme hatası:', e); 
-            }
-            
-            // Yeni günlük görevler oluştur
-            generateDailyTasks(new Date().toISOString().split('T')[0]);
-            
-            // Ekranı güncelle
-            updateStatsBar();
-            updateUI();
-            updateDailyGoalDisplay(); // GÜNLÜK HEDEF UI'INI SIFIRLA!
-            
-            log.game('✅ TÜM 3 SİSTEM TEMİZLENDİ! IndexedDB + localStorage + URL + Günlük XP');
-            showCustomAlert('Tüm veriler TAMAMEN sıfırlandı! IndexedDB, localStorage, URL geçmişi ve Günlük XP temizlendi.', 'success', 'Veriler Sıfırlandı');
+    // =========================================
+    // 🔥 TEMEL SKORLAR
+    // =========================================
+    totalPoints = 0;
+    starPoints = 0;
+    level = 1;
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionWrong = 0;
+    comboCount = 0;
+
+    // Rozetleri sıfırla
+    badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
+
+    // =========================================
+    // 🔥 STREAK + GÜNLÜK HEDEF SIFIRLA
+    // =========================================
+    streakData = {
+        currentStreak: 0,
+        playDates: [],
+        dailyGoal: 5,
+        dailyCorrect: 0
+    };
+
+    // =========================================
+    // 🔥 DAILY TASKS SIFIRLA
+    // =========================================
+    dailyTasks = {
+        lastTaskDate: null,
+        tasks: [],
+        bonusTasks: [],
+        completedTasks: [],
+        rewardsClaimed: false,
+        todayStats: {
+            kelimeCevir: 0,
+            dinleBul: 0,
+            boslukDoldur: 0,
+            ayetOku: 0,
+            duaOgre: 0,
+            hadisOku: 0,
+            toplamDogru: 0,
+            toplamPuan: 0,
+            perfectStreak: 0,
+            farklıZorluk: new Set()
         }
+    };
+
+    // ================================
+// 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA
+// ================================
+localStorage.setItem("dailyGoalHasene", "2700");  // hedef sıfır → 2700 varsayılan
+localStorage.setItem("dailyHasene", "0");         // günlük kazanılan XP sıfır
+localStorage.setItem("dailyGoalLevel", "normal"); // varsayılan zorluk
+localStorage.removeItem("lastDailyXPReset");       // reset tarihi temizle
+
+// UI Güncelle → Barları sıfırla
+const bar = document.getElementById("dailyGoalProgress");
+const barText = document.getElementById("dailyGoalProgressText");
+const goalText = document.getElementById("dailyGoalText");
+
+if (bar) bar.style.width = "0%";
+if (barText) barText.textContent = `0 / 2700 Hasene`;
+if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
+
+    // Her 1 hedeften 540 XP geliyorsa — dilersen değiştir
+
+    // =========================================
+    // 🔥 INDEXED DB TEMİZLE
+    // =========================================
+    if (db) {
+        try {
+            const transaction = db.transaction(['gameData'], 'readwrite');
+            const store = transaction.objectStore('gameData');
+            store.clear();
+            log.debug('🗑️ IndexedDB temizlendi');
+        } catch(e) {
+            log.error('IndexedDB temizleme hatası:', e);
+        }
+    }
+
+    // =========================================
+    // 🔥 LOCAL STORAGE TEMİZLE
+    // =========================================
+    localStorage.removeItem('hasene_totalPoints');
+    localStorage.removeItem('hasene_badges');
+    localStorage.removeItem('hasene_streak');
+    localStorage.removeItem('hasene_dailyTasks');
+    localStorage.removeItem('hasene_currentMode');
+    localStorage.removeItem('hasene_currentDifficulty');
+    localStorage.removeItem('hasene_wordStats');
+    localStorage.removeItem('dailyXP');
+
+    // =========================================
+    // 🔥 URL GEÇMİŞ TEMİZLE
+    // =========================================
+    try {
+        if (window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    } catch(e) {}
+
+    // =========================================
+    // 🔥 YENİ DAILY TASK ÜRET
+    // =========================================
+    generateDailyTasks(new Date().toISOString().split('T')[0]);
+
+    // =========================================
+    // 🔥 UI GÜNCELLE
+    // =========================================
+    updateStatsBar();
+    updateUI();
+    if (typeof updateDailyGoalDisplay === "function") {
+        updateDailyGoalDisplay();
+    }
+
+    showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");
+}
+
 
         function updateStatsBar() {
             // NULL KONTROL - Kritik elementler
@@ -5978,20 +6025,40 @@
     </div>
 
     <script>
-        // Ana menüyü göster
-        function showMainMenu() {
-            if (document.getElementById('mainMenu')) {
-                document.getElementById('mainMenu').style.display = 'block';
-                document.getElementById('gameScreen').style.display = 'none';
-                document.getElementById('modeSelector').style.display = 'none';
-                
-                // Navigation active state
-                document.querySelectorAll('.flutter-nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                document.querySelector('.flutter-nav-item').classList.add('active');
-            }
-        }
+// Tüm oyun ekranlarını gizle
+function hideAllGameScreens() {
+    const screens = [
+        'kelimeCevirScreen',
+        'dinleBulScreen',
+        'boslukDoldurScreen',
+        'ayetOkuScreen',
+        'hadisOkuScreen',
+        'duaOgrenScreen'
+    ];
+
+    screens.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+}
+
+// Ana menüyü göster
+function showMainMenu() {
+
+    hideAllGameScreens();   // ← ***BURAYA EN ÜSTE***
+
+    if (document.getElementById('mainMenu')) {
+        document.getElementById('mainMenu').style.display = 'block';
+        document.getElementById('gameScreen').style.display = 'none';
+        document.getElementById('modeSelector').style.display = 'none';
+
+        // Navigation active state
+        document.querySelectorAll('.flutter-nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector('.flutter-nav-item').classList.add('active');
+    }
+}
 
         // Bottom navigation active state yönetimi
         function setActiveNavItem(index) {
