@@ -1018,7 +1018,7 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-/* ======== PREMIUM BACK BUTTON ======== */
+/* ========== PREMIUM BACK BUTTON ========== */
 .back-btn {
     background: linear-gradient(135deg, #ece9f1, #d8d3e3);
     border: 1px solid #b8b0ca;
@@ -1043,7 +1043,18 @@ body {
 .back-btn:active {
     transform: translateX(-1px) scale(0.96);
 }
-/* ======== PREMIUM START BUTTON ======== */
+
+
+.back-btn:hover {
+    background: #f3f0fa;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.back-btn:active {
+    transform: translateX(-1px) scale(0.96);
+}
+/* ========== PREMIUM START BUTTON ========== */
 #startBtn, .start-btn {
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: none;
@@ -1070,8 +1081,11 @@ body {
 .start-btn:active {
     transform: scale(0.96);
 }
-/* ======== PREMIUM NEXT BUTTON ======== */
-.nextBtn, #nextBtn, .next-btn {
+
+/* ========== PREMIUM NEXT BUTTON ========== */
+.nextBtn, #nextBtn,
+.dinleNextBtn, #dinleNextBtn,
+.boslukNextBtn, #boslukNextBtn {
     background: linear-gradient(135deg, #42a5f5, #1e88e5);
     padding: 12px 20px;
     border-radius: 12px;
@@ -1083,10 +1097,11 @@ body {
     max-width: 260px;
     box-shadow: 0 4px 12px rgba(33,150,243,0.3);
     margin: 14px auto 0 auto;
-    display: none; /* başlangıçta gizli */
+    display: none; /* ilk etapta gizli */
     transition: 0.4s;
 }
 
+/* Animasyon ile görünmesi için */
 .next-appear {
     display: block !important;
     animation: nextPop 0.4s ease-out forwards;
@@ -1096,6 +1111,7 @@ body {
     0% { opacity: 0; transform: scale(0.7) translateY(15px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
+
 /* PREMIUM CARD HOVERS */
 .game-card {
     transition: 0.25s;
@@ -1108,4 +1124,32 @@ body {
 
 .game-card:active {
     transform: scale(0.97);
+}
+.nextBtn, #nextBtn,
+.dinleNextBtn, #dinleNextBtn,
+.boslukNextBtn, #boslukNextBtn,
+#duaNextBtn, #ayetNextBtn, #hadisNextBtn {
+    background: linear-gradient(135deg, #42a5f5, #1e88e5);
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 1em;
+    border: none;
+    width: 100%;
+    max-width: 260px;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+    margin: 14px auto 0 auto;
+    display: none;
+    transition: 0.4s;
+}
+
+.next-appear {
+    display: block !important;
+    animation: nextPop 0.4s ease-out forwards;
+}
+
+@keyframes nextPop {
+    0% { opacity: 0; transform: scale(0.7) translateY(15px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
 }
