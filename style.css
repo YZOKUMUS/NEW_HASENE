@@ -623,3 +623,142 @@ body {
     color: #888;
     margin-top: 10px;
 }
+/* =====================================
+   PREMIUM HEADER (HASENE-YILDIZ-MERTEBE)
+   ===================================== */
+
+.premium-header {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.45);
+    border-radius: 18px;
+    padding: 14px 20px;
+    margin: 10px auto;
+    width: 94%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.6);
+    transition: all 0.25s ease;
+}
+
+.premium-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.12);
+}
+
+/* Her istatistik itemi */
+.premium-stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.premium-stat-number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4a4a4a;
+    text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+
+.premium-stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #555;
+    opacity: 0.8;
+}
+/* ===========================
+   PREMIUM TOP STATS PANEL
+   =========================== */
+.premium-stats-panel {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 16px;
+    margin: 12px 0;
+    position: relative;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Panel içindeki küçük yazılar */
+.premium-stats-panel span {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Panel içindeki değerler */
+.premium-stats-panel strong {
+    font-size: 18px;
+    color: #4A3CE8;
+    font-weight: 800;
+}
+
+/* Küçük fade-in animasyonu */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* ================================
+   🟣 PREMIUM GAME CARD UPDATE
+   ================================ */
+.game-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    background: rgba(255, 255, 255, 0.20);
+    border: 1px solid rgba(255, 255, 255, 0.40);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-radius: 22px;
+    padding: 22px 12px;
+    cursor: pointer;
+    text-align: center;
+
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.22);
+}
+
+.game-card:active {
+    transform: scale(0.96);
+}
+
+/* İkon */
+.game-card .card-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+    opacity: 0.95;
+}
+
+/* Başlık */
+.game-card .card-title {
+    font-size: 1.15em;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #272640;
+}
+
+/* Açıklama */
+.game-card .card-desc {
+    font-size: 0.82em;
+    color: #4a4a5c;
+    line-height: 1.25em;
+    opacity: 0.9;
+}
+
+/* Izgara optimize */
+.flutter-game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 14px 20px 40px;
+}
