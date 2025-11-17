@@ -1018,3 +1018,94 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+/* ======== PREMIUM BACK BUTTON ======== */
+.back-btn {
+    background: linear-gradient(135deg, #ece9f1, #d8d3e3);
+    border: 1px solid #b8b0ca;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9em;
+    color: #4a3f68;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    transition: 0.25s;
+}
+
+.back-btn:hover {
+    background: #f3f0fa;
+    transform: translateX(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.back-btn:active {
+    transform: translateX(-1px) scale(0.96);
+}
+/* ======== PREMIUM START BUTTON ======== */
+#startBtn, .start-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    padding: 14px 22px;
+    color: white;
+    font-weight: 700;
+    border-radius: 14px;
+    font-size: 1.1em;
+    box-shadow: 0 4px 12px rgba(118,75,162,0.35);
+    width: 100%;
+    max-width: 260px;
+    margin: 10px auto;
+    display: block;
+    transition: 0.25s;
+}
+
+#startBtn:hover,
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(118,75,162,0.45);
+}
+
+#startBtn:active,
+.start-btn:active {
+    transform: scale(0.96);
+}
+/* ======== PREMIUM NEXT BUTTON ======== */
+.nextBtn, #nextBtn, .next-btn {
+    background: linear-gradient(135deg, #42a5f5, #1e88e5);
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 1em;
+    border: none;
+    width: 100%;
+    max-width: 260px;
+    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+    margin: 14px auto 0 auto;
+    display: none; /* başlangıçta gizli */
+    transition: 0.4s;
+}
+
+.next-appear {
+    display: block !important;
+    animation: nextPop 0.4s ease-out forwards;
+}
+
+@keyframes nextPop {
+    0% { opacity: 0; transform: scale(0.7) translateY(15px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+/* PREMIUM CARD HOVERS */
+.game-card {
+    transition: 0.25s;
+}
+
+.game-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+}
+
+.game-card:active {
+    transform: scale(0.97);
+}
