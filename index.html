@@ -201,15 +201,15 @@
 
         <!-- Ayet Okuma Modu -->
         <div class="ayet-mode" id="ayetMode" style="display: none;">
-            <button class="back-btn" id="backFromAyetBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-                <i class="material-icons" style="font-size: 14px;">west</i>
-                Geri
+            <button class="back-btn" id="backFromAyetBtn">
+                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
+                <span>Ana Sayfa</span>
             </button>
             <div class="ayet-card">
                 <div class="sure-info" id="ayetSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="ayetArabic">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
                 <div class="translation" id="ayetTranslation">Yükleniyor...</div>
-                <button class="audio-btn" id="ayetAudioBtn"></button>
+                <button class="audio-btn" id="ayetAudioBtn" title="Ses çal"></button>
                 <div class="navigation-btns">
                     <button class="nav-btn" id="prevAyetBtn">← Önceki</button>
                     <button class="nav-btn" id="nextAyetBtn">Sonraki →</button>
@@ -219,15 +219,15 @@
 
         <!-- Dua Modu -->
         <div class="dua-mode" id="duaMode" style="display: none;">
-            <button class="back-btn" id="backFromDuaBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-                <i class="material-icons" style="font-size: 14px;">west</i>
-                Geri
+            <button class="back-btn" id="backFromDuaBtn">
+                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
+                <span>Ana Sayfa</span>
             </button>
             <div class="dua-card">
                 <div class="sure-info" id="duaSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="duaArabic">Arapça Metin</div>
                 <div class="translation" id="duaTranslation">Anlamı</div>
-                <button class="audio-btn" id="duaAudioBtn"></button>
+                <button class="audio-btn" id="duaAudioBtn" title="Ses çal"></button>
                 <div class="navigation-btns">
                     <button class="nav-btn" id="prevDuaBtn">← Önceki</button>
                     <button class="nav-btn" id="nextDuaBtn">Sonraki →</button>
@@ -237,9 +237,9 @@
 
         <!-- Hadis Oku Modu -->
         <div class="hadis-mode" id="hadisMode" style="display: none;">
-            <button class="back-btn" id="backFromHadisBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-                <i class="material-icons" style="font-size: 14px;">west</i>
-                Geri
+            <button class="back-btn" id="backFromHadisBtn">
+                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
+                <span>Ana Sayfa</span>
             </button>
             <div class="hadis-card">
                 <div class="hadis-category" id="hadisCategory">Kategori</div>
@@ -483,30 +483,30 @@
                 <!-- (removed) header intentionally omitted -->
                 
                 <!-- Mini Takvim -->
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 8px;">
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 0.95em; color: #ecf0f1;" id="calendarMonth">Kasım 2025</div>
-                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; max-width: 100%;">
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 8px; overflow-x: auto;">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 0.95em; color: #ecf0f1; min-width: 200px;" id="calendarMonth">Kasım 2025</div>
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; max-width: 100%; min-width: 280px; width: 100%;">
                         <!-- Takvim günleri buraya eklenecek -->
                     </div>
                     
                     <!-- Legend (Minimal, No Label) -->
                     <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.55em; color: #bdc3c7;">
-                            <span style="display: flex; align-items: center; gap: 2px;">
-                                <div style="font-size: 1.2em;">🎯</div>
-                                Bugün
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.6em; color: #bdc3c7;">
+                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
+                                <span style="font-size: 1.2em;">🎯</span>
+                                <span>Bugün</span>
                             </span>
-                            <span style="display: flex; align-items: center; gap: 2px;">
-                                <div style="font-size: 1.2em;">✅</div>
-                                Tamamlandı
+                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
+                                <span style="font-size: 1.2em;">✅</span>
+                                <span>Tamamlandı</span>
                             </span>
-                            <span style="display: flex; align-items: center; gap: 2px;">
-                                <div style="font-size: 1.2em;">🔥</div>
-                                Streak
+                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
+                                <span style="font-size: 1.2em;">🔥</span>
+                                <span>Streak</span>
                             </span>
-                            <span style="display: flex; align-items: center; gap: 2px;">
-                                <div style="font-size: 1.2em;">❄️</div>
-                                Boş
+                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
+                                <span style="font-size: 1.2em;">❄️</span>
+                                <span>Boş</span>
                             </span>
                         </div>
                     </div>
@@ -2186,13 +2186,26 @@
         function cleanupAudioListeners() {
             // Tüm audio event listener'larını temizle (memory leak önleme)
             if (currentAudio) {
-                currentAudio.onloadeddata = null;
-                currentAudio.oncanplay = null;
-                currentAudio.onended = null;
-                currentAudio.onerror = null;
-                currentAudio.ontimeupdate = null;
-                currentAudio.onpause = null;
-                currentAudio.onplay = null;
+                try {
+                    currentAudio.onloadeddata = null;
+                    currentAudio.oncanplay = null;
+                    currentAudio.onended = null;
+                    currentAudio.onerror = null;
+                    currentAudio.ontimeupdate = null;
+                    currentAudio.onpause = null;
+                    currentAudio.onplay = null;
+                    currentAudio.onloadstart = null;
+                    // Also remove addEventListener if used
+                    if (currentAudio.removeEventListener) {
+                        currentAudio.removeEventListener('loadeddata', () => {});
+                        currentAudio.removeEventListener('canplay', () => {});
+                        currentAudio.removeEventListener('ended', () => {});
+                        currentAudio.removeEventListener('error', () => {});
+                        currentAudio.removeEventListener('timeupdate', () => {});
+                    }
+                } catch (e) {
+                    log.debug('Audio cleanup warning:', e);
+                }
             }
         }
 
@@ -2257,18 +2270,22 @@ function hideAllGameScreens() {
                 
                 // Ses bittiğinde butonu aktif et ve cleanup
                 currentAudio.onended = () => {
-                    if (button) button.disabled = false;
-                    cleanupAudioListeners();
-                    currentAudio = null;
-                };
-                
-                // Hata durumunda cleanup
-                currentAudio.onerror = () => {
-                    log.error('Ses dosyası yüklenemedi:', audioUrl);
-                    if (button) button.disabled = false;
-                    cleanupAudioListeners();
-                    currentAudio = null;
-                };
+                        if (button) button.disabled = false;
+                        cleanupAudioListeners();
+                        if (currentAudio) {
+                            currentAudio = null;
+                        }
+                    };
+                    
+                    // Hata durumunda cleanup
+                    currentAudio.onerror = () => {
+                        log.error('Ses dosyası yüklenemedi:', audioUrl);
+                        if (button) button.disabled = false;
+                        cleanupAudioListeners();
+                        if (currentAudio) {
+                            currentAudio = null;
+                        }
+                    };
                 
                 // Ses dosyasını yükle
                 currentAudio.load();
@@ -5984,40 +6001,37 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     </div>
 
     <script>
-// Tüm oyun ekranlarını gizle
-function hideAllGameScreens() {
-    const screens = [
-        'kelimeCevirScreen',
-        'dinleBulScreen',
-        'boslukDoldurScreen',
-        'ayetOkuScreen',
-        'hadisOkuScreen',
-        'duaOgrenScreen'
-    ];
 
-    screens.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-}
-
-// Ana menüyü göster
+// Ana menüyü göster - uses hideAllGameScreens from main script
 function showMainMenu() {
-
-    hideAllGameScreens();   // ← ***BURAYA EN ÜSTE***
-
-    if (document.getElementById('mainMenu')) {
+    // Use the hideAllGameScreens function from main script if available
+    if (typeof hideAllGameScreens === 'function') {
+        hideAllGameScreens();
+    } else {
+        // Fallback if function not available
+        const screens = ['kelimeCevirScreen', 'dinleBulScreen', 'boslukDoldurScreen', 'ayetOkuScreen', 'hadisOkuScreen', 'duaOgrenScreen'];
+        screens.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+if (document.getElementById('mainMenu')) {
         document.getElementById('mainMenu').style.display = 'block';
-        document.getElementById('gameScreen').style.display = 'none';
-        document.getElementById('modeSelector').style.display = 'none';
+    const gameScreen = document.getElementById('gameScreen');
+        const modeSelector = document.getElementById('modeSelector');
+        if (gameScreen) gameScreen.style.display = 'none';
+        if (modeSelector) modeSelector.style.display = 'none';
 
-        // Navigation active state
+
+// Navigation active state
         document.querySelectorAll('.flutter-nav-item').forEach(item => {
             item.classList.remove('active');
         });
-        document.querySelector('.flutter-nav-item').classList.add('active');
+        const firstNavItem = document.querySelector('.flutter-nav-item');
+        if (firstNavItem) firstNavItem.classList.add('active');
     }
 }
+
 
         // Bottom navigation active state yönetimi
         function setActiveNavItem(index) {

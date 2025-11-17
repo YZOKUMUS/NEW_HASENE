@@ -221,26 +221,7 @@ body {
     min-height: 40px;
 }
 
-/* ----- NEXT BUTTON ----- */
-.next-btn,
-#nextBtn,
-#dinleNextBtn,
-#boslukNextBtn {
-    width: 100%;
-    background: #8B4513;
-    color: #fff;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 1em;
-    cursor: pointer;
-    border: none;
-    margin-top: 12px;
-    display: none;
-}
 
-.next-btn:hover {
-    background: #7a3f11;
-}
 
 /* ----- BOTTOM NAV ----- */
 .flutter-top-nav {
@@ -314,6 +295,165 @@ body {
         padding:14px;
     }
 }
+
+/* Calendar mobile improvements */
+    #calendarGrid {
+        gap: 2px !important;
+    }
+    
+    #calendarGrid > div {
+        min-height: 28px !important;
+        max-height: 32px !important;
+        max-width: 32px !important;
+        font-size: 0.55em !important;
+        padding: 4px 2px !important;
+    }
+    
+    #calendarModal .modal-content {
+        padding: 12px !important;
+        margin: 10px !important;
+    }
+    
+    /* Button improvements for mobile */
+    .back-btn, #backFromGameBtn, #backToMenuBtn, 
+    #backFromAyetBtn, #backFromDuaBtn, #backFromHadisBtn,
+    #backFromBoslukBtn, #backFromDinleBtn {
+        padding: 8px 12px !important;
+        font-size: 0.8em !important;
+    }
+    
+    .start-btn, #startBtn {
+        max-width: 100% !important;
+        padding: 12px 18px !important;
+    }
+    
+    #nextBtn, #dinleNextBtn, #boslukNextBtn,
+    #duaNextBtn, #ayetNextBtn, #hadisNextBtn {
+        max-width: 100% !important;
+        padding: 12px 18px !important;
+    }
+    
+    /* Game cards mobile */
+    .flutter-game-grid {
+        gap: 10px !important;
+        padding: 10px 12px !important;
+    }
+    
+    .game-card {
+        padding: 16px 10px !important;
+    }
+    
+    .game-card .card-icon {
+        font-size: 36px !important;
+    }
+    
+    .game-card .card-title {
+        font-size: 0.95em !important;
+    }
+    
+    .game-card .card-desc {
+        font-size: 0.75em !important;
+    }
+    
+    /* Stats panel mobile */
+    .premium-stats-panel {
+        padding: 14px 12px 18px !important;
+        margin: 10px 12px !important;
+    }
+    
+    .premium-stats-panel div[id$="Points"],
+    .premium-stats-panel #playerLevel {
+        font-size: 18px !important;
+    }
+    
+    /* Ayet/Dua/Hadis modes mobile */
+    .ayet-mode,
+    .dua-mode,
+    .hadis-mode {
+        margin: 70px auto 80px auto !important;
+        padding: 12px !important;
+        min-height: calc(100vh - 150px) !important;
+    }
+    
+    .ayet-card,
+    .dua-card,
+    .hadis-card {
+        padding: 15px !important;
+        gap: 12px !important;
+        max-height: calc(100vh - 220px) !important;
+    }
+    
+    .arabic {
+        font-size: clamp(18px, 5vw, 28px) !important;
+        padding: 12px !important;
+        line-height: 1.6 !important;
+    }
+    
+    .translation {
+        font-size: clamp(13px, 3.5vw, 16px) !important;
+        padding: 12px !important;
+        line-height: 1.6 !important;
+    }
+    
+    .sure-info {
+        font-size: 0.85em !important;
+        padding: 6px 10px !important;
+    }
+    
+    .navigation-btns {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .nav-btn {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: clamp(13px, 3vw, 15px) !important;
+    }
+    
+    .ayet-card .audio-btn,
+    .dua-card .audio-btn {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    
+    .hadis-title {
+        font-size: clamp(15px, 4vw, 18px) !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .hadis-text {
+        font-size: clamp(14px, 3.5vw, 16px) !important;
+        padding: 15px !important;
+        line-height: 1.7 !important;
+        text-align: left !important;
+    }
+    
+    .hadis-header {
+        font-size: clamp(12px, 2.5vw, 14px) !important;
+        padding: 8px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .hadis-ref {
+        font-size: clamp(11px, 2vw, 13px) !important;
+        padding: 6px !important;
+    }
+    
+    .ayet-mode .back-btn,
+    .dua-mode .back-btn,
+    .hadis-mode .back-btn {
+        padding: 8px 12px !important;
+        font-size: clamp(12px, 2.5vw, 14px) !important;
+        margin-bottom: 12px !important;
+    }
+
+
+
+
+
+
 /* =============================
    GAME MODE CARDS – FLUTTER STYLE
    ============================= */
@@ -440,13 +580,228 @@ body {
 .game-card.ayet   { border-left: 5px solid #feca57; }
 .game-card.hadis  { border-left: 5px solid #ff9ff3; }
 
-/* ========== MOBİL ========== */
-@media (max-width: 480px) {
-    .flutter-game-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
+/* ============================================
+   📖 AYET OKU - DUA ET - HADİS OKU MODLARI
+   ============================================ */
+
+/* Mode container styles */
+.ayet-mode,
+.dua-mode,
+.hadis-mode {
+    max-width: 600px;
+    margin: 75px auto 90px auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    min-height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
 }
+
+/* Card container styles */
+.ayet-card,
+.dua-card,
+.hadis-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+/* Sure/Ayet info styles */
+.sure-info {
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #8B4513;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(139, 69, 19, 0.1), rgba(139, 69, 19, 0.05));
+    border-radius: 12px;
+    margin-bottom: 10px;
+    word-break: break-word;
+}
+
+/* Arabic text styles - responsive */
+.arabic {
+    font-family: 'Uthmani', serif;
+    direction: rtl;
+    text-align: center;
+    font-size: clamp(20px, 4vw, 32px);
+    margin: 15px 0;
+    color: #2c2c2c;
+    line-height: 1.8;
+    padding: 15px;
+    background: rgba(244, 244, 244, 0.5);
+    border-radius: 12px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Translation text styles */
+.translation {
+    font-size: clamp(14px, 3vw, 18px);
+    line-height: 1.7;
+    color: #444;
+    padding: 15px;
+    background: rgba(250, 250, 250, 0.8);
+    border-radius: 12px;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    margin: 10px 0;
+}
+
+/* Audio button - centered and larger */
+.ayet-card .audio-btn,
+.dua-card .audio-btn {
+    width: 60px;
+    height: 60px;
+    margin: 10px auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ayet-card .audio-btn:hover,
+.dua-card .audio-btn:hover {
+    transform: scale(1.1);
+}
+
+.ayet-card .audio-btn:active,
+.dua-card .audio-btn:active {
+    transform: scale(0.95);
+}
+
+/* Navigation buttons container */
+.navigation-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+/* Navigation buttons */
+.nav-btn {
+    flex: 1;
+    max-width: 150px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(14px, 2.5vw, 16px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.nav-btn:active {
+    transform: scale(0.96);
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+/* Back button for these modes - improved */
+.ayet-mode .back-btn,
+.dua-mode .back-btn,
+.hadis-mode .back-btn {
+    align-self: flex-start;
+    margin: 0 0 15px 0;
+    padding: 10px 16px;
+    font-size: clamp(13px, 2.5vw, 15px);
+    position: relative;
+    z-index: 10;
+}
+
+/* Hadis specific styles */
+.hadis-category {
+    text-align: center;
+    font-size: clamp(11px, 2vw, 13px);
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.hadis-title {
+    text-align: center;
+    font-size: clamp(16px, 3vw, 20px);
+    font-weight: 700;
+    color: #8B4513;
+    margin-bottom: 15px;
+    word-break: break-word;
+}
+
+.hadis-header {
+    text-align: center;
+    font-size: clamp(13px, 2.5vw, 15px);
+    font-weight: 600;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(139, 69, 19, 0.05);
+    border-radius: 8px;
+    word-break: break-word;
+}
+
+.hadis-text {
+    font-size: clamp(15px, 3vw, 18px);
+    line-height: 1.8;
+    color: #333;
+    padding: 20px;
+    background: rgba(250, 250, 250, 0.8);
+    border-radius: 12px;
+    text-align: justify;
+    margin: 15px 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.hadis-ref {
+    text-align: center;
+    font-size: clamp(12px, 2vw, 14px);
+    color: #888;
+    font-style: italic;
+    margin-top: 10px;
+    padding: 8px;
+    word-break: break-word;
+}
+
+/* ========== MOBİL ========== */
+/* Mobile responsive - consolidated with main responsive styles above */
+
 
 
 /* ============================================
@@ -924,6 +1279,7 @@ body {
 
     box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
     transition: all 0.25s ease;
+    cursor: pointer;
 }
 
 .start-btn:hover,
@@ -936,89 +1292,7 @@ body {
 #startBtn:active {
     transform: scale(0.95);
 }
-/* ============================================
-   🚀 PREMIUM NEXT BUTTON (SONRAKİ)
-   ============================================ */
-#nextBtn,
-#dinleNextBtn,
-.next-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white !important;
-    border: none;
-    padding: 14px 22px;
-    border-radius: 14px;
-    font-size: 1em;
-    font-weight: 700;
-    width: 100%;
-    max-width: 280px;
-    margin: 12px auto;
-    display: block;
 
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
-    transition: all 0.25s ease;
-}
-
-#nextBtn:hover,
-#dinleNextBtn:hover,
-.next-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 26px rgba(16, 185, 129, 0.55);
-}
-
-#nextBtn:active,
-#dinleNextBtn:active,
-.next-btn:active {
-    transform: scale(0.96);
-}
-/* ============================================
-   ⬅️ PREMIUM BACK BUTTON (GERİ)
-   ============================================ */
-.back-btn {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    color: #111;
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.95em;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-    transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-    transform: translateX(-3px);
-    background: rgba(255,255,255,0.55);
-}
-
-.back-btn:active {
-    transform: scale(0.92);
-}
-.next-appear {
-    animation: nextFadeUp 0.35s ease forwards;
-}
-
-@keyframes nextFadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.next-appear {
-    opacity: 0;
-    transform: translateY(10px);
-    animation: nextButtonFade 0.35s ease-out forwards;
-}
-
-@keyframes nextButtonFade {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-/* ========== PREMIUM BACK BUTTON ========== */
 .back-btn {
     background: linear-gradient(135deg, #ece9f1, #d8d3e3);
     border: 1px solid #b8b0ca;
@@ -1031,7 +1305,8 @@ body {
     align-items: center;
     gap: 6px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-    transition: 0.25s;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
 .back-btn:hover {
@@ -1045,63 +1320,47 @@ body {
 }
 
 
-.back-btn:hover {
-    background: #f3f0fa;
-    transform: translateX(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.back-btn:active {
-    transform: translateX(-1px) scale(0.96);
-}
-/* ========== PREMIUM START BUTTON ========== */
-#startBtn, .start-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
-    padding: 14px 22px;
-    color: white;
-    font-weight: 700;
-    border-radius: 14px;
-    font-size: 1.1em;
-    box-shadow: 0 4px 12px rgba(118,75,162,0.35);
-    width: 100%;
-    max-width: 260px;
-    margin: 10px auto;
-    display: block;
-    transition: 0.25s;
-}
-
-#startBtn:hover,
-.start-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(118,75,162,0.45);
-}
-
-#startBtn:active,
-.start-btn:active {
-    transform: scale(0.96);
-}
-
-/* ========== PREMIUM NEXT BUTTON ========== */
+/* ========== PREMIUM NEXT BUTTON (CONSOLIDATED) ========== */
 .nextBtn, #nextBtn,
 .dinleNextBtn, #dinleNextBtn,
-.boslukNextBtn, #boslukNextBtn {
-    background: linear-gradient(135deg, #42a5f5, #1e88e5);
-    padding: 12px 20px;
-    border-radius: 12px;
-    color: white;
+.boslukNextBtn, #boslukNextBtn,
+#duaNextBtn, #ayetNextBtn, #hadisNextBtn,
+.next-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    padding: 14px 22px;
+    border-radius: 14px;
+    color: white !important;
     font-weight: 700;
     font-size: 1em;
     border: none;
     width: 100%;
-    max-width: 260px;
-    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
-    margin: 14px auto 0 auto;
-    display: none; /* ilk etapta gizli */
-    transition: 0.4s;
+    max-width: 280px;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    margin: 12px auto;
+    display: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
-/* Animasyon ile görünmesi için */
+.nextBtn:hover, #nextBtn:hover,
+.dinleNextBtn:hover, #dinleNextBtn:hover,
+.boslukNextBtn:hover, #boslukNextBtn:hover,
+#duaNextBtn:hover, #ayetNextBtn:hover, #hadisNextBtn:hover,
+.next-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(16, 185, 129, 0.55);
+}
+
+/* ========== PREMIUM NEXT BUTTON ========== */
+.nextBtn:active, #nextBtn:active,
+.dinleNextBtn:active, #dinleNextBtn:active,
+.boslukNextBtn:active, #boslukNextBtn:active,
+#duaNextBtn:active, #ayetNextBtn:active, #hadisNextBtn:active,
+.next-btn:active {
+    transform: scale(0.96);
+}
+
+/* Next button appear animation */
 .next-appear {
     display: block !important;
     animation: nextPop 0.4s ease-out forwards;

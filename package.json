@@ -1,0 +1,28 @@
+{
+  "name": "new_hasene",
+  "version": "1.0.0",
+  "description": "**Hasene Arabic Game**, Arapça öğrenmeyi eğlenceli ve interaktif hale getiren web tabanlı bir eğitim oyunudur. Oyun, çeşitli modlarla Arapça kelime bilgisini geliştirmeyi amaçlar.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yzokumus/NEW_HASENE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yzokumus/NEW_HASENE/issues"
+  },
+  "homepage": "https://github.com/yzokumus/NEW_HASENE#readme",
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  }
+}
