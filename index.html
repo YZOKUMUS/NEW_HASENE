@@ -4615,6 +4615,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.nextBtn.style.visibility = 'visible';
                     elements.nextBtn.removeAttribute('hidden');
                     elements.nextBtn.setAttribute('aria-hidden', 'false');
+
+                    // 🔥 Animasyonu ekle
+        elements.nextBtn.classList.add("next-appear");
                     // Ensure it's visible on small viewports by scrolling it into view
                     setTimeout(() => {
                         try {
@@ -5030,6 +5033,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             updateDinleUI();
             // Show the Dinle 'Next' button
             elements.dinleNextBtn.style.display = 'block';
+            // 🔥 Animasyonu ekle
+            elements.dinleNextBtn.classList.add("next-appear");
             log.debug(`✅ Cevap işlemi tamamen tamamlandı!`);
         }
 
@@ -5271,6 +5276,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             updateBoslukUI();
             // Show the Bosluk 'Next' button
             elements.boslukNextBtn.style.display = 'block';
+            elements.boslukNextBtn.classList.add("next-appear");  // ← EKLENDİ
         }
 
         elements.boslukNextBtn.onclick = () => {
