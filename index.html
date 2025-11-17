@@ -5886,58 +5886,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         
         }); // DOMContentLoaded event listener sonu
 
-        // ============ PWA SERVICE WORKER KAYDI ============
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                    log.debug('🎮 SW registered: ', registration);
+        
                         
-                        // PWA yükleme prompt'u
-                        let deferredPrompt;
-                        window.addEventListener('beforeinstallprompt', (e) => {
-                            log.debug('💾 PWA install prompt available');
-                            e.preventDefault();
-                            deferredPrompt = e;
-                            
-                            // Install button göster (isteğe bağlı)
-                            showPWAInstallPrompt(deferredPrompt);
-                        });
+                       
 
-                        // PWA yüklendiğinde
-                        window.addEventListener('appinstalled', (evt) => {
-                            log.game('📱 PWA was installed');
-                            alert('🎉 Hasene Arapça Oyunu başarıyla yüklendi!\n\nArtık telefon masaüstünden açabilirsiniz! 🚀');
-                        });
-                    })
-                    .catch(registrationError => {
-                        log.error('❌ SW registration failed: ', registrationError);
-                    });
-            });
-
-            // PWA Install Prompt fonksiyonu
-            function showPWAInstallPrompt(deferredPrompt) {
-    log.debug('💾 PWA kurulumu hazır!');
-
-    // Kurulum butonunu görünür yap
-    document.getElementById("pwaInstallBtn").style.display = "block";
-
-    // Kullanıcı tetikleyince prompt açılacak
-    window.triggerPWAInstall = () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    log.debug('✅ User accepted the install prompt');
-                } else {
-                    log.debug('❌ User dismissed the install prompt');
-                }
-                deferredPrompt = null;
-            });
-        }
-    };
-}
-        } // <-- MISSING CLOSING BRACE ADDED HERE
+                         // <-- MISSING CLOSING BRACE ADDED HERE
 
         // ============ LOADING SAYFASI KONTROLü ============
         window.addEventListener('DOMContentLoaded', () => {
@@ -6157,9 +6110,7 @@ function showMainMenu() {
                 return false;
             }
         };
-
-        
-    
+       
 
     </script>
 
@@ -6171,7 +6122,6 @@ function showMainMenu() {
             .catch(err => console.log("SW registration failed ❌", err));
     }
 </script>
-
 
 
 <button id="pwaInstallBtn" onclick="window.triggerPWAInstall()"
