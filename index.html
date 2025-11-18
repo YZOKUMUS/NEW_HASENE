@@ -539,7 +539,7 @@
 
     <!-- Başarılar/Rozetler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)">
-        <div class="modal-content badges-content" onclick="handleBadgesModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content badges-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
@@ -629,7 +629,7 @@
 
     <!-- Takvim Modal - Duolingo Style, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)">
-        <div class="modal-content calendar-content" onclick="handleCalendarModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
+        <div class="modal-content calendar-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
@@ -679,7 +679,7 @@
 
     <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" onclick="handleDailyTasksModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
@@ -734,7 +734,7 @@
 
     <!-- İstatistikler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)">
-        <div class="modal-content stats-content" onclick="handleStatsModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
@@ -3524,15 +3524,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-            if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
-                // Eğer scroll yapıldıysa, kapatma
-                if (badgesModalIsScrolling) {
-                    return;
-                }
+            // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
+            if (target && (target.closest('.modal-content'))) {
+                return;
             }
             
-            // Panel üzerine veya dış arka plana tıklanırsa kapat
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
+                // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
+                return;
+            }
+            
+            // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeBadgesModal();
         }
         
@@ -3773,15 +3776,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-            if (target && (target.id === 'statsScrollableContent' || target.closest('#statsScrollableContent'))) {
-                // Eğer scroll yapıldıysa, kapatma
-                if (statsModalIsScrolling) {
-                    return;
-                }
+            // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
+            if (target && (target.closest('.modal-content'))) {
+                return;
             }
             
-            // Panel üzerine veya dış arka plana tıklanırsa kapat
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'statsScrollableContent' || target.closest('#statsScrollableContent'))) {
+                // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
+                return;
+            }
+            
+            // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeStatsModal();
         }
         
@@ -4203,15 +4209,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-            if (target && (target.id === 'calendarScrollableContent' || target.closest('#calendarScrollableContent'))) {
-                // Eğer scroll yapıldıysa, kapatma
-                if (calendarModalIsScrolling) {
-                    return;
-                }
+            // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
+            if (target && (target.closest('.modal-content'))) {
+                return;
             }
             
-            // Panel üzerine veya dış arka plana tıklanırsa kapat
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'calendarScrollableContent' || target.closest('#calendarScrollableContent'))) {
+                // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
+                return;
+            }
+            
+            // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeCalendarModal();
         }
 
@@ -4764,15 +4773,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-            if (target && (target.id === 'dailyTasksScrollableContent' || target.closest('#dailyTasksScrollableContent'))) {
-                // Eğer scroll yapıldıysa, kapatma
-                if (dailyTasksModalIsScrolling) {
-                    return;
-                }
+            // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
+            if (target && (target.closest('.modal-content'))) {
+                return;
             }
             
-            // Panel üzerine veya dış arka plana tıklanırsa kapat
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'dailyTasksScrollableContent' || target.closest('#dailyTasksScrollableContent'))) {
+                // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
+                return;
+            }
+            
+            // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeDailyTasksModal();
             // Ana sayfanın görünür olduğundan emin ol
             if (elements && elements.mainMenu) {
