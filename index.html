@@ -2296,6 +2296,10 @@
         let currentDuaIndex = 0;
         let currentHadisIndex = 0;
         
+        // Cevap pozisyon takibi (tahmin edilmesini zorlaştırmak için)
+        let recentAnswerPositions = []; // Son 10 sorunun doğru cevap pozisyonları
+        const MAX_POSITION_HISTORY = 10;
+        
         // Ses kontrolü için
         let currentAudio = null;
 
@@ -5539,6 +5543,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             score = 0;
             correct = 0;
             wrong = 0;
+            
+            // Cevap pozisyon geçmişini sıfırla (yeni oyun başladığında)
+            recentAnswerPositions = [];
 
             updateUI();
 
@@ -5658,8 +5665,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 ...wrongAnswers.map(w => ({ text: w.anlam, correct: false }))
             ];
 
-            // Karıştır
-            shuffle(allOptions);
+            // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
+            smartShuffle(allOptions);
 
             // Seçenekleri göster
             elements.options.innerHTML = '';
@@ -5715,6 +5722,73 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
+        }
+        
+        // ============ AKILLI CEVAP POZİSYONU SEÇİMİ ============
+        // Kullanıcının tahmin etmesini zorlaştırmak için akıllı pozisyon seçimi
+        function getSmartAnswerPosition(totalOptions = 4) {
+            // Son pozisyonları kontrol et
+            const positionCounts = [0, 0, 0, 0]; // Her pozisyonun son 10 sorudaki görünme sayısı
+            
+            recentAnswerPositions.forEach(pos => {
+                if (pos >= 0 && pos < totalOptions) {
+                    positionCounts[pos]++;
+                }
+            });
+            
+            // En az kullanılan pozisyonları bul
+            const minCount = Math.min(...positionCounts);
+            const leastUsedPositions = positionCounts
+                .map((count, index) => ({ count, index }))
+                .filter(item => item.count === minCount)
+                .map(item => item.index);
+            
+            // Son pozisyonu kontrol et - üst üste aynı pozisyonda gelmesin
+            const lastPosition = recentAnswerPositions.length > 0 ? recentAnswerPositions[recentAnswerPositions.length - 1] : -1;
+            const availablePositions = leastUsedPositions.filter(pos => pos !== lastPosition);
+            
+            // Eğer son pozisyon hariç en az kullanılan pozisyon varsa, onu kullan
+            let selectedPosition;
+            if (availablePositions.length > 0) {
+                selectedPosition = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+            } else if (leastUsedPositions.length > 0) {
+                // Son pozisyon hariç seçenek yoksa, en az kullanılanlardan rastgele seç
+                selectedPosition = leastUsedPositions[Math.floor(Math.random() * leastUsedPositions.length)];
+            } else {
+                // Fallback: tamamen rastgele
+                selectedPosition = Math.floor(Math.random() * totalOptions);
+            }
+            
+            // Pozisyon geçmişine ekle
+            recentAnswerPositions.push(selectedPosition);
+            if (recentAnswerPositions.length > MAX_POSITION_HISTORY) {
+                recentAnswerPositions.shift(); // En eski pozisyonu çıkar
+            }
+            
+            return selectedPosition;
+        }
+        
+        // Akıllı karıştırma - doğru cevabı belirli pozisyona yerleştir
+        function smartShuffle(options) {
+            // Doğru cevabı bul
+            const correctIndex = options.findIndex(opt => opt.correct === true);
+            if (correctIndex === -1) {
+                // Doğru cevap bulunamadıysa normal karıştır
+                shuffle(options);
+                return;
+            }
+            
+            // Doğru cevabı çıkar
+            const correctAnswer = options.splice(correctIndex, 1)[0];
+            
+            // Yanlış cevapları karıştır
+            shuffle(options);
+            
+            // Akıllı pozisyon seç
+            const targetPosition = getSmartAnswerPosition(options.length + 1);
+            
+            // Doğru cevabı hedef pozisyona yerleştir
+            options.splice(targetPosition, 0, correctAnswer);
         }
 
         // ============ CEVAP KONTROL ============
@@ -6131,7 +6205,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug(`🎯 Doğru cevap: "${currentDinleQuestion.kelime}" (index: 0)`);
             log.debug(`❌ Yanlış cevaplar: ${wrongAnswers.map(w => `"${w.kelime}"`).join(', ')}`);
 
-            shuffle(allOptions);
+            // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
+            smartShuffle(allOptions);
 
             // Seçenekleri göster
             elements.dinleOptions.innerHTML = '';
@@ -6372,7 +6447,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 ...wrongWords.map(w => ({ text: w, correct: false }))
             ];
 
-            shuffle(allOptions);
+            // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
+            smartShuffle(allOptions);
 
             // Seçenekleri göster
             elements.boslukOptions.innerHTML = '';
