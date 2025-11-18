@@ -48,25 +48,76 @@
     
 </head>
 <body>
-    <!-- Loading Sayfası -->
+    <!-- Loading Sayfası - Premium Design -->
     <div class="loading-screen" id="loadingScreen">
-        <img src="icon-512-v4-RED-MUSHAF.png" alt="Hasene Logo" class="loading-logo">
+        <!-- Floating Particles Background -->
+        <div class="loading-particles">
+            <span class="particle">ب</span>
+            <span class="particle">س</span>
+            <span class="particle">م</span>
+            <span class="particle">ال</span>
+            <span class="particle">له</span>
+            <span class="particle">ال</span>
+            <span class="particle">رح</span>
+            <span class="particle">من</span>
+        </div>
         
-        <div class="loading-title">HASENE</div>
+        <!-- Flying Letters to Bag Animation -->
+        <div class="flying-letters-container">
+            <!-- Torba (Bag) at bottom -->
+            <div class="letter-bag">
+                <div class="bag-icon">👜</div>
+                <div class="bag-glow"></div>
+            </div>
+            <!-- Flying letters will be dynamically added here -->
+        </div>
         
-        <div class="hadis-box">
-            <div class="hadis-arabic">
+        <!-- Logo Container with 3D Effect -->
+        <div class="loading-logo-container">
+            <img src="icon-512-v4-RED-MUSHAF.png" alt="Hasene Logo" class="loading-logo">
+            <div class="logo-glow"></div>
+        </div>
+        
+        <!-- Title with Typing Animation -->
+        <div class="loading-title-wrapper">
+            <div class="loading-title" id="loadingTitle">HASENE</div>
+            <div class="title-underline"></div>
+        </div>
+        
+        <!-- Progressive Loading Steps -->
+        <div class="loading-steps" id="loadingSteps">
+            <div class="loading-step active" data-step="1">
+                <div class="step-icon">📚</div>
+                <div class="step-text">Kelime verileri yükleniyor...</div>
+            </div>
+            <div class="loading-step" data-step="2">
+                <div class="step-icon">📖</div>
+                <div class="step-text">Ayetler hazırlanıyor...</div>
+            </div>
+            <div class="loading-step" data-step="3">
+                <div class="step-icon">✨</div>
+                <div class="step-text">Hazırlanıyor...</div>
+            </div>
+        </div>
+        
+        <!-- Dynamic Hadis Box -->
+        <div class="hadis-box" id="hadisBox">
+            <div class="hadis-arabic" id="hadisArabic">
                 مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
             </div>
-            <div class="hadis-turkish">
+            <div class="hadis-turkish" id="hadisTurkish">
                 "Kim Allah'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."
                 <br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">(Tirmizi, Sevâbü'l-Kur'ân 16)</small>
             </div>
         </div>
         
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Yükleniyor...</div>
+        <!-- Progress Bar -->
+        <div class="loading-progress-container">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            <div class="loading-percentage" id="loadingPercentage">0%</div>
+        </div>
         
+        <!-- Copyright -->
         <div class="copyright">© YZOKUMUS 2025</div>
     </div>
 
@@ -6234,24 +6285,182 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
                          // <-- MISSING CLOSING BRACE ADDED HERE
 
-        // ============ LOADING SAYFASI KONTROLü ============
+        // ============ PREMIUM LOADING SCREEN – GENIUS DESIGN ============
         window.addEventListener('DOMContentLoaded', () => {
-    const loadingScreen = document.getElementById('loadingScreen');
-    const mainContainer = document.getElementById('mainMenu'); // <-- DÜZELTİLDİ
-
-    const showMainApp = () => {
-        requestAnimationFrame(() => {
-            if (loadingScreen) loadingScreen.classList.add('fade-out');
-
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainContainer = document.getElementById('mainMenu');
+            const loadingSteps = document.getElementById('loadingSteps');
+            const progressBar = document.getElementById('loadingProgressBar');
+            const loadingPercentage = document.getElementById('loadingPercentage');
+            const hadisArabic = document.getElementById('hadisArabic');
+            const hadisTurkish = document.getElementById('hadisTurkish');
+            
+            // Dinamik Hadisler Listesi
+            const hadisler = [
+                {
+                    arabic: 'مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا',
+                    turkish: '"Kim Allah\'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."',
+                    source: '(Tirmizi, Sevâbü\'l-Kur\'ân 16)'
+                },
+                {
+                    arabic: 'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',
+                    turkish: '"Sizin en hayırlınız, Kur\'an\'ı öğrenen ve öğretendir."',
+                    source: '(Buhari, Fedâilü\'l-Kur\'ân 21)'
+                },
+                {
+                    arabic: 'إِنَّ اللَّهَ يُحِبُّ إِذَا عَمِلَ أَحَدُكُمْ عَمَلًا أَنْ يُتْقِنَهُ',
+                    turkish: '"Allah, sizden birinizin bir iş yaptığında onu mükemmel yapmasını sever."',
+                    source: '(Taberani)'
+                },
+                {
+                    arabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
+                    turkish: '"İlim öğrenmek her Müslümana farzdır."',
+                    source: '(İbn Mâce)'
+                }
+            ];
+            
+            // Rastgele hadis seç
+            const randomHadis = hadisler[Math.floor(Math.random() * hadisler.length)];
+            if (hadisArabic && hadisTurkish) {
+                hadisArabic.textContent = randomHadis.arabic;
+                hadisTurkish.innerHTML = `"${randomHadis.turkish}"<br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">${randomHadis.source}</small>`;
+            }
+            
+            // Flying Letters to Bag Animation
+            const flyingContainer = document.querySelector('.flying-letters-container');
+            const letters = ['ب', 'س', 'م', 'ال', 'له', 'ال', 'رح', 'من', 'ر', 'ح', 'ي', 'م', 'ن'];
+            const bagBottom = window.innerHeight - 120; // Torba pozisyonu
+            const bagCenter = window.innerWidth / 2;
+            
+            let letterIndex = 0;
+            const createFlyingLetter = () => {
+                if (letterIndex >= letters.length) {
+                    letterIndex = 0; // Tekrar başla
+                }
+                
+                const letter = letters[letterIndex];
+                const flyingLetter = document.createElement('div');
+                flyingLetter.className = 'flying-letter';
+                flyingLetter.textContent = letter;
+                
+                // Rastgele başlangıç pozisyonu (ekranın üstü veya kenarları)
+                const startX = Math.random() * window.innerWidth;
+                const startY = -50; // Ekranın üstünden başla
+                
+                flyingLetter.style.left = startX + 'px';
+                flyingLetter.style.top = startY + 'px';
+                
+                // Torba pozisyonuna göre hedef hesapla
+                const targetX = bagCenter - startX;
+                const targetY = bagBottom - startY;
+                
+                flyingLetter.style.setProperty('--target-x', targetX + 'px');
+                flyingLetter.style.setProperty('--target-y', targetY + 'px');
+                
+                if (flyingContainer) {
+                    flyingContainer.appendChild(flyingLetter);
+                    
+                    // Animasyon bitince elementi kaldır
+                    setTimeout(() => {
+                        if (flyingLetter.parentNode) {
+                            flyingLetter.parentNode.removeChild(flyingLetter);
+                        }
+                    }, 3000);
+                }
+                
+                letterIndex++;
+            };
+            
+            // İlk harfi hemen gönder, sonra düzenli aralıklarla gönder
+            createFlyingLetter();
+            const letterInterval = setInterval(() => {
+                createFlyingLetter();
+            }, 400); // Her 400ms'de bir harf gönder
+            
+            // Loading bitince interval'i temizle
             setTimeout(() => {
-                if (loadingScreen) loadingScreen.style.display = 'none';
-                if (mainContainer) mainContainer.style.display = 'block';
-            }, 500);
+                clearInterval(letterInterval);
+            }, 12000);
+            
+            // Ana uygulamayı göster fonksiyonu
+            const showMainApp = () => {
+                requestAnimationFrame(() => {
+                    if (loadingScreen) loadingScreen.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        if (loadingScreen) loadingScreen.style.display = 'none';
+                        if (mainContainer) mainContainer.style.display = 'block';
+                    }, 500);
+                });
+            };
+            
+            // Progressive Loading Steps
+            let currentStep = 1;
+            const totalSteps = 3;
+            let progress = 0;
+            
+            const updateStep = (stepNumber) => {
+                if (!loadingSteps) return;
+                const steps = loadingSteps.querySelectorAll('.loading-step');
+                steps.forEach((step, index) => {
+                    if (index + 1 === stepNumber) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+            };
+            
+            const updateProgress = (percent) => {
+                if (progressBar) {
+                    progressBar.style.width = percent + '%';
+                }
+                if (loadingPercentage) {
+                    loadingPercentage.textContent = Math.round(percent) + '%';
+                }
+            };
+            
+            // Step 1: Kelime verileri (0-40%) - Süre uzatıldı
+            updateStep(1);
+            const step1Interval = setInterval(() => {
+                if (progress < 40) {
+                    progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
+                    updateProgress(progress);
+                } else {
+                    clearInterval(step1Interval);
+                }
+            }, 50); // 30ms'den 50ms'ye çıkarıldı
+            
+            // Step 2: Ayetler (40-80%) - Süre uzatıldı
+            setTimeout(() => {
+                updateStep(2);
+                const step2Interval = setInterval(() => {
+                    if (progress < 80) {
+                        progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
+                        updateProgress(progress);
+                    } else {
+                        clearInterval(step2Interval);
+                    }
+                }, 50); // 30ms'den 50ms'ye çıkarıldı
+            }, 2000); // 800ms'den 2000ms'ye çıkarıldı
+            
+            // Step 3: Hazırlanıyor (80-100%) - Süre uzatıldı
+            setTimeout(() => {
+                updateStep(3);
+                const step3Interval = setInterval(() => {
+                    if (progress < 100) {
+                        progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
+                        updateProgress(progress);
+                    } else {
+                        clearInterval(step3Interval);
+                        // Tüm adımlar tamamlandı, ana uygulamayı göster
+                        setTimeout(() => {
+                            showMainApp();
+                        }, 800); // 500ms'den 800ms'ye çıkarıldı
+                    }
+                }, 45); // 25ms'den 45ms'ye çıkarıldı
+            }, 4000); // 1600ms'den 4000ms'ye çıkarıldı
         });
-    };
-
-    setTimeout(showMainApp, 2500);
-});
 
 
 
