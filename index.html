@@ -26,7 +26,7 @@
     <meta name="msapplication-config" content="browserconfig.xml">
     
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.qurancomplex.gov.sa; font-src 'self' https://fonts.gstatic.com https://fonts.qurancomplex.gov.sa; img-src 'self' data:; media-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com; connect-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com; connect-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com;">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="icon-192-v4-RED-MUSHAF.png">
@@ -34,14 +34,16 @@
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512-v4-RED-MUSHAF.png">
     
     <!-- Uthmani Kur'an Fonts -->
+    <!-- Note: Uthmani font is loaded locally via style.css (KFGQPC Uthmanic Script HAFS Regular.otf) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- KFGQPC Uthmanic Script HAFS (Uthmani Font) -->
-    <link href="https://fonts.qurancomplex.gov.sa/css/UthmanicScript.css" rel="stylesheet">
+    <!-- Google Fonts with error handling - loads asynchronously to prevent blocking on certificate errors -->
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.onerror=null; this.remove();">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     
-    <!-- Material Icons (served via Google Fonts). Preconnect is sufficient; remove explicit preload to avoid unused-preload warnings. -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+    <!-- Material Icons (served via Google Fonts) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.onerror=null; this.remove();">
+    <noscript><link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet"></noscript>
     
     <!-- Flutter Modern CSS -->
     <link rel="stylesheet" href="style.css">
