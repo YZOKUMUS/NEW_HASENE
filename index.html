@@ -25,6 +25,9 @@
     <meta name="msapplication-TileColor" content="#667eea">
     <meta name="msapplication-config" content="browserconfig.xml">
     
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com; connect-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com;">
+    
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="icon-192-v4-RED-MUSHAF.png">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192-v4-RED-MUSHAF.png">
@@ -76,37 +79,41 @@
         <div class="main-menu" id="mainMenu">
 
 
-            <!-- Günlük Hedef Progress Bar -->
+            <!-- Günlük Hedef Progress Bar - Modern Design -->
             <div class="daily-goal-section">
-                <!-- Kompakt Panel -->
+                <!-- Modern Stats Panel -->
                 <div class="premium-stats-panel">   
-                    <!-- Hedef Butonu -->
-                    <button onclick="showDailyGoalSettings()" style="position: absolute; top: 8px; right: 8px; background: #667eea; border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                        <span style="font-size: 16px;">🎯</span>
+                    <!-- Hedef Butonu - Premium -->
+                    <button onclick="showDailyGoalSettings()" class="goal-settings-btn" style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #58cc02 0%, #4db300 100%); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; animation: goalButtonPulse 2s infinite;" onmouseover="this.style.transform='scale(1.15) rotate(5deg)'; this.style.boxShadow='0 6px 20px rgba(88, 204, 2, 0.5), 0 0 0 4px rgba(88, 204, 2, 0.2)'; this.style.animation='none'" onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7)'; this.style.animation='goalButtonPulse 2s infinite'" onmousedown="this.style.transform='scale(0.95) rotate(-5deg)'" onmouseup="this.style.transform='scale(1.15) rotate(5deg)'">
+                        <span style="font-size: 20px; display: inline-block; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" id="goalButtonIcon">🎯</span>
                     </button>
                     
-                    <!-- Stats - İslami Terminoloji -->
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; padding-right: 32px;">
-                        <div style="text-align: center;">
-                            <div style="color: #FF8F00; font-weight: 700; font-size: 16px;" id="gamePoints">0</div>
-                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">HASENE</div>
+                    <!-- Stats - Modern Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; padding-right: 40px;">
+                        <!-- Hasene -->
+                        <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <div style="color: #FF8F00; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="gamePoints">0</div>
+                            <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
                         </div>
-                        <div style="text-align: center;">
-                            <div style="color: #FFC107; font-weight: 700; font-size: 16px;" id="starPoints">0</div>
-                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">YILDIZ</div>
+                        <!-- Yıldız -->
+                        <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 235, 59, 0.1) 100%); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 193, 7, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <div style="color: #FFC107; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255, 193, 7, 0.2);" id="starPoints">0</div>
+                            <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">⭐ YILDIZ</div>
                         </div>
-                        <div style="text-align: center;">
-                            <div style="color: #9C27B0; font-weight: 700; font-size: 16px;" id="playerLevel">1. Mertebe</div>
-                            <div style="color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">MERTEBE</div>
+                        <!-- Mertebe -->
+                        <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(186, 104, 200, 0.1) 100%); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(156, 39, 176, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            <div style="color: #9C27B0; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(156, 39, 176, 0.2);" id="playerLevel">1. Mertebe</div>
+                            <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">MERTEBE</div>
                         </div>
                     </div>
                     
-                    <!-- Progress -->
-                    <div style="background: rgba(0,0,0,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-                        <div id="dailyGoalProgress" style="background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; width: 0%; transition: width 0.5s;"></div>
+                    <!-- Progress Bar - Modern -->
+                    <div style="background: rgba(0,0,0,0.08); height: 8px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="dailyGoalProgress" style="background: linear-gradient(90deg, #58cc02 0%, #4db300 100%); height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(88, 204, 2, 0.4);"></div>
                     </div>
-                    <div style="text-align: center; margin-top: 4px; color: rgba(0,0,0,0.6); font-size: 10px; font-weight: 600;">
-                        <span id="dailyGoalText">Günlük Vird: 2700 Hasene</span> • <span id="dailyGoalProgressText">0 / 2700 Hasene</span>
+                    <!-- Progress Text - Modern -->
+                    <div style="text-align: center; margin-top: 4px; color: rgba(0,0,0,0.7); font-size: clamp(10px, 2vw, 11px); font-weight: 600; line-height: 1.4;">
+                        <span id="dailyGoalText" style="color: #58cc02; font-weight: 700;">Günlük Vird: 2700 Hasene</span> • <span id="dailyGoalProgressText" style="color: rgba(0,0,0,0.7);">0 / 2700 Hasene</span>
                     </div>
                 </div>
             </div>
@@ -137,38 +144,38 @@
             <!-- Flutter Oyun Kartları -->
             <div class="flutter-game-grid">
 
-    <button class="game-card glass kelime" id="kelimeCevirBtn">
-        <div class="card-icon">🔄</div>
+    <button class="game-card glass kelime" id="kelimeCevirBtn" aria-label="Kelime Çevir oyununu başlat - Arapça kelimeleri Türkçe'ye çevir" role="button">
+        <div class="card-icon" aria-hidden="true">🔄</div>
         <div class="card-title">Kelime Çevir</div>
         <div class="card-desc">Arapça kelimeleri Türkçe'ye çevir</div>
     </button>
 
-    <button class="game-card glass dinle" id="dinleBulBtn">
-        <div class="card-icon">🎧</div>
+    <button class="game-card glass dinle" id="dinleBulBtn" aria-label="Dinle ve Bul oyununu başlat - Kelimeyi dinle ve sahih kelimeyi seç" role="button">
+        <div class="card-icon" aria-hidden="true">🎧</div>
         <div class="card-title">Dinle ve Bul</div>
         <div class="card-desc">Kelimeyi dinle ve sahih kelimeyi seç</div>
     </button>
 
-    <button class="game-card glass bosluk" id="boslukDoldurBtn">
-        <div class="card-icon">✏️</div>
+    <button class="game-card glass bosluk" id="boslukDoldurBtn" aria-label="Boşluk Doldur oyununu başlat - Ayetteki eksik kelimeyi tamamla" role="button">
+        <div class="card-icon" aria-hidden="true">✏️</div>
         <div class="card-title">Boşluk Doldur</div>
         <div class="card-desc">Ayetteki eksik kelimeyi tamamla</div>
     </button>
 
-    <button class="game-card glass dua" id="duaEtBtn">
-        <div class="card-icon">🤲</div>
+    <button class="game-card glass dua" id="duaEtBtn" aria-label="Dua Et modunu aç - Kur'an'dan duaları öğren ve dinle" role="button">
+        <div class="card-icon" aria-hidden="true">🤲</div>
         <div class="card-title">Dua Et</div>
-        <div class="card-desc">Kur’an’dan duaları öğren ve dinle</div>
+        <div class="card-desc">Kur'an'dan duaları öğren ve dinle</div>
     </button>
 
-    <button class="game-card glass ayet" id="ayetOkuBtn">
-        <div class="card-icon">📖</div>
+    <button class="game-card glass ayet" id="ayetOkuBtn" aria-label="Ayet Oku modunu aç - Ayetleri oku ve anlamlarını öğren" role="button">
+        <div class="card-icon" aria-hidden="true">📖</div>
         <div class="card-title">Ayet Oku</div>
         <div class="card-desc">Ayetleri oku ve anlamlarını öğren</div>
     </button>
 
-    <button class="game-card glass hadis" id="hadisOkuBtn">
-        <div class="card-icon">📜</div>
+    <button class="game-card glass hadis" id="hadisOkuBtn" aria-label="Hadis Oku modunu aç - Hadis-i şerifleri oku ve öğren" role="button">
+        <div class="card-icon" aria-hidden="true">📜</div>
         <div class="card-title">Hadis Oku</div>
         <div class="card-desc">Hadis-i şerifleri oku ve öğren</div>
     </button>
@@ -282,7 +289,7 @@
                 <button class="audio-btn" id="boslukAudioBtn"></button>
                 <div class="options" id="boslukOptions"></div>
                 <div class="feedback" id="boslukFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
+                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
             </div>
         </div>
 
@@ -317,7 +324,7 @@
                 <button class="audio-btn" id="dinleAudioBtn"></button>
                 <div class="options" id="dinleOptions"></div>
                 <div class="feedback" id="dinleFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
+                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
             </div>
         </div>
 
@@ -350,14 +357,14 @@
         </div>
 
         <!-- Combo Indicator -->
-        <div id="comboIndicator" style="display: none; text-align: center; padding: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; margin: 10px 0; animation: comboPopIn 0.3s ease; box-shadow: 0 4px 15px rgba(245,87,108,0.4);">
-            <div style="font-size: 1.8em; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+        <div id="comboIndicator" style="display: none; text-align: center; padding: 8px 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; margin: 8px 4px; animation: comboPopIn 0.3s ease; box-shadow: 0 4px 15px rgba(245,87,108,0.4); max-width: 100%; box-sizing: border-box;">
+            <div style="font-size: clamp(14px, 3vw, 16px); font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.2;">
                 🔥 COMBO <span id="comboCount">3</span>x 🔥
             </div>
-            <div style="font-size: 0.9em; color: rgba(255,255,255,0.9); margin-top: 4px;">
+            <div style="font-size: clamp(11px, 2.5vw, 13px); color: rgba(255,255,255,0.9); margin-top: 3px; line-height: 1.2;">
                 +<span id="comboBonus">5</span> Bonus Hasene!
             </div>
-            <div style="font-size: 0.7em; color: rgba(255,255,255,0.7); margin-top: 2px;">
+            <div style="font-size: clamp(9px, 2vw, 11px); color: rgba(255,255,255,0.7); margin-top: 2px; line-height: 1.2;">
                 (Her 3 combo = +5 Hasene)
             </div>
         </div>
@@ -396,7 +403,7 @@
         <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">açığa vurduğumuz</button>
     </div>
     <div class="feedback" id="feedback" style="font-size: clamp(13px, 3vw, 16px); margin-bottom: 8px; text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;"></div>
-    <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; max-width: 100%; margin-top: 10px; display: none; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
+    <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; max-width: 100%; margin-top: 10px; display: none; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
 </div>
         </div>  <!-- gameScreen sonu -->
     </div>
@@ -464,56 +471,42 @@
         </div>
     </div>
 
-    <!-- Takvim Modal -->
+    <!-- Takvim Modal - Duolingo Style -->
     <div class="modal" id="calendarModal">
-        <div class="modal-content" style="max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 18px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
+        <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; background: #ffffff; border-radius: 16px;">
             
-            <!-- Başlık -->
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; font-size: 1.4em; color: #f39c12; font-weight: bold;">günlük seri!</h2>
+            <!-- Başlık ve Streak -->
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 1.5em; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">
+                    <span id="calendarStreakCount" style="color: #58cc02;">0</span> gün seri
+                </div>
+                <div style="font-size: 0.9em; color: #999; margin-top: 4px;">
+                    Her gün oyna, serini bozma!
+                </div>
             </div>
             
-            <!-- Haftalık Streak Gösterimi -->
-            <div id="weeklyStreakDisplay" style="margin: 15px 0; padding: 0 5px;">
+            <!-- Haftalık Streak Gösterimi (Duolingo Style) -->
+            <div id="weeklyStreakDisplay" style="margin-bottom: 32px; padding: 16px; background: #f7f7f7; border-radius: 12px;">
                 <!-- Bu alan JavaScript ile doldurulacak -->
             </div>
             
-            <!-- Aylık Takvim Bölümü -->
-            <div style="margin: 20px 0; background: rgba(44, 62, 80, 0.3); border-radius: 12px; padding: 15px;">
-                <!-- (removed) header intentionally omitted -->
+            <!-- Aylık Takvim Bölümü (Duolingo Style) -->
+            <div style="margin-bottom: 24px;">
+                <!-- Ay Başlığı -->
+                <div style="text-align: center; font-weight: 600; font-size: 1.1em; color: #1a1a1a; margin-bottom: 16px;" id="calendarMonth">
+                    Ocak 2025
+                </div>
                 
-                <!-- Mini Takvim -->
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 8px; overflow-x: auto;">
-                    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; font-size: 0.95em; color: #ecf0f1; min-width: 200px;" id="calendarMonth">Kasım 2025</div>
-                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; max-width: 100%; min-width: 280px; width: 100%;">
-                        <!-- Takvim günleri buraya eklenecek -->
-                    </div>
-                    
-                    <!-- Legend (Minimal, No Label) -->
-                    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.6em; color: #bdc3c7;">
-                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
-                                <span style="font-size: 1.2em;">🎯</span>
-                                <span>Bugün</span>
-                            </span>
-                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
-                                <span style="font-size: 1.2em;">✅</span>
-                                <span>Tamamlandı</span>
-                            </span>
-                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
-                                <span style="font-size: 1.2em;">🔥</span>
-                                <span>Streak</span>
-                            </span>
-                            <span style="display: flex; align-items: center; gap: 4px; justify-content: center;">
-                                <span style="font-size: 1.2em;">❄️</span>
-                                <span>Boş</span>
-                            </span>
-                        </div>
-                    </div>
+                <!-- Takvim Grid -->
+                <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 100%; margin: 0 auto;">
+                    <!-- Takvim günleri buraya eklenecek -->
                 </div>
             </div>
 
-            <button id="closeCalendarBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">Kapat</button>
+            <!-- Kapat Butonu -->
+            <button id="closeCalendarBtn" onclick="closeCalendarModal()" style="width: 100%; padding: 14px; background: #58cc02; color: white; border: none; border-radius: 12px; font-size: 1em; font-weight: 700; cursor: pointer; margin-top: 16px; transition: background 0.2s, transform 0.1s;" onmouseover="this.style.background='#4db300'; this.style.transform='scale(1.02)'" onmouseout="this.style.background='#58cc02'; this.style.transform='scale(1)'">
+                Kapat
+            </button>
         </div>
     </div>
 
@@ -901,6 +894,36 @@
                 </div>
             </div>
             
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">🎮 Oyun Modlarına Göre Puan</h4>
+                <div style="font-size: 0.75em; color: #555; line-height: 1.8;">
+                    <div style="margin-bottom: 8px;">
+                        <strong>🔤 Kelime Çevir:</strong><br>
+                        <span style="font-size: 0.9em;">Kelime Zorluğu × 2 Hasene</span><br>
+                        <span style="font-size: 0.85em; color: #888;">Kolay: 10-18 | Orta: 20-22 | Zor: 24-42</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>🎵 Dinle ve Bul:</strong><br>
+                        <span style="font-size: 0.9em;">Kelime Zorluğu × 2 Hasene</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>📝 Boşluk Doldur:</strong><br>
+                        <span style="font-size: 0.9em;">Sabit 10 Hasene</span>
+                    </div>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
+                        <span style="font-size: 0.85em; color: #888;">📖 Ayet Oku, 🤲 Dua Öğren, 📚 Hadis Oku modlarında puan kazanılmaz (sadece günlük görev ilerlemesi)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: #fef3c7; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 8px 0; color: #d97706; font-size: 0.9em;">📋 Günlük Görevler</h4>
+                <div style="font-size: 0.75em; color: #555;">
+                    Tüm günlük görevleri tamamla:<br>
+                    <strong style="color: #d97706; font-size: 1.1em;">+2,500 Hasene Bonus!</strong>
+                </div>
+            </div>
+            
             <button id="closeXPInfoBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">
                 Bâreke'llahu fîke! 🤲
             </button>
@@ -974,6 +997,16 @@
         // This lets us avoid replacing hundreds of console.log occurrences while keeping
         // a single control to enable verbose logs during debugging.
         console.log = (...args) => { if (typeof CONFIG !== 'undefined' && CONFIG.debug) __orig_console_log(...args); };
+        const forceLog = (...args) => __orig_console_log(...args);
+        
+        // ============ YARDIMCI FONKSİYONLAR ============
+        // Yerel tarih formatı (YYYY-MM-DD) - UTC yerine yerel saat dilimi kullanır
+        function getLocalDateString(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         
         // ============ SECURITY - HTML SANITIZATION ============
         function sanitizeHTML(input) {
@@ -1192,9 +1225,11 @@
             localStorage.setItem('dailyGoalHasene', goal.hasene);
             
             // Günlük Hasene'yi sıfırla (her gün başta)
-            const today = new Date().toDateString();
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             const lastDate = localStorage.getItem('lastDailyGoalDate');
-            if (lastDate !== today) {
+            // Eski format (toDateString) kontrolü - geriye uyumluluk için
+            const todayOldFormat = new Date().toDateString();
+            if (lastDate !== today && lastDate !== todayOldFormat) {
                 localStorage.setItem('dailyXP', '0');
                 localStorage.setItem('lastDailyGoalDate', today);
             }
@@ -1218,11 +1253,14 @@
             };
             
             const progressPercent = Math.min((dailyXP / goalXP) * 100, 100);
+            const isCompleted = dailyXP >= goalXP;
             
             // NULL KONTROL - Elementleri kontrol et
             const progressEl = document.getElementById('dailyGoalProgress');
             const progressTextEl = document.getElementById('dailyGoalProgressText');
             const goalTextEl = document.getElementById('dailyGoalText');
+            const goalButton = document.querySelector('.goal-settings-btn');
+            const goalButtonIcon = document.getElementById('goalButtonIcon');
             
             if (!progressEl || !progressTextEl || !goalTextEl) {
                 log.error('❌ HATA: Günlük hedef elementleri bulunamadı!');
@@ -1234,17 +1272,39 @@
             goalTextEl.textContent = goalXP + ' hasene hedefine ulaş! (' + goals[goalLevel].name + ')';
             
             // Hedef tamamlandıysa
-            if (dailyXP >= goalXP) {
+            if (isCompleted) {
                 goalTextEl.textContent = '✅ Günlük hedef tamamlandı!';
+                
+                // Butonu altın yap ve kutlama animasyonu ekle
+                if (goalButton) {
+                    goalButton.classList.add('completed');
+                    goalButton.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+                    goalButton.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.5), 0 0 0 0 rgba(255, 215, 0, 0.7)';
+                    if (goalButtonIcon) {
+                        goalButtonIcon.textContent = '✨';
+                    }
+                }
+            } else {
+                // Hedef tamamlanmadıysa normal görünüm
+                if (goalButton) {
+                    goalButton.classList.remove('completed');
+                    goalButton.style.background = 'linear-gradient(135deg, #58cc02 0%, #4db300 100%)';
+                    goalButton.style.boxShadow = '0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7)';
+                    if (goalButtonIcon) {
+                        goalButtonIcon.textContent = '🎯';
+                    }
+                }
             }
         }
         
         function addDailyXP(xp) {
-            const today = new Date().toDateString();
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             const lastDate = localStorage.getItem('lastDailyGoalDate');
+            // Eski format (toDateString) kontrolü - geriye uyumluluk için
+            const todayOldFormat = new Date().toDateString();
             
             // Yeni gün başladıysa sıfırla
-            if (lastDate !== today) {
+            if (lastDate !== today && lastDate !== todayOldFormat) {
                 localStorage.setItem('dailyXP', '0');
                 localStorage.setItem('lastDailyGoalDate', today);
             }
@@ -1273,7 +1333,7 @@
         function showSuccessMessage(message) {
             const msg = document.createElement('div');
             msg.textContent = message;
-            msg.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; padding: 15px 25px; border-radius: 12px; font-weight: 600; z-index: 10000; box-shadow: 0 8px 24px rgba(74,222,128,0.4); animation: slideDown 0.3s ease;';
+            msg.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: clamp(12px, 2.5vw, 14px); z-index: 10000; box-shadow: 0 8px 24px rgba(74,222,128,0.4); animation: slideDown 0.3s ease; max-width: 90%; box-sizing: border-box; text-align: center; line-height: 1.3;';
             document.body.appendChild(msg);
             
             setTimeout(() => {
@@ -1793,7 +1853,9 @@
 
         // ============ ÖZEL ONAY POP-UP ============
         function showCustomConfirm(correct, wrong, xp) {
+            forceLog('[MODAL] Fonksiyon cagrildi - Dogru=' + correct + ' Yanlis=' + wrong + ' XP=' + xp);
             return new Promise((resolve) => {
+                forceLog('[MODAL] Promise olusturuldu');
                 const confirmModal = document.getElementById('customConfirm');
                 const confirmCorrect = document.getElementById('confirmCorrect');
                 const confirmWrong = document.getElementById('confirmWrong');
@@ -1801,34 +1863,71 @@
                 const confirmOK = document.getElementById('confirmOK');
                 const confirmCancel = document.getElementById('confirmCancel');
 
-                // Değerleri güncelle
+                forceLog('[MODAL] Element kontrol:', 
+                    'Modal=' + !!confirmModal,
+                    'Correct=' + !!confirmCorrect,
+                    'Wrong=' + !!confirmWrong,
+                    'XP=' + !!confirmXP,
+                    'OK=' + !!confirmOK,
+                    'Cancel=' + !!confirmCancel
+                );
+
+                if (!confirmModal || !confirmCorrect || !confirmWrong || !confirmXP || !confirmOK || !confirmCancel) {
+                    console.error('[MODAL] HATA - Elementler bulunamadi!');
+                    resolve(true);
+                    return;
+                }
+
+                forceLog('[MODAL] Degerler guncelleniyor...');
                 confirmCorrect.textContent = correct;
                 confirmWrong.textContent = wrong;
                 confirmXP.textContent = xp;
 
-                // Pop-up'ı göster
-                confirmModal.style.display = 'flex';
+                forceLog('[MODAL] Modal gosteriliyor...');
+                // CSS class ile göster (daha güvenilir)
+                confirmModal.classList.add('show');
+                // Ayrıca inline style da ekle (çift güvence)
+                confirmModal.style.setProperty('display', 'flex', 'important');
+                
+                // requestAnimationFrame ile bir sonraki frame'de kontrol et
+                requestAnimationFrame(() => {
+                    const computedDisplay = window.getComputedStyle(confirmModal).display;
+                    const isVisible = confirmModal.offsetParent !== null;
+                    forceLog('[MODAL] Display degeri (sonraki frame):', computedDisplay, 'Gorunur mu?', isVisible);
+                    if (computedDisplay === 'none' || !isVisible) {
+                        forceLog('[MODAL] HATA - Hala none! Zorla gosteriliyor...');
+                        confirmModal.style.setProperty('display', 'flex', 'important');
+                        confirmModal.style.setProperty('visibility', 'visible', 'important');
+                        confirmModal.style.setProperty('opacity', '1', 'important');
+                    }
+                });
 
-                // Event listener'ları ekle
                 const handleOK = () => {
-                    confirmModal.style.display = 'none';
+                    forceLog('[MODAL] OK butonuna tiklandi');
+                    confirmModal.classList.remove('show');
+                    confirmModal.style.setProperty('display', 'none', 'important');
                     cleanup();
                     resolve(true);
                 };
 
                 const handleCancel = () => {
-                    confirmModal.style.display = 'none';
+                    forceLog('[MODAL] Cancel butonuna tiklandi');
+                    confirmModal.classList.remove('show');
+                    confirmModal.style.setProperty('display', 'none', 'important');
                     cleanup();
                     resolve(false);
                 };
 
                 const cleanup = () => {
-                    confirmOK.removeEventListener('click', handleOK);
-                    confirmCancel.removeEventListener('click', handleCancel);
+                    forceLog('[MODAL] Cleanup yapiliyor...');
+                    if (confirmOK) confirmOK.removeEventListener('click', handleOK);
+                    if (confirmCancel) confirmCancel.removeEventListener('click', handleCancel);
                 };
 
+                forceLog('[MODAL] Event listener\'lar ekleniyor...');
                 confirmOK.addEventListener('click', handleOK);
                 confirmCancel.addEventListener('click', handleCancel);
+                forceLog('[MODAL] Event listener\'lar eklendi - Modal bekleniyor...');
             });
         }
 
@@ -2252,6 +2351,13 @@ function hideAllGameScreens() {
                 return;
             }
             
+            // URL doğrulama
+            if (!audioUrl.startsWith('http://') && !audioUrl.startsWith('https://') && !audioUrl.startsWith('data:')) {
+                log.error('Geçersiz ses URL formatı:', audioUrl);
+                if (button) button.disabled = false;
+                return;
+            }
+            
             // Butonu devre dışı bırak
             if (button) button.disabled = true;
             
@@ -2262,6 +2368,7 @@ function hideAllGameScreens() {
                 currentAudio.addEventListener('loadeddata', () => {
                     currentAudio.play().catch(err => {
                         log.error('Ses çalma hatası:', err);
+                        log.error('Ses URL:', audioUrl);
                         if (button) button.disabled = false;
                         cleanupAudioListeners();
                         currentAudio = null;
@@ -2278,8 +2385,10 @@ function hideAllGameScreens() {
                     };
                     
                     // Hata durumunda cleanup
-                    currentAudio.onerror = () => {
+                    currentAudio.onerror = (e) => {
                         log.error('Ses dosyası yüklenemedi:', audioUrl);
+                        log.error('Hata kodu:', currentAudio.error?.code);
+                        log.error('Hata mesajı:', currentAudio.error?.message);
                         if (button) button.disabled = false;
                         cleanupAudioListeners();
                         if (currentAudio) {
@@ -2292,6 +2401,7 @@ function hideAllGameScreens() {
                 
             } catch (err) {
                 log.error('Audio oluşturma hatası:', err);
+                log.error('Ses URL:', audioUrl);
                 if (button) button.disabled = false;
                 currentAudio = null;
             }
@@ -2414,7 +2524,7 @@ function hideAllGameScreens() {
                 p: totalPoints, // points
                 b: badges.bronze + ',' + badges.silver + ',' + badges.gold + ',' + badges.diamond, // badges
                 s: streakData.currentStreak, // streak
-                d: new Date().toISOString().split('T')[0] // date
+                d: getLocalDateString() // date (yerel tarih)
             };
             const encoded = btoa(JSON.stringify(gameData));
             const newUrl = window.location.origin + window.location.pathname + '?data=' + encoded;
@@ -2468,7 +2578,7 @@ function hideAllGameScreens() {
                 
                 // Puanları yükle (IndexedDB öncelikli, localStorage yedek)
                 totalPoints = parseInt(savedPoints || localStorage.getItem('hasene_totalPoints') || '0');
-                starPoints = Math.floor(totalPoints / 500);
+                starPoints = Math.floor(totalPoints / 100);
                 level = calculateLevel(totalPoints);
                 
                 log.debug('📊 IndexedDB yüklendi:', {totalPoints, savedPoints});
@@ -2477,7 +2587,7 @@ function hideAllGameScreens() {
                 try {
                     // localStorage dene
                     totalPoints = parseInt(localStorage.getItem('hasene_totalPoints') || '0');
-                    starPoints = Math.floor(totalPoints / 500);
+                    starPoints = Math.floor(totalPoints / 100);
                     level = calculateLevel(totalPoints);
                     log.debug('📊 localStorage yüklendi:', totalPoints);
                 } catch (localError) {
@@ -2485,7 +2595,7 @@ function hideAllGameScreens() {
                     // Son çare: URL'den yükle
                     const urlLoaded = loadFromURL();
                     if (urlLoaded) {
-                        starPoints = Math.floor(totalPoints / 500);
+                        starPoints = Math.floor(totalPoints / 100);
                         level = calculateLevel(totalPoints);
                     } else {
                         // Hiçbir şey çalışmıyor, varsayılan değerler
@@ -2548,7 +2658,7 @@ function hideAllGameScreens() {
             
             // Günlük kontrol
             checkDailyProgress();
-            checkDailyTasks();
+            checkDailyTasks(); // Bu fonksiyon içinde zaten updateTasksDisplay() çağrılıyor
         }
 
         // Daha zorlu seviye hesaplama sistemi
@@ -2749,7 +2859,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     // =========================================
     // 🔥 YENİ DAILY TASK ÜRET
     // =========================================
-    generateDailyTasks(new Date().toISOString().split('T')[0]);
+    generateDailyTasks(getLocalDateString());
 
     // =========================================
     // 🔥 UI GÜNCELLE
@@ -3151,7 +3261,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ TAKVİM SİSTEMİ ============
         function checkDailyProgress() {
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             
             // Eğer bugün ilk defa açılıyorsa
             if (streakData.todayDate !== today) {
@@ -3191,7 +3301,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Bir önceki günü hesapla
                     const prevDate = new Date(currentDate);
                     prevDate.setDate(prevDate.getDate() - 1);
-                    currentDate = prevDate.toISOString().split('T')[0];
+                    currentDate = getLocalDateString(prevDate);
                 } else {
                     // Ardışık olmayan tarih bulundu, streak burada bitiyor
                     break;
@@ -3226,7 +3336,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Bir önceki günü hesapla
                     const prevDate = new Date(currentDate);
                     prevDate.setDate(prevDate.getDate() - 1);
-                    currentDate = prevDate.toISOString().split('T')[0];
+                    currentDate = getLocalDateString(prevDate);
                 } else {
                     // Ardışık olmayan tarih, streak burada bitiyor
                     break;
@@ -3238,7 +3348,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function updateDailyProgress(correctAnswers) {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             
             // Günlük ilerleme güncelle
             streakData.todayProgress += correctAnswers;
@@ -3343,7 +3453,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 date.setDate(today.getDate() - i);
                 weekDays.push({
                     date: date,
-                    dateStr: date.toISOString().split('T')[0],
+                    dateStr: getLocalDateString(date),
                     dayName: dayNames[date.getDay()],
                     isToday: i === 0
                 });
@@ -3351,59 +3461,61 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // PlayDates set'ini oluştur
             const playDatesSet = new Set(streakData.playDates);
+            const currentStreakDates = calculateCurrentStreakDates();
+            const currentStreakSet = new Set(currentStreakDates);
             
-            // HTML oluştur
+            // HTML oluştur - Duolingo Style
             let html = '';
             
-            // Container wrapper
-            html += '<div style="display: flex; flex-direction: column; gap: 8px; max-width: 100%; margin: 0 auto;">';
-            
-            // Gün isimleri
-            html += '<div style="display: flex; justify-content: space-evenly; align-items: center;">';
+            // Gün isimleri (üst satır)
+            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;">';
             weekDays.forEach(day => {
-                const dayColor = day.isToday ? '#f39c12' : '#7f8c8d';
-                html += `<div style="text-align: center; font-size: 0.75em; color: ${dayColor}; font-weight: ${day.isToday ? 'bold' : 'normal'}; width: 42px;">${day.dayName}</div>`;
+                const dayColor = day.isToday ? '#58cc02' : '#999';
+                const fontWeight = day.isToday ? '700' : '400';
+                html += `<div style="text-align: center; font-size: 0.75em; color: ${dayColor}; font-weight: ${fontWeight};">${day.dayName}</div>`;
             });
             html += '</div>';
             
-            // Streak gösterimi
-            html += '<div style="display: flex; justify-content: space-evenly; align-items: center;">';
+            // Günler (alt satır) - Duolingo kare stili
+            html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">';
             weekDays.forEach(day => {
                 const hasPlayed = playDatesSet.has(day.dateStr);
-                let circleStyle = '';
-                let iconContent = '';
+                const isInStreak = currentStreakSet.has(day.dateStr);
+                
+                let boxStyle = 'aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: 600; transition: transform 0.2s;';
                 
                 if (day.isToday) {
                     if (hasPlayed) {
-                        // Bugün oynandı - mavi arka plan, beyaz tick
-                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
-                        iconContent = '✓';
+                        // Bugün tamamlandı - yeşil (Duolingo style)
+                        boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
                     } else {
-                        // Bugün oynanmadı - gri arka plan
-                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
-                        iconContent = '';
+                        // Bugün henüz oynanmadı - mavi kenarlık
+                        boxStyle += ' background: #e5f4e3; color: #58cc02; border: 2px solid #58cc02;';
                     }
+                } else if (isInStreak && hasPlayed) {
+                    // Streak günü - altın/yeşil (Duolingo style)
+                    boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700;';
+                } else if (hasPlayed) {
+                    // Oynandı ama streak dışında - yeşil
+                    boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
                 } else {
-                    if (hasPlayed) {
-                        // Geçmiş günler oynandı - turuncu arka plan, beyaz tick
-                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #f39c12; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
-                        iconContent = '✓';
-                    } else {
-                        // Geçmiş günler oynanmadı - gri arka plan
-                        circleStyle = 'width: 42px; height: 42px; border-radius: 50%; background: #7f8c8d; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
-                        iconContent = '';
-                    }
+                    // Oynanmadı - gri
+                    boxStyle += ' background: #e5e5e5; color: #999; border: 2px solid #e5e5e5;';
                 }
                 
-                html += `<div style="${circleStyle}">
-                    <span style="color: white; font-size: 1.3em; font-weight: bold;">${iconContent}</span>
-                </div>`;
+                const icon = hasPlayed ? '✓' : '';
+                html += `<div style="${boxStyle}" title="${day.dateStr}">${icon}</div>`;
             });
-            html += '</div>'; // Streak gösterimi kapanış
-            html += '</div>'; // Container wrapper kapanış
+            html += '</div>';
             
             // HTML'i yerleştir
             document.getElementById('weeklyStreakDisplay').innerHTML = html;
+            
+            // Streak sayısını güncelle
+            const streakCountEl = document.getElementById('calendarStreakCount');
+            if (streakCountEl) {
+                streakCountEl.textContent = streakData.currentStreak || 0;
+            }
         }
 
         function generateMonthlyCalendar() {
@@ -3411,6 +3523,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const year = today.getFullYear();
             const month = today.getMonth();
             const todayDate = today.getDate();
+            const todayStr = getLocalDateString();
             
             // Ay adını güncelle
             const monthNames = [
@@ -3425,10 +3538,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // HTML string olarak oluştur
             let html = '';
             
-            // Haftanın günlerini ekle (daha kısa isimler + küçük font)
+            // Haftanın günlerini ekle (Duolingo style - üst satır)
             const dayNames = ['Pz', 'Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct'];
             dayNames.forEach(day => {
-                html += `<div style="font-weight: 600; font-size: 0.55em; color: #95a5a6; padding: 1px; text-align: center; min-height: 14px; display: flex; align-items: center; justify-content: center;">${day}</div>`;
+                html += `<div style="text-align: center; font-weight: 600; font-size: 0.75em; color: #999; padding: 8px 0; display: flex; align-items: center; justify-content: center;">${day}</div>`;
             });
             
             // Ayın ilk gününün haftanın hangi günü olduğunu bul
@@ -3440,55 +3553,50 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 html += '<div></div>';
             }
             
-            // Mevcut streak'in gerçek tarih aralığını hesapla (doğru algoritma)
+            // Mevcut streak'in gerçek tarih aralığını hesapla
             const currentStreakDates = calculateCurrentStreakDates();
             const currentStreakSet = new Set(currentStreakDates);
 
             // playDates array'ini Set'e çevir
             const playDatesSet = new Set(streakData.playDates);
             
-            // Ayın günlerini ekle
+            // Ayın günlerini ekle (Duolingo kare stili)
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasPlayed = playDatesSet.has(dateStr);
+                const isInStreak = currentStreakSet.has(dateStr);
+                const isToday = dateStr === todayStr;
                 
-                let style = 'padding: 4px 2px; border-radius: 50%; cursor: pointer; font-size: 0.6em; min-height: 24px; max-height: 28px; max-width: 28px; display: flex; align-items: center; justify-content: center; color: #ecf0f1; flex-direction: column;';
+                // Duolingo style kare
+                let boxStyle = 'aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;';
                 
-                let dayContent = day;
-                let tooltip = dateStr;
-                
-                // Bugün ise vurgula
-                if (day === todayDate) {
-                    if (playDatesSet.has(dateStr)) {
-                        style += ' background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; font-weight: bold; border: 3px solid #3498db; box-shadow: 0 0 12px rgba(52,152,219,0.6);';
-                        dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.2em;">✅</div>`;
-                        tooltip = `${dateStr} - Bugün tamamlandı!`;
+                if (isToday) {
+                    if (hasPlayed) {
+                        // Bugün tamamlandı - yeşil (Duolingo style)
+                        boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02; box-shadow: 0 2px 8px rgba(88, 204, 2, 0.3);';
                     } else {
-                        style += ' background: #3498db; color: white; font-weight: bold; box-shadow: 0 0 8px rgba(52,152,219,0.5); animation: pulse 3s infinite;';
-                        dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.2em;">🎯</div>`;
-                        tooltip = `${dateStr} - Bugün (henüz oynanmadı)`;
+                        // Bugün henüz oynanmadı - mavi kenarlık
+                        boxStyle += ' background: #e5f4e3; color: #58cc02; border: 2px solid #58cc02;';
                     }
-                }
-                // Mevcut streak'in bir parçasıysa (ALEV 🔥)
-                else if (currentStreakSet.has(dateStr) && playDatesSet.has(dateStr)) {
-                    style += ' background: linear-gradient(135deg, #e74c3c, #f39c12); color: white; font-weight: bold; border: 2px solid #f1c40f; box-shadow: 0 0 10px rgba(231,76,60,0.4);';
-                    dayContent = `<div style="font-size: 0.5em;">${day}</div><div style="font-size: 1.4em;">🔥</div>`;
-                    tooltip = `${dateStr} - Streak günü! Alev yakıyor! 🔥`;
-                }
-                // Oyun oynandı ama streak dışında (normal tik)
-                else if (playDatesSet.has(dateStr)) {
-                    style += ' background: #2ecc71; color: white; font-weight: 600;';
-                    dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.1em;">✓</div>`;
-                    tooltip = `${dateStr} - Tamamlandı`;
-                }
-                // Geçmiş günler - oynanmadı (BUZ ❄️)
-                else if (day < todayDate) {
-                    style += ' color: #95a5a6; background: rgba(149,165,166,0.1);';
-                    dayContent = `<div style="font-size: 0.6em;">${day}</div><div style="font-size: 1.1em;">❄️</div>`;
-                    tooltip = `${dateStr} - Oynanmadı (streak dondu!)`;
+                } else if (isInStreak && hasPlayed) {
+                    // Streak günü - altın (Duolingo style)
+                    boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);';
+                } else if (hasPlayed) {
+                    // Oynandı ama streak dışında - yeşil
+                    boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
+                } else if (day < todayDate) {
+                    // Geçmiş gün - oynanmadı - gri
+                    boxStyle += ' background: #e5e5e5; color: #999; border: 2px solid #e5e5e5;';
+                } else {
+                    // Gelecek gün - açık gri
+                    boxStyle += ' background: #f7f7f7; color: #ccc; border: 2px solid #f7f7f7;';
                 }
                 
-                html += `<div style="${style}" title="${tooltip}">${dayContent}</div>`;
+                const content = hasPlayed ? '✓' : day;
+                const tooltip = `${dateStr}${hasPlayed ? ' - Tamamlandı' : isToday ? ' - Bugün' : ''}${isInStreak && hasPlayed ? ' - Streak!' : ''}`;
+                
+                html += `<div style="${boxStyle}" title="${tooltip}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${content}</div>`;
             }
             
             // HTML'i yerleştir
@@ -3504,10 +3612,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.stats('🔍 STREAK SİSTEMİ ANALİZ RAPORU');
             log.stats('=====================================');
             
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDateString();
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            const yesterdayStr = getLocalDateString(yesterday);
             
             // Mevcut streak verilerini analiz et
             log.stats('📊 Mevcut Veriler:');
@@ -3598,7 +3706,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ GÜNLİK GÖREVLER SİSTEMİ ============
         function checkDailyTasks() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             
             log.debug('🔍 Günlük görev kontrolü:', {
                 bugün: today,
@@ -3612,33 +3720,46 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (dailyTasks.lastTaskDate !== today) {
                 log.debug('🔄 Yeni gün başladı, görevler yenileniyor...');
                 generateDailyTasks(today);
+                // Görevler oluşturulduktan sonra badge'i güncelle
+                if (typeof updateTasksDisplay === 'function') {
+                    updateTasksDisplay();
+                }
             } else {
                 log.debug('✅ Aynı gün, mevcut görevler korunuyor');
+                // Mevcut görevler için de badge'i güncelle
+                if (typeof updateTasksDisplay === 'function') {
+                    updateTasksDisplay();
+                }
             }
         }
 
         function generateDailyTasks(date) {
-            // Temel görevler listesi
+            // Temel görevler listesi (tüm oyun modlarını kapsayacak şekilde genişletildi)
             const baseTasks = [
                 { id: 'kelime5', name: '5 kelime çevir', target: 5, current: 0, type: 'kelimeCevir', reward: 1 },
                 { id: 'ayet3', name: '3 ayet oku', target: 3, current: 0, type: 'ayetOku', reward: 1 },
                 { id: 'dua2', name: '2 dua öğren', target: 2, current: 0, type: 'duaOgre', reward: 1 },
                 { id: 'hadis1', name: '1 hadis oku', target: 1, current: 0, type: 'hadisOku', reward: 1 },
+                { id: 'dinle2', name: '2 kelime dinle', target: 2, current: 0, type: 'dinleBul', reward: 1 },
+                { id: 'bosluk1', name: '1 boşluk doldur', target: 1, current: 0, type: 'boslukDoldur', reward: 1 },
                 { id: 'dogru10', name: '10 doğru cevap ver', target: 10, current: 0, type: 'toplamDogru', reward: 1 },
                 { id: 'puan100', name: '100 puan topla', target: 100, current: 0, type: 'toplamPuan', reward: 1 }
             ];
 
-            // Bonus görevler listesi
+            // Bonus görevler listesi (daha fazla çeşitlilik)
             const bonusTasksList = [
                 { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 soru çöz', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
                 { id: 'allDiff', name: '3 farklı zorlukta oyna', target: 3, current: 0, type: 'farklıZorluk', reward: 2 },
                 { id: 'combo15', name: '15 doğru cevap ver (bonus)', target: 15, current: 0, type: 'toplamDogru', reward: 2 },
-                { id: 'dinle3', name: '3 kelime dinle', target: 3, current: 0, type: 'dinleBul', reward: 2 },
-                { id: 'bosluk2', name: '2 boşluk doldur', target: 2, current: 0, type: 'boslukDoldur', reward: 2 }
+                { id: 'dinle5', name: '5 kelime dinle (bonus)', target: 5, current: 0, type: 'dinleBul', reward: 2 },
+                { id: 'bosluk3', name: '3 boşluk doldur (bonus)', target: 3, current: 0, type: 'boslukDoldur', reward: 2 },
+                { id: 'kelime10', name: '10 kelime çevir (bonus)', target: 10, current: 0, type: 'kelimeCevir', reward: 2 },
+                { id: 'puan200', name: '200 puan topla (bonus)', target: 200, current: 0, type: 'toplamPuan', reward: 2 },
+                { id: 'dogru20', name: '20 doğru cevap ver (bonus)', target: 20, current: 0, type: 'toplamDogru', reward: 2 }
             ];
 
-            // Rastgele 2 bonus görev seç
-            const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 2);
+            // Rastgele 3 bonus görev seç (2'den 3'e çıkarıldı)
+            const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 3);
 
             dailyTasks.lastTaskDate = date;
             dailyTasks.tasks = baseTasks;
@@ -3662,11 +3783,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 tarih: date,
                 temelGörevler: baseTasks.length,
                 bonusGörevler: selectedBonus.length,
+                toplamGörevler: baseTasks.length + selectedBonus.length,
                 tamamlananlar: dailyTasks.completedTasks.length,
                 stats: dailyTasks.todayStats
             });
 
             saveStats();
+            
+            // Görevler oluşturulduktan sonra badge'i güncelle
+            // Not: checkDailyTasks() içinde de çağrılıyor ama burada da çağırmak daha güvenli
+            setTimeout(() => {
+                if (typeof updateTasksDisplay === 'function') {
+                    updateTasksDisplay();
+                }
+            }, 100);
         }
 
         function updateTaskProgress(gameType, amount = 1) {
@@ -3709,6 +3839,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
             log.debug(`📋 Toplam tamamlanan görev: ${dailyTasks.completedTasks.length}`);
             saveStats();
+            
+            // Badge'i güncelle
+            updateTasksDisplay();
         }
 
         function showDailyTasksModal() {
@@ -3721,7 +3854,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 bonusTasks: dailyTasks.bonusTasks.length,
                 completed: dailyTasks.completedTasks.length,
                 lastDate: dailyTasks.lastTaskDate,
-                today: new Date().toISOString().split('T')[0]
+                today: getLocalDateString()
             });
             
             // Görev verilerini güncelle
@@ -3739,13 +3872,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Güvenlik kontrolü: Eğer görevler boşsa, yeniden oluştur
             if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
                 log.debug('⚠️ Tasks boş, yeniden oluşturuluyor...');
-                generateDailyTasks(new Date().toISOString().split('T')[0]);
+                generateDailyTasks(getLocalDateString());
             }
             
             const completedCount = dailyTasks.completedTasks.length;
             const totalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
+            const incompleteCount = totalCount - completedCount;
             
-            log.debug('📊 updateTasksDisplay:', { completedCount, totalCount });
+            log.debug('📊 updateTasksDisplay:', { 
+                completedCount, 
+                totalCount, 
+                incompleteCount,
+                baseTasks: dailyTasks.tasks.length,
+                bonusTasks: dailyTasks.bonusTasks.length,
+                rewardsClaimed: dailyTasks.rewardsClaimed
+            });
             
             // Genel ilerleme
             document.getElementById('completedTasks').textContent = completedCount;
@@ -3753,6 +3894,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             const progressPercent = (completedCount / totalCount) * 100;
             document.getElementById('taskProgress').style.width = progressPercent + '%';
+            
+            // Badge güncelle (tamamlanmamış görev varsa göster)
+            const tasksBadge = document.getElementById('tasksBadge');
+            if (tasksBadge) {
+                if (incompleteCount > 0 && !dailyTasks.rewardsClaimed) {
+                    tasksBadge.style.display = 'flex';
+                    // 12 veya daha fazla ise "9+" göster, değilse tam sayıyı göster
+                    // (11 görev olduğu için, kullanıcı tam sayıyı görebilsin)
+                    const badgeText = incompleteCount >= 12 ? '9+' : incompleteCount.toString();
+                    tasksBadge.textContent = badgeText;
+                    log.debug('🏷️ Badge güncellendi:', { incompleteCount, badgeText });
+                } else {
+                    tasksBadge.style.display = 'none';
+                    log.debug('🏷️ Badge gizlendi:', { incompleteCount, rewardsClaimed: dailyTasks.rewardsClaimed });
+                }
+            } else {
+                log.error('❌ tasksBadge elementi bulunamadı!');
+            }
 
             // Temel görevleri göster
             const dailyList = document.getElementById('dailyTasksList');
@@ -3815,16 +3974,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function getTaskDisplayName(task) {
             // Görev tipine göre uygun isim döndür
             const taskNames = {
-                'kelime5': 'Kelime Çevir',
-                'ayet3': 'Ayet Oku', 
-                'dua2': 'Dua Öğren',
-                'dogru10': 'Doğru Cevaplar',
-                'puan100': 'Puan Topla',
-                'perfect5': 'Mükemmel Seri',
-                'allDiff': 'Farklı Zorluklar',
-                'hadis1': 'Hadis Oku',
-                'dinle3': 'Dinle & Bul',
-                'bosluk2': 'Boşluk Doldur'
+                'kelime5': '5 Kelime Çevir',
+                'kelime10': '10 Kelime Çevir (Bonus)',
+                'ayet3': '3 Ayet Oku', 
+                'dua2': '2 Dua Öğren',
+                'hadis1': '1 Hadis Oku',
+                'dinle2': '2 Kelime Dinle',
+                'dinle3': '3 Kelime Dinle (Bonus)',
+                'dinle5': '5 Kelime Dinle (Bonus)',
+                'bosluk1': '1 Boşluk Doldur',
+                'bosluk2': '2 Boşluk Doldur (Bonus)',
+                'bosluk3': '3 Boşluk Doldur (Bonus)',
+                'dogru10': '10 Doğru Cevap',
+                'dogru20': '20 Doğru Cevap (Bonus)',
+                'puan100': '100 Puan Topla',
+                'puan200': '200 Puan Topla (Bonus)',
+                'perfect5': 'Mükemmel Seri (5 Soru)',
+                'allDiff': '3 Farklı Zorlukta Oyna',
+                'combo15': '15 Doğru Cevap (Combo)'
             };
             
             return taskNames[task.id] || task.name;
@@ -3862,6 +4029,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const claimBtn = document.getElementById('claimRewardsBtn');
             if (claimBtn) {
                 claimBtn.addEventListener('click', claimDailyRewards);
+            }
+            
+            // Sayfa yüklendiğinde badge'i güncelle
+            if (typeof updateTasksDisplay === 'function') {
+                updateTasksDisplay();
             }
         });
 
@@ -4135,45 +4307,72 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
         };
 
-        elements.backFromGameBtn.onclick = async () => {
-            // Ses durdur
-            stopCurrentAudio();
-            
-            // Oyun sırasında çıkış - puanlar zaten kaydedildi ama kullanıcıya bilgi verelim
-            if (sessionScore > 0) {
-                const confirmed = await showCustomConfirm(sessionCorrect, sessionWrong, sessionScore);
-                
-                if (!confirmed) {
-                    return; // Kullanıcı vazgeçti
+        if (elements.backFromGameBtn) {
+            elements.backFromGameBtn.onclick = async () => {
+                forceLog('=== GERI BUTONU TIKLANDI (KELIME CEVIR) ===');
+                try {
+                    forceLog('[1] Ses durduruluyor...');
+                    stopCurrentAudio();
+                    
+                    forceLog('[2] Timer durduruluyor...');
+                    stopTimer();
+                    
+                    forceLog('[3] Skor kontrol:', 'Score=' + sessionScore, 'Dogru=' + sessionCorrect, 'Yanlis=' + sessionWrong);
+                    
+                    if (sessionScore > 0 || sessionCorrect > 0 || sessionWrong > 0) {
+                        forceLog('[4] Puan VAR - Modal gosteriliyor...');
+                        const confirmed = await showCustomConfirm(sessionCorrect, sessionWrong, sessionScore);
+                        forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
+                        
+                        if (!confirmed) {
+                            forceLog('[6] IPTAL - Cikis yapilmiyor');
+                            return;
+                        }
+                        
+                        forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
+                        if (sessionCorrect > 0) {
+                            updateTaskProgress('toplamDogru', sessionCorrect);
+                        }
+                    } else {
+                        forceLog('[4] Puan YOK - Direkt cikis');
+                    }
+                    
+                    forceLog('[8] State\'ler sifirlaniyor...');
+                    sessionScore = 0;
+                    sessionCorrect = 0;
+                    sessionWrong = 0;
+                    comboCount = 0;
+                    questionCount = 0;
+                    score = 0;
+                    correct = 0;
+                    wrong = 0;
+                    lives = 0;
+                    timeLeft = 0;
+                    
+                    updateUI();
+                    updateProgress();
+                    
+                    forceLog('[9] Ekranlar gizleniyor...');
+                    if (elements.gameScreen) elements.gameScreen.style.display = 'none';
+                    if (elements.modeSelector) elements.modeSelector.style.display = 'none';
+                    if (elements.mainMenu) {
+                        elements.mainMenu.removeAttribute('style');
+                        elements.mainMenu.style.display = 'block';
+                    }
+                    if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+                    forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
+                } catch (error) {
+                    console.error('HATA - Geri butonu:', error);
+                    console.error('HATA - Stack:', error.stack);
+                    hideAllModes();
+                    if (elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
                 }
-                
-                // Session istatistiklerini günlük görevlere kaydet
-                if (sessionCorrect > 0) {
-                    updateTaskProgress('toplamDogru', sessionCorrect);
-                    // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar eklemeyelim!
-                }
-                
-                // Session değişkenlerini sıfırla
-                sessionScore = 0;
-                sessionCorrect = 0;
-                sessionWrong = 0;
-                comboCount = 0;
-                
-                log.debug('🏁 Oyundan erken çıkıldı. Puanlar kaydedildi:', {
-                    totalPoints,
-                    kazanilanPuan: sessionScore
-                });
-            }
-            
-            stopTimer();
-            if (elements.gameScreen) elements.gameScreen.style.display = 'none';
-            if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-            if (elements.mainMenu) {
-                elements.mainMenu.removeAttribute('style');
-                elements.mainMenu.style.display = 'block';
-            }
-            if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-        };
+            };
+        } else {
+            console.warn('⚠️ backFromGameBtn elementi bulunamadı!');
+        }
 
         if (elements.backFromAyetBtn) {
             elements.backFromAyetBtn.onclick = () => {
@@ -4213,79 +4412,135 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             };
         }
 
-        elements.backFromBoslukBtn.onclick = async () => {
-            // Ses durdur
-            stopCurrentAudio();
-            
-            // Oyun sırasında çıkış - puanlar zaten kaydedildi
-            if (boslukScore > 0) {
-                const confirmed = await showCustomConfirm(boslukCorrect, boslukWrong, boslukScore);
-                
-                if (!confirmed) return;
-                
-                // Session istatistiklerini kaydet
-                if (boslukCorrect > 0) {
-                    updateTaskProgress('boslukDoldur', boslukCorrect);
-                    updateTaskProgress('toplamDogru', boslukCorrect);
-                    // NOT: toplamPuan zaten addSessionPoints'te eklendi!
+        if (elements.backFromBoslukBtn) {
+            elements.backFromBoslukBtn.onclick = async () => {
+                forceLog('=== GERI BUTONU TIKLANDI (BOSLUK DOLDUR) ===');
+                try {
+                    forceLog('[1] Ses durduruluyor...');
+                    stopCurrentAudio();
+                    
+                    forceLog('[2] Timer durduruluyor...');
+                    stopTimer();
+                    
+                    forceLog('[3] Skor kontrol:', 'Score=' + boslukScore, 'Dogru=' + boslukCorrect, 'Yanlis=' + boslukWrong);
+                    
+                    if (boslukScore > 0 || boslukCorrect > 0 || boslukWrong > 0) {
+                        forceLog('[4] Puan VAR - Modal gosteriliyor...');
+                        const confirmed = await showCustomConfirm(boslukCorrect, boslukWrong, boslukScore);
+                        forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
+                        
+                        if (!confirmed) {
+                            forceLog('[6] IPTAL - Cikis yapilmiyor');
+                            return;
+                        }
+                        
+                        forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
+                        if (boslukCorrect > 0) {
+                            updateTaskProgress('boslukDoldur', boslukCorrect);
+                            updateTaskProgress('toplamDogru', boslukCorrect);
+                        }
+                    } else {
+                        forceLog('[4] Puan YOK - Direkt cikis');
+                    }
+                    
+                    forceLog('[8] State\'ler sifirlaniyor...');
+                    boslukScore = 0;
+                    boslukCorrect = 0;
+                    boslukWrong = 0;
+                    boslukQuestionCount = 0;
+                    sessionScore = 0;
+                    sessionCorrect = 0;
+                    sessionWrong = 0;
+                    comboCount = 0;
+                    
+                    updateBoslukUI();
+                    
+                    forceLog('[9] Ekranlar gizleniyor...');
+                    hideAllModes();
+                    if (elements.mainMenu) {
+                        elements.mainMenu.removeAttribute('style');
+                        elements.mainMenu.style.display = 'block';
+                    }
+                    if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+                    forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
+                } catch (error) {
+                    console.error('HATA - Bosluk geri butonu:', error);
+                    console.error('HATA - Stack:', error.stack);
+                    hideAllModes();
+                    if (elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
                 }
-                
-                // Reset
-                boslukScore = 0;
-                boslukCorrect = 0;
-                boslukWrong = 0;
-                sessionScore = 0;
-                sessionCorrect = 0;
-                sessionWrong = 0;
-                comboCount = 0;
-            }
-            
-            // Hide all modes and return to main menu
-            hideAllModes();
-            if (elements.mainMenu) {
-                elements.mainMenu.removeAttribute('style');
-                elements.mainMenu.style.display = 'block';
-            }
-            if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-        };
+            };
+        } else {
+            console.warn('⚠️ backFromBoslukBtn elementi bulunamadı!');
+        }
 
-        elements.backFromDinleBtn.onclick = async () => {
-            // Ses durdur
-            stopCurrentAudio();
-            
-            // Oyun sırasında çıkış - puanlar zaten kaydedildi
-            if (dinleScore > 0) {
-                const confirmed = await showCustomConfirm(dinleCorrect, dinleWrong, dinleScore);
-                
-                if (!confirmed) return;
-                
-                // Session istatistiklerini kaydet
-                if (dinleCorrect > 0) {
-                    updateTaskProgress('dinleBul', dinleCorrect);
-                    updateTaskProgress('toplamDogru', dinleCorrect);
-                    // NOT: toplamPuan zaten addSessionPoints'te eklendi!
+        if (elements.backFromDinleBtn) {
+            elements.backFromDinleBtn.onclick = async () => {
+                forceLog('=== GERI BUTONU TIKLANDI (DINLE) ===');
+                try {
+                    forceLog('[1] Ses durduruluyor...');
+                    stopCurrentAudio();
+                    
+                    forceLog('[2] Timer durduruluyor...');
+                    stopTimer();
+                    
+                    forceLog('[3] Skor kontrol:', 'Score=' + dinleScore, 'Dogru=' + dinleCorrect, 'Yanlis=' + dinleWrong);
+                    
+                    if (dinleScore > 0 || dinleCorrect > 0 || dinleWrong > 0) {
+                        forceLog('[4] Puan VAR - Modal gosteriliyor...');
+                        const confirmed = await showCustomConfirm(dinleCorrect, dinleWrong, dinleScore);
+                        forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
+                        
+                        if (!confirmed) {
+                            forceLog('[6] IPTAL - Cikis yapilmiyor');
+                            return;
+                        }
+                        
+                        forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
+                        if (dinleCorrect > 0) {
+                            updateTaskProgress('dinleBul', dinleCorrect);
+                            updateTaskProgress('toplamDogru', dinleCorrect);
+                        }
+                    } else {
+                        forceLog('[4] Puan YOK - Direkt cikis');
+                    }
+                    
+                    forceLog('[8] State\'ler sifirlaniyor...');
+                    dinleScore = 0;
+                    dinleCorrect = 0;
+                    dinleWrong = 0;
+                    dinleQuestionCount = 0;
+                    sessionScore = 0;
+                    sessionCorrect = 0;
+                    sessionWrong = 0;
+                    comboCount = 0;
+                    
+                    updateDinleUI();
+                    
+                    forceLog('[9] Ekranlar gizleniyor...');
+                    hideAllModes();
+                    if (elements.mainMenu) {
+                        elements.mainMenu.removeAttribute('style');
+                        elements.mainMenu.style.display = 'block';
+                    }
+                    if (elements.settingsBtn) {
+                        elements.settingsBtn.style.display = 'none';
+                    }
+                    forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
+                } catch (error) {
+                    console.error('HATA - Dinle geri butonu:', error);
+                    console.error('HATA - Stack:', error.stack);
+                    hideAllModes();
+                    if (elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
                 }
-                
-                // Reset
-                dinleScore = 0;
-                dinleCorrect = 0;
-                dinleWrong = 0;
-                sessionScore = 0;
-                sessionCorrect = 0;
-                sessionWrong = 0;
-                comboCount = 0;
-            }
-            
-            // Hide all modes and return to main menu
-            hideAllModes();
-            if (elements.mainMenu) {
-                elements.mainMenu.removeAttribute('style');
-                elements.mainMenu.style.display = 'block';
-            }
-            if (elements.settingsBtn) {
-                elements.settingsBtn.style.display = 'none';
-            }
-        };
+            };
+        } else {
+            console.warn('⚠️ backFromDinleBtn elementi bulunamadı!');
+        }
 
         // ============ MOD SEÇİCİYİ BAŞLAT (Sadece Kelime Çevir için) ============
         function initModeSelector() {
@@ -4633,7 +4888,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.nextBtn.style.display = 'block';
                     elements.nextBtn.style.visibility = 'visible';
                     elements.nextBtn.removeAttribute('hidden');
-                    elements.nextBtn.setAttribute('aria-hidden', 'false');
+                    elements.nextBtn.removeAttribute('aria-hidden'); // Görünür buton için aria-hidden kaldırılmalı
 
                     // 🔥 Animasyonu ekle
         elements.nextBtn.classList.add("next-appear");
@@ -4669,7 +4924,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Butonu hemen gizle
             elements.nextBtn.style.display = 'none';
             elements.nextBtn.style.visibility = 'hidden';
-            elements.nextBtn.setAttribute('aria-hidden', 'true');
+            // display: none olduğunda aria-hidden gerekmez, zaten erişilebilirlik ağacından çıkar
             elements.nextBtn.classList.remove("next-appear");
             
             loadQuestion();
@@ -5529,24 +5784,73 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 log.debug('🔒 Audio butonu devre dışı bırakıldı');
                 
                 try {
+                    // URL doğrulama
+                    if (!ayet.ayet_ses_dosyasi || (!ayet.ayet_ses_dosyasi.startsWith('http://') && !ayet.ayet_ses_dosyasi.startsWith('https://'))) {
+                        log.error('❌ Geçersiz ses URL formatı:', ayet.ayet_ses_dosyasi);
+                        elements.ayetAudioBtn.disabled = false;
+                        return;
+                    }
+                    
                     currentAudio = new Audio(ayet.ayet_ses_dosyasi);
                     
-                    // Direkt çalmayı dene
-                    currentAudio.play().then(() => {
-                        log.debug('🎵 Ayet sesi başlatıldı - URL:', ayet.ayet_ses_dosyasi);
-                        log.debug('🎵 Audio object durumu:', {
-                            currentTime: currentAudio.currentTime,
-                            duration: currentAudio.duration,
-                            paused: currentAudio.paused,
-                            readyState: currentAudio.readyState,
-                            volume: currentAudio.volume
+                    // Ses yüklendiğinde çal
+                    currentAudio.addEventListener('loadeddata', () => {
+                        currentAudio.play().then(() => {
+                            log.debug('🎵 Ayet sesi başlatıldı - URL:', ayet.ayet_ses_dosyasi);
+                            log.debug('🎵 Audio object durumu:', {
+                                currentTime: currentAudio.currentTime,
+                                duration: currentAudio.duration,
+                                paused: currentAudio.paused,
+                                readyState: currentAudio.readyState,
+                                volume: currentAudio.volume
+                            });
+                            elements.ayetAudioBtn.disabled = false;
+                        }).catch(err => {
+                            log.error('❌ Ses çalma hatası:', err);
+                            log.error('❌ Ses URL:', ayet.ayet_ses_dosyasi);
+                            elements.ayetAudioBtn.disabled = false;
+                            currentAudio = null;
                         });
-                        elements.ayetAudioBtn.disabled = false; // Butonu tekrar aktif et
-                    }).catch(err => {
-                        log.error('❌ Ses çalma hatası:', err);
-                        elements.ayetAudioBtn.disabled = false;
-                        currentAudio = null;
                     });
+                    
+                    // Hata durumunda
+                    currentAudio.onerror = (e) => {
+                        log.error('❌ Ses dosyası yüklenemedi:', ayet.ayet_ses_dosyasi);
+                        log.error('❌ Hata kodu:', currentAudio.error?.code);
+                        log.error('❌ Hata mesajı:', currentAudio.error?.message);
+                        log.error('❌ Hata tipi:', currentAudio.error?.name);
+                        
+                        // Tanzil.net URL'lerini everyayah.com'a çevir (fallback)
+                        if (ayet.ayet_ses_dosyasi && ayet.ayet_ses_dosyasi.includes('tanzil.net')) {
+                            const ayetNo = ayet.ayet_kimligi?.split(':')[1] || '';
+                            const sureNo = ayet.ayet_kimligi?.split(':')[0] || '';
+                            const fallbackUrl = `https://everyayah.com/data/Alafasy_128kbps/${String(sureNo).padStart(3, '0')}${String(ayetNo).padStart(3, '0')}.mp3`;
+                            log.error('🔄 Fallback URL deneniyor:', fallbackUrl);
+                            
+                            // Fallback URL'i dene
+                            const fallbackAudio = new Audio(fallbackUrl);
+                            fallbackAudio.addEventListener('loadeddata', () => {
+                                fallbackAudio.play().then(() => {
+                                    log.debug('✅ Fallback ses başarıyla çalındı');
+                                    currentAudio = fallbackAudio;
+                                }).catch(err => {
+                                    log.error('❌ Fallback ses de çalınamadı:', err);
+                                    elements.ayetAudioBtn.disabled = false;
+                                });
+                            });
+                            fallbackAudio.onerror = () => {
+                                log.error('❌ Fallback ses de yüklenemedi');
+                                elements.ayetAudioBtn.disabled = false;
+                            };
+                            fallbackAudio.load();
+                        } else {
+                            elements.ayetAudioBtn.disabled = false;
+                            currentAudio = null;
+                        }
+                    };
+                    
+                    // Ses dosyasını yükle
+                    currentAudio.load();
                     
                     // Ses yüklenme durumu
                     currentAudio.onloadstart = () => {
@@ -5990,23 +6294,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
     <!-- Flutter Bottom Navigation -->
     <div class="flutter-top-nav">                                
-        <a class="flutter-nav-item" onclick="showMainMenu()">
+        <a class="flutter-nav-item" onclick="showMainMenu(); setActiveNavItem(0);">
             <i class="material-icons">home</i>
             <span>Ana Sayfa</span>
         </a>
-        <a class="flutter-nav-item" onclick="showStatsModal()">
+        <a class="flutter-nav-item" onclick="showStatsModal(); setActiveNavItem(1);">
             <i class="material-icons">analytics</i>
             <span>İstatistik</span>
         </a>
-        <a class="flutter-nav-item" onclick="showDailyTasksModal()">
+        <a class="flutter-nav-item" onclick="showDailyTasksModal(); setActiveNavItem(2);" id="navTasks">
             <i class="material-icons">task_alt</i>
             <span>Görevler</span>
+            <span class="nav-badge" id="tasksBadge" style="display: none;">!</span>
         </a>
-        <a class="flutter-nav-item" onclick="showBadgesModal()">
+        <a class="flutter-nav-item" onclick="showBadgesModal(); setActiveNavItem(3);">
             <i class="material-icons">emoji_events</i>
             <span>Başarılar</span>
         </a>
-        <a class="flutter-nav-item" onclick="showCalendarModal()">
+        <a class="flutter-nav-item" onclick="showCalendarModal(); setActiveNavItem(4);">
             <i class="material-icons">calendar_today</i>
             <span>Takvim</span>
         </a>

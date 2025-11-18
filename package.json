@@ -4,11 +4,8 @@
   "description": "**Hasene Arabic Game**, Arapça öğrenmeyi eğlenceli ve interaktif hale getiren web tabanlı bir eğitim oyunudur. Oyun, çeşitli modlarla Arapça kelime bilgisini geliştirmeyi amaçlar.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node server.js"
-  },
-  "scripts": {
-    "test": "jest"
   },
   "repository": {
     "type": "git",

@@ -229,27 +229,144 @@ body {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    height: 70px;
-    background: #fff;
+    height: 75px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
     width: 100%;
     max-width: 600px;
-    box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-radius: 20px 20px 0 0;
+    border-radius: 24px 24px 0 0;
+    padding: 8px 12px 12px 12px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    z-index: 1000;
 }
 
 .flutter-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #888;
+    justify-content: center;
+    color: #999;
     cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-width: 60px;
+    gap: 4px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.flutter-nav-item i {
+    font-size: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+}
+
+.flutter-nav-item span {
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.flutter-nav-item:hover {
+    background: rgba(88, 204, 2, 0.08);
+    color: #58cc02;
+    transform: translateY(-2px);
+}
+
+.flutter-nav-item:hover i {
+    transform: scale(1.1);
+}
+
+.flutter-nav-item:active {
+    transform: translateY(0) scale(0.95);
 }
 
 .flutter-nav-item.active {
-    color: #8B4513;
+    color: #58cc02;
+    background: linear-gradient(135deg, rgba(88, 204, 2, 0.15) 0%, rgba(88, 204, 2, 0.08) 100%);
+    font-weight: 600;
+}
+
+.flutter-nav-item.active i {
+    transform: scale(1.15);
+    color: #58cc02;
+}
+
+.flutter-nav-item.active span {
+    font-weight: 600;
+    color: #58cc02;
+}
+
+/* Badge/Notification indicator */
+.flutter-nav-item .nav-badge {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.6);
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .flutter-top-nav {
+        height: 70px;
+        padding: 6px 8px 10px 8px;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .flutter-nav-item {
+        padding: 6px 8px;
+        min-width: 50px;
+        gap: 3px;
+    }
+    
+    .flutter-nav-item i {
+        font-size: 22px;
+    }
+    
+    .flutter-nav-item span {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .flutter-nav-item span {
+        font-size: 9px;
+    }
+    
+    .flutter-nav-item i {
+        font-size: 20px;
+    }
 }
 
 /* ----- MODAL ----- */
@@ -966,14 +1083,27 @@ body {
 
 /* Combo Indicator - Responsive */
 #comboIndicator {
-    padding: 10px !important;
+    padding: 8px 12px !important;
     margin: 8px 4px !important;
-    font-size: clamp(14px, 3vw, 18px) !important;
+    font-size: clamp(12px, 2.5vw, 14px) !important;
     box-sizing: border-box;
+    max-width: 100% !important;
+    border-radius: 10px !important;
 }
 
-#comboIndicator > div {
-    font-size: clamp(1.2em, 4vw, 1.8em) !important;
+#comboIndicator > div:first-child {
+    font-size: clamp(14px, 3vw, 16px) !important;
+    line-height: 1.2 !important;
+}
+
+#comboIndicator > div:nth-child(2) {
+    font-size: clamp(11px, 2.5vw, 13px) !important;
+    line-height: 1.2 !important;
+}
+
+#comboIndicator > div:nth-child(3) {
+    font-size: clamp(9px, 2vw, 11px) !important;
+    line-height: 1.2 !important;
 }
 
 /* Audio and Hint Buttons - Responsive */
@@ -1367,16 +1497,74 @@ body {
    PREMIUM TOP STATS PANEL
    =========================== */
 .premium-stats-panel {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 18px;
-    padding: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 20px 16px;
     margin: 12px 0;
     position: relative;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
     animation: fadeIn 0.5s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-stats-panel:hover {
+    box-shadow: 0 6px 32px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.stat-card {
+    cursor: pointer;
+}
+
+.stat-card:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+/* Günlük Hedef Butonu Animasyonları */
+@keyframes goalButtonPulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 8px rgba(88, 204, 2, 0);
+    }
+}
+
+.goal-settings-btn {
+    position: relative;
+    overflow: visible;
+}
+
+.goal-settings-btn:hover #goalButtonIcon {
+    transform: scale(1.2) rotate(15deg);
+}
+
+.goal-settings-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* Hedef tamamlandıysa özel stil */
+.goal-settings-btn.completed {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    animation: goalButtonCelebrate 1s ease-in-out;
+}
+
+@keyframes goalButtonCelebrate {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.2) rotate(-10deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(10deg);
+    }
+    75% {
+        transform: scale(1.2) rotate(-10deg);
+    }
 }
 
 /* Panel içindeki küçük yazılar */
@@ -1649,6 +1837,9 @@ body {
     box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     transition: all 0.25s ease;
     cursor: pointer;
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
 }
 
 .back-btn:hover {
@@ -1659,6 +1850,99 @@ body {
 
 .back-btn:active {
     transform: translateX(-1px) scale(0.96);
+}
+
+/* ========== CUSTOM CONFIRM MODAL ========== */
+.custom-confirm {
+    display: none !important; /* Default olarak gizli, JavaScript ile gösterilecek */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.65);
+    z-index: 1100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.custom-confirm.show {
+    display: flex !important;
+}
+
+.confirm-content {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    text-align: center;
+    animation: panelFadeIn 0.3s ease-out;
+}
+
+.confirm-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #4a3f68;
+}
+
+.confirm-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.confirm-stat {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    color: #444;
+}
+
+.confirm-message {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 18px;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.confirm-btn.cancel {
+    background: #f0f0f5;
+    color: #555;
+}
+
+.confirm-btn.ok {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    color: white;
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.35);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+}
+
+.confirm-btn:active {
+    transform: translateY(0) scale(0.97);
 }
 
 
@@ -1713,6 +1997,46 @@ body {
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* Combo Animations */
+@keyframes comboPopIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.8) translateY(-10px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+@keyframes comboShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px) translateX(-50%); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) translateX(-50%); 
+    }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 1; 
+        transform: translateY(0) translateX(-50%); 
+    }
+    to { 
+        opacity: 0; 
+        transform: translateY(-20px) translateX(-50%); 
+    }
+}
+
 /* PREMIUM CARD HOVERS */
 .game-card {
     transition: 0.25s;
@@ -1748,9 +2072,4 @@ body {
 .next-appear {
     display: block !important;
     animation: nextPop 0.4s ease-out forwards;
-}
-
-@keyframes nextPop {
-    0% { opacity: 0; transform: scale(0.7) translateY(15px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
 }
