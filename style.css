@@ -799,6 +799,348 @@ body {
     word-break: break-word;
 }
 
+/* ============================================
+   🎮 OYUN MODLARI - MOBİL UYUMLULUK
+   ============================================ */
+
+/* Game Screen (Kelime Çevir) */
+.game-screen {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 8px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dinle Mode */
+.dinle-mode {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 8px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Boşluk Mode */
+.bosluk-mode {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 8px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Game Box - Responsive */
+.game-screen .game-box,
+.dinle-mode .game-box,
+.bosluk-mode .game-box {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 8px auto !important;
+    padding: 12px !important;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Arabic Text - Responsive */
+.game-screen .arabic-text,
+.game-screen .arabic,
+.dinle-mode .arabic,
+.bosluk-mode .arabic {
+    font-size: clamp(20px, 5vw, 32px) !important;
+    line-height: 1.6 !important;
+    padding: 10px !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Options Container - Responsive */
+.game-screen .options,
+.dinle-mode .options,
+.bosluk-mode .options {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding: 0 !important;
+    gap: 8px !important;
+}
+
+/* Option Buttons - Responsive */
+.game-screen .option,
+.dinle-mode .option,
+.bosluk-mode .option {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(12px, 3vw, 16px) !important;
+    padding: 12px 8px !important;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Sure Info - Responsive */
+.game-screen .sure-info,
+.dinle-mode .sure-info,
+.bosluk-mode .sure-info {
+    font-size: clamp(9px, 2vw, 12px) !important;
+    padding: 6px 8px !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Feedback - Responsive */
+.game-screen .feedback,
+.dinle-mode .feedback,
+.bosluk-mode .feedback {
+    font-size: clamp(13px, 3vw, 16px) !important;
+    padding: 10px !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Stats Grid - Responsive */
+.game-screen > div[style*="grid-template-columns"],
+.dinle-mode > div[style*="grid-template-columns"],
+.bosluk-mode > div[style*="grid-template-columns"] {
+    gap: 2px !important;
+    margin: 4px !important;
+    padding: 0 4px !important;
+    box-sizing: border-box;
+}
+
+/* Stat Cards - Responsive */
+.flutter-stat-card {
+    padding: 4px 2px !important;
+    min-height: auto !important;
+    box-sizing: border-box;
+}
+
+.flutter-stat-value {
+    font-size: clamp(0.85em, 2.5vw, 0.95em) !important;
+    margin-bottom: 1px !important;
+}
+
+.flutter-stat-label {
+    font-size: clamp(0.4em, 1.5vw, 0.5em) !important;
+    line-height: 1 !important;
+}
+
+/* Game Info Bar - Responsive */
+.game-info {
+    font-size: clamp(11px, 2.5vw, 14px) !important;
+    padding: 8px 6px !important;
+    margin: 8px 4px !important;
+    flex-wrap: wrap;
+    gap: 4px;
+    box-sizing: border-box;
+}
+
+.game-info > div {
+    font-size: clamp(10px, 2vw, 12px) !important;
+    white-space: nowrap;
+}
+
+/* Combo Indicator - Responsive */
+#comboIndicator {
+    padding: 10px !important;
+    margin: 8px 4px !important;
+    font-size: clamp(14px, 3vw, 18px) !important;
+    box-sizing: border-box;
+}
+
+#comboIndicator > div {
+    font-size: clamp(1.2em, 4vw, 1.8em) !important;
+}
+
+/* Audio and Hint Buttons - Responsive */
+.game-actions {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 8px 0 !important;
+    flex-wrap: wrap;
+}
+
+.game-actions button,
+.audio-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    box-sizing: border-box;
+}
+
+.game-actions img {
+    width: 24px !important;
+    height: 24px !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+/* Next Button - Responsive */
+#nextBtn,
+#dinleNextBtn,
+#boslukNextBtn {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(12px, 3vw, 14px) !important;
+    padding: 12px 16px !important;
+    margin: 10px 0 !important;
+    box-sizing: border-box;
+    min-height: 44px;
+}
+
+/* Back Button - Responsive */
+.game-screen .back-btn,
+.dinle-mode .back-btn,
+.bosluk-mode .back-btn {
+    padding: 8px 12px !important;
+    font-size: clamp(11px, 2.5vw, 13px) !important;
+    margin: 6px 4px !important;
+    box-sizing: border-box;
+    min-height: 36px;
+}
+
+/* Progress Bar - Responsive */
+#progressBar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* ============================================
+   📱 EKSTRA MOBİL MEDIA QUERIES
+   ============================================ */
+
+@media (max-width: 480px) {
+    /* Game Screen Container */
+    .game-screen,
+    .dinle-mode,
+    .bosluk-mode {
+        padding: 4px !important;
+    }
+    
+    /* Game Box - Extra Padding Reduction */
+    .game-screen .game-box,
+    .dinle-mode .game-box,
+    .bosluk-mode .game-box {
+        padding: 10px !important;
+        margin: 4px auto !important;
+    }
+    
+    /* Stats Grid - Extra Compact */
+    .game-screen > div[style*="grid-template-columns"],
+    .dinle-mode > div[style*="grid-template-columns"],
+    .bosluk-mode > div[style*="grid-template-columns"] {
+        gap: 1px !important;
+        margin: 2px !important;
+        padding: 0 2px !important;
+    }
+    
+    /* Stat Cards - Extra Compact */
+    .flutter-stat-card {
+        padding: 3px 1px !important;
+    }
+    
+    .flutter-stat-value {
+        font-size: 0.8em !important;
+    }
+    
+    .flutter-stat-label {
+        font-size: 0.35em !important;
+    }
+    
+    /* Game Info - Extra Compact */
+    .game-info {
+        padding: 6px 4px !important;
+        margin: 6px 2px !important;
+        font-size: 10px !important;
+    }
+    
+    .game-info > div {
+        font-size: 9px !important;
+    }
+    
+    /* Combo Indicator - Extra Compact */
+    #comboIndicator {
+        padding: 8px !important;
+        margin: 6px 2px !important;
+    }
+    
+    /* Back Button - Extra Compact */
+    .game-screen .back-btn,
+    .dinle-mode .back-btn,
+    .bosluk-mode .back-btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        margin: 4px 2px !important;
+    }
+}
+
+@media (max-width: 360px) {
+    /* Very Small Screens */
+    .game-screen .arabic-text,
+    .game-screen .arabic,
+    .dinle-mode .arabic,
+    .bosluk-mode .arabic {
+        font-size: 18px !important;
+        padding: 8px !important;
+    }
+    
+    .game-screen .option,
+    .dinle-mode .option,
+    .bosluk-mode .option {
+        font-size: 11px !important;
+        padding: 10px 6px !important;
+    }
+    
+    .game-screen .sure-info,
+    .dinle-mode .sure-info,
+    .bosluk-mode .sure-info {
+        font-size: 8px !important;
+        padding: 4px 6px !important;
+    }
+    
+    .game-screen .feedback,
+    .dinle-mode .feedback,
+    .bosluk-mode .feedback {
+        font-size: 12px !important;
+        padding: 8px !important;
+    }
+    
+    #nextBtn,
+    #dinleNextBtn,
+    #boslukNextBtn {
+        font-size: 11px !important;
+        padding: 10px 12px !important;
+    }
+}
+
 /* ========== MOBİL ========== */
 /* Mobile responsive - consolidated with main responsive styles above */
 

@@ -282,7 +282,7 @@
                 <button class="audio-btn" id="boslukAudioBtn"></button>
                 <div class="options" id="boslukOptions"></div>
                 <div class="feedback" id="boslukFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; margin-top: 16px;">Sonraki Soru →</button>
+                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
             </div>
         </div>
 
@@ -317,7 +317,7 @@
                 <button class="audio-btn" id="dinleAudioBtn"></button>
                 <div class="options" id="dinleOptions"></div>
                 <div class="feedback" id="dinleFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; margin-top: 16px;">Sonraki Soru →</button>
+                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
             </div>
         </div>
 
@@ -376,11 +376,11 @@
         </div>
 
         <!-- Oyun Alanı -->
-        <div class="game-box" style="max-width: 350px; margin: 32px auto; padding: 16px 12px; border-radius: 18px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
-    <div class="arabic-text arabic-large" id="arabicWord" style="color: #2c2c2c; margin-bottom: 8px; font-size: 2rem; text-align: center;">
+        <div class="game-box" style="max-width: 100%; width: 100%; margin: 8px auto; padding: 12px; border-radius: 18px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.07); box-sizing: border-box;">
+    <div class="arabic-text arabic-large" id="arabicWord" style="color: #2c2c2c; margin-bottom: 8px; font-size: clamp(20px, 5vw, 32px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">
         فَكُبْكِبُوا۟
     </div>
-    <div class="sure-info" id="sureInfo" style="font-size: 8pt; margin-bottom: 6px; text-align: center;">ID: 26:94:1 | Zorluk: 13 | Aralık: 12-21</div>
+    <div class="sure-info" id="sureInfo" style="font-size: clamp(9px, 2vw, 12px); margin-bottom: 6px; text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">ID: 26:94:1 | Zorluk: 13 | Aralık: 12-21</div>
     <div class="game-actions" style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 8px; margin-bottom: 8px;">
         <button class="flutter-fab" id="audioBtn" style="background: transparent; box-shadow: none; border: none;">
             <img src="hoparlor.png" alt="Ses" style="width: 24px; height: 24px;">
@@ -389,14 +389,14 @@
             <img src="clue.png" alt="İpucu" style="width: 24px; height: 24px;">
         </button>
     </div>
-    <div class="options" id="options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-        <button class="option flutter-option-btn" style="font-size: 10pt; padding: 10px 0;">tepe taklak atılırlar</button>
-        <button class="option flutter-option-btn" style="font-size: 10pt; padding: 10px 0;">öğüdüm</button>
-        <button class="option flutter-option-btn" style="font-size: 10pt; padding: 10px 0;">onların çevresinden</button>
-        <button class="option flutter-option-btn" style="font-size: 10pt; padding: 10px 0;">açığa vurduğumuz</button>
+    <div class="options" id="options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; width: 100%; max-width: 100%; box-sizing: border-box;">
+        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">tepe taklak atılırlar</button>
+        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">öğüdüm</button>
+        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">onların çevresinden</button>
+        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">açığa vurduğumuz</button>
     </div>
-    <div class="feedback" id="feedback" style="font-size: 10pt; margin-bottom: 8px; text-align: center;"></div>
-    <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; margin-top: 10px; display: none; height: 36px; font-size: 10pt;">Sonraki Soru →</button>
+    <div class="feedback" id="feedback" style="font-size: clamp(13px, 3vw, 16px); margin-bottom: 8px; text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;"></div>
+    <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; max-width: 100%; margin-top: 10px; display: none; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;">Sonraki Soru →</button>
 </div>
         </div>  <!-- gameScreen sonu -->
     </div>
@@ -4047,7 +4047,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
                 log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
                 log.debug(`🎯 Bir sonraki soru yükleniyor...`);
+                // Butonu hemen gizle
                 elements.dinleNextBtn.style.display = 'none';
+                elements.dinleNextBtn.classList.remove("next-appear");
                 loadDinleQuestion();
             };
             
@@ -4663,6 +4665,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // ⚡ Speed animation ve haptic feedback
             addSpeedAnimation(elements.gameScreen, 'fade-in');
             triggerHaptic('light');
+            
+            // Butonu hemen gizle
+            elements.nextBtn.style.display = 'none';
+            elements.nextBtn.style.visibility = 'hidden';
+            elements.nextBtn.setAttribute('aria-hidden', 'true');
+            elements.nextBtn.classList.remove("next-appear");
             
             loadQuestion();
         };
@@ -5297,6 +5305,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         elements.boslukNextBtn.onclick = () => {
+            // Butonu hemen gizle
+            elements.boslukNextBtn.style.display = 'none';
+            elements.boslukNextBtn.classList.remove("next-appear");
+            
             loadBoslukQuestion();
         };
 
