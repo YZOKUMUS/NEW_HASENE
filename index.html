@@ -378,18 +378,21 @@
             </button>
             
             <!-- İstatistikler -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 4px;">
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="boslukScore" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 8px; padding: 0 4px;">
+                <!-- Hasene -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
+                    <div style="color: #FF8F00; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="boslukScore">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
                 </div>
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="boslukCorrect" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
+                <!-- Sahih -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
+                    <div style="color: #4CAF50; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="boslukCorrect">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
                 </div>
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="boslukWrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
+                <!-- Hatalı -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
+                    <div style="color: #F44336; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="boslukWrong">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
                 </div>
             </div>
 
@@ -410,18 +413,21 @@
             </button>
             
             <!-- İstatistikler -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 4px;">
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="dinleScore" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 8px; padding: 0 4px;">
+                <!-- Hasene -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
+                    <div style="color: #FF8F00; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="dinleScore">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
                 </div>
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="dinleCorrect" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
+                <!-- Sahih -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
+                    <div style="color: #4CAF50; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="dinleCorrect">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
                 </div>
-                <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                    <div class="flutter-stat-value" id="dinleWrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                    <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
+                <!-- Hatalı -->
+                <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
+                    <div style="color: #F44336; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="dinleWrong">0</div>
+                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
                 </div>
             </div>
 
@@ -446,22 +452,21 @@
         </button>
 
         <!-- İstatistikler -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin: 4px;">
-            <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                <div class="flutter-stat-value" id="score" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HASENE</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 8px; padding: 0 4px;">
+            <!-- Hasene -->
+            <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
+                <div style="color: #FF8F00; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="score">0</div>
+                <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
             </div>
-            <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                <div class="flutter-stat-value" id="level" style="font-size: 0.95em; margin-bottom: 1px;">1</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">MERTEBE</div>
+            <!-- Sahih -->
+            <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
+                <div style="color: #4CAF50; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="correct">0</div>
+                <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
             </div>
-            <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                <div class="flutter-stat-value" id="correct" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">SAHİH</div>
-            </div>
-            <div class="flutter-stat-card" style="padding: 4px 1px; min-height: auto;">
-                <div class="flutter-stat-value" id="wrong" style="font-size: 0.95em; margin-bottom: 1px;">0</div>
-                <div class="flutter-stat-label" style="font-size: 0.5em; line-height: 1;">HATALI</div>
+            <!-- Hatalı -->
+            <div class="stat-card" style="text-align: center; padding: 12px 8px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 12px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
+                <div style="color: #F44336; font-weight: 700; font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="wrong">0</div>
+                <div style="color: rgba(0,0,0,0.65); font-size: clamp(10px, 2vw, 11px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
             </div>
         </div>
 
@@ -531,8 +536,8 @@
     </div>
 
     <!-- Başarılar/Rozetler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
-    <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)" ontouchstart="handleBadgesModalClick(event)">
-        <div class="modal-content badges-content" onclick="handleBadgesModalClick(event)" ontouchstart="handleBadgesModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+    <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)">
+        <div class="modal-content badges-content" onclick="handleBadgesModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
@@ -540,7 +545,7 @@
             </div>
             
             <!-- Scroll Edilebilir İçerik -->
-            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
                 
                 <!-- Terakki Özeti -->
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
@@ -621,8 +626,8 @@
     </div>
 
     <!-- Takvim Modal - Duolingo Style, Her Yere Tıklayınca Kapanır -->
-    <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)" ontouchstart="handleCalendarModalClick(event)">
-        <div class="modal-content calendar-content" onclick="handleCalendarModalClick(event)" ontouchstart="handleCalendarModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
+    <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)">
+        <div class="modal-content calendar-content" onclick="handleCalendarModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
@@ -630,7 +635,7 @@
             </div>
             
             <!-- Scroll Edilebilir İçerik -->
-            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+            <div id="calendarScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
                 
                 <!-- Streak Bilgisi -->
                 <div style="text-align: center; margin-bottom: 24px;">
@@ -671,8 +676,8 @@
     </div>
 
     <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
-    <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)" ontouchstart="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" onclick="handleDailyTasksModalClick(event)" ontouchstart="handleDailyTasksModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+    <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
+        <div class="modal-content daily-tasks-content" onclick="handleDailyTasksModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
@@ -691,7 +696,7 @@
             </div>
 
             <!-- Görevler Container - Scroll Edilebilir -->
-            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
                 <!-- Temel Görevler -->
                 <div style="margin-bottom: 12px;">
                     <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
@@ -726,8 +731,8 @@
     </div>
 
     <!-- İstatistikler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
-    <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)" ontouchstart="handleStatsModalClick(event)">
-        <div class="modal-content stats-content" onclick="handleStatsModalClick(event)" ontouchstart="handleStatsModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+    <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)">
+        <div class="modal-content stats-content" onclick="handleStatsModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
@@ -735,7 +740,7 @@
             </div>
             
             <!-- Scroll Edilebilir İçerik -->
-            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+            <div id="statsScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
 
             <!-- Genel Özet -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center;">
@@ -2366,7 +2371,7 @@
             
             // Kelime oyunu
             score: document.getElementById('score'),
-            level: document.getElementById('level'),
+            // level: document.getElementById('level'), // Kaldırıldı - Mertebe artık gösterilmiyor
             correct: document.getElementById('correct'),
             wrong: document.getElementById('wrong'),
             progressBar: document.getElementById('progressBar'),
@@ -3156,9 +3161,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Alt bar (oyun içi stats) güncelle
             const scoreElement = document.getElementById('score');
-            const levelElement = document.getElementById('level');
             if (scoreElement) scoreElement.textContent = totalPoints;
-            if (levelElement) levelElement.textContent = level;
+            // level elementi artık yok (Mertebe kaldırıldı)
             
             // Kaydet
             saveStats();
@@ -3353,6 +3357,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showBadgesModal() {
+            // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+            initBadgesModalTouchEvents();
+            
             // Body scroll'u engelle
             document.body.style.overflow = 'hidden';
             
@@ -3384,20 +3391,115 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
         }
         
+        // Touch event tracking for badges modal scroll detection
+        let badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+        let badgesModalIsScrolling = false;
+        
+        // Badges modal için touch event'leri
+        function initBadgesModalTouchEvents() {
+            const badgesModal = document.getElementById('badgesModal');
+            const badgesScrollableContent = document.getElementById('badgesScrollableContent');
+            if (!badgesModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (badgesModal.hasAttribute('data-touch-events-initialized')) return;
+            badgesModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (badgesScrollableContent) {
+                badgesScrollableContent.addEventListener('touchstart', function(e) {
+                    badgesModalIsScrolling = false;
+                }, { passive: true });
+                
+                badgesScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    badgesModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            badgesModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'badgesScrollableContent' || e.target.closest('#badgesScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                badgesModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                badgesModalIsScrolling = false;
+            }, { passive: true });
+            
+            badgesModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'badgesScrollableContent' || e.target.closest('#badgesScrollableContent'))) {
+                    badgesModalIsScrolling = true;
+                    return;
+                }
+                
+                if (badgesModalTouchStart.x !== 0 || badgesModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - badgesModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - badgesModalTouchStart.y);
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
+                        badgesModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            badgesModal.addEventListener('touchend', function(e) {
+                // Touch end'de scroll kontrolü yap
+                if (badgesModalIsScrolling) {
+                    // Scroll oldu, kapatma
+                    badgesModalIsScrolling = false;
+                    badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                // Scroll değilse, normal click gibi davran
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - badgesModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - badgesModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - badgesModalTouchStart.y);
+                
+                // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    // X butonuna tıklanmışsa ignore et
+                    const target = e.target;
+                    if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    closeBadgesModal();
+                }
+                
+                badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
+        
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
         function handleBadgesModalClick(event) {
-            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
-            event.stopPropagation();
-            event.preventDefault();
-            
-            // X butonuna tıklanırsa kapatma
+            // X butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
             const target = event.target;
             if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
-                // Butonun kendi onclick handler'ı çalışsın
                 return;
             }
             
-            // Her yere tıklanınca kapat ve ana sayfaya dön
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
+                // Eğer scroll yapıldıysa, kapatma
+                if (badgesModalIsScrolling) {
+                    return;
+                }
+            }
+            
+            // Panel üzerine veya dış arka plana tıklanırsa kapat
             closeBadgesModal();
         }
         
@@ -3411,6 +3513,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ İSTATİSTİKLER SİSTEMİ ============
         function showStatsModal() {
+            // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+            initStatsModalTouchEvents();
+            
             // Body scroll'u engelle
             document.body.style.overflow = 'hidden';
             // Genel istatistikleri güncelle
@@ -3521,19 +3626,114 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
         
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
-        function handleStatsModalClick(event) {
-            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
-            event.stopPropagation();
-            event.preventDefault();
+        // Touch event tracking for scroll detection
+        let statsModalTouchStart = { x: 0, y: 0, time: 0 };
+        let statsModalIsScrolling = false;
+        
+        // Stats modal için touch event'leri - DOMContentLoaded içinde ekleniyor
+        function initStatsModalTouchEvents() {
+            const statsModal = document.getElementById('statsModal');
+            const statsScrollableContent = document.getElementById('statsScrollableContent');
+            if (!statsModal) return;
             
-            // X butonuna tıklanırsa kapatma
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (statsModal.hasAttribute('data-touch-events-initialized')) return;
+            statsModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (statsScrollableContent) {
+                statsScrollableContent.addEventListener('touchstart', function(e) {
+                    statsModalIsScrolling = false;
+                }, { passive: true });
+                
+                statsScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    statsModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            statsModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'statsScrollableContent' || e.target.closest('#statsScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                statsModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                statsModalIsScrolling = false;
+            }, { passive: true });
+            
+            statsModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'statsScrollableContent' || e.target.closest('#statsScrollableContent'))) {
+                    statsModalIsScrolling = true;
+                    return;
+                }
+                
+                if (statsModalTouchStart.x !== 0 || statsModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - statsModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - statsModalTouchStart.y);
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
+                        statsModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            statsModal.addEventListener('touchend', function(e) {
+                // Touch end'de scroll kontrolü yap
+                if (statsModalIsScrolling) {
+                    // Scroll oldu, kapatma
+                    statsModalIsScrolling = false;
+                    statsModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                // Scroll değilse, normal click gibi davran
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - statsModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - statsModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - statsModalTouchStart.y);
+                
+                // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    // X butonuna tıklanmışsa ignore et
+                    const target = e.target;
+                    if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
+                        statsModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    closeStatsModal();
+                }
+                
+                statsModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
+        
+        function handleStatsModalClick(event) {
+            // X butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
             const target = event.target;
             if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
-                // Butonun kendi onclick handler'ı çalışsın
                 return;
             }
             
-            // Her yere tıklanınca kapat ve ana sayfaya dön
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'statsScrollableContent' || target.closest('#statsScrollableContent'))) {
+                // Eğer scroll yapıldıysa, kapatma
+                if (statsModalIsScrolling) {
+                    return;
+                }
+            }
+            
+            // Panel üzerine veya dış arka plana tıklanırsa kapat
             closeStatsModal();
         }
         
@@ -3855,20 +4055,115 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
         }
         
+        // Touch event tracking for calendar modal scroll detection
+        let calendarModalTouchStart = { x: 0, y: 0, time: 0 };
+        let calendarModalIsScrolling = false;
+        
+        // Calendar modal için touch event'leri
+        function initCalendarModalTouchEvents() {
+            const calendarModal = document.getElementById('calendarModal');
+            const calendarScrollableContent = document.getElementById('calendarScrollableContent');
+            if (!calendarModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (calendarModal.hasAttribute('data-touch-events-initialized')) return;
+            calendarModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (calendarScrollableContent) {
+                calendarScrollableContent.addEventListener('touchstart', function(e) {
+                    calendarModalIsScrolling = false;
+                }, { passive: true });
+                
+                calendarScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    calendarModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            calendarModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'calendarScrollableContent' || e.target.closest('#calendarScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                calendarModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                calendarModalIsScrolling = false;
+            }, { passive: true });
+            
+            calendarModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'calendarScrollableContent' || e.target.closest('#calendarScrollableContent'))) {
+                    calendarModalIsScrolling = true;
+                    return;
+                }
+                
+                if (calendarModalTouchStart.x !== 0 || calendarModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - calendarModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - calendarModalTouchStart.y);
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
+                        calendarModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            calendarModal.addEventListener('touchend', function(e) {
+                // Touch end'de scroll kontrolü yap
+                if (calendarModalIsScrolling) {
+                    // Scroll oldu, kapatma
+                    calendarModalIsScrolling = false;
+                    calendarModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                // Scroll değilse, normal click gibi davran
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - calendarModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - calendarModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - calendarModalTouchStart.y);
+                
+                // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    // X butonuna tıklanmışsa ignore et
+                    const target = e.target;
+                    if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
+                        calendarModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    closeCalendarModal();
+                }
+                
+                calendarModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
+        
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
         function handleCalendarModalClick(event) {
-            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
-            event.stopPropagation();
-            event.preventDefault();
-            
             // X butonuna veya kapat butonuna tıklanırsa kapatma
             const target = event.target;
             if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
-                // Butonun kendi onclick handler'ı çalışsın
                 return;
             }
             
-            // Her yere tıklanınca kapat ve ana sayfaya dön
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'calendarScrollableContent' || target.closest('#calendarScrollableContent'))) {
+                // Eğer scroll yapıldıysa, kapatma
+                if (calendarModalIsScrolling) {
+                    return;
+                }
+            }
+            
+            // Panel üzerine veya dış arka plana tıklanırsa kapat
             closeCalendarModal();
         }
 
@@ -4277,6 +4572,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showDailyTasksModal() {
+            // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+            initDailyTasksModalTouchEvents();
+            
             // Günlük görevleri kontrol et ve güncelle
             checkDailyTasks();
             
@@ -4314,20 +4612,119 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
         }
         
+        // Touch event tracking for daily tasks modal scroll detection
+        let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+        let dailyTasksModalIsScrolling = false;
+        
+        // Daily tasks modal için touch event'leri
+        function initDailyTasksModalTouchEvents() {
+            const dailyTasksModal = document.getElementById('dailyTasksModal');
+            const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
+            if (!dailyTasksModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
+            dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (dailyTasksScrollableContent) {
+                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
+                    dailyTasksModalIsScrolling = false;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    dailyTasksModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            dailyTasksModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                dailyTasksModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                dailyTasksModalIsScrolling = false;
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    dailyTasksModalIsScrolling = true;
+                    return;
+                }
+                
+                if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
+                        dailyTasksModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchend', function(e) {
+                // Touch end'de scroll kontrolü yap
+                if (dailyTasksModalIsScrolling) {
+                    // Scroll oldu, kapatma
+                    dailyTasksModalIsScrolling = false;
+                    dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                // Scroll değilse, normal click gibi davran
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - dailyTasksModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
+                
+                // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    // X butonuna veya ödül toplama butonuna tıklanmışsa ignore et
+                    const target = e.target;
+                    if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
+                        dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    closeDailyTasksModal();
+                    // Ana sayfanın görünür olduğundan emin ol
+                    if (elements && elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
+                }
+                
+                dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
+        
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
         function handleDailyTasksModalClick(event) {
-            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
-            event.stopPropagation();
-            event.preventDefault();
-            
             // X butonuna veya ödül toplama butonuna tıklanırsa kapatma
             const target = event.target;
             if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
-                // Butonların kendi onclick handler'ları çalışsın
                 return;
             }
             
-            // Her yere tıklanınca kapat ve ana sayfaya dön
+            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            if (target && (target.id === 'dailyTasksScrollableContent' || target.closest('#dailyTasksScrollableContent'))) {
+                // Eğer scroll yapıldıysa, kapatma
+                if (dailyTasksModalIsScrolling) {
+                    return;
+                }
+            }
+            
+            // Panel üzerine veya dış arka plana tıklanırsa kapat
             closeDailyTasksModal();
             // Ana sayfanın görünür olduğundan emin ol
             if (elements && elements.mainMenu) {
@@ -5435,10 +5832,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // ============ UI GÜNCELLE ============
         function updateUI() {
             // Alt bar: Sadece session (oyun içi) puanları göster
-            elements.score.textContent = sessionScore;
-            elements.correct.textContent = sessionCorrect;
-            elements.wrong.textContent = sessionWrong;
-            elements.level.textContent = level; // Global seviye
+            if (elements.score) elements.score.textContent = sessionScore;
+            if (elements.correct) elements.correct.textContent = sessionCorrect;
+            if (elements.wrong) elements.wrong.textContent = sessionWrong;
+            // level elementi artık yok (Mertebe kaldırıldı), bu yüzden güncelleme yapılmıyor
         }
 
         // ============ SÜRE YÖNETİMİ ============
@@ -7233,6 +7630,118 @@ if (document.getElementById('mainMenu')) {
     }
 </script>
 
+<!-- PWA INSTALL PROMPT -->
+<script>
+    let deferredPrompt;
+    let pwaInstallBtn;
+    
+    // Sayfa yüklendiğinde butonu al
+    window.addEventListener('DOMContentLoaded', () => {
+        pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        
+        // Mobil cihaz kontrolü
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        
+        // Eğer standalone modda çalışıyorsa (zaten yüklü), butonu gizle
+        if (isStandalone) {
+            if (pwaInstallBtn) {
+                pwaInstallBtn.style.display = 'none';
+            }
+            log.debug('📱 Uygulama standalone modda çalışıyor (zaten yüklü)');
+            return;
+        }
+        
+        // Mobil cihazlarda veya masaüstünde butonu göster (test için)
+        // Gerçek kullanımda sadece beforeinstallprompt geldiğinde gösterilecek
+        if (pwaInstallBtn) {
+            // Test için: Mobil cihazlarda varsayılan olarak göster
+            // Masaüstünde de göster (kullanıcı test edebilsin)
+            pwaInstallBtn.style.display = 'block';
+            log.debug('📲 PWA install butonu görünür (test modu)');
+        }
+    });
+    
+    // beforeinstallprompt event'i yakala
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Varsayılan prompt'u engelle
+        e.preventDefault();
+        // Event'i sakla
+        deferredPrompt = e;
+        // Butonu göster
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'block';
+        }
+        log.debug('📲 PWA install prompt hazır');
+    });
+    
+    // Uygulama zaten yüklüyse butonu gizle
+    window.addEventListener('appinstalled', () => {
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+        log.debug('✅ PWA başarıyla yüklendi');
+    });
+    
+    // PWA install fonksiyonu
+    window.triggerPWAInstall = async () => {
+        if (!deferredPrompt) {
+            log.warn('⚠️ PWA install prompt mevcut değil');
+            // Alternatif: Kullanıcıya manuel talimat ver
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            const isEdge = /Edge/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !isChrome;
+            
+            let instructions = '📲 Uygulamayı ana ekrana eklemek için:\n\n';
+            
+            if (isIOS) {
+                instructions += '• Safari: Paylaş butonu (□↑) > "Ana Ekrana Ekle"\n';
+            } else if (isAndroid) {
+                if (isChrome) {
+                    instructions += '• Chrome: Menü (⋮) > "Uygulamayı yükle" veya "Ana ekrana ekle"\n';
+                } else {
+                    instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" seçeneğini bulun\n';
+                }
+            } else {
+                // Masaüstü
+                if (isChrome || isEdge) {
+                    instructions += '• Chrome/Edge: Adres çubuğundaki yükle ikonuna (⬇) tıklayın\n';
+                    instructions += '• Veya Menü (⋮) > "Uygulamayı yükle"\n';
+                } else if (isSafari) {
+                    instructions += '• Safari: Dosya > "Ana Ekrana Ekle"\n';
+                } else {
+                    instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" veya "Uygulamayı yükle" seçeneğini bulun\n';
+                }
+            }
+            
+            alert(instructions);
+            return;
+        }
+        
+        // Prompt'u göster
+        deferredPrompt.prompt();
+        
+        // Kullanıcının seçimini bekle
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            log.debug('✅ Kullanıcı PWA yüklemeyi kabul etti');
+        } else {
+            log.debug('❌ Kullanıcı PWA yüklemeyi reddetti');
+        }
+        
+        // Prompt'u temizle
+        deferredPrompt = null;
+        
+        // Butonu gizle
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'none';
+        }
+    };
+</script>
 
 <button id="pwaInstallBtn" onclick="window.triggerPWAInstall()"
     style="
@@ -7240,17 +7749,25 @@ if (document.getElementById('mainMenu')) {
         bottom: 90px;
         right: 20px;
         padding: 12px 18px;
-        background: #FFD700;
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
         border: none;
         border-radius: 12px;
-        font-size: 15px;
+        font-size: clamp(13px, 3vw, 15px);
         font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        color: #1a1a1a;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
         z-index: 9999;
         display: none;
-    ">
+        cursor: pointer;
+        transition: all 0.3s ease;
+    "
+    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(255, 215, 0, 0.5)'"
+    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(255, 215, 0, 0.4)'">
     📲 Uygulamayı Yükle
 </button>
 
 </body>
 </html>
+
+
+

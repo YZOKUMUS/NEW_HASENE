@@ -151,8 +151,8 @@ body {
 /* ----- AUDIO & HINT BUTTONS ----- */
 .audio-btn,
 .hint-btn {
-    width: 50px;
-    height: 50px;
+    width: 24px;
+    height: 24px;
     background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -631,8 +631,8 @@ body {
     
     .ayet-card .audio-btn,
     .dua-card .audio-btn {
-        width: 55px !important;
-        height: 55px !important;
+        width: 24px !important;
+        height: 24px !important;
     }
     
     .hadis-title {
@@ -864,8 +864,8 @@ body {
 /* Audio button - centered and larger */
 .ayet-card .audio-btn,
 .dua-card .audio-btn {
-    width: 60px;
-    height: 60px;
+    width: 24px;
+    height: 24px;
     margin: 10px auto;
     background-size: contain;
     background-repeat: no-repeat;
@@ -1203,10 +1203,10 @@ body {
 
 .game-actions button,
 .audio-btn {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
     box-sizing: border-box;
 }
 
