@@ -397,7 +397,7 @@
             </div>
 
             <div class="game-box">
-                <div class="arabic" id="boslukAyetText">Ayet metni yükleniyor...</div>
+                <div class="arabic" id="boslukAyetText" style="color: #2c2c2c; margin-bottom: 8px; font-size: clamp(20px, 5vw, 32px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">Ayet metni yükleniyor...</div>
                 <button class="audio-btn" id="boslukAudioBtn"></button>
                 <div class="options" id="boslukOptions"></div>
                 <div class="feedback" id="boslukFeedback"></div>
@@ -7652,13 +7652,18 @@ if (document.getElementById('mainMenu')) {
             return;
         }
         
-        // Mobil cihazlarda veya masaüstünde butonu göster (test için)
-        // Gerçek kullanımda sadece beforeinstallprompt geldiğinde gösterilecek
+        // Sadece mobil cihazlarda butonu göster
+        // Masaüstünde PWA install tarayıcının kendi UI'sı ile yapılır
         if (pwaInstallBtn) {
-            // Test için: Mobil cihazlarda varsayılan olarak göster
-            // Masaüstünde de göster (kullanıcı test edebilsin)
-            pwaInstallBtn.style.display = 'block';
-            log.debug('📲 PWA install butonu görünür (test modu)');
+            if (isMobile) {
+                // Mobil cihazlarda butonu göster (beforeinstallprompt event'i geldiğinde de görünecek)
+                pwaInstallBtn.style.display = 'block';
+                log.debug('📲 PWA install butonu görünür (mobil cihaz)');
+            } else {
+                // Masaüstünde butonu gizle
+                pwaInstallBtn.style.display = 'none';
+                log.debug('💻 Masaüstü cihaz - PWA install butonu gizli (tarayıcı UI kullanılır)');
+            }
         }
     });
     
@@ -7687,13 +7692,24 @@ if (document.getElementById('mainMenu')) {
     // PWA install fonksiyonu
     window.triggerPWAInstall = async () => {
         if (!deferredPrompt) {
-            log.warn('⚠️ PWA install prompt mevcut değil');
-            // Alternatif: Kullanıcıya manuel talimat ver
+            // Mobil cihaz kontrolü
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile) {
+                // Masaüstünde buton görünmemeli, ama eğer görünürse kullanıcıya bilgi ver
+                log.debug('💻 Masaüstü cihaz - PWA install tarayıcı UI ile yapılır');
+                alert('💻 Masaüstünde uygulamayı yüklemek için:\n\n' +
+                      '• Chrome/Edge: Adres çubuğundaki yükle ikonuna (⬇) tıklayın\n' +
+                      '• Veya Menü (⋮) > "Uygulamayı yükle"\n\n' +
+                      'Not: Bu buton sadece mobil cihazlarda görünür.');
+                return;
+            }
+            
+            // Mobil cihazlarda prompt yoksa manuel talimat ver
+            log.debug('⚠️ PWA install prompt mevcut değil (mobil cihaz)');
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isAndroid = /Android/.test(navigator.userAgent);
             const isChrome = /Chrome/.test(navigator.userAgent);
-            const isEdge = /Edge/.test(navigator.userAgent);
-            const isSafari = /Safari/.test(navigator.userAgent) && !isChrome;
             
             let instructions = '📲 Uygulamayı ana ekrana eklemek için:\n\n';
             
@@ -7706,15 +7722,7 @@ if (document.getElementById('mainMenu')) {
                     instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" seçeneğini bulun\n';
                 }
             } else {
-                // Masaüstü
-                if (isChrome || isEdge) {
-                    instructions += '• Chrome/Edge: Adres çubuğundaki yükle ikonuna (⬇) tıklayın\n';
-                    instructions += '• Veya Menü (⋮) > "Uygulamayı yükle"\n';
-                } else if (isSafari) {
-                    instructions += '• Safari: Dosya > "Ana Ekrana Ekle"\n';
-                } else {
-                    instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" veya "Uygulamayı yükle" seçeneğini bulun\n';
-                }
+                instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" seçeneğini bulun\n';
             }
             
             alert(instructions);
