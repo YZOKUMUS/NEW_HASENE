@@ -126,6 +126,59 @@
 
 
 
+    <!-- Onboarding/Tutorial Modal - Yeni Oyuncular İçin -->
+    <div class="modal onboarding-modal" id="onboardingModal" style="display: none;">
+        <div class="onboarding-container">
+            <div class="onboarding-progress">
+                <div class="progress-bar" id="onboardingProgressBar"></div>
+                <div class="progress-text" id="onboardingProgressText">1 / 6</div>
+            </div>
+            <div class="onboarding-slides" id="onboardingSlides">
+                <div class="onboarding-slide active" data-slide="1">
+                    <div class="slide-icon">👋</div>
+                    <h2 class="slide-title">Hoş Geldin!</h2>
+                    <p class="slide-description">Kur'an-ı Kerim kelimelerini öğrenmek için hazır mısın?<br>Bu kısa turda sana oyunu tanıtacağız.</p>
+                </div>
+                <div class="onboarding-slide" data-slide="2">
+                    <div class="slide-icon">🎮</div>
+                    <h2 class="slide-title">6 Farklı Oyun Modu</h2>
+                    <div class="slide-features">
+                        <div class="feature-item">📚 <strong>Kelime Çevir</strong> - Kelimeleri öğren</div>
+                        <div class="feature-item">🎧 <strong>Dinle & Bul</strong> - Dinleyerek bul</div>
+                        <div class="feature-item">📝 <strong>Boşluk Doldur</strong> - Ayetleri tamamla</div>
+                        <div class="feature-item">📖 <strong>Ayet Oku</strong> - Ayetleri oku</div>
+                        <div class="feature-item">🤲 <strong>Dua Öğren</strong> - Duaları öğren</div>
+                        <div class="feature-item">📜 <strong>Hadis Oku</strong> - Hadisleri oku</div>
+                    </div>
+                </div>
+                <div class="onboarding-slide" data-slide="3">
+                    <div class="slide-icon">📿</div>
+                    <h2 class="slide-title">Hasene Sistemi</h2>
+                    <p class="slide-description">Her doğru cevap ile <strong>Hasene</strong> kazanırsın!<br><br><span style="font-size: 0.9em; color: #666;">• 100 Hasene = 1 ⭐ Yıldız<br>• Her 3 doğru = +5 Hasene Bonus<br>• Günlük hedefi tamamla = +1,000 Hasene</span></p>
+                </div>
+                <div class="onboarding-slide" data-slide="4">
+                    <div class="slide-icon">🎯</div>
+                    <h2 class="slide-title">Günlük Görevler</h2>
+                    <p class="slide-description">Her gün yeni görevler seni bekliyor!<br><br><span style="font-size: 0.9em; color: #666;">• 8 temel görev + 3 bonus görev<br>• Tüm görevleri tamamla = +2,500 Hasene<br>• Her gün sıfırlanır</span></p>
+                </div>
+                <div class="onboarding-slide" data-slide="5">
+                    <div class="slide-icon">🔥</div>
+                    <h2 class="slide-title">Muvazebet (Streak)</h2>
+                    <p class="slide-description">Her gün oyna, serini bozma!<br><br><span style="font-size: 0.9em; color: #666;">• Her gün oynayarak serini artır<br>• Günlük hedefi tamamla = +1 gün<br>• En uzun serini kırma!</span></p>
+                </div>
+                <div class="onboarding-slide" data-slide="6">
+                    <div class="slide-icon">🚀</div>
+                    <h2 class="slide-title">Hazırsın!</h2>
+                    <p class="slide-description">Artık oyuna başlayabilirsin!<br><br><span style="font-size: 0.9em; color: #666;">İyi eğlenceler ve başarılar!<br>Her gün biraz daha ilerle! 📈</span></p>
+                </div>
+            </div>
+            <div class="onboarding-buttons">
+                <button class="onboarding-btn skip-btn" id="onboardingSkipBtn" onclick="event.stopPropagation(); skipOnboarding();" style="display: block !important; visibility: visible !important; opacity: 1 !important;">Atla</button>
+                <button class="onboarding-btn next-btn" id="onboardingNextBtn" onclick="event.stopPropagation(); nextOnboardingSlide();" style="display: block !important; visibility: visible !important; opacity: 1 !important;">İleri →</button>
+            </div>
+        </div>
+    </div>
+
         <!-- Ana Menü -->
         <div class="main-menu" id="mainMenu">
 
@@ -134,6 +187,11 @@
             <div class="daily-goal-section">
                 <!-- Modern Stats Panel -->
                 <div class="premium-stats-panel">   
+                    <!-- TEST: Reset Butonu - Sol Üst Köşe (Test Amaçlı) -->
+                    <button onclick="confirmResetStats()" class="reset-stats-btn" style="position: absolute; top: 12px; left: 12px; background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="Test: Tüm İstatistikleri Sıfırla">
+                        <span style="font-size: 16px;">🔄</span>
+                    </button>
+                    
                     <!-- Hedef Butonu - Premium -->
                     <button onclick="showDailyGoalSettings()" class="goal-settings-btn" style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #58cc02 0%, #4db300 100%); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; animation: goalButtonPulse 2s infinite;" onmouseover="this.style.transform='scale(1.15) rotate(5deg)'; this.style.boxShadow='0 6px 20px rgba(88, 204, 2, 0.5), 0 0 0 4px rgba(88, 204, 2, 0.2)'; this.style.animation='none'" onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7)'; this.style.animation='goalButtonPulse 2s infinite'" onmousedown="this.style.transform='scale(0.95) rotate(-5deg)'" onmouseup="this.style.transform='scale(1.15) rotate(5deg)'">
                         <span style="font-size: 20px; display: inline-block; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);" id="goalButtonIcon">🎯</span>
@@ -472,155 +530,213 @@
         </div>
     </div>
 
-    <!-- Müjdeler Modal -->
-    <div class="modal" id="badgesModal">
-        <div class="modal-content" style="max-width: 400px; max-height: 80vh; overflow-y: auto;">
-            <h3 style="margin: 15px 0 10px 0; font-size: 1.3em;">🏆 Kazanımlarınız</h3>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
-                <!-- Mütebahhir -->
-                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);">
-                    <div style="font-size: 1.2em;">💎</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mütebahhir</div>
-                    <div style="font-size: 1em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Mütecaviz = 1 Mütebahhir</div>
-                </div>
-                
-                <!-- Mütecaviz -->
-                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);">
-                    <div style="font-size: 1.2em;">🥇</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mütecaviz</div>
-                    <div style="font-size: 1em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Müterakki = 1 Mütecaviz</div>
-                </div>
-                
-                <!-- Müterakki -->
-                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);">
-                    <div style="font-size: 1.2em;">🥈</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Müterakki</div>
-                    <div style="font-size: 1em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Mübtedi = 1 Müterakki</div>
-                </div>
-                
-                <!-- Mübtedi -->
-                <div style="text-align: center; padding: 8px; border-radius: 8px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%);">
-                    <div style="font-size: 1.2em;">🥉</div>
-                    <div style="font-weight: bold; margin: 2px 0; font-size: 0.8em;">Mübtedi</div>
-                    <div style="font-size: 1em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
-                    <div style="font-size: 0.6em; color: #666;">5 Yıldız = 1 Mübtedi</div>
-                </div>
+    <!-- Başarılar/Rozetler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)" ontouchstart="handleBadgesModalClick(event)">
+        <div class="modal-content badges-content" onclick="handleBadgesModalClick(event)" ontouchstart="handleBadgesModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+            <!-- Başlık ve Kapat Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
+                <button onclick="event.stopPropagation(); closeBadgesModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
             
-            <div style="text-align: center; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 8px;">
-                <div style="font-size: 1.1em; margin-bottom: 5px;">📊 Terakkiniz</div>
-                <div>⭐ <span id="badgesModalStars">0</span> Yıldız</div>
-                <div>📈 <span id="badgesModalLevel">1</span>. Mertebe</div>
-                <div>📿 <span id="badgesModalPoints">0</span> Hasene</div>
+            <!-- Scroll Edilebilir İçerik -->
+            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+                
+                <!-- Terakki Özeti -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
+                    <div style="font-size: 0.85em; font-weight: 600; margin-bottom: 8px; opacity: 0.9;">📊 Terakkiniz</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
+                        <div>
+                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalStars">0</div>
+                            <div style="font-size: 0.7em; opacity: 0.9;">⭐ Yıldız</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalLevel">1</div>
+                            <div style="font-size: 0.7em; opacity: 0.9;">📈 Mertebe</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalPoints">0</div>
+                            <div style="font-size: 0.7em; opacity: 0.9;">📿 Hasene</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rozetler Grid -->
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">🏅 Mertebe Rozetleri</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <!-- Mütebahhir -->
+                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%); border: 2px solid #00bcd4; box-shadow: 0 2px 8px rgba(0,188,212,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 2em; margin-bottom: 4px;">💎</div>
+                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #00bcd4;">Mütebahhir</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
+                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Mütecaviz = 1</div>
+                        </div>
+                        
+                        <!-- Mütecaviz -->
+                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 2px solid #ff9800; box-shadow: 0 2px 8px rgba(255,152,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 2em; margin-bottom: 4px;">🥇</div>
+                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #ff9800;">Mütecaviz</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
+                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Müterakki = 1</div>
+                        </div>
+                        
+                        <!-- Müterakki -->
+                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 2px solid #9c27b0; box-shadow: 0 2px 8px rgba(156,39,176,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 2em; margin-bottom: 4px;">🥈</div>
+                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #9c27b0;">Müterakki</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
+                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Mübtedi = 1</div>
+                        </div>
+                        
+                        <!-- Mübtedi -->
+                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); border: 2px solid #ff5722; box-shadow: 0 2px 8px rgba(255,87,34,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 2em; margin-bottom: 4px;">🥉</div>
+                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #ff5722;">Mübtedi</div>
+                            <div style="font-size: 1.3em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
+                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Yıldız = 1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bilgi Kutusu -->
+                <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #3b82f6;">
+                    <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Rozet Sistemi</div>
+                    <div style="font-size: 0.75em; color: #555; line-height: 1.5;">
+                        • 5 Yıldız = 1 Mübtedi Rozeti<br>
+                        • 5 Mübtedi = 1 Müterakki Rozeti<br>
+                        • 5 Müterakki = 1 Mütecaviz Rozeti<br>
+                        • 5 Mütecaviz = 1 Mütebahhir Rozeti
+                    </div>
+                </div>
+                
             </div>
-            
-            <button id="closeBadgesBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">Kapat</button>
+            <!-- Scroll Edilebilir İçerik Sonu -->
+
+            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
+            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                Herhangi bir yere tıklayarak kapatabilirsiniz
+            </div>
         </div>
     </div>
 
-    <!-- Takvim Modal - Duolingo Style -->
-    <div class="modal" id="calendarModal">
-        <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; background: #ffffff; border-radius: 16px;">
-            
-            <!-- Başlık ve Streak -->
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div style="font-size: 1.5em; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">
-                    <span id="calendarStreakCount" style="color: #58cc02;">0</span> gün seri
-                </div>
-                <div style="font-size: 0.9em; color: #999; margin-top: 4px;">
-                    Her gün oyna, serini bozma!
-                </div>
+    <!-- Takvim Modal - Duolingo Style, Her Yere Tıklayınca Kapanır -->
+    <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)" ontouchstart="handleCalendarModalClick(event)">
+        <div class="modal-content calendar-content" onclick="handleCalendarModalClick(event)" ontouchstart="handleCalendarModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
+            <!-- Başlık ve Kapat Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
+                <button onclick="event.stopPropagation(); closeCalendarModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
             
-            <!-- Haftalık Streak Gösterimi (Duolingo Style) -->
-            <div id="weeklyStreakDisplay" style="margin-bottom: 32px; padding: 16px; background: #f7f7f7; border-radius: 12px;">
-                <!-- Bu alan JavaScript ile doldurulacak -->
-            </div>
-            
-            <!-- Aylık Takvim Bölümü (Duolingo Style) -->
-            <div style="margin-bottom: 24px;">
-                <!-- Ay Başlığı -->
-                <div style="text-align: center; font-weight: 600; font-size: 1.1em; color: #1a1a1a; margin-bottom: 16px;" id="calendarMonth">
-                    Ocak 2025
+            <!-- Scroll Edilebilir İçerik -->
+            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
+                
+                <!-- Streak Bilgisi -->
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="font-size: 1.5em; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">
+                        <span id="calendarStreakCount" style="color: #58cc02;">0</span> gün seri
+                    </div>
+                    <div style="font-size: 0.9em; color: #999; margin-top: 4px;">
+                        Her gün oyna, serini bozma!
+                    </div>
                 </div>
                 
-                <!-- Takvim Grid -->
-                <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 100%; margin: 0 auto;">
-                    <!-- Takvim günleri buraya eklenecek -->
+                <!-- Haftalık Streak Gösterimi (Duolingo Style) -->
+                <div id="weeklyStreakDisplay" style="margin-bottom: 32px; padding: 16px; background: #f7f7f7; border-radius: 12px;">
+                    <!-- Bu alan JavaScript ile doldurulacak -->
                 </div>
+                
+                <!-- Aylık Takvim Bölümü (Duolingo Style) -->
+                <div style="margin-bottom: 24px;">
+                    <!-- Ay Başlığı -->
+                    <div style="text-align: center; font-weight: 600; font-size: 1.1em; color: #1a1a1a; margin-bottom: 16px;" id="calendarMonth">
+                        Ocak 2025
+                    </div>
+                    
+                    <!-- Takvim Grid -->
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 100%; margin: 0 auto;">
+                        <!-- Takvim günleri buraya eklenecek -->
+                    </div>
+                </div>
+                
             </div>
+            <!-- Scroll Edilebilir İçerik Sonu -->
 
-            <!-- Kapat Butonu -->
-            <button id="closeCalendarBtn" onclick="closeCalendarModal()" style="width: 100%; padding: 14px; background: #58cc02; color: white; border: none; border-radius: 12px; font-size: 1em; font-weight: 700; cursor: pointer; margin-top: 16px; transition: background 0.2s, transform 0.1s;" onmouseover="this.style.background='#4db300'; this.style.transform='scale(1.02)'" onmouseout="this.style.background='#58cc02'; this.style.transform='scale(1)'">
-                Kapat
-            </button>
+            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
+            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                Herhangi bir yere tıklayarak kapatabilirsiniz
+            </div>
         </div>
     </div>
 
-    <!-- Günlük Görevler Modal -->
-    <div class="modal" id="dailyTasksModal">
-        <div class="modal-content" style="max-width: 480px; max-height: 80vh; overflow-y: auto;">
-            <h3 style="margin: 8px 0 6px 0; font-size: 1em;">🎯 Günlük Görevler</h3>
+    <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)" ontouchstart="handleDailyTasksModalClick(event)">
+        <div class="modal-content daily-tasks-content" onclick="handleDailyTasksModalClick(event)" ontouchstart="handleDailyTasksModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+            <!-- Başlık ve Kapat Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
+                <button onclick="event.stopPropagation(); closeDailyTasksModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
+            </div>
             
-            <!-- Genel İlerleme -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px; border-radius: 6px; margin: 8px 0; text-align: center;">
-                <div style="font-size: 0.8em; font-weight: bold;">Bugünkü İlerleme</div>
-                <div style="font-size: 0.7em; margin-top: 2px;">
-                    <span id="completedTasks">0</span>/<span id="totalTasks">5</span> Görev Tamamlandı
+            <!-- Genel İlerleme - Kompakt -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 10px; margin-bottom: 12px; text-align: center;">
+                <div style="font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Bugünkü İlerleme</div>
+                <div style="font-size: 0.9em; font-weight: 700; margin-bottom: 6px;">
+                    <span id="completedTasks">0</span>/<span id="totalTasks">11</span> Görev Tamamlandı
                 </div>
-                <div style="background: rgba(255,255,255,0.3); border-radius: 8px; height: 4px; margin: 4px 0;">
-                    <div id="taskProgress" style="background: white; height: 100%; border-radius: 8px; width: 0%; transition: width 0.3s;"></div>
-                </div>
-            </div>
-
-            <!-- Temel Görevler -->
-            <div style="margin: 16px 0;">
-                <div id="dailyTasksList">
-                    <!-- Görevler buraya dinamik eklenecek -->
+                <div style="background: rgba(255,255,255,0.3); border-radius: 10px; height: 6px; overflow: hidden;">
+                    <div id="taskProgress" style="background: white; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
                 </div>
             </div>
 
-            <!-- Bonus Görevler -->
-            <div style="margin: 16px 0;">
-                <div id="bonusTasksList">
-                    <!-- Bonus görevler buraya dinamik eklenecek -->
+            <!-- Görevler Container - Scroll Edilebilir -->
+            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+                <!-- Temel Görevler -->
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
+                    <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+                        <!-- Görevler buraya dinamik eklenecek -->
+                    </div>
+                </div>
+
+                <!-- Bonus Görevler -->
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 0.75em; font-weight: 600; color: #f59e0b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">⭐ Bonus Görevler</div>
+                    <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+                        <!-- Bonus görevler buraya dinamik eklenecek -->
+                    </div>
+                </div>
+
+                <!-- Ödül Toplama -->
+                <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 10px; padding: 12px; margin-top: 8px; text-align: center; border: 2px solid #4caf50;">
+                    <div style="font-size: 1em; color: #2e7d2e; font-weight: 700; margin-bottom: 4px;">🎉 Tebrikler!</div>
+                    <div style="font-size: 0.8em; color: #555; margin-bottom: 8px;">Tüm görevleri tamamladın!</div>
+                    <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.85em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        +2,500 Hasene Ödül Topla 🎁
+                    </button>
                 </div>
             </div>
 
-            <!-- Ödül Toplama -->
-            <div id="rewardsSection" style="display: none; background: #e8f5e8; border-radius: 8px; padding: 12px; margin: 12px 0; text-align: center;">
-                <div style="font-size: 1em; color: #2e7d2e; font-weight: bold;">🎉 Tebrikler!</div>
-                <div style="font-size: 0.8em; color: #666; margin: 4px 0;">Tüm görevleri tamamladın!</div>
-                <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: #4caf50; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8em; cursor: pointer;">
-                    +5 ⭐ Ödül Topla
-                </button>
+            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
+            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                Herhangi bir yere tıklayarak kapatabilirsiniz
             </div>
-
-            <button id="closeDailyTasksBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">Kapat</button>
         </div>
     </div>
 
-    <!-- İstatistikler Modal -->
-    <div class="modal" id="statsModal">
-        <div class="modal-content" style="max-width: 420px; max-height: 90vh; overflow-y: auto; padding: 20px;">
-            <h3 style="margin: 10px 0 15px 0; font-size: 1.1em; text-align: center;">📊 İstatistikler</h3>
-            
-            <!-- Tab Butonları -->
-            <div style="display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px;">
-                <button id="statsTabGeneral" onclick="switchStatsTab('general')" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.9em; cursor: pointer; transition: all 0.3s ease;">
-                    📈 Genel
-                </button>
-                <button id="statsTabWords" onclick="switchStatsTab('words')" style="flex: 1; padding: 10px; background: white; color: #666; border: 2px solid #e0e0e0; border-radius: 8px; font-weight: 600; font-size: 0.9em; cursor: pointer; transition: all 0.3s ease;">
-                    📚 Kelimeler
-                </button>
+    <!-- İstatistikler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)" ontouchstart="handleStatsModalClick(event)">
+        <div class="modal-content stats-content" onclick="handleStatsModalClick(event)" ontouchstart="handleStatsModalClick(event)" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+            <!-- Başlık ve Kapat Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
+                <button onclick="event.stopPropagation(); closeStatsModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
+            
+            <!-- Scroll Edilebilir İçerik -->
+            <div style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;" onclick="event.stopPropagation();" ontouchstart="event.stopPropagation();">
 
-            <!-- Genel İstatistikler Tab -->
-            <div id="statsContentGeneral" style="display: block;">
             <!-- Genel Özet -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-bottom: 10px;">
@@ -787,18 +903,8 @@
                 </div>
             </div>
 
-            <!-- İstatistik Sıfırlama Uyarısı -->
-            <div style="background: #ffebee; padding: 10px; border-radius: 6px; margin: 12px 0; border-left: 4px solid #f44336;">
-                <div style="font-size: 0.85em; color: #c62828; margin-bottom: 8px;">⚠️ Dikkat: Tüm istatistikleri sıfırlamak istiyorsan:</div>
-                <button onclick="confirmResetStats()" style="background: #f44336; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; cursor: pointer;">
-                    🔄 Tüm İstatistikleri Sıfırla
-                </button>
-            </div>
-            </div>
-            <!-- Genel İstatistikler Tab Sonu -->
-
-            <!-- Kelime İstatistikleri Tab -->
-            <div id="statsContentWords" style="display: none;">
+            <!-- Kelime İstatistikleri Bölümü -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
             <!-- Genel Özet -->
             <div style="background: linear-gradient(135deg, #845EC2 0%, #4E8397 100%); color: white; padding: 15px; border-radius: 12px; margin: 15px 0; text-align: center;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
@@ -849,10 +955,14 @@
             </div>
 
             </div>
-            <!-- Kelime İstatistikleri Tab Sonu -->
+            <!-- Kelime İstatistikleri Bölümü Sonu -->
+            </div>
+            <!-- Scroll Edilebilir İçerik Sonu -->
 
-            <!-- Kapat Butonu -->
-            <button id="closeStatsBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">Kapat</button>
+            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
+            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                Herhangi bir yere tıklayarak kapatabilirsiniz
+            </div>
         </div>
     </div>
 
@@ -1455,30 +1565,52 @@
         function updateWordStatistics() {
             log.stats('📊 updateWordStatistics ÇAĞRILDI!');
             
-            const wordStats = loadWordStats();
-            log.stats('📦 wordStats yüklendi:', wordStats);
-            
-            // Genel istatistikleri hesapla
-            const totalWords = Object.keys(wordStats).length;
-            const masteredWords = Object.values(wordStats).filter(stat => stat.masteryLevel >= 3.0 && stat.successRate >= 0.6).length;
-            const strugglingWords = Object.values(wordStats).filter(stat => stat.successRate < 0.6 || stat.masteryLevel < 1.0).length;
-            
-            // Genel özet güncelle
-            document.getElementById('wordStatsTotal').textContent = totalWords;
-            document.getElementById('wordStatsMastered').textContent = masteredWords;
-            document.getElementById('wordStatsStruggling').textContent = strugglingWords;
-            
-            // Kelime listesini göster (varsayılan: hepsi)
-            filterWordStats('all');
-            
-            // Event listener'ları ekle (sadece bir kez)
-            const statsContentWords = document.getElementById('statsContentWords');
-            if (!statsContentWords.hasAttribute('data-listeners-added')) {
-                document.getElementById('filterAll').onclick = () => filterWordStats('all');
-                document.getElementById('filterMastered').onclick = () => filterWordStats('mastered');
-                document.getElementById('filterStruggling').onclick = () => filterWordStats('struggling');
-                document.getElementById('filterRecent').onclick = () => filterWordStats('recent');
-                statsContentWords.setAttribute('data-listeners-added', 'true');
+            try {
+                const wordStats = loadWordStats();
+                log.stats('📦 wordStats yüklendi:', wordStats);
+                
+                // Genel istatistikleri hesapla
+                const totalWords = Object.keys(wordStats).length;
+                const masteredWords = Object.values(wordStats).filter(stat => stat.masteryLevel >= 3.0 && stat.successRate >= 0.6).length;
+                const strugglingWords = Object.values(wordStats).filter(stat => stat.successRate < 0.6 || stat.masteryLevel < 1.0).length;
+                
+                // Genel özet güncelle (null kontrolü ile)
+                const wordStatsTotalEl = document.getElementById('wordStatsTotal');
+                const wordStatsMasteredEl = document.getElementById('wordStatsMastered');
+                const wordStatsStrugglingEl = document.getElementById('wordStatsStruggling');
+                
+                if (wordStatsTotalEl) wordStatsTotalEl.textContent = totalWords;
+                if (wordStatsMasteredEl) wordStatsMasteredEl.textContent = masteredWords;
+                if (wordStatsStrugglingEl) wordStatsStrugglingEl.textContent = strugglingWords;
+                
+                // Kelime listesini göster (varsayılan: hepsi)
+                filterWordStats('all');
+                
+                // Event listener'ları ekle (sadece bir kez) - null kontrolü ile
+                const filterAll = document.getElementById('filterAll');
+                const filterMastered = document.getElementById('filterMastered');
+                const filterStruggling = document.getElementById('filterStruggling');
+                const filterRecent = document.getElementById('filterRecent');
+                
+                if (filterAll && !filterAll.hasAttribute('data-listener-added')) {
+                    filterAll.onclick = () => filterWordStats('all');
+                    filterAll.setAttribute('data-listener-added', 'true');
+                }
+                if (filterMastered && !filterMastered.hasAttribute('data-listener-added')) {
+                    filterMastered.onclick = () => filterWordStats('mastered');
+                    filterMastered.setAttribute('data-listener-added', 'true');
+                }
+                if (filterStruggling && !filterStruggling.hasAttribute('data-listener-added')) {
+                    filterStruggling.onclick = () => filterWordStats('struggling');
+                    filterStruggling.setAttribute('data-listener-added', 'true');
+                }
+                if (filterRecent && !filterRecent.hasAttribute('data-listener-added')) {
+                    filterRecent.onclick = () => filterWordStats('recent');
+                    filterRecent.setAttribute('data-listener-added', 'true');
+                }
+            } catch (error) {
+                log.error('❌ updateWordStatistics HATA:', error);
+                log.error('Stack trace:', error.stack);
             }
         }
         
@@ -1529,7 +1661,8 @@
                             anlam: `Sure ${sure}, Ayet ${ayet}, Kelime ${kelimeIndex}`,
                             id: wordId
                         };
-                        log.warn('⚠️ Kelime verisi bulunamadı, geçici veri oluşturuldu:', wordData);
+                        // Sadece debug modunda göster (çok fazla uyarı olabilir)
+                        log.stats('⚠️ Kelime verisi bulunamadı, geçici veri oluşturuldu:', wordData);
                     }
                     
                     const shouldShow = 
@@ -1774,11 +1907,13 @@
 
                     // Başarı oranı faktörü (düşük başarı oranı = yüksek öncelik)
                     if (stats.successRate < 0.6) {
-                        priorityScore *= (1.5 - stats.successRate);
+                        // successRate 0-1 arası olduğu için sonuç 0.5-1.5 arası olur
+                        priorityScore *= Math.max(0.1, 1.5 - stats.successRate);
                     }
 
                     // Ustalık seviyesi faktörü (düşük ustalık = yüksek öncelik)
-                    priorityScore *= (2.0 - stats.masteryLevel / 5.0);
+                    // masteryLevel 0-5 arası olduğu için sonuç 1.0-2.0 arası olur
+                    priorityScore *= Math.max(0.1, 2.0 - stats.masteryLevel / 5.0);
                 } else {
                     // Hiç görülmemiş kelimeler orta öncelikli
                     priorityScore = 1.2;
@@ -1795,6 +1930,13 @@
 
             // Weighted random selection (en öncelikli kelimeler daha fazla seçilir)
             const totalWeight = wordsWithPriority.reduce((sum, item) => sum + item.priority, 0);
+            
+            // Güvenlik kontrolü: totalWeight 0 veya negatif olamaz
+            if (totalWeight <= 0 || wordsWithPriority.length === 0) {
+                log.warn('⚠️ Öncelik puanları hesaplanamadı, rastgele kelime seçiliyor');
+                return filteredData[Math.floor(Math.random() * filteredData.length)];
+            }
+            
             let random = Math.random() * totalWeight;
 
             for (const item of wordsWithPriority) {
@@ -1935,21 +2077,53 @@
                 confirmXP.textContent = xp;
 
                 forceLog('[MODAL] Modal gosteriliyor...');
+                
+                // Modal'ı body'ye taşı (eğer başka bir yerdeyse)
+                if (confirmModal.parentNode !== document.body) {
+                    document.body.appendChild(confirmModal);
+                    forceLog('[MODAL] Modal body\'ye tasindi');
+                }
+                
+                // Önce tüm stil özelliklerini sıfırla
+                confirmModal.style.removeProperty('display');
+                confirmModal.style.removeProperty('visibility');
+                confirmModal.style.removeProperty('opacity');
+                
                 // CSS class ile göster (daha güvenilir)
                 confirmModal.classList.add('show');
+                
                 // Ayrıca inline style da ekle (çift güvence)
                 confirmModal.style.setProperty('display', 'flex', 'important');
+                confirmModal.style.setProperty('visibility', 'visible', 'important');
+                confirmModal.style.setProperty('opacity', '1', 'important');
+                confirmModal.style.setProperty('z-index', '11000', 'important');
                 
                 // requestAnimationFrame ile bir sonraki frame'de kontrol et
                 requestAnimationFrame(() => {
                     const computedDisplay = window.getComputedStyle(confirmModal).display;
+                    const computedVisibility = window.getComputedStyle(confirmModal).visibility;
+                    const computedOpacity = window.getComputedStyle(confirmModal).opacity;
+                    const computedZIndex = window.getComputedStyle(confirmModal).zIndex;
                     const isVisible = confirmModal.offsetParent !== null;
-                    forceLog('[MODAL] Display degeri (sonraki frame):', computedDisplay, 'Gorunur mu?', isVisible);
-                    if (computedDisplay === 'none' || !isVisible) {
-                        forceLog('[MODAL] HATA - Hala none! Zorla gosteriliyor...');
+                    
+                    forceLog('[MODAL] Display degeri (sonraki frame):', computedDisplay);
+                    forceLog('[MODAL] Visibility:', computedVisibility);
+                    forceLog('[MODAL] Opacity:', computedOpacity);
+                    forceLog('[MODAL] Z-index:', computedZIndex);
+                    forceLog('[MODAL] Gorunur mu?', isVisible);
+                    forceLog('[MODAL] Parent:', confirmModal.parentNode?.tagName || 'null');
+                    
+                    if (computedDisplay === 'none' || !isVisible || computedOpacity === '0') {
+                        forceLog('[MODAL] HATA - Hala gorunmuyor! Zorla gosteriliyor...');
                         confirmModal.style.setProperty('display', 'flex', 'important');
                         confirmModal.style.setProperty('visibility', 'visible', 'important');
                         confirmModal.style.setProperty('opacity', '1', 'important');
+                        confirmModal.style.setProperty('z-index', '11000', 'important');
+                        confirmModal.style.setProperty('position', 'fixed', 'important');
+                        confirmModal.style.setProperty('top', '0', 'important');
+                        confirmModal.style.setProperty('left', '0', 'important');
+                        confirmModal.style.setProperty('width', '100%', 'important');
+                        confirmModal.style.setProperty('height', '100%', 'important');
                     }
                 });
 
@@ -2152,6 +2326,7 @@
                 duaOgre: 0,
                 hadisOku: 0,
                 toplamDogru: 0,
+                toplamYanlis: 0,  // Bugünkü toplam yanlış cevap sayısı
                 toplamPuan: 0,
                 perfectStreak: 0,
                 farklıZorluk: new Set()
@@ -2847,6 +3022,7 @@ function hideAllGameScreens() {
             duaOgre: 0,
             hadisOku: 0,
             toplamDogru: 0,
+            toplamYanlis: 0,
             toplamPuan: 0,
             perfectStreak: 0,
             farklıZorluk: new Set()
@@ -3065,6 +3241,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Bugünkü toplam puana da ekle (günlük performans için)
             dailyTasks.todayStats.toplamPuan += points;
             
+            // Bugünkü toplam doğru cevap sayısını güncelle
+            dailyTasks.todayStats.toplamDogru++;
+            
             // Daily XP ekle
             addDailyXP(points);
             
@@ -3107,6 +3286,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.game(`❌ === addSessionWrong() ÇAĞRILDI ===`);
             log.game(`📊 Önce: sessionWrong=${sessionWrong}, wrong=${wrong}`);
             sessionWrong++;
+            
+            // Bugünkü toplam yanlış cevap sayısını güncelle
+            if (dailyTasks && dailyTasks.todayStats) {
+                dailyTasks.todayStats.toplamYanlis = (dailyTasks.todayStats.toplamYanlis || 0) + 1;
+            }
             
             // Yanlış cevap sesi
             playSound('wrong');
@@ -3169,6 +3353,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showBadgesModal() {
+            // Body scroll'u engelle
+            document.body.style.overflow = 'hidden';
+            
             // Tüm rozet sayılarını güncelle
             document.getElementById('diamondBadgeCount').textContent = badges.diamond;
             document.getElementById('goldBadgeCount').textContent = badges.gold;
@@ -3185,7 +3372,33 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function closeBadgesModal() {
-            document.getElementById('badgesModal').style.display = 'none';
+            const modal = document.getElementById('badgesModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Body scroll'u tekrar aktif et
+                document.body.style.overflow = '';
+                // Ana sayfanın görünür olduğundan emin ol
+                if (elements && elements.mainMenu) {
+                    elements.mainMenu.style.display = 'block';
+                }
+            }
+        }
+        
+        // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
+        function handleBadgesModalClick(event) {
+            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
+            event.stopPropagation();
+            event.preventDefault();
+            
+            // X butonuna tıklanırsa kapatma
+            const target = event.target;
+            if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
+                // Butonun kendi onclick handler'ı çalışsın
+                return;
+            }
+            
+            // Her yere tıklanınca kapat ve ana sayfaya dön
+            closeBadgesModal();
         }
         
         function showXPInfoModal() {
@@ -3198,6 +3411,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ İSTATİSTİKLER SİSTEMİ ============
         function showStatsModal() {
+            // Body scroll'u engelle
+            document.body.style.overflow = 'hidden';
             // Genel istatistikleri güncelle
             document.getElementById('statsLevel').textContent = level;
             document.getElementById('statsPoints').textContent = totalPoints.toLocaleString();
@@ -3237,11 +3452,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             document.getElementById('statsDiamond').textContent = badges.diamond;
             
             // Başarı analizi hesapla
-            const totalGameActions = dailyTasks.todayStats.kelimeCevir + dailyTasks.todayStats.dinleBul + 
-                                   dailyTasks.todayStats.boslukDoldur + dailyTasks.todayStats.ayetOku + 
-                                   dailyTasks.todayStats.duaOgre + dailyTasks.todayStats.hadisOku;
+            // Toplam deneme sayısı = Doğru + Yanlış
+            const totalAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
             
-            const successRate = totalGameActions > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalGameActions) * 100) : 0;
+            // Başarı oranı: Bugünkü toplam doğru cevap / Bugünkü toplam deneme sayısı
+            const successRate = totalAttempts > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalAttempts) * 100) : 0;
             const avgPointsPerDay = streakData.totalPlayDays > 0 ? Math.round(totalPoints / streakData.totalPlayDays) : totalPoints;
             const playConsistency = Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100);
             const levelProgressPercent = Math.round(progressPercentage);
@@ -3274,8 +3489,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Modal'ı göster
             document.getElementById('statsModal').style.display = 'flex';
             
-            // Varsayılan tab'ı göster (Genel)
-            switchStatsTab('general');
+            // Kelime istatistiklerini güncelle (artık tek sayfa olduğu için her zaman göster)
+            if (typeof updateWordStatistics === 'function') {
+                updateWordStatistics();
+            }
             
             log.debug('📊 İstatistikler modalı açıldı');
         }
@@ -3291,7 +3508,33 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
         
         function closeStatsModal() {
-            document.getElementById('statsModal').style.display = 'none';
+            const modal = document.getElementById('statsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Body scroll'u tekrar aktif et
+                document.body.style.overflow = '';
+                // Ana sayfanın görünür olduğundan emin ol
+                if (elements && elements.mainMenu) {
+                    elements.mainMenu.style.display = 'block';
+                }
+            }
+        }
+        
+        // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
+        function handleStatsModalClick(event) {
+            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
+            event.stopPropagation();
+            event.preventDefault();
+            
+            // X butonuna tıklanırsa kapatma
+            const target = event.target;
+            if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
+                // Butonun kendi onclick handler'ı çalışsın
+                return;
+            }
+            
+            // Her yere tıklanınca kapat ve ana sayfaya dön
+            closeStatsModal();
         }
         
         function confirmResetStats() {
@@ -3311,7 +3554,113 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // Global fonksiyonlar (window'a ekle)
         window.showStatsModal = showStatsModal;
         window.closeStatsModal = closeStatsModal;
+        window.handleStatsModalClick = handleStatsModalClick;
+        window.handleCalendarModalClick = handleCalendarModalClick;
+        window.handleBadgesModalClick = handleBadgesModalClick;
+        window.handleDailyTasksModalClick = handleDailyTasksModalClick;
         window.confirmResetStats = confirmResetStats;
+        
+        // ============ ONBOARDING/TUTORIAL SİSTEMİ ============
+        let currentOnboardingSlide = 1;
+        const totalOnboardingSlides = 6;
+        
+        function showOnboarding() {
+            const onboardingModal = document.getElementById('onboardingModal');
+            if (onboardingModal) {
+                onboardingModal.style.display = 'flex';
+                currentOnboardingSlide = 1;
+                updateOnboardingSlide();
+            }
+        }
+        
+        function closeOnboarding() {
+            const onboardingModal = document.getElementById('onboardingModal');
+            if (onboardingModal) {
+                onboardingModal.style.display = 'none';
+                // İlk açılış işaretini kaydet
+                localStorage.setItem('hasSeenOnboarding', 'true');
+                // Ana menüyü göster
+                const mainContainer = document.getElementById('mainMenu');
+                if (mainContainer) {
+                    mainContainer.style.display = 'block';
+                }
+            }
+        }
+        
+        function nextOnboardingSlide() {
+            if (currentOnboardingSlide < totalOnboardingSlides) {
+                currentOnboardingSlide++;
+                updateOnboardingSlide();
+            } else {
+                // Son slide'da "Başla" butonu göster
+                closeOnboarding();
+            }
+        }
+        
+        function prevOnboardingSlide() {
+            if (currentOnboardingSlide > 1) {
+                currentOnboardingSlide--;
+                updateOnboardingSlide();
+            }
+        }
+        
+        function skipOnboarding() {
+            closeOnboarding();
+        }
+        
+        function updateOnboardingSlide() {
+            // Tüm slide'ları gizle
+            const slides = document.querySelectorAll('.onboarding-slide');
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Aktif slide'ı göster
+            const activeSlide = document.querySelector(`.onboarding-slide[data-slide="${currentOnboardingSlide}"]`);
+            if (activeSlide) {
+                activeSlide.classList.add('active');
+            }
+            
+            // İlerleme barını güncelle
+            const progressBar = document.getElementById('onboardingProgressBar');
+            const progressText = document.getElementById('onboardingProgressText');
+            const nextBtn = document.getElementById('onboardingNextBtn');
+            const skipBtn = document.getElementById('onboardingSkipBtn');
+            
+            if (progressBar) {
+                const progress = (currentOnboardingSlide / totalOnboardingSlides) * 100;
+                progressBar.style.width = progress + '%';
+            }
+            
+            if (progressText) {
+                progressText.textContent = `${currentOnboardingSlide} / ${totalOnboardingSlides}`;
+            }
+            
+            // Butonların görünür olduğundan emin ol
+            if (nextBtn) {
+                nextBtn.style.display = 'block';
+                nextBtn.style.visibility = 'visible';
+                nextBtn.style.opacity = '1';
+                if (currentOnboardingSlide === totalOnboardingSlides) {
+                    nextBtn.textContent = 'Başla! 🚀';
+                } else {
+                    nextBtn.textContent = 'İleri →';
+                }
+            }
+            
+            if (skipBtn) {
+                skipBtn.style.display = 'block';
+                skipBtn.style.visibility = 'visible';
+                skipBtn.style.opacity = '1';
+            }
+        }
+        
+        // Global fonksiyonlar
+        window.showOnboarding = showOnboarding;
+        window.closeOnboarding = closeOnboarding;
+        window.nextOnboardingSlide = nextOnboardingSlide;
+        window.prevOnboardingSlide = prevOnboardingSlide;
+        window.skipOnboarding = skipOnboarding;
 
         // ============ TAKVİM SİSTEMİ ============
         function checkDailyProgress() {
@@ -3481,6 +3830,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showCalendarModal() {
+            // Body scroll'u engelle
+            document.body.style.overflow = 'hidden';
             // Haftalık streak gösterimini oluştur
             generateWeeklyStreakDisplay();
             
@@ -3492,7 +3843,33 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function closeCalendarModal() {
-            document.getElementById('calendarModal').style.display = 'none';
+            const modal = document.getElementById('calendarModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Body scroll'u tekrar aktif et
+                document.body.style.overflow = '';
+                // Ana sayfanın görünür olduğundan emin ol
+                if (elements && elements.mainMenu) {
+                    elements.mainMenu.style.display = 'block';
+                }
+            }
+        }
+        
+        // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
+        function handleCalendarModalClick(event) {
+            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
+            event.stopPropagation();
+            event.preventDefault();
+            
+            // X butonuna veya kapat butonuna tıklanırsa kapatma
+            const target = event.target;
+            if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
+                // Butonun kendi onclick handler'ı çalışsın
+                return;
+            }
+            
+            // Her yere tıklanınca kapat ve ana sayfaya dön
+            closeCalendarModal();
         }
 
         function generateWeeklyStreakDisplay() {
@@ -3828,6 +4205,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 duaOgre: 0,
                 hadisOku: 0,
                 toplamDogru: 0,
+                toplamYanlis: 0,
                 toplamPuan: 0,
                 perfectStreak: 0,
                 farklıZorluk: new Set()
@@ -3915,11 +4293,46 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             updateTasksDisplay();
             
             // Modal'ı göster
-            document.getElementById('dailyTasksModal').style.display = 'flex';
+            const modal = document.getElementById('dailyTasksModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Body scroll'u engelle
+                document.body.style.overflow = 'hidden';
+            }
         }
 
         function closeDailyTasksModal() {
-            document.getElementById('dailyTasksModal').style.display = 'none';
+            const modal = document.getElementById('dailyTasksModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Body scroll'u tekrar aktif et
+                document.body.style.overflow = '';
+                // Ana sayfanın görünür olduğundan emin ol
+                if (elements && elements.mainMenu) {
+                    elements.mainMenu.style.display = 'block';
+                }
+            }
+        }
+        
+        // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
+        function handleDailyTasksModalClick(event) {
+            // Event'in yayılmasını durdur (yanlışlıkla başka butonları tetiklemesin)
+            event.stopPropagation();
+            event.preventDefault();
+            
+            // X butonuna veya ödül toplama butonuna tıklanırsa kapatma
+            const target = event.target;
+            if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
+                // Butonların kendi onclick handler'ları çalışsın
+                return;
+            }
+            
+            // Her yere tıklanınca kapat ve ana sayfaya dön
+            closeDailyTasksModal();
+            // Ana sayfanın görünür olduğundan emin ol
+            if (elements && elements.mainMenu) {
+                elements.mainMenu.style.display = 'block';
+            }
         }
 
         function updateTasksDisplay() {
@@ -4000,25 +4413,51 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             const div = document.createElement('div');
             div.style.cssText = `
-                padding: 10px; 
+                padding: 8px 10px; 
                 border: 2px solid ${isCompleted ? '#4caf50' : '#e0e0e0'}; 
-                border-radius: 6px; 
-                margin: 6px 0;
+                border-radius: 8px; 
                 background: ${isCompleted ? '#f1f8e9' : 'white'};
+                transition: all 0.2s;
             `;
             
+            // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
+            div.onclick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            };
+            div.ontouchstart = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            };
+            
+            // Hover efekti
+            div.onmouseover = function() {
+                if (!isCompleted) {
+                    this.style.borderColor = '#667eea';
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 2px 8px rgba(102,126,234,0.2)';
+                }
+            };
+            div.onmouseout = function() {
+                if (!isCompleted) {
+                    this.style.borderColor = '#e0e0e0';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                }
+            };
+            
             div.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-weight: 600; font-size: 0.85em; color: ${isCompleted ? '#2e7d2e' : '#333'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span style="font-weight: 600; font-size: 0.8em; color: ${isCompleted ? '#2e7d2e' : '#333'}; line-height: 1.3;">
                         ${isCompleted ? '✅' : '⏳'} ${getTaskDisplayName(task)}
                     </span>
-                    <span style="font-size: 0.75em; color: #666;">+${task.reward} ⭐</span>
+                    <span style="font-size: 0.7em; color: ${isCompleted ? '#2e7d2e' : '#f59e0b'}; font-weight: 600;">+${task.reward} ⭐</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="flex: 1; background: #f0f0f0; border-radius: 8px; height: 5px; margin-right: 8px;">
-                        <div style="background: ${isCompleted ? '#4caf50' : '#2196f3'}; height: 100%; border-radius: 8px; width: ${progressPercent}%; transition: width 0.3s;"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <div style="flex: 1; background: #f0f0f0; border-radius: 6px; height: 4px; overflow: hidden;">
+                        <div style="background: ${isCompleted ? '#4caf50' : '#2196f3'}; height: 100%; border-radius: 6px; width: ${progressPercent}%; transition: width 0.3s;"></div>
                     </div>
-                    <span style="font-size: 0.7em; color: #666; font-weight: 500;">${task.current}/${task.target}</span>
+                    <span style="font-size: 0.65em; color: #666; font-weight: 600; white-space: nowrap;">${task.current}/${task.target}</span>
                 </div>
             `;
             
@@ -6274,8 +6713,100 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (closeCalendarBtn) closeCalendarBtn.onclick = closeCalendarModal;
             if (closeDailyTasksBtn) closeDailyTasksBtn.onclick = closeDailyTasksModal;
             if (closeStatsBtn) closeStatsBtn.onclick = closeStatsModal;
+            
+            // Calendar Modal - Mobil touch event desteği (Panel üzerine tıklayınca da kapanır)
+            const calendarModal = document.getElementById('calendarModal');
+            const calendarContent = document.querySelector('.calendar-content');
+            if (calendarModal && calendarContent) {
+                // Touch event'ler için - her yere dokunulduğunda kapat (butonlar hariç)
+                calendarModal.addEventListener('touchend', function(e) {
+                    // Event'in yayılmasını durdur
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const target = e.target;
+                    // X butonuna veya kapat butonuna dokunulursa kapatma
+                    if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
+                        return;
+                    }
+                    // Her yere dokunulduğunda kapat ve ana sayfaya dön
+                    closeCalendarModal();
+                    if (elements && elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
+                }, { passive: false }); // passive: false çünkü preventDefault kullanıyoruz
+            }
+            
+            // Badges Modal - Mobil touch event desteği (Panel üzerine tıklayınca da kapanır)
+            const badgesModal = document.getElementById('badgesModal');
+            const badgesContent = document.querySelector('.badges-content');
+            if (badgesModal && badgesContent) {
+                // Touch event'ler için - her yere dokunulduğunda kapat (butonlar hariç)
+                badgesModal.addEventListener('touchend', function(e) {
+                    // Event'in yayılmasını durdur
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const target = e.target;
+                    // X butonuna dokunulursa kapatma (artık closeBadgesBtn yok, X butonu var)
+                    if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
+                        return;
+                    }
+                    // Her yere dokunulduğunda kapat ve ana sayfaya dön
+                    closeBadgesModal();
+                    if (elements && elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
+                }, { passive: false }); // passive: false çünkü preventDefault kullanıyoruz
+            }
             if (closeDailyGoalBtn) closeDailyGoalBtn.onclick = closeDailyGoalModal;
             if (closeXPInfoBtn) closeXPInfoBtn.onclick = closeXPInfoModal;
+            
+            // Stats Modal - Mobil touch event desteği (Panel üzerine tıklayınca da kapanır)
+            const statsModal = document.getElementById('statsModal');
+            const statsContent = document.querySelector('.stats-content');
+            if (statsModal && statsContent) {
+                // Touch event'ler için - her yere dokunulduğunda kapat (butonlar hariç)
+                statsModal.addEventListener('touchend', function(e) {
+                    // Event'in yayılmasını durdur
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const target = e.target;
+                    // X butonuna dokunulursa kapatma
+                    if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
+                        return;
+                    }
+                    // Her yere dokunulduğunda kapat ve ana sayfaya dön
+                    closeStatsModal();
+                    if (elements && elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
+                }, { passive: false }); // passive: false çünkü preventDefault kullanıyoruz
+            }
+            
+            // Daily Tasks Modal - Mobil touch event desteği (Panel üzerine tıklayınca da kapanır)
+            const dailyTasksModal = document.getElementById('dailyTasksModal');
+            const dailyTasksContent = document.querySelector('.daily-tasks-content');
+            if (dailyTasksModal && dailyTasksContent) {
+                // Touch event'ler için - her yere dokunulduğunda kapat (butonlar hariç)
+                dailyTasksModal.addEventListener('touchend', function(e) {
+                    // Event'in yayılmasını durdur
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const target = e.target;
+                    // X butonuna veya ödül toplama butonuna dokunulursa kapatma
+                    if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
+                        return;
+                    }
+                    // Her yere dokunulduğunda kapat ve ana sayfaya dön
+                    closeDailyTasksModal();
+                    if (elements && elements.mainMenu) {
+                        elements.mainMenu.style.display = 'block';
+                    }
+                }, { passive: false }); // passive: false çünkü preventDefault kullanıyoruz
+            }
         
         }); // DOMContentLoaded event listener sonu
 
@@ -6316,7 +6847,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     arabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
                     turkish: '"İlim öğrenmek her Müslümana farzdır."',
                     source: '(İbn Mâce)'
-                }
+                },          
+                {
+                    arabic: 'إِنَّ الْأَجْرَ مَعَ الْمُصْطَلِحِينَ',
+                    turkish: '"Kazancı, hakseverlerle birlikte olanlara verir."',
+                    source: '(Ahmed bin Hanbel)'
+                },      
+                {
+                    arabic: 'إِنَّ الْأَجْرَ مَعَ الْمُصْطَلِحِينَ',
+                    turkish: '"Kazancı, hakseverlerle birlikte olanlara verir."',
+                    source: '(Ahmed bin Hanbel)'
+                },      
+
+                
+
             ];
             
             // Rastgele hadis seç
@@ -6326,16 +6870,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hadisTurkish.innerHTML = `"${randomHadis.turkish}"<br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">${randomHadis.source}</small>`;
             }
             
-            // Flying Letters to Bag Animation
+            // Flying Letters to Bag Animation - Arapça Alfabe Sırasıyla
             const flyingContainer = document.querySelector('.flying-letters-container');
-            const letters = ['ب', 'س', 'م', 'ال', 'له', 'ال', 'رح', 'من', 'ر', 'ح', 'ي', 'م', 'ن'];
+            // Arapça alfabe sırasıyla: ا (elif), ب (be), ت (te), ث (se), ج (cim), ح (ha), خ (hı), د (dal), ذ (zel), ر (ra), ز (ze), س (sin), ش (şın), ص (sad), ض (dad), ط (tı), ظ (zı), ع (ayn), غ (gayn), ف (fe), ق (kaf), ك (kef), ل (lam), م (mim), ن (nun), و (vav), ه (he), ي (ye)
+            const letters = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'و', 'ه', 'ي'];
             const bagBottom = window.innerHeight - 120; // Torba pozisyonu
             const bagCenter = window.innerWidth / 2;
             
             let letterIndex = 0;
             const createFlyingLetter = () => {
                 if (letterIndex >= letters.length) {
-                    letterIndex = 0; // Tekrar başla
+                    letterIndex = 0; // Tekrar başla (28 harf tamamlandıktan sonra)
                 }
                 
                 const letter = letters[letterIndex];
@@ -6389,7 +6934,23 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     
                     setTimeout(() => {
                         if (loadingScreen) loadingScreen.style.display = 'none';
-                        if (mainContainer) mainContainer.style.display = 'block';
+                        
+                        // İlk açılış kontrolü - Onboarding göster
+                        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+                        if (!hasSeenOnboarding) {
+                            // Onboarding göster
+                            setTimeout(() => {
+                                if (typeof showOnboarding === 'function') {
+                                    showOnboarding();
+                                } else {
+                                    console.warn('showOnboarding fonksiyonu bulunamadı!');
+                                    if (mainContainer) mainContainer.style.display = 'block';
+                                }
+                            }, 100);
+                        } else {
+                            // Direkt ana menüyü göster
+                            if (mainContainer) mainContainer.style.display = 'block';
+                        }
                     }, 500);
                 });
             };
