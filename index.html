@@ -2854,7 +2854,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         if (window.history.replaceState) {
             window.history.replaceState({}, '', window.location.pathname);
         }
-    } catch(e) {}
+    } catch(e) {
+        // URL temizleme hatası kritik değil, sessizce geç
+        log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
+    }
 
     // =========================================
     // 🔥 YENİ DAILY TASK ÜRET

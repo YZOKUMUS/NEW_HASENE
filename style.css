@@ -655,22 +655,7 @@ body {
     padding: 12px;
 }
 
-.game-card {
-    padding: 18px 14px;
-    border-radius: 18px;
-    text-align: center;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.4);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    backdrop-filter: blur(14px);
-    background: rgba(255,255,255,0.55);
-    transition: 0.25s ease;
-}
-
-.game-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 26px rgba(0,0,0,0.18);
-}
+/* Not: .game-card stilleri 1591. satırda detaylı olarak tanımlı, burada tekrar tanımlamaya gerek yok */
 
 .card-icon {
     font-size: 40px;
@@ -1647,25 +1632,12 @@ body {
     gap: 14px;
     padding: 14px 20px 40px;
 }
-/* ================================
-   ⭐ PREMIUM STATS PANEL
-   ================================ */
-.premium-stats-panel {
-    background: rgba(255, 255, 255, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+/* ==========================================
+   ⭐ PREMIUM STATS PANEL (CONSOLIDATED)
+   ========================================== */
+/* Not: Ana stil 1499. satırda tanımlı, burada sadece ek özellikler */
 
-    border-radius: 18px;
-    padding: 18px 16px 22px;
-    margin: 12px 16px;
-
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
-}
-
-/* İç parlama efekti */
+/* İç parlama efekti (opsiyonel - eğer gerekirse) */
 .premium-stats-panel::after {
     content: "";
     position: absolute;
@@ -1673,121 +1645,20 @@ body {
     left: -20%;
     width: 140%;
     height: 140%;
-    background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
     pointer-events: none;
-    opacity: 0.25;
+    opacity: 0.2;
+    z-index: 0;
 }
 
-/* Stats rakamları */
-.premium-stats-panel div[id$="Points"],
-.premium-stats-panel #playerLevel {
-    font-size: 20px !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.5px;
-}
-
-/* Alt başlık yazıları */
-.premium-stats-panel div[style*="font-size: 10px"] {
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    color: rgba(0,0,0,0.55) !important;
-    text-transform: uppercase;
-}
-
-/* Hedef ayar butonu */
-.premium-stats-panel button {
-    background: rgba(255, 255, 255, 0.35) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.2s ease;
-}
-
-.premium-stats-panel button:hover {
-    transform: scale(1.1);
-}
-
-.premium-stats-panel button:active {
-    transform: scale(0.92);
-}
-/* ==========================================
-   ⭐ PREMIUM GLASS STATS PANEL
-   ========================================== */
-.premium-stats-panel {
-    background: rgba(255, 255, 255, 0.20);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    padding: 20px 16px 22px;
-    border-radius: 18px;
-
-    border: 1px solid rgba(255, 255, 255, 0.30);
-    box-shadow: 0 8px 26px rgba(0,0,0,0.18);
-
-    position: relative;
-    overflow: hidden;
-
-    animation: panelFadeIn 0.8s ease forwards;
-}
-
-@keyframes panelFadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.premium-stats-panel::after {
-    content: "";
-    position: absolute;
-    top: -35%;
-    left: -20%;
-    width: 160%;
-    height: 160%;
-    background: radial-gradient(circle, rgba(255,255,255,0.28), transparent 70%);
-    pointer-events: none;
-    opacity: 0.22;
-}
-/* Büyük rakamlar */
-.premium-stats-panel #gamePoints::before {
-    content: "🟡 ";
-}
-.premium-stats-panel #starPoints::before {
-    content: "⭐ ";
-}
-.premium-stats-panel #playerLevel::before {
-    content: "🕌 ";
-}
-
-.premium-stats-panel div[id$="Points"],
-.premium-stats-panel #playerLevel {
-    font-size: 22px !important;
-    font-weight: 800 !important;
-    color: #222;
-}
+/* Günlük hedef progress bar */
 #dailyGoalProgress {
-    background: linear-gradient(90deg, #7f5af0, #22d3ee, #16a34a);
-    box-shadow: 0 0 8px rgba(123,97,255,0.8);
+    background: linear-gradient(90deg, #58cc02 0%, #4db300 100%);
+    box-shadow: 0 2px 8px rgba(88, 204, 2, 0.4);
     height: 100%;
-    transition: width 0.4s ease, background 1s ease;
-}
-.premium-stats-panel button {
-    background: rgba(255, 255, 255, 0.45) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: all 0.25s ease;
-}
-
-.premium-stats-panel button:hover {
-    transform: scale(1.12);
-}
-
-.premium-stats-panel button:active {
-    transform: scale(0.90);
-}
-.premium-stats-panel:hover {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.22);
-    transform: translateY(-3px);
-    transition: all 0.25s ease;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    position: relative;
 }
 /* ============================================
    🌟 PREMIUM START BUTTON (BAŞLA)
@@ -2037,39 +1908,6 @@ body {
     }
 }
 
-/* PREMIUM CARD HOVERS */
-.game-card {
-    transition: 0.25s;
-}
+/* Not: .game-card stilleri 658 ve 1591. satırlarda tanımlı, burada tekrar tanımlamaya gerek yok */
 
-.game-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-}
-
-.game-card:active {
-    transform: scale(0.97);
-}
-.nextBtn, #nextBtn,
-.dinleNextBtn, #dinleNextBtn,
-.boslukNextBtn, #boslukNextBtn,
-#duaNextBtn, #ayetNextBtn, #hadisNextBtn {
-    background: linear-gradient(135deg, #42a5f5, #1e88e5);
-    padding: 12px 20px;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    font-size: 1em;
-    border: none;
-    width: 100%;
-    max-width: 260px;
-    box-shadow: 0 4px 12px rgba(33,150,243,0.3);
-    margin: 14px auto 0 auto;
-    display: none;
-    transition: 0.4s;
-}
-
-.next-appear {
-    display: block !important;
-    animation: nextPop 0.4s ease-out forwards;
-}
+/* Not: .nextBtn stilleri 1950. satırda tanımlı, burada tekrar tanımlamaya gerek yok */
