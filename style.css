@@ -2,6 +2,15 @@
    HASENE ARAPÇA OYUNU – MODERN CLEAN STYLE V1.0
    ================================================ */
 
+/* Uthmani Font - KFGQPC Uthmanic Script HAFS */
+@font-face {
+    font-family: 'Uthmani';
+    src: url('KFGQPC Uthmanic Script HAFS Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* ----- GLOBAL RESET ----- */
 * {
     margin: 0;
@@ -1087,7 +1096,8 @@ body {
 .bosluk-mode .option {
     width: 100% !important;
     max-width: 100% !important;
-    font-size: clamp(12px, 3vw, 16px) !important;
+    font-size: clamp(14px, 3.5vw, 20px) !important;
+    font-family: 'Uthmani', serif !important;
     padding: 12px 8px !important;
     box-sizing: border-box;
     word-break: break-word;
@@ -1098,6 +1108,33 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+/* Arapça cevap şıkları - Ana metinle aynı font boyutu ve kalınlığı */
+.dinle-mode .option.arabic-option,
+.bosluk-mode .option.arabic-option,
+.dinle-mode .option.arabic-option span,
+.bosluk-mode .option.arabic-option span {
+    font-size: clamp(20px, 5vw, 32px) !important;
+    font-family: 'Uthmani', serif !important;
+    font-weight: normal !important;
+    direction: rtl !important;
+}
+
+/* Masaüstü için daha büyük font - Dinle ve Bul, Boşluk Doldur */
+@media (min-width: 769px) {
+    .dinle-mode .option,
+    .bosluk-mode .option {
+        font-size: 20px !important;
+    }
+    
+    /* Masaüstünde Arapça cevap şıkları - Ana metinle aynı boyut */
+    .dinle-mode .option.arabic-option,
+    .bosluk-mode .option.arabic-option,
+    .dinle-mode .option.arabic-option span,
+    .bosluk-mode .option.arabic-option span {
+        font-size: 32px !important;
+    }
 }
 
 /* Sure Info - Responsive */
@@ -1330,7 +1367,7 @@ body {
     .game-screen .option,
     .dinle-mode .option,
     .bosluk-mode .option {
-        font-size: 11px !important;
+        font-size: 13px !important;
         padding: 10px 6px !important;
     }
     

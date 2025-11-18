@@ -37,6 +37,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KFGQPC Uthmanic Script HAFS (Uthmani Font) -->
+    <link href="https://fonts.qurancomplex.gov.sa/css/UthmanicScript.css" rel="stylesheet">
     
     <!-- Material Icons (served via Google Fonts). Preconnect is sufficient; remove explicit preload to avoid unused-preload warnings. -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
@@ -952,9 +954,20 @@
             <!-- Öğrenme İpuçları -->
             <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #f39c12;">
                 <div style="font-size: 0.9em; color: #856404; font-weight: bold; margin-bottom: 6px;">💡 Öğrenme İpuçları</div>
-                <div style="font-size: 0.8em; color: #666;">
+                <div style="font-size: 0.8em; color: #666; line-height: 1.6;">
+                    <strong>📚 Zorlanılan Kelimeler:</strong><br>
+                    • İlk oyundan itibaren görünebilir<br>
+                    • Başarı oranı %60'ın altında VEYA ustalık seviyesi 1.0'ın altında olan kelimeler<br>
+                    • Yanlış cevap verdiğin kelimeler hemen bu kategoride görünür<br><br>
+                    
+                    <strong>✅ Öğrenildi Kelimeler:</strong><br>
+                    • En az 15 doğru cevap ve %60 başarı oranı gerekir<br>
+                    • Ustalık seviyesi 3.0'ın üzerinde olmalı<br>
+                    • Her doğru cevap +0.2, her yanlış cevap -0.5 ustalık puanı verir<br>
+                    • Tahmini: 15-20 soru (yanlışlar varsa daha fazla)<br><br>
+                    
+                    <strong>🔄 Genel:</strong><br>
                     • Zorlandığın kelimeler otomatik olarak daha sık gösterilir<br>
-                    • %60'ın üzerinde başarı oranı olan kelimeler "öğrenildi" sayılır<br>
                     • Uzun süre görülmeyen kelimeler tekrar önceliklendirilir
                 </div>
             </div>
@@ -1598,19 +1611,35 @@
                 const filterRecent = document.getElementById('filterRecent');
                 
                 if (filterAll && !filterAll.hasAttribute('data-listener-added')) {
-                    filterAll.onclick = () => filterWordStats('all');
+                    filterAll.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        filterWordStats('all');
+                    };
                     filterAll.setAttribute('data-listener-added', 'true');
                 }
                 if (filterMastered && !filterMastered.hasAttribute('data-listener-added')) {
-                    filterMastered.onclick = () => filterWordStats('mastered');
+                    filterMastered.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        filterWordStats('mastered');
+                    };
                     filterMastered.setAttribute('data-listener-added', 'true');
                 }
                 if (filterStruggling && !filterStruggling.hasAttribute('data-listener-added')) {
-                    filterStruggling.onclick = () => filterWordStats('struggling');
+                    filterStruggling.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        filterWordStats('struggling');
+                    };
                     filterStruggling.setAttribute('data-listener-added', 'true');
                 }
                 if (filterRecent && !filterRecent.hasAttribute('data-listener-added')) {
-                    filterRecent.onclick = () => filterWordStats('recent');
+                    filterRecent.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        filterWordStats('recent');
+                    };
                     filterRecent.setAttribute('data-listener-added', 'true');
                 }
             } catch (error) {
@@ -3722,6 +3751,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // X butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
             const target = event.target;
             if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
+                return;
+            }
+            
+            // Filtre butonlarına tıklanırsa paneli kapatma
+            if (target && (
+                target.id === 'filterAll' || 
+                target.id === 'filterMastered' || 
+                target.id === 'filterStruggling' || 
+                target.id === 'filterRecent' ||
+                target.closest('#filterAll') ||
+                target.closest('#filterMastered') ||
+                target.closest('#filterStruggling') ||
+                target.closest('#filterRecent')
+            )) {
+                // Filtre butonlarının kendi onclick handler'ları çalışsın
                 return;
             }
             
