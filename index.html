@@ -52,77 +52,42 @@
     
 </head>
 <body>
-    <!-- Loading Sayfası - Premium Design -->
-    <div class="loading-screen" id="loadingScreen">
-        <!-- Floating Particles Background -->
-        <div class="loading-particles">
-            <span class="particle">ب</span>
-            <span class="particle">س</span>
-            <span class="particle">م</span>
-            <span class="particle">ال</span>
-            <span class="particle">له</span>
-            <span class="particle">ال</span>
-            <span class="particle">رح</span>
-            <span class="particle">من</span>
+    <!-- Loading Sayfası - Yeni Tasarım -->
+    <div class="loading-screen-new" id="loadingScreen">
+        <!-- Logo -->
+        <div class="loading-logo-wrapper">
+            <img src="icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img">
         </div>
-        
-        <!-- Flying Letters to Bag Animation -->
-        <div class="flying-letters-container">
-            <!-- Torba (Bag) at bottom -->
-            <div class="letter-bag">
-                <div class="bag-icon">👜</div>
-                <div class="bag-glow"></div>
-            </div>
-            <!-- Flying letters will be dynamically added here -->
-        </div>
-        
-        <!-- Logo Container with 3D Effect -->
-        <div class="loading-logo-container">
-        <img src="icon-512-v4-RED-MUSHAF.png" alt="Hasene Logo" class="loading-logo">
-            <div class="logo-glow"></div>
-        </div>
-        
-        <!-- Title with Typing Animation -->
-        <div class="loading-title-wrapper">
-            <div class="loading-title" id="loadingTitle">HASENE</div>
-            <div class="title-underline"></div>
-        </div>
-        
-        <!-- Progressive Loading Steps -->
-        <div class="loading-steps" id="loadingSteps">
-            <div class="loading-step active" data-step="1">
-                <div class="step-icon">📚</div>
-                <div class="step-text">Kelime verileri yükleniyor...</div>
-            </div>
-            <div class="loading-step" data-step="2">
-                <div class="step-icon">📖</div>
-                <div class="step-text">Ayetler hazırlanıyor...</div>
-            </div>
-            <div class="loading-step" data-step="3">
-                <div class="step-icon">✨</div>
-                <div class="step-text">Hazırlanıyor...</div>
-            </div>
-        </div>
-        
-        <!-- Dynamic Hadis Box -->
-        <div class="hadis-box" id="hadisBox">
-            <div class="hadis-arabic" id="hadisArabic">
+
+        <!-- Title -->
+        <h1 class="loading-app-title">HASENE</h1>
+
+        <!-- Hadith Box -->
+        <div class="loading-hadith-container" id="hadisBox">
+            <div class="loading-hadith-arabic-text" id="hadisArabic">
                 مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
             </div>
-            <div class="hadis-turkish" id="hadisTurkish">
+            <div class="loading-hadith-turkish-text" id="hadisTurkish">
                 "Kim Allah'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."
-                <br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">(Tirmizi, Sevâbü'l-Kur'ân 16)</small>
+            </div>
+            <div class="loading-hadith-source-text">(Tirmizi, Sevâbü'l-Kur'ân 16)</div>
+        </div>
+
+        <!-- Book Icon -->
+        <div class="loading-book-wrapper">
+            <img src="OPENBOOK.PNG" alt="Book" class="loading-book-icon" id="bagIcon">
+        </div>
+
+        <!-- Progress Section -->
+        <div class="loading-progress-wrapper">
+            <div class="loading-progress-text" id="loadingProgressLabel">Kelime verileri yükleniyor...</div>
+            <div class="loading-progress-track">
+                <div class="loading-progress-fill" id="loadingProgressBar"></div>
             </div>
         </div>
-        
-        <!-- Progress Bar -->
-        <div class="loading-progress-container">
-            <div class="loading-progress-bar" id="loadingProgressBar"></div>
-            <div class="loading-percentage" id="loadingPercentage">0%</div>
-        </div>
-        
+
         <!-- Copyright -->
-        <div class="copyright">© YZOKUMUS 2025</div>
+        <div class="loading-footer-text">© YZOKUMUS 2025</div>
     </div>
 
    
@@ -374,161 +339,196 @@
             </div>
         </div>
 
-        <!-- Boşluk Doldur Modu -->
+        <!-- Boşluk Doldur Modu - Duolingo Tarzı -->
         <div class="bosluk-mode" id="boslukMode" style="display: none;">
-            <button class="back-btn" id="backFromBoslukBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-                <i class="material-icons" style="font-size: 14px;">west</i>
-                Geri
-            </button>
-            
-            <!-- İstatistikler -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 6px; padding: 0 4px;">
-                <!-- Hasene -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
-                    <div style="color: #FF8F00; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="boslukScore">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
+            <!-- Duolingo Tarzı Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromBoslukBtn">
+                    ←
+                </button>
+                <div class="duolingo-progress-container">
+                    <div class="duolingo-progress-bar" id="boslukProgressBar" style="width: 0%;"></div>
                 </div>
-                <!-- Sahih -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
-                    <div style="color: #4CAF50; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="boslukCorrect">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
-                </div>
-                <!-- Hatalı -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
-                    <div style="color: #F44336; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="boslukWrong">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
+                <div class="duolingo-hearts" id="boslukHearts" style="display: none;">
+                    <span>❤️</span>
+                    <span>❤️</span>
+                    <span>❤️</span>
                 </div>
             </div>
 
-            <div class="game-box">
-                <div class="arabic" id="boslukAyetText" style="color: #2c2c2c; margin-bottom: 8px; font-size: clamp(20px, 5vw, 32px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">Ayet metni yükleniyor...</div>
-                <button class="audio-btn" id="boslukAudioBtn"></button>
-                <div class="options" id="boslukOptions"></div>
-                <div class="feedback" id="boslukFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
+            <!-- Duolingo Tarzı Soru Alanı -->
+            <div class="duolingo-question-area">
+                <div class="duolingo-question-number" id="boslukQuestionNumber">Soru 1 / 10</div>
+                <div class="arabic" id="boslukAyetText" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
+                <div class="duolingo-question-hint" id="boslukQuestionHint">Eksik kelimeyi seç</div>
+                <div class="sure-info" id="boslukSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
+                
+                <div class="duolingo-audio-buttons">
+                    <button class="duolingo-audio-btn" id="boslukAudioBtn" title="Sesi çal">
+                        <img src="hoparlor.png" alt="Ses">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Duolingo Tarzı Seçenekler -->
+            <div class="duolingo-options-container">
+                <div id="boslukOptions" style="display: flex; flex-direction: column; gap: 0;">
+                    <!-- Seçenekler buraya dinamik eklenecek -->
+                </div>
+                <div class="feedback" id="boslukFeedback" style="font-size: 16px; margin: 16px 0 8px 0; text-align: center; min-height: 24px; color: #666;"></div>
+                <button class="flutter-btn flutter-btn-primary" id="boslukNextBtn" style="width: 100%; margin-top: 8px; display: none; min-height: 50px; font-size: 16px; font-weight: 600; border-radius: 16px; border: none; background: #58cc02; color: #fff; cursor: pointer; transition: all 0.2s;" aria-label="Sonraki soruya geç" onmouseover="this.style.background='#4fb802'" onmouseout="this.style.background='#58cc02'">Sonraki Soru →</button>
+            </div>
+
+            <!-- Duolingo Tarzı İstatistikler -->
+            <div class="duolingo-stats-bar">
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value hasene" id="boslukScore">0</div>
+                    <div class="duolingo-stat-label">Hasene</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value correct" id="boslukCorrect">0</div>
+                    <div class="duolingo-stat-label">Sahih</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value wrong" id="boslukWrong">0</div>
+                    <div class="duolingo-stat-label">Hatalı</div>
+                </div>
             </div>
         </div>
 
-        <!-- Dinle ve Bul Modu -->
+        <!-- Dinle ve Bul Modu - Duolingo Tarzı -->
         <div class="dinle-mode" id="dinleMode" style="display: none;">
-            <button class="back-btn" id="backFromDinleBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-                <i class="material-icons" style="font-size: 14px;">west</i>
-                Geri
-            </button>
-            
-            <!-- İstatistikler -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 6px; padding: 0 4px;">
-                <!-- Hasene -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
-                    <div style="color: #FF8F00; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="dinleScore">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
+            <!-- Duolingo Tarzı Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromDinleBtn">
+                    ←
+                </button>
+                <div class="duolingo-progress-container">
+                    <div class="duolingo-progress-bar" id="dinleProgressBar" style="width: 0%;"></div>
                 </div>
-                <!-- Sahih -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
-                    <div style="color: #4CAF50; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="dinleCorrect">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
-                </div>
-                <!-- Hatalı -->
-                <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
-                    <div style="color: #F44336; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="dinleWrong">0</div>
-                    <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
+                <div class="duolingo-hearts" id="dinleHearts" style="display: none;">
+                    <span>❤️</span>
+                    <span>❤️</span>
+                    <span>❤️</span>
                 </div>
             </div>
 
-            <div class="game-box">
+            <!-- Duolingo Tarzı Soru Alanı -->
+            <div class="duolingo-question-area">
+                <div class="duolingo-question-number" id="dinleQuestionNumber">Soru 1 / 10</div>
                 <div style="text-align: center; margin: 30px 0;">
-                    <div style="font-size: 1.5em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
+                    <div style="font-size: 3em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
                 </div>
-                <div class="sure-info" id="dinleSureInfo" style="text-align: center; color: var(--md-on-surface-variant); font-size: 12px; margin: 8px 0;">ID: 0</div>
-                <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
-                    <button class="audio-btn" id="dinleAudioBtn" title="Sesi tekrar çal"></button>
-                    <button class="audio-btn" id="dinleMicBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s;" title="Ses tanıma ile cevap ver">
+                <div class="duolingo-question-hint" id="dinleQuestionHint">Kelimeyi dinle ve sahih kelimeyi seç</div>
+                <div class="sure-info" id="dinleSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
+                
+                <div class="duolingo-audio-buttons">
+                    <button class="duolingo-audio-btn" id="dinleAudioBtn" title="Sesi tekrar çal">
+                        <img src="hoparlor.png" alt="Ses">
+                    </button>
+                    <button class="duolingo-audio-btn" id="dinleMicBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea;" title="Ses tanıma ile cevap ver">
                         <span style="font-size: 1.5em;">🎤</span>
                     </button>
                 </div>
-                <div id="speechStatus" style="text-align: center; font-size: 0.85em; color: #666; margin-bottom: 8px; min-height: 20px;"></div>
-                <div class="options" id="dinleOptions"></div>
-                <div class="feedback" id="dinleFeedback"></div>
-                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
+                <div id="speechStatus" style="text-align: center; font-size: 0.85em; color: #666; margin-top: 12px; min-height: 20px;"></div>
+            </div>
+
+            <!-- Duolingo Tarzı Seçenekler -->
+            <div class="duolingo-options-container">
+                <div id="dinleOptions" style="display: flex; flex-direction: column; gap: 0;">
+                    <!-- Seçenekler buraya dinamik eklenecek -->
+                </div>
+                <div class="feedback" id="dinleFeedback" style="font-size: 16px; margin: 16px 0 8px 0; text-align: center; min-height: 24px; color: #666;"></div>
+                <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; margin-top: 8px; display: none; min-height: 50px; font-size: 16px; font-weight: 600; border-radius: 16px; border: none; background: #58cc02; color: #fff; cursor: pointer; transition: all 0.2s;" aria-label="Sonraki soruya geç" onmouseover="this.style.background='#4fb802'" onmouseout="this.style.background='#58cc02'">Sonraki Soru →</button>
+            </div>
+
+            <!-- Duolingo Tarzı İstatistikler -->
+            <div class="duolingo-stats-bar">
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value hasene" id="dinleScore">0</div>
+                    <div class="duolingo-stat-label">Hasene</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value correct" id="dinleCorrect">0</div>
+                    <div class="duolingo-stat-label">Sahih</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value wrong" id="dinleWrong">0</div>
+                    <div class="duolingo-stat-label">Hatalı</div>
+                </div>
             </div>
         </div>
 
-        <!-- Oyun Ekranı -->
+        <!-- Oyun Ekranı - Duolingo Tarzı -->
         <div class="game-screen" id="gameScreen" style="display: none;">
-        <!-- Geri Butonu -->
-        <button class="back-btn" id="backFromGameBtn" style="margin: 6px 8px 4px 8px; padding: 4px 8px; font-size: 0.75em;">
-            <i class="material-icons" style="font-size: 14px;">west</i>
-            Geri
-        </button>
+            <!-- Duolingo Tarzı Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromGameBtn">
+                    ←
+                </button>
+                <div class="duolingo-progress-container">
+                    <div class="duolingo-progress-bar" id="duolingoProgressBar" style="width: 0%;"></div>
+                </div>
+                <div class="duolingo-hearts" id="duolingoHearts" style="display: none;">
+                    <span>❤️</span>
+                    <span>❤️</span>
+                    <span>❤️</span>
+                </div>
+            </div>
 
-        <!-- İstatistikler -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 6px; padding: 0 4px;">
-            <!-- Hasene -->
-            <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(255, 143, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(255, 143, 0, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(255, 143, 0, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 143, 0, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 143, 0, 0.1)'">
-                <div style="color: #FF8F00; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(255, 143, 0, 0.2);" id="score">0</div>
-                <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HASENE</div>
+            <!-- Duolingo Tarzı Soru Alanı -->
+            <div class="duolingo-question-area">
+                <div class="duolingo-question-number" id="duolingoQuestionNumber">Soru 1 / 10</div>
+                <div class="arabic-text arabic-large" id="arabicWord" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(28px, 6vw, 42px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.6;">
+                    فَكُبْكِبُوا۟
+                </div>
+                <div class="duolingo-question-hint" id="duolingoQuestionHint">Bu kelimenin Türkçe karşılığı nedir?</div>
+                <div class="sure-info" id="sureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 26:94:1 | Zorluk: 13</div>
+                
+                <div class="duolingo-audio-buttons">
+                    <button class="duolingo-audio-btn" id="audioBtn">
+                        <img src="hoparlor.png" alt="Ses">
+                    </button>
+                    <button class="duolingo-audio-btn" id="hintBtn">
+                        <img src="clue.png" alt="İpucu">
+                    </button>
+                </div>
             </div>
-            <!-- Sahih -->
-            <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(129, 199, 132, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(76, 175, 80, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(76, 175, 80, 0.1)'">
-                <div style="color: #4CAF50; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(76, 175, 80, 0.2);" id="correct">0</div>
-                <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">SAHİH</div>
-            </div>
-            <!-- Hatalı -->
-            <div class="stat-card" style="text-align: center; padding: 8px 6px; background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(239, 154, 154, 0.15) 100%); border-radius: 10px; border: 1px solid rgba(244, 67, 54, 0.2); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(244, 67, 54, 0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(244, 67, 54, 0.1)'">
-                <div style="color: #F44336; font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); margin-bottom: 2px; text-shadow: 0 1px 2px rgba(244, 67, 54, 0.2);" id="wrong">0</div>
-                <div style="color: rgba(0,0,0,0.65); font-size: clamp(9px, 1.8vw, 10px); font-weight: 600; letter-spacing: 0.5px;">HATALI</div>
-            </div>
-        </div>
 
-        <!-- Combo Indicator -->
-        <div id="comboIndicator" style="display: none; text-align: center; padding: 8px 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; margin: 8px 4px; animation: comboPopIn 0.3s ease; box-shadow: 0 4px 15px rgba(245,87,108,0.4); max-width: 100%; box-sizing: border-box;">
-            <div style="font-size: clamp(14px, 3vw, 16px); font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); line-height: 1.2;">
-                🔥 COMBO <span id="comboCount">3</span>x 🔥
+            <!-- Duolingo Tarzı Seçenekler -->
+            <div class="duolingo-options-container">
+                <div id="options" style="display: flex; flex-direction: column; gap: 0;">
+                    <!-- Seçenekler buraya dinamik eklenecek -->
+                </div>
+                <div class="feedback" id="feedback" style="font-size: 16px; margin: 16px 0 8px 0; text-align: center; min-height: 24px; color: #666;"></div>
+                <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; margin-top: 8px; display: none; min-height: 50px; font-size: 16px; font-weight: 600; border-radius: 16px; border: none; background: #58cc02; color: #fff; cursor: pointer; transition: all 0.2s;" aria-label="Sonraki soruya geç" onmouseover="this.style.background='#4fb802'" onmouseout="this.style.background='#58cc02'">Sonraki Soru →</button>
             </div>
-            <div style="font-size: clamp(11px, 2.5vw, 13px); color: rgba(255,255,255,0.9); margin-top: 3px; line-height: 1.2;">
-                +<span id="comboBonus">5</span> Bonus Hasene!
-            </div>
-            <div style="font-size: clamp(9px, 2vw, 11px); color: rgba(255,255,255,0.7); margin-top: 2px; line-height: 1.2;">
-                (Her 3 combo = +5 Hasene)
-            </div>
-        </div>
 
-        <!-- Can ve Süre -->
-        <div class="game-info">
-            <div id="livesDisplay" style="display: none;">
-                ❤️ Can: <span id="lives">3</span>
+            <!-- Combo Indicator -->
+            <div id="comboIndicator" style="display: none; text-align: center; padding: 12px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin: 0 20px 12px 20px; border-radius: 12px; animation: comboPopIn 0.3s ease; box-shadow: 0 4px 15px rgba(245,87,108,0.4);">
+                <div style="font-size: 16px; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                    🔥 COMBO <span id="comboCount">3</span>x 🔥
+                </div>
+                <div style="font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 4px;">
+                    +<span id="comboBonus">5</span> Bonus Hasene!
+                </div>
             </div>
-            <div id="timerDisplay" style="display: none;">
-                ⏱️ Süre: <span id="timer">30</span>s
-            </div>
-            <div>
-                📊 Mod: <span id="currentMode">Klasik</span>
-            </div>
-        </div>
 
-        <!-- Oyun Alanı -->
-        <div class="game-box" style="max-width: 100%; width: 100%; margin: 8px auto; padding: 12px; border-radius: 18px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.07); box-sizing: border-box;">
-    <div class="arabic-text arabic-large" id="arabicWord" style="color: #2c2c2c; margin-bottom: 8px; font-size: clamp(20px, 5vw, 32px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">
-        فَكُبْكِبُوا۟
-    </div>
-    <div class="sure-info" id="sureInfo" style="font-size: clamp(9px, 2vw, 12px); margin-bottom: 6px; text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;">ID: 26:94:1 | Zorluk: 13 | Aralık: 12-21</div>
-    <div class="game-actions" style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <button class="flutter-fab" id="audioBtn" style="background: transparent; box-shadow: none; border: none;">
-            <img src="hoparlor.png" alt="Ses" style="width: 24px; height: 24px;">
-        </button>
-        <button class="flutter-fab" id="hintBtn" style="background: transparent; box-shadow: none; border: none;">
-            <img src="clue.png" alt="İpucu" style="width: 24px; height: 24px;">
-        </button>
-    </div>
-    <div class="options" id="options" style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 100%; box-sizing: border-box;">
-        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">tepe taklak atılırlar</button>
-        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">öğüdüm</button>
-        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">onların çevresinden</button>
-        <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">açığa vurduğumuz</button>
-    </div>
-    <div class="feedback" id="feedback" style="font-size: clamp(13px, 3vw, 16px); margin-bottom: 8px; text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box;"></div>
-    <button class="flutter-btn flutter-btn-primary" id="nextBtn" style="width: 100%; max-width: 100%; margin-top: 10px; display: none; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
-</div>
+            <!-- Duolingo Tarzı İstatistikler -->
+            <div class="duolingo-stats-bar">
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value hasene" id="score">0</div>
+                    <div class="duolingo-stat-label">Hasene</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value correct" id="correct">0</div>
+                    <div class="duolingo-stat-label">Sahih</div>
+                </div>
+                <div class="duolingo-stat-item">
+                    <div class="duolingo-stat-value wrong" id="wrong">0</div>
+                    <div class="duolingo-stat-label">Hatalı</div>
+                </div>
+            </div>
         </div>  <!-- gameScreen sonu -->
     </div>
 
@@ -2757,6 +2757,21 @@
             }
         }
 
+
+// Navigasyon bar'ı gizle/göster fonksiyonları
+function hideBottomNavBar() {
+    const bottomNavBar = document.getElementById('bottomNavBar');
+    if (bottomNavBar) {
+        bottomNavBar.style.display = 'none';
+    }
+}
+
+function showBottomNavBar() {
+    const bottomNavBar = document.getElementById('bottomNavBar');
+    if (bottomNavBar) {
+        bottomNavBar.style.display = 'flex';
+    }
+}
 
 function hideAllGameScreens() {
     const screens = [
@@ -5771,6 +5786,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.dinleMode) {
                 elements.dinleMode.style.display = 'block';
                 
+                // Navigasyon bar'ı gizle (oyun başladığında)
+                hideBottomNavBar();
+                
                 // Ses tanıma sistemini başlat
                 initSpeechRecognition();
                 elements.dinleMode.style.zIndex = '';
@@ -5839,6 +5857,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.mainMenu) elements.mainMenu.style.display = 'none';
             if (elements.boslukMode) {
                 elements.boslukMode.style.display = 'block';
+                
+                // Navigasyon bar'ı gizle (oyun başladığında)
+                hideBottomNavBar();
+                
                 elements.boslukMode.style.zIndex = '';
             }
             log.debug('✅ UI değişikliği tamamlandı');
@@ -5925,6 +5947,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             hideAllModes();
             if (elements.mainMenu) elements.mainMenu.style.display = 'block';
             if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
         };
 
         if (elements.backFromGameBtn) {
@@ -5980,6 +6005,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.mainMenu.style.display = 'block';
             }
             if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
+            
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
                     console.error('HATA - Geri butonu:', error);
@@ -5988,6 +6017,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
                     }
+                    
+                    // Navigasyon bar'ı göster (ana ekrana dönünce)
+                    showBottomNavBar();
                 }
             };
         } else {
@@ -6016,6 +6048,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.mainMenu.style.display = 'block';
                 }
                 if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+                
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
+                
                 log.debug('✅ Ana menüye döndü');
             };
         }
@@ -6029,6 +6065,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.mainMenu.style.display = 'block';
                 }
                 if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+                
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
             };
         }
 
@@ -6082,6 +6121,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.mainMenu.style.display = 'block';
             }
             if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
+            
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
                     console.error('HATA - Bosluk geri butonu:', error);
@@ -6090,6 +6133,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
                     }
+                    
+                    // Navigasyon bar'ı göster (ana ekrana dönünce)
+                    showBottomNavBar();
                 }
             };
         } else {
@@ -6148,6 +6194,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.settingsBtn) {
                 elements.settingsBtn.style.display = 'none';
                     }
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
+            
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
                     console.error('HATA - Dinle geri butonu:', error);
@@ -6156,6 +6206,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
                     }
+                    
+                    // Navigasyon bar'ı göster (ana ekrana dönünce)
+                    showBottomNavBar();
                 }
             };
         } else {
@@ -6179,37 +6232,66 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // ============ MOD SEÇ ============
         function selectMode(modeKey) {
             currentMode = modeKey;
+            // "Zorluk" modu seçildiğinde otomatik olarak zorluk seviyesini 'zor' yap
+            if (modeKey === 'zorluk') {
+                currentDifficulty = 'zor';
+                log.debug('🔥 Zorluk modu seçildi, zorluk seviyesi "zor" olarak ayarlandı');
+            }
             saveStats(); // Mod değiştiğinde kaydet!
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             event.target.closest('.mode-btn').classList.add('active');
         }
 
         // ============ OYUNU BAŞLAT ============
-        elements.startBtn.onclick = () => {
+        if (elements.startBtn) {
+            elements.startBtn.onclick = () => {
             const mode = CONFIG.gameModes[currentMode];
             
             // Ayarları uygula
             lives = mode.lives;
+            
+            // Kalplerin görünürlüğünü kontrol et
+            // Sadece: (Mod: "hayat") VEYA (Mod: "zorluk" VE zorluk: "zor")
+            const duolingoHearts = document.getElementById('duolingoHearts');
+            const shouldShowHearts = (currentMode === 'hayat') || (currentMode === 'zorluk' && currentDifficulty === 'zor');
+            
+            if (duolingoHearts) {
+                if (shouldShowHearts && lives > 0) {
+                    duolingoHearts.style.display = 'flex';
+                    // Kalpleri başlangıç değerine ayarla
+                    const heartSpans = duolingoHearts.querySelectorAll('span');
+                    heartSpans.forEach((heart, index) => {
+                        if (index < lives) {
+                            heart.style.opacity = '1';
+                        } else {
+                            heart.style.opacity = '0.3';
+                        }
+                    });
+                } else {
+                    duolingoHearts.style.display = 'none';
+                }
+            }
+            
             if (lives > 0) {
-                elements.livesDisplay.style.display = 'block';
-                elements.lives.textContent = lives;
+                if (elements.livesDisplay) elements.livesDisplay.style.display = 'block';
+                if (elements.lives) elements.lives.textContent = lives;
             } else {
-                elements.livesDisplay.style.display = 'none';
+                if (elements.livesDisplay) elements.livesDisplay.style.display = 'none';
             }
 
             if (mode.timeLimit > 0) {
-                elements.timerDisplay.style.display = 'block';
+                if (elements.timerDisplay) elements.timerDisplay.style.display = 'block';
             } else {
-                elements.timerDisplay.style.display = 'none';
+                if (elements.timerDisplay) elements.timerDisplay.style.display = 'none';
             }
 
             if (mode.showHint) {
-                elements.hintBtn.style.display = 'block';
+                if (elements.hintBtn) elements.hintBtn.style.display = 'block';
             } else {
-                elements.hintBtn.style.display = 'none';
+                if (elements.hintBtn) elements.hintBtn.style.display = 'none';
             }
 
-            elements.currentMode.textContent = mode.name;
+            if (elements.currentMode) elements.currentMode.textContent = mode.name;
 
             // Session puanlarını sıfırla (global puanları koru)
             sessionScore = 0;
@@ -6232,10 +6314,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             updateUI();
 
             // Ekranları değiştir - Sadece Kelime Çevir oyunu başlat
-            elements.modeSelector.style.display = 'none';
+            if (elements.modeSelector) elements.modeSelector.style.display = 'none';
             // Main menu'yu da gizle (eğer hala açıksa)
             if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-            elements.gameScreen.style.display = 'block';
+            if (elements.gameScreen) elements.gameScreen.style.display = 'block';
+            
+            // Navigasyon bar'ı gizle (oyun başladığında)
+            hideBottomNavBar();
             
                 // 🎮 Gesture sistemini başlat
                 /* gestures removed per cleanup: swipe gestures intentionally disabled
@@ -6243,10 +6328,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // initGameGestures();
             
             // ⚡ Speed animation ile yeni soruyu yükle
-            addSpeedAnimation(elements.gameScreen, 'slide-up');
+            if (elements.gameScreen) {
+                addSpeedAnimation(elements.gameScreen, 'slide-up');
+            }
             
             loadQuestion();
-        };
+            };
+        }
 
         // ============ AYARLARA DÖN ============
         if (elements.settingsBtn) {
@@ -6288,6 +6376,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.gameScreen.style.display = 'none';
                 elements.modeSelector.style.display = 'none';
                 elements.mainMenu.style.display = 'block';
+                
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
+                
                 log.game(`✅ Kelime Çevir oyunu bitti ve ana menüye dönüldü!`);
                 return;
             }
@@ -6352,11 +6444,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
             smartShuffle(allOptions);
 
-            // Seçenekleri göster
+            // Seçenekleri göster - Duolingo Tarzı
             elements.options.innerHTML = '';
             allOptions.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'option flutter-option-btn';
+                btn.className = 'duolingo-option';
                 // Türkçe kelimeler için özel class ekle (Arapça değilse)
                 if (!isArabic(opt.text)) {
                     btn.classList.add('turkish-option');
@@ -6365,12 +6457,52 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 btn.onclick = () => checkAnswer(btn, opt.correct);
                 elements.options.appendChild(btn);
             });
+            
+            // Duolingo tarzı soru numarasını güncelle
+            const duolingoQuestionNumber = document.getElementById('duolingoQuestionNumber');
+            if (duolingoQuestionNumber) {
+                duolingoQuestionNumber.textContent = `Soru ${questionCount + 1} / ${mode.questionsPerLevel}`;
+            }
+            
+            // Duolingo tarzı ilerleme çubuğunu güncelle
+            const duolingoProgressBar = document.getElementById('duolingoProgressBar');
+            if (duolingoProgressBar) {
+                const progress = ((questionCount + 1) / mode.questionsPerLevel) * 100;
+                duolingoProgressBar.style.width = progress + '%';
+            }
+            
+            // Kalplerin görünürlüğünü kontrol et (her soru yüklendiğinde)
+            const duolingoHearts = document.getElementById('duolingoHearts');
+            const shouldShowHearts = (currentMode === 'hayat') || (currentMode === 'zorluk' && currentDifficulty === 'zor');
+            if (duolingoHearts) {
+                if (shouldShowHearts && mode.lives > 0) {
+                    duolingoHearts.style.display = 'flex';
+                    // Kalpleri güncelle
+                    const heartSpans = duolingoHearts.querySelectorAll('span');
+                    heartSpans.forEach((heart, index) => {
+                        if (index < lives) {
+                            heart.style.opacity = '1';
+                        } else {
+                            heart.style.opacity = '0.3';
+                        }
+                    });
+                } else {
+                    duolingoHearts.style.display = 'none';
+                }
+            }
 
             // Sıfırla
             elements.feedback.textContent = '';
             elements.feedback.className = 'feedback';
             elements.nextBtn.style.display = 'none';
             elements.hintBtn.disabled = false;
+            
+            // Tüm butonları aktif et
+            const allBtns = document.querySelectorAll('.duolingo-option, .option');
+            allBtns.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('disabled', 'correct', 'wrong');
+            });
 
             // İlerleme güncelle
             updateProgress();
@@ -6490,10 +6622,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             stopTimer();
             
-            // Tüm butonları kapat
-            const allBtns = document.querySelectorAll('.option');
+            // Tüm butonları kapat - Duolingo tarzı
+            const allBtns = document.querySelectorAll('.duolingo-option, .option');
             log.game(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-            allBtns.forEach(btn => btn.disabled = true);
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
 
             const mode = CONFIG.gameModes[currentMode];
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
@@ -6506,13 +6641,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (isCorrect) {
                 log.game(`✅ === SAHİH CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.feedback.textContent = '✅ Mâşâallah!';
-                elements.feedback.className = 'feedback correct';
+                if (elements.feedback) {
+                    elements.feedback.textContent = '✅ Mâşâallah!';
+                    elements.feedback.className = 'feedback correct';
+                }
                 
                 // 🎆 SUCCESS ANIMATIONS & FEEDBACK
                 triggerSuccessBurst(button);
                 triggerHaptic('success');
-                addSpeedAnimation(elements.feedback, 'bounce-in');
+                if (elements.feedback) {
+                    addSpeedAnimation(elements.feedback, 'bounce-in');
+                }
                 
                 // Combo sistemi için confetti
                 if (comboCount >= 2) {
@@ -6540,12 +6679,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             } else {
                 log.game(`❌ === HATA CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.feedback.textContent = `❌ Hatalı! Sahih: ${currentQuestion.anlam}`;
-                elements.feedback.className = 'feedback wrong';
+                if (elements.feedback) {
+                    elements.feedback.textContent = `❌ Hatalı! Sahih: ${currentQuestion.anlam}`;
+                    elements.feedback.className = 'feedback wrong';
+                }
                 
                 // 📱 ERROR FEEDBACK
                 triggerHaptic('error');
-                addSpeedAnimation(elements.feedback, 'zoom-in');
+                if (elements.feedback) {
+                    addSpeedAnimation(elements.feedback, 'zoom-in');
+                }
                 
                 log.game(`📊 addSessionWrong() çağrılıyor...`);
                 addSessionWrong(); // Session yanlış sayısını artır
@@ -6560,7 +6703,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (mode.lives > 0) {
                     log.game(`💀 Can kaybı: ${lives} - 1 = ${lives - 1}`);
                     lives--;
-                    elements.lives.textContent = lives;
+                    if (elements.lives) {
+                        elements.lives.textContent = lives;
+                    }
+                    // Duolingo tarzı kalpleri güncelle (sadece görünürse)
+                    const duolingoHearts = document.getElementById('duolingoHearts');
+                    if (duolingoHearts && duolingoHearts.style.display !== 'none') {
+                        const heartSpans = duolingoHearts.querySelectorAll('span');
+                        heartSpans.forEach((heart, index) => {
+                            if (index < lives) {
+                                heart.style.opacity = '1';
+                            } else {
+                                heart.style.opacity = '0.3';
+                            }
+                        });
+                    }
                     
                     if (lives <= 0) {
                         setTimeout(() => gameOver('Canlarınız bitti!'), 1500);
@@ -6677,25 +6834,48 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         // ============ İPUCU ============
-        elements.hintBtn.onclick = () => {
-            // Bir yanlış cevabı kaldır
-            const allBtns = document.querySelectorAll('.option');
-            const wrongBtns = Array.from(allBtns).filter(btn => 
-                !btn.textContent.includes(currentQuestion.anlam) && !btn.disabled
-            );
-            
-            if (wrongBtns.length > 0) {
-                const randomWrong = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
-                randomWrong.style.opacity = '0.3';
-                randomWrong.disabled = true;
+        if (elements.hintBtn) {
+            elements.hintBtn.onclick = () => {
+                // currentQuestion kontrolü
+                if (!currentQuestion || !currentQuestion.anlam) {
+                    console.warn('⚠️ İpucu: currentQuestion bulunamadı!');
+                    return;
+                }
                 
-                // İpucu puan cezası
-                score = Math.max(0, score - 10);
-                updateUI();
+                // Bir yanlış cevabı kaldır - Duolingo tarzı butonlar için
+                // Sadece game-screen içindeki butonları ara
+                const gameScreen = document.getElementById('gameScreen');
+                if (!gameScreen) {
+                    console.warn('⚠️ İpucu: gameScreen bulunamadı!');
+                    return;
+                }
                 
-                elements.hintBtn.disabled = true;
-            }
-        };
+                const allBtns = gameScreen.querySelectorAll('.duolingo-option, .option');
+                const wrongBtns = Array.from(allBtns).filter(btn => {
+                    if (btn.disabled) return false;
+                    const btnText = btn.textContent || btn.innerText || '';
+                    // Doğru cevabı içermeyen butonları bul
+                    return !btnText.includes(currentQuestion.anlam);
+                });
+                
+                if (wrongBtns.length > 0) {
+                    const randomWrong = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+                    randomWrong.style.opacity = '0.3';
+                    randomWrong.disabled = true;
+                    randomWrong.classList.add('disabled');
+                    
+                    // İpucu puan cezası
+                    score = Math.max(0, score - 10);
+                    updateUI();
+                    
+                    if (elements.hintBtn) {
+                        elements.hintBtn.disabled = true;
+                    }
+                } else {
+                    console.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
+                }
+            };
+        }
 
         // ============ SEVİYE ATLAMA ============
         function showLevelUpModal(newLevel) {
@@ -7400,6 +7580,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.dinleMode.style.display = 'none';
                 elements.mainMenu.style.display = 'block';
                 
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
+                
                 log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
                 // Sıfırla
                 dinleScore = 0;
@@ -7473,11 +7656,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
             smartShuffle(allOptions);
 
-            // Seçenekleri göster
+            // Seçenekleri göster - Duolingo Tarzı
             elements.dinleOptions.innerHTML = '';
             allOptions.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'option flutter-option-btn';
+                btn.className = 'duolingo-option';
                 // Arapça ise özel sınıf ekle ve düzgün formatlama
                 if (isArabic(opt.text)) {
                     btn.classList.add('arabic-option');
@@ -7488,10 +7671,34 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 btn.onclick = () => checkDinleAnswer(btn, opt.correct);
                 elements.dinleOptions.appendChild(btn);
             });
+            
+            // Duolingo tarzı soru numarasını güncelle
+            const dinleQuestionNumber = document.getElementById('dinleQuestionNumber');
+            if (dinleQuestionNumber) {
+                dinleQuestionNumber.textContent = `Soru ${dinleQuestionCount + 1} / ${DINLE_MAX_QUESTIONS}`;
+            }
+            
+            // Duolingo tarzı ilerleme çubuğunu güncelle
+            const dinleProgressBar = document.getElementById('dinleProgressBar');
+            if (dinleProgressBar) {
+                const progress = ((dinleQuestionCount + 1) / DINLE_MAX_QUESTIONS) * 100;
+                dinleProgressBar.style.width = progress + '%';
+            }
 
-            elements.dinleFeedback.textContent = '';
-            elements.dinleFeedback.className = 'feedback';
-            elements.dinleNextBtn.style.display = 'none';
+            if (elements.dinleFeedback) {
+                elements.dinleFeedback.textContent = '';
+                elements.dinleFeedback.className = 'feedback';
+            }
+            if (elements.dinleNextBtn) {
+                elements.dinleNextBtn.style.display = 'none';
+            }
+            
+            // Tüm butonları aktif et
+            const allBtns = document.querySelectorAll('.dinle-mode .duolingo-option, .dinle-mode .option');
+            allBtns.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('disabled', 'correct', 'wrong');
+            });
 
             // Otomatik ses çal
             if (currentDinleQuestion.ses_dosyasi) {
@@ -7516,15 +7723,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug(`📊 Kelime istatistiği güncelleniyor (Dinle): ${currentDinleQuestion.kelime} (ID: ${currentDinleQuestion.id})`);
             updateWordStats(currentDinleQuestion.id, isCorrect);
             
-            const allBtns = elements.dinleOptions.querySelectorAll('.option');
+            const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
             log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-            allBtns.forEach(btn => btn.disabled = true);
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
 
             if (isCorrect) {
                 log.debug(`✅ === SAHİH CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.dinleFeedback.textContent = '✅ Mâşâallah!';
-                elements.dinleFeedback.className = 'feedback correct';
+                if (elements.dinleFeedback) {
+                    elements.dinleFeedback.textContent = '✅ Mâşâallah!';
+                    elements.dinleFeedback.className = 'feedback correct';
+                }
                 
                 // Haptic feedback - doğru cevap
                 triggerHaptic('success');
@@ -7555,8 +7767,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             } else {
                 log.debug(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.dinleFeedback.textContent = `❌ Hatalı! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
-                elements.dinleFeedback.className = 'feedback wrong';
+                if (elements.dinleFeedback) {
+                    elements.dinleFeedback.textContent = `❌ Hatalı! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
+                    elements.dinleFeedback.className = 'feedback wrong';
+                }
                 
                 // Haptic feedback - yanlış cevap
                 triggerHaptic('error');
@@ -7592,18 +7806,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug(`🎨 UI güncelleniyor ve Next butonu gösteriliyor...`);
             updateDinleUI();
             // Show the Dinle 'Next' button
-            elements.dinleNextBtn.style.display = 'block';
-            // 🔥 Animasyonu ekle
-            elements.dinleNextBtn.classList.add("next-appear");
+            if (elements.dinleNextBtn) {
+                elements.dinleNextBtn.style.display = 'block';
+                // 🔥 Animasyonu ekle
+                elements.dinleNextBtn.classList.add("next-appear");
+            }
             log.debug(`✅ Cevap işlemi tamamen tamamlandı!`);
         }
 
         function updateDinleUI() {
             log.debug(`🎨 DinleUI güncelleniyor...`);
             log.debug(`📊 Gösterilecek değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}`);
-            elements.dinleScore.textContent = dinleScore;
-            elements.dinleCorrect.textContent = dinleCorrect;
-            elements.dinleWrong.textContent = dinleWrong;
+            if (elements.dinleScore) elements.dinleScore.textContent = dinleScore;
+            if (elements.dinleCorrect) elements.dinleCorrect.textContent = dinleCorrect;
+            if (elements.dinleWrong) elements.dinleWrong.textContent = dinleWrong;
             log.debug(`✅ DinleUI güncellendi!`);
         }
 
@@ -7635,6 +7851,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Direkt ana menüye dön
                 elements.boslukMode.style.display = 'none';
                 elements.mainMenu.style.display = 'block';
+                
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
                 
                 log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
                 // Sıfırla
@@ -7721,11 +7940,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
             smartShuffle(allOptions);
 
-            // Seçenekleri göster
+            // Seçenekleri göster - Duolingo Tarzı
             elements.boslukOptions.innerHTML = '';
             allOptions.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = 'option flutter-option-btn';
+                btn.className = 'duolingo-option';
                 // Boşluk Doldur'da her zaman Arapça format kullan (ayet parçaları)
                 if (opt.text === '...' || opt.text.trim() === '') {
                     // Boş seçenekler için normal format
@@ -7738,10 +7957,40 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 btn.onclick = () => checkBoslukAnswer(btn, opt.correct);
                 elements.boslukOptions.appendChild(btn);
             });
+            
+            // Duolingo tarzı soru numarasını güncelle
+            const boslukQuestionNumber = document.getElementById('boslukQuestionNumber');
+            if (boslukQuestionNumber) {
+                boslukQuestionNumber.textContent = `Soru ${boslukQuestionCount + 1} / ${BOSLUK_MAX_QUESTIONS}`;
+            }
+            
+            // Duolingo tarzı ilerleme çubuğunu güncelle
+            const boslukProgressBar = document.getElementById('boslukProgressBar');
+            if (boslukProgressBar) {
+                const progress = ((boslukQuestionCount + 1) / BOSLUK_MAX_QUESTIONS) * 100;
+                boslukProgressBar.style.width = progress + '%';
+            }
+            
+            // Sure info güncelle
+            if (elements.boslukSureInfo && currentBoslukQuestion) {
+                elements.boslukSureInfo.textContent = `${currentBoslukQuestion.sure_adi || ''} ${currentBoslukQuestion.ayet_no || ''}`;
+                elements.boslukSureInfo.style.display = 'block';
+            }
 
-            elements.boslukFeedback.textContent = '';
-            elements.boslukFeedback.className = 'feedback';
-            elements.boslukNextBtn.style.display = 'none';
+            if (elements.boslukFeedback) {
+                elements.boslukFeedback.textContent = '';
+                elements.boslukFeedback.className = 'feedback';
+            }
+            if (elements.boslukNextBtn) {
+                elements.boslukNextBtn.style.display = 'none';
+            }
+            
+            // Tüm butonları aktif et
+            const allBtns = document.querySelectorAll('.bosluk-mode .duolingo-option, .bosluk-mode .option');
+            allBtns.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('disabled', 'correct', 'wrong');
+            });
 
             // Otomatik ses çal
             if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
@@ -7749,11 +7998,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
         }
 
-        elements.boslukAudioBtn.onclick = () => {
-            if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
-                playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
-            }
-        };
+        if (elements.boslukAudioBtn) {
+            elements.boslukAudioBtn.onclick = () => {
+                if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
+                    playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
+                }
+            };
+        }
 
         function checkBoslukAnswer(button, isCorrect) {
             log.debug(`🚨 === BOŞLUK DOLDUR CEVAP KONTROLÜ ===`);
@@ -7767,15 +8018,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // KELİME İSTATİSTİKLERİ SADECE KELİME ÇEVİR OYUNUNDA KAYIT EDİLİYOR
             // Boşluk Doldur oyunu için istatistik kaydedilmiyor
             
-            const allBtns = elements.boslukOptions.querySelectorAll('.option');
+            const allBtns = elements.boslukOptions.querySelectorAll('.duolingo-option, .option');
             log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-            allBtns.forEach(btn => btn.disabled = true);
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
 
             if (isCorrect) {
                 log.debug(`✅ === DOĞRU CEVAP İŞLEMİ ===`);
                 button.classList.add('correct');
-                elements.boslukFeedback.textContent = '✅ Mâşâallah!';
-                elements.boslukFeedback.className = 'feedback correct';
+                if (elements.boslukFeedback) {
+                    elements.boslukFeedback.textContent = '✅ Mâşâallah!';
+                    elements.boslukFeedback.className = 'feedback correct';
+                }
                 
                 // Haptic feedback - doğru cevap
                 triggerHaptic('success');
@@ -7804,8 +8060,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             } else {
                 log.debug(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
                 button.classList.add('wrong');
-                elements.boslukFeedback.textContent = `❌ Hatalı! Doğru kelime: ${missingWord}`;
-                elements.boslukFeedback.className = 'feedback wrong';
+                if (elements.boslukFeedback) {
+                    elements.boslukFeedback.textContent = `❌ Hatalı! Doğru kelime: ${missingWord}`;
+                    elements.boslukFeedback.className = 'feedback wrong';
+                }
                 
                 // Haptic feedback - yanlış cevap
                 triggerHaptic('error');
@@ -7842,24 +8100,30 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug(`🚨 === BOŞLUK DOLDUR CEVAP KONTROLÜ BİTTİ ===`);
             updateBoslukUI();
             // Show the Bosluk 'Next' button
-            elements.boslukNextBtn.style.display = 'block';
-            elements.boslukNextBtn.classList.add("next-appear");  // ← EKLENDİ
+            if (elements.boslukNextBtn) {
+                elements.boslukNextBtn.style.display = 'block';
+                elements.boslukNextBtn.classList.add("next-appear");
+            }
         }
 
-        elements.boslukNextBtn.onclick = () => {
-            // Butonu hemen gizle
-            elements.boslukNextBtn.style.display = 'none';
-            elements.boslukNextBtn.classList.remove("next-appear");
-            
-            loadBoslukQuestion();
-        };
+        if (elements.boslukNextBtn) {
+            elements.boslukNextBtn.onclick = () => {
+                // Butonu hemen gizle
+                if (elements.boslukNextBtn) {
+                    elements.boslukNextBtn.style.display = 'none';
+                    elements.boslukNextBtn.classList.remove("next-appear");
+                }
+                
+                loadBoslukQuestion();
+            };
+        }
 
         function updateBoslukUI() {
             log.debug(`🎨 BoslukUI güncelleniyor...`);
             log.debug(`📊 Gösterilecek değerler: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
-            elements.boslukScore.textContent = boslukScore;
-            elements.boslukCorrect.textContent = boslukCorrect;
-            elements.boslukWrong.textContent = boslukWrong;
+            if (elements.boslukScore) elements.boslukScore.textContent = boslukScore;
+            if (elements.boslukCorrect) elements.boslukCorrect.textContent = boslukCorrect;
+            if (elements.boslukWrong) elements.boslukWrong.textContent = boslukWrong;
             log.debug(`✅ BoslukUI güncellendi!`);
         }
 
@@ -8613,20 +8877,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }); // DOMContentLoaded event listener sonu
 
         
-                        
-                       
-
-                         // <-- MISSING CLOSING BRACE ADDED HERE
-
-        // ============ PREMIUM LOADING SCREEN – GENIUS DESIGN ============
+        // ============ YENİ LOADING SCREEN ============
         window.addEventListener('DOMContentLoaded', () => {
-    const loadingScreen = document.getElementById('loadingScreen');
+            // Yeni Loading Screen JavaScript
+            const loadingScreen = document.getElementById('loadingScreen');
             const mainContainer = document.getElementById('mainMenu');
-            const loadingSteps = document.getElementById('loadingSteps');
             const progressBar = document.getElementById('loadingProgressBar');
-            const loadingPercentage = document.getElementById('loadingPercentage');
+            const progressLabel = document.getElementById('loadingProgressLabel');
             const hadisArabic = document.getElementById('hadisArabic');
             const hadisTurkish = document.getElementById('hadisTurkish');
+            const bagIcon = document.getElementById('bagIcon');
             
             // Dinamik Hadisler Listesi
             const hadisler = [
@@ -8649,180 +8909,249 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     arabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
                     turkish: '"İlim öğrenmek her Müslümana farzdır."',
                     source: '(İbn Mâce)'
-                },          
+                },
                 {
                     arabic: 'إِنَّ الْأَجْرَ مَعَ الْمُصْطَلِحِينَ',
                     turkish: '"Kazancı, hakseverlerle birlikte olanlara verir."',
                     source: '(Ahmed bin Hanbel)'
-                },      
-                {
-                    arabic: 'إِنَّ الْأَجْرَ مَعَ الْمُصْطَلِحِينَ',
-                    turkish: '"Kazancı, hakseverlerle birlikte olanlara verir."',
-                    source: '(Ahmed bin Hanbel)'
-                },      
-
-                
-
+                }
             ];
             
             // Rastgele hadis seç
             const randomHadis = hadisler[Math.floor(Math.random() * hadisler.length)];
             if (hadisArabic && hadisTurkish) {
                 hadisArabic.textContent = randomHadis.arabic;
-                hadisTurkish.innerHTML = `"${randomHadis.turkish}"<br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">${randomHadis.source}</small>`;
+                const hadisSource = document.querySelector('.loading-hadith-source-text');
+                if (hadisSource) {
+                    hadisTurkish.textContent = randomHadis.turkish;
+                    hadisSource.textContent = randomHadis.source;
+                } else {
+                    hadisTurkish.innerHTML = `"${randomHadis.turkish}"<br><small style="opacity: 0.7; font-size: 13px; margin-top: 10px; display: block;">${randomHadis.source}</small>`;
+                }
             }
             
-            // Flying Letters to Bag Animation - Arapça Alfabe Sırasıyla
-            const flyingContainer = document.querySelector('.flying-letters-container');
-            // Arapça alfabe sırasıyla: ا (elif), ب (be), ت (te), ث (se), ج (cim), ح (ha), خ (hı), د (dal), ذ (zel), ر (ra), ز (ze), س (sin), ش (şın), ص (sad), ض (dad), ط (tı), ظ (zı), ع (ayn), غ (gayn), ف (fe), ق (kaf), ك (kef), ل (lam), م (mim), ن (nun), و (vav), ه (he), ي (ye)
-            const letters = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'و', 'ه', 'ي'];
-            const bagBottom = window.innerHeight - 120; // Torba pozisyonu
-            const bagCenter = window.innerWidth / 2;
+            // Harfleri kitaba uçurma animasyonu
+            const arabicAlphabet = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'];
+            let animationInterval = null;
             
-            let letterIndex = 0;
-            const createFlyingLetter = () => {
-                if (letterIndex >= letters.length) {
-                    letterIndex = 0; // Tekrar başla (28 harf tamamlandıktan sonra)
-                }
-                
-                const letter = letters[letterIndex];
-                const flyingLetter = document.createElement('div');
-                flyingLetter.className = 'flying-letter';
-                flyingLetter.textContent = letter;
-                
-                // Rastgele başlangıç pozisyonu (ekranın üstü veya kenarları)
-                const startX = Math.random() * window.innerWidth;
-                const startY = -50; // Ekranın üstünden başla
-                
-                flyingLetter.style.left = startX + 'px';
-                flyingLetter.style.top = startY + 'px';
-                
-                // Torba pozisyonuna göre hedef hesapla
-                const targetX = bagCenter - startX;
-                const targetY = bagBottom - startY;
-                
-                flyingLetter.style.setProperty('--target-x', targetX + 'px');
-                flyingLetter.style.setProperty('--target-y', targetY + 'px');
-                
-                if (flyingContainer) {
-                    flyingContainer.appendChild(flyingLetter);
-                    
-                    // Animasyon bitince elementi kaldır
-                    setTimeout(() => {
-                        if (flyingLetter.parentNode) {
-                            flyingLetter.parentNode.removeChild(flyingLetter);
-                        }
-                    }, 3000);
-                }
-                
-                letterIndex++;
-            };
-            
-            // İlk harfi hemen gönder, sonra düzenli aralıklarla gönder
-            createFlyingLetter();
-            const letterInterval = setInterval(() => {
-                createFlyingLetter();
-            }, 400); // Her 400ms'de bir harf gönder
-            
-            // Loading bitince interval'i temizle
-            setTimeout(() => {
-                clearInterval(letterInterval);
-            }, 12000);
-            
-            // Ana uygulamayı göster fonksiyonu
-    const showMainApp = () => {
-        requestAnimationFrame(() => {
-            if (loadingScreen) loadingScreen.classList.add('fade-out');
-
-            setTimeout(() => {
-                if (loadingScreen) loadingScreen.style.display = 'none';
-                        
-                        // İlk açılış kontrolü - Onboarding göster
-                        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-                        if (!hasSeenOnboarding) {
-                            // Onboarding göster
-                            setTimeout(() => {
-                                if (typeof showOnboarding === 'function') {
-                                    showOnboarding();
-                                } else {
-                                    console.warn('showOnboarding fonksiyonu bulunamadı!');
-                if (mainContainer) mainContainer.style.display = 'block';
-                                }
-                            }, 100);
-                        } else {
-                            // Direkt ana menüyü göster
-                            if (mainContainer) mainContainer.style.display = 'block';
-                        }
-            }, 500);
-        });
-    };
-
-            // Progressive Loading Steps
-            let currentStep = 1;
-            const totalSteps = 3;
-            let progress = 0;
-            
-            const updateStep = (stepNumber) => {
-                if (!loadingSteps) return;
-                const steps = loadingSteps.querySelectorAll('.loading-step');
-                steps.forEach((step, index) => {
-                    if (index + 1 === stepNumber) {
-                        step.classList.add('active');
-                    } else {
-                        step.classList.remove('active');
+            // Tüm uçan harfleri temizle
+            function clearAllFlyingLetters() {
+                const allLetters = document.querySelectorAll('.flying-letter');
+                allLetters.forEach(letter => {
+                    if (letter.parentNode) {
+                        letter.parentNode.removeChild(letter);
                     }
                 });
-            };
+            }
             
-            const updateProgress = (percent) => {
-                if (progressBar) {
-                    progressBar.style.width = percent + '%';
+            function animateLettersToBag() {
+                // Önce tüm eski harfleri temizle
+                clearAllFlyingLetters();
+                
+                const bagIconElement = document.getElementById('bagIcon');
+                if (!bagIconElement) {
+                    setTimeout(animateLettersToBag, 500);
+                    return;
                 }
-                if (loadingPercentage) {
-                    loadingPercentage.textContent = Math.round(percent) + '%';
-                }
-            };
+                
+                const bagRect = bagIconElement.getBoundingClientRect();
+                const bagCenterX = bagRect.left + bagRect.width / 2;
+                const bagCenterY = bagRect.top + bagRect.height / 2;
+                
+                arabicAlphabet.forEach((letter, index) => {
+                    setTimeout(() => {
+                        // Rastgele başlangıç pozisyonu - kesinlikle ekranın dışından
+                        const side = Math.floor(Math.random() * 4);
+                        let startX, startY;
+                        
+                        if (side === 0) { // Üst
+                            startX = Math.random() * window.innerWidth;
+                            startY = -100; // Ekranın üstünden
+                        } else if (side === 1) { // Sağ
+                            startX = window.innerWidth + 100;
+                            startY = Math.random() * window.innerHeight;
+                        } else if (side === 2) { // Alt
+                            startX = Math.random() * window.innerWidth;
+                            startY = window.innerHeight + 100;
+                        } else { // Sol
+                            startX = -100;
+                            startY = Math.random() * window.innerHeight;
+                        }
+                        
+                        const letterEl = document.createElement('div');
+                        letterEl.className = 'flying-letter';
+                        letterEl.textContent = letter;
+                        letterEl.style.position = 'fixed';
+                        letterEl.style.left = startX + 'px';
+                        letterEl.style.top = startY + 'px';
+                        letterEl.style.zIndex = '100000';
+                        letterEl.style.pointerEvents = 'none';
+                        letterEl.style.opacity = '1';
+                        letterEl.style.transform = 'scale(1)';
+                        letterEl.style.transition = 'none'; // İlk başta transition yok
+                        letterEl.style.willChange = 'transform, opacity, left, top';
+                        
+                        // Loading screen içine ekle
+                        if (loadingScreen) {
+                            loadingScreen.appendChild(letterEl);
+                        } else {
+                            document.body.appendChild(letterEl);
+                        }
+                        
+                        // Animasyonu hemen başlat (requestAnimationFrame ile)
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                // Transition'ı aktif et ve hedefe git - daha yavaş (4.5 saniye)
+                                letterEl.style.transition = 'all 4.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                                letterEl.style.left = bagCenterX + 'px';
+                                letterEl.style.top = bagCenterY + 'px';
+                                letterEl.style.transform = 'scale(0.4) rotate(360deg)';
+                                
+                                // Kitaba yaklaştıkça küçül
+                                setTimeout(() => {
+                                    if (letterEl && letterEl.parentNode) {
+                                        letterEl.style.transform = 'scale(0.25) rotate(360deg)';
+                                    }
+                                }, 3500); // 2000'den 3500'e çıkarıldı
+                                
+                                // Kitaba ulaştıktan sonra kaybol - kesinlikle kaldır
+                                setTimeout(() => {
+                                    if (letterEl && letterEl.parentNode) {
+                                        letterEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                        letterEl.style.opacity = '0';
+                                        letterEl.style.transform = 'scale(0.01) rotate(360deg)';
+                                        
+                                        // DOM'dan kesinlikle kaldır
+                                        setTimeout(() => {
+                                            if (letterEl && letterEl.parentNode) {
+                                                try {
+                                                    letterEl.parentNode.removeChild(letterEl);
+                                                } catch(e) {
+                                                    // Zaten kaldırılmış olabilir
+                                                }
+                                            }
+                                        }, 300);
+                                    }
+                                }, 4500); // 2500'den 4500'e çıkarıldı
+                            });
+                        });
+                    }, index * 300); // 200'den 300'e çıkarıldı (harfler arası gecikme)
+                });
+            }
             
-            // Step 1: Kelime verileri (0-40%) - Süre uzatıldı
-            updateStep(1);
-            const step1Interval = setInterval(() => {
-                if (progress < 40) {
-                    progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
-                    updateProgress(progress);
+            // Animasyonu başlat
+            const startAnimation = () => {
+                // Önce tüm harfleri temizle
+                clearAllFlyingLetters();
+                
+                const bagIconElement = document.getElementById('bagIcon');
+                if (bagIconElement && bagIconElement.complete) {
+                    // Önceki interval'i temizle
+                    if (animationInterval) {
+                        clearInterval(animationInterval);
+                        animationInterval = null;
+                    }
+                    
+                    // İlk animasyonu başlat
+                    setTimeout(() => {
+                        animateLettersToBag();
+                    }, 1000);
+                    
+                    // Yeni interval başlat - daha uzun aralık (harfler yavaş uçtuğu için)
+                    animationInterval = setInterval(() => {
+                        animateLettersToBag();
+                    }, 12000); // 8 saniyeden 12 saniyeye çıkarıldı
                 } else {
-                    clearInterval(step1Interval);
+                    setTimeout(startAnimation, 200);
                 }
-            }, 50); // 30ms'den 50ms'ye çıkarıldı
+            };
             
-            // Step 2: Ayetler (40-80%) - Süre uzatıldı
-            setTimeout(() => {
-                updateStep(2);
-                const step2Interval = setInterval(() => {
-                    if (progress < 80) {
-                        progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
-                        updateProgress(progress);
-                    } else {
-                        clearInterval(step2Interval);
-                    }
-                }, 50); // 30ms'den 50ms'ye çıkarıldı
-            }, 2000); // 800ms'den 2000ms'ye çıkarıldı
+            // Sayfa yüklendiğinde temizle ve başlat
+            clearAllFlyingLetters();
             
-            // Step 3: Hazırlanıyor (80-100%) - Süre uzatıldı
+            // Biraz bekleyip başlat (DOM'un hazır olması için)
             setTimeout(() => {
-                updateStep(3);
-                const step3Interval = setInterval(() => {
-                    if (progress < 100) {
-                        progress += 1; // 2'den 1'e düşürüldü (daha yavaş)
-                        updateProgress(progress);
-                    } else {
-                        clearInterval(step3Interval);
-                        // Tüm adımlar tamamlandı, ana uygulamayı göster
-                        setTimeout(() => {
-                            showMainApp();
-                        }, 800); // 500ms'den 800ms'ye çıkarıldı
+                startAnimation();
+            }, 300);
+            
+            // Sayfa kapanırken temizle
+            window.addEventListener('beforeunload', () => {
+                clearAllFlyingLetters();
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                }
+            });
+            
+            // Progress bar animasyonu
+            let progress = 0;
+            const progressSteps = [
+                { percent: 40, label: 'Kelime verileri yükleniyor...', duration: 2000 },
+                { percent: 70, label: 'Ayetler hazırlanıyor...', duration: 2000 },
+                { percent: 100, label: 'Haydi Bismillah...', duration: 1500 }
+            ];
+            
+            function updateProgress() {
+                if (progressSteps.length === 0) return;
+                
+                const step = progressSteps.shift();
+                const targetProgress = step.percent;
+                const increment = (targetProgress - progress) / (step.duration / 30);
+                
+                const interval = setInterval(() => {
+                    progress += increment;
+                    if (progress >= targetProgress) {
+                        progress = targetProgress;
+                        clearInterval(interval);
+                        
+                        if (progressSteps.length > 0) {
+                            setTimeout(updateProgress, 500);
+                        } else {
+                            setTimeout(() => {
+                                // Loading screen kapanırken tüm harfleri temizle
+                                clearAllFlyingLetters();
+                                if (animationInterval) {
+                                    clearInterval(animationInterval);
+                                    animationInterval = null;
+                                }
+                                
+                                if (loadingScreen) {
+                                    loadingScreen.style.opacity = '0';
+                                    setTimeout(() => {
+                                        loadingScreen.style.display = 'none';
+                                        // Ekstra temizlik
+                                        clearAllFlyingLetters();
+                                    }, 500);
+                                }
+                                
+                                const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+                                if (!hasSeenOnboarding) {
+                                    setTimeout(() => {
+                                        if (typeof showOnboarding === 'function') {
+                                            showOnboarding();
+                                        } else {
+                                            if (mainContainer) mainContainer.style.display = 'block';
+                                        }
+                                    }, 100);
+                                } else {
+                                    if (mainContainer) mainContainer.style.display = 'block';
+                                }
+                            }, 1000);
+                        }
                     }
-                }, 45); // 25ms'den 45ms'ye çıkarıldı
-            }, 4000); // 1600ms'den 4000ms'ye çıkarıldı
+                    
+                    if (progressBar) {
+                        progressBar.style.width = progress + '%';
+                    }
+                }, 30);
+                
+                if (progressLabel) {
+                    progressLabel.textContent = step.label;
+                }
+            }
+            
+            setTimeout(() => {
+                updateProgress();
+            }, 500);
         });
 
 
@@ -8868,7 +9197,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     </div>
 
     <!-- Flutter Bottom Navigation -->
-    <div class="flutter-top-nav">                                
+    <div class="flutter-top-nav" id="bottomNavBar">                                
         <a class="flutter-nav-item" onclick="showMainMenu(); setActiveNavItem(0);">
             <i class="material-icons">home</i>
             <span>Ana Sayfa</span>
@@ -8909,6 +9238,11 @@ function showMainMenu() {
                 el.style.zIndex = '';
             }
         });
+    }
+    
+    // Navigasyon bar'ı göster (ana ekrana dönünce)
+    if (typeof showBottomNavBar === 'function') {
+        showBottomNavBar();
     }
     
     // Tüm oyun modlarını gizle

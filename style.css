@@ -1042,46 +1042,745 @@ body {
    🎮 OYUN MODLARI - MOBİL UYUMLULUK
    ============================================ */
 
-/* Game Screen (Kelime Çevir) */
+/* Game Screen (Kelime Çevir) - Duolingo Tarzı */
 .game-screen {
     max-width: 100%;
     width: 100%;
     margin: 0 auto;
-    padding: 8px;
+    padding: 0;
     padding-bottom: 90px; /* Alt nav bar için boşluk */
     box-sizing: border-box;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #fff;
 }
 
-/* Dinle Mode */
+/* Duolingo Tarzı Header */
+.game-screen .duolingo-header {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.game-screen .duolingo-back-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.game-screen .duolingo-back-btn:hover {
+    background: #f5f5f5;
+}
+
+.game-screen .duolingo-progress-container {
+    flex: 1;
+    margin: 0 16px;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.game-screen .duolingo-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #58cc02 0%, #58cc02 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.game-screen .duolingo-hearts {
+    display: flex;
+    gap: 4px;
+    font-size: 20px;
+}
+
+/* Duolingo Tarzı Soru Alanı */
+.game-screen .duolingo-question-area {
+    padding: 40px 24px;
+    text-align: center;
+    background: #fff;
+    flex: 1;
+}
+
+.game-screen .duolingo-question-number {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.game-screen .duolingo-question-hint {
+    font-size: 18px;
+    color: #666;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+.game-screen .duolingo-audio-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.game-screen .duolingo-audio-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.game-screen .duolingo-audio-btn:hover {
+    border-color: #58cc02;
+    background: #f0fdf4;
+}
+
+.game-screen .duolingo-audio-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Duolingo Tarzı Seçenek Butonları */
+.game-screen .duolingo-options-container {
+    padding: 0 20px 20px 20px;
+}
+
+.game-screen .duolingo-option {
+    width: 100%;
+    padding: 18px 24px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 3px solid #e0e0e0;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.game-screen .duolingo-option:hover:not(.disabled) {
+    border-color: #58cc02;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
+}
+
+.game-screen .duolingo-option.correct {
+    background: #58cc02;
+    border-color: #58cc02;
+    color: #fff;
+}
+
+.game-screen .duolingo-option.wrong {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: #fff;
+}
+
+.game-screen .duolingo-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Duolingo Tarzı İstatistikler */
+.game-screen .duolingo-stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.game-screen .duolingo-stat-item {
+    text-align: center;
+}
+
+.game-screen .duolingo-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.game-screen .duolingo-stat-value.hasene {
+    color: #ff8f00;
+}
+
+.game-screen .duolingo-stat-value.correct {
+    color: #58cc02;
+}
+
+.game-screen .duolingo-stat-value.wrong {
+    color: #ff4444;
+}
+
+.game-screen .duolingo-stat-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Animasyonlar */
+@keyframes duolingoSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.game-screen .duolingo-question-area {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.game-screen .duolingo-option {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.game-screen .duolingo-option:nth-child(1) { animation-delay: 0.1s; }
+.game-screen .duolingo-option:nth-child(2) { animation-delay: 0.2s; }
+.game-screen .duolingo-option:nth-child(3) { animation-delay: 0.3s; }
+.game-screen .duolingo-option:nth-child(4) { animation-delay: 0.4s; }
+
+/* Responsive */
+@media (max-width: 480px) {
+    .game-screen .duolingo-question-area {
+        padding: 30px 20px;
+    }
+    
+    .game-screen .duolingo-option {
+        font-size: 16px;
+        padding: 16px 20px;
+    }
+    
+    .game-screen .duolingo-question-hint {
+        font-size: 16px;
+    }
+}
+
+/* Dinle Mode - Duolingo Tarzı */
 .dinle-mode {
     max-width: 100%;
     width: 100%;
     margin: 0 auto;
-    padding: 8px;
+    padding: 0;
     padding-bottom: 90px; /* Alt nav bar için boşluk */
     box-sizing: border-box;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #fff;
 }
 
-/* Boşluk Mode */
+/* Dinle Mode için Duolingo Tarzı Stiller */
+.dinle-mode .duolingo-header {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dinle-mode .duolingo-back-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.dinle-mode .duolingo-back-btn:hover {
+    background: #f5f5f5;
+}
+
+.dinle-mode .duolingo-progress-container {
+    flex: 1;
+    margin: 0 16px;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.dinle-mode .duolingo-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #58cc02 0%, #58cc02 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.dinle-mode .duolingo-hearts {
+    display: flex;
+    gap: 4px;
+    font-size: 20px;
+}
+
+.dinle-mode .duolingo-question-area {
+    padding: 40px 24px;
+    text-align: center;
+    background: #fff;
+    flex: 1;
+}
+
+.dinle-mode .duolingo-question-number {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.dinle-mode .duolingo-question-hint {
+    font-size: 18px;
+    color: #666;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+.dinle-mode .duolingo-audio-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.dinle-mode .duolingo-audio-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dinle-mode .duolingo-audio-btn:hover {
+    border-color: #58cc02;
+    background: #f0fdf4;
+}
+
+.dinle-mode .duolingo-audio-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+.dinle-mode .duolingo-options-container {
+    padding: 0 20px 20px 20px;
+}
+
+.dinle-mode .duolingo-option {
+    width: 100%;
+    padding: 18px 24px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 3px solid #e0e0e0;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.dinle-mode .duolingo-option:hover:not(.disabled) {
+    border-color: #58cc02;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
+}
+
+.dinle-mode .duolingo-option.correct {
+    background: #58cc02;
+    border-color: #58cc02;
+    color: #fff;
+}
+
+.dinle-mode .duolingo-option.wrong {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: #fff;
+}
+
+.dinle-mode .duolingo-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Dinle ve Bul - Arapça seçenekler için Uthmani font (Kelime Çevir ile aynı) */
+.dinle-mode .duolingo-option.arabic-option {
+    font-family: 'Uthmani', serif !important;
+    font-size: clamp(24px, 5vw, 36px) !important;
+    font-weight: normal !important;
+    direction: rtl !important;
+}
+
+.dinle-mode .duolingo-option.arabic-option span {
+    font-family: 'Uthmani', serif !important;
+    font-weight: normal !important;
+}
+
+.dinle-mode .duolingo-stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.dinle-mode .duolingo-stat-item {
+    text-align: center;
+}
+
+.dinle-mode .duolingo-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.dinle-mode .duolingo-stat-value.hasene {
+    color: #ff8f00;
+}
+
+.dinle-mode .duolingo-stat-value.correct {
+    color: #58cc02;
+}
+
+.dinle-mode .duolingo-stat-value.wrong {
+    color: #ff4444;
+}
+
+.dinle-mode .duolingo-stat-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dinle-mode .duolingo-question-area {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.dinle-mode .duolingo-option {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.dinle-mode .duolingo-option:nth-child(1) { animation-delay: 0.1s; }
+.dinle-mode .duolingo-option:nth-child(2) { animation-delay: 0.2s; }
+.dinle-mode .duolingo-option:nth-child(3) { animation-delay: 0.3s; }
+.dinle-mode .duolingo-option:nth-child(4) { animation-delay: 0.4s; }
+
+@media (max-width: 480px) {
+    .dinle-mode .duolingo-question-area {
+        padding: 30px 20px;
+    }
+    
+    .dinle-mode .duolingo-option {
+        font-size: 16px;
+        padding: 16px 20px;
+    }
+    
+    .dinle-mode .duolingo-question-hint {
+        font-size: 16px;
+    }
+}
+
+/* Boşluk Mode - Duolingo Tarzı */
 .bosluk-mode {
     max-width: 100%;
     width: 100%;
     margin: 0 auto;
-    padding: 8px;
+    padding: 0;
     padding-bottom: 90px; /* Alt nav bar için boşluk */
     box-sizing: border-box;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #fff;
+}
+
+/* Boşluk Mode için Duolingo Tarzı Stiller */
+.bosluk-mode .duolingo-header {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.bosluk-mode .duolingo-back-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.bosluk-mode .duolingo-back-btn:hover {
+    background: #f5f5f5;
+}
+
+.bosluk-mode .duolingo-progress-container {
+    flex: 1;
+    margin: 0 16px;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.bosluk-mode .duolingo-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #58cc02 0%, #58cc02 100%);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.bosluk-mode .duolingo-hearts {
+    display: flex;
+    gap: 4px;
+    font-size: 20px;
+}
+
+.bosluk-mode .duolingo-question-area {
+    padding: 40px 24px;
+    text-align: center;
+    background: #fff;
+    flex: 1;
+}
+
+.bosluk-mode .duolingo-question-number {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.bosluk-mode .duolingo-question-hint {
+    font-size: 18px;
+    color: #666;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+.bosluk-mode .duolingo-audio-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.bosluk-mode .duolingo-audio-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bosluk-mode .duolingo-audio-btn:hover {
+    border-color: #58cc02;
+    background: #f0fdf4;
+}
+
+.bosluk-mode .duolingo-audio-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+.bosluk-mode .duolingo-options-container {
+    padding: 0 20px 20px 20px;
+}
+
+.bosluk-mode .duolingo-option {
+    width: 100%;
+    padding: 18px 24px;
+    margin-bottom: 12px;
+    background: #fff;
+    border: 3px solid #e0e0e0;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-family: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+.bosluk-mode .duolingo-option:hover:not(.disabled) {
+    border-color: #58cc02;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
+}
+
+.bosluk-mode .duolingo-option.correct {
+    background: #58cc02;
+    border-color: #58cc02;
+    color: #fff;
+}
+
+.bosluk-mode .duolingo-option.wrong {
+    background: #ff4444;
+    border-color: #ff4444;
+    color: #fff;
+}
+
+.bosluk-mode .duolingo-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Boşluk Doldur - Arapça seçenekler için Uthmani font (Kelime Çevir ile aynı) */
+.bosluk-mode .duolingo-option.arabic-option {
+    font-family: 'Uthmani', serif !important;
+    font-size: clamp(24px, 5vw, 36px) !important;
+    font-weight: normal !important;
+    direction: rtl !important;
+}
+
+.bosluk-mode .duolingo-option.arabic-option span {
+    font-family: 'Uthmani', serif !important;
+    font-weight: normal !important;
+}
+
+.bosluk-mode .duolingo-stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.bosluk-mode .duolingo-stat-item {
+    text-align: center;
+}
+
+.bosluk-mode .duolingo-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.bosluk-mode .duolingo-stat-value.hasene {
+    color: #ff8f00;
+}
+
+.bosluk-mode .duolingo-stat-value.correct {
+    color: #58cc02;
+}
+
+.bosluk-mode .duolingo-stat-value.wrong {
+    color: #ff4444;
+}
+
+.bosluk-mode .duolingo-stat-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bosluk-mode .duolingo-question-area {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.bosluk-mode .duolingo-option {
+    animation: duolingoSlideIn 0.4s ease;
+}
+
+.bosluk-mode .duolingo-option:nth-child(1) { animation-delay: 0.1s; }
+.bosluk-mode .duolingo-option:nth-child(2) { animation-delay: 0.2s; }
+.bosluk-mode .duolingo-option:nth-child(3) { animation-delay: 0.3s; }
+.bosluk-mode .duolingo-option:nth-child(4) { animation-delay: 0.4s; }
+
+@media (max-width: 480px) {
+    .bosluk-mode .duolingo-question-area {
+        padding: 30px 20px;
+    }
+    
+    .bosluk-mode .duolingo-option {
+        font-size: 16px;
+        padding: 16px 20px;
+    }
+    
+    .bosluk-mode .duolingo-question-hint {
+        font-size: 16px;
+    }
 }
 
 /* Game Box - Responsive */
@@ -1153,7 +1852,9 @@ body {
 .dinle-mode .option.arabic-option,
 .bosluk-mode .option.arabic-option,
 .dinle-mode .option.arabic-option span,
-.bosluk-mode .option.arabic-option span {
+.bosluk-mode .option.arabic-option span,
+.dinle-mode .duolingo-option.arabic-option,
+.dinle-mode .duolingo-option.arabic-option span {
     font-size: clamp(20px, 5vw, 32px) !important;
     font-family: 'Uthmani', serif !important;
     font-weight: normal !important;
@@ -1179,7 +1880,11 @@ body {
     .dinle-mode .option.arabic-option,
     .bosluk-mode .option.arabic-option,
     .dinle-mode .option.arabic-option span,
-    .bosluk-mode .option.arabic-option span {
+    .bosluk-mode .option.arabic-option span,
+    .dinle-mode .duolingo-option.arabic-option,
+    .dinle-mode .duolingo-option.arabic-option span,
+    .bosluk-mode .duolingo-option.arabic-option,
+    .bosluk-mode .duolingo-option.arabic-option span {
         font-size: 32px !important;
     }
 }
@@ -1538,7 +2243,11 @@ body {
 /* ============================
    ✨ PREMIUM LOADING SCREEN – GENIUS DESIGN
    ============================ */
-.loading-screen {
+/* =====================================
+   YENİ LOADING SCREEN TASARIMI
+   ===================================== */
+
+.loading-screen-new {
     position: fixed;
     top: 0;
     left: 0;
@@ -1552,10 +2261,14 @@ body {
     text-align: center;
     z-index: 99999;
     overflow: hidden;
-    /* Gradient Morphing Background */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-    background-size: 400% 400%;
-    animation: gradientMorph 15s ease infinite;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 @keyframes gradientMorph {
@@ -1615,46 +2328,228 @@ body {
     overflow: hidden;
 }
 
-.letter-bag {
+/* Letter Bag Container */
+.letter-bag-container {
     position: absolute;
-    bottom: 80px;
+    bottom: 180px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 6;
-    animation: bagPulse 2s ease-in-out infinite;
+    z-index: 11;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bag-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bag-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.flying-letter {
+    position: fixed;
+    font-family: 'Uthmani', serif;
+    font-size: 12px;
+    color: #1a1a1a;
+    z-index: 1000;
+    pointer-events: none;
+    font-weight: normal;
+}
+
+.besmele-text {
+    font-family: 'Uthmani', serif;
+    font-size: 12px;
+    color: #1a1a1a;
+    direction: rtl;
+    line-height: 1.8;
+    min-height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    letter-spacing: 0.5px;
+    font-weight: normal;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.besmele-text .besmele-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    text-align: center;
+    flex-shrink: 0;
+    width: calc(7.14% - 1px); /* 14 harf per satır = 100% / 14 ≈ 7.14% */
+    min-width: 0;
+}
+
+.besmele-text .besmele-char[style*="opacity: 1"],
+.besmele-text .besmele-char:not([style*="opacity: 0"]) {
+    opacity: 1 !important;
+    transform: translateY(0);
 }
 
 .bag-icon {
     font-size: clamp(40px, 8vw, 60px);
-    filter: drop-shadow(0 4px 15px rgba(255, 215, 0, 0.6));
-    animation: bagBounce 1.5s ease-in-out infinite;
+    /* Glow efektleri kaldırıldı - sade görünüm */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Açılmış Mushaf İkonu - Büyük ve Sabit, Sade */
+.mushaf-icon {
+    position: relative;
+    width: clamp(180px, 36vw, 280px);
+    height: clamp(135px, 27vw, 210px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Glow efektleri kaldırıldı - sade görünüm */
+    transform-origin: center;
+}
+
+.mushaf-page {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: 
+        linear-gradient(135deg, #f5f5dc 0%, #fffef0 50%, #f5f5dc 100%),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 69, 19, 0.03) 2px,
+            rgba(139, 69, 19, 0.03) 4px
+        );
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.mushaf-page::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 10%;
+    bottom: 10%;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 8px,
+            rgba(139, 69, 19, 0.05) 8px,
+            rgba(139, 69, 19, 0.05) 10px
+        );
+    opacity: 0.3;
+}
+
+.mushaf-page-left {
+    left: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    transform: perspective(200px) rotateY(-5deg);
+    transform-origin: right center;
+}
+
+.mushaf-page-right {
+    right: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    transform: perspective(200px) rotateY(5deg);
+    transform-origin: left center;
+}
+
+.mushaf-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+        #8B4513 0%, 
+        #A0522D 30%,
+        #8B4513 50%,
+        #A0522D 70%,
+        #8B4513 100%);
+    border-radius: 2px;
+    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.2), inset 2px 0 4px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+.mushaf-text {
+    position: absolute;
+    font-size: clamp(60px, 12vw, 90px);
+    z-index: 3;
+    /* Sade görünüm - efektler kaldırıldı */
+}
+
+@keyframes mushafShine {
+    0%, 100% {
+        filter: drop-shadow(0 6px 20px rgba(255, 215, 0, 0.8)) 
+                drop-shadow(0 0 30px rgba(255, 193, 7, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 8px 25px rgba(255, 215, 0, 1)) 
+                drop-shadow(0 0 40px rgba(255, 193, 7, 0.9));
+    }
+}
+
+@keyframes mushafTextGlow {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+    }
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.6));
+    }
 }
 
 .bag-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: bagGlow 2s ease-in-out infinite;
+    display: none; /* Glow efekti kaldırıldı - sade görünüm */
 }
+
 
 @keyframes bagPulse {
     0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.1); }
+    50% { transform: translateX(-50%) scale(1.08); }
 }
 
 @keyframes bagBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(-2deg); }
+    50% { transform: translateY(-10px) rotate(0deg); }
+    75% { transform: translateY(-8px) rotate(2deg); }
 }
 
 @keyframes bagGlow {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
-    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1); 
+        opacity: 0.5; 
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.4); 
+        opacity: 0.8; 
+    }
 }
 
 .flying-letter {
@@ -1824,6 +2719,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     animation: hadisFadeIn 1s ease-out;
+    margin-top: auto;
 }
 
 @keyframes hadisFadeIn {
@@ -1853,6 +2749,7 @@ body {
     z-index: 10;
     width: clamp(250px, 70vw, 400px);
     margin-bottom: 20px;
+    direction: rtl; /* Sağdan sola için */
 }
 
 .loading-progress-bar {
@@ -1863,6 +2760,7 @@ body {
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.5);
     transition: width 0.3s ease;
     animation: progressShimmer 2s infinite;
+    margin-left: auto; /* Sağdan başlaması için */
 }
 
 @keyframes progressShimmer {
@@ -1897,6 +2795,188 @@ body {
 @keyframes fadeOut {
     to { opacity: 0; transform: scale(0.95); }
 }
+
+/* Logo Wrapper */
+.loading-logo-wrapper {
+    margin-bottom: 40px;
+    animation: logoFloatNew 3s ease-in-out infinite;
+}
+
+@keyframes logoFloatNew {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.loading-logo-img {
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+/* Title */
+.loading-app-title {
+    font-size: clamp(32px, 6vw, 48px);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    margin-bottom: 50px;
+    letter-spacing: 3px;
+    margin: 0 0 50px 0;
+}
+
+/* Hadith Container */
+.loading-hadith-container {
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.loading-hadith-arabic-text {
+    font-family: 'Reem Kufi', serif;
+    font-size: clamp(18px, 4vw, 24px);
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 15px;
+    line-height: 1.8;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.loading-hadith-turkish-text {
+    font-size: clamp(14px, 3vw, 16px);
+    color: rgba(255, 255, 255, 0.95);
+    text-align: center;
+    line-height: 1.6;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.loading-hadith-source-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* Book Wrapper */
+.loading-book-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.loading-book-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.4));
+    animation: bookPulse 2s ease-in-out infinite;
+    mix-blend-mode: multiply;
+}
+
+@keyframes bookPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Progress Wrapper */
+.loading-progress-wrapper {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px 0;
+}
+
+.loading-progress-text {
+    text-align: center;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    opacity: 0.9;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.loading-progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    direction: rtl;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.loading-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.3s ease;
+    animation: progressShineNew 2s linear infinite;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes progressShineNew {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Footer */
+.loading-footer-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Flying Letters */
+.flying-letter {
+    position: fixed;
+    font-family: 'Reem Kufi', serif;
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 2px 15px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(102, 126, 234, 0.6);
+    pointer-events: none;
+    z-index: 100000;
+    opacity: 1;
+    will-change: transform, opacity;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .loading-logo-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .loading-book-wrapper {
+        width: 80px;
+        height: 80px;
+    }
+
+    .flying-letter {
+        font-size: 20px;
+    }
+}
+
 /* =====================================
    PREMIUM HEADER (HASENE-YILDIZ-MERTEBE)
    ===================================== */
