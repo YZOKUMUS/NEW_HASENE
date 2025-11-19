@@ -858,38 +858,43 @@
             <!-- Scroll Edilebilir İçerik -->
             <div id="dailyTasksScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
 
-            <!-- Genel İlerleme - Kompakt -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 10px; margin-bottom: 12px; text-align: center;">
-                <div style="font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Bugünkü İlerleme</div>
-                <div style="font-size: 0.9em; font-weight: 700; margin-bottom: 6px;">
+            <!-- Genel İlerleme - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
+                <h3 style="font-size: 16px; margin-bottom: 16px; opacity: 0.9; font-weight: 600;">📊 Bugünkü İlerleme</h3>
+                <div style="font-size: 28px; font-weight: 700; margin-bottom: 16px;">
                     <span id="completedTasks">0</span>/<span id="totalTasks">11</span> Görev Tamamlandı
                 </div>
-                <div style="background: rgba(255,255,255,0.3); border-radius: 10px; height: 6px; overflow: hidden;">
-                    <div id="taskProgress" style="background: white; height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 12px; height: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                    <div id="taskProgress" style="background: rgba(255,255,255,0.95); height: 100%; border-radius: 12px; width: 0%; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
                 </div>
             </div>
 
-            <!-- Temel Görevler -->
-            <div style="margin-bottom: 12px;">
-                <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
-                <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+            <!-- Temel Görevler - Modern Tasarım -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 14px; font-weight: 600; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.2em;">📋</span> Temel Görevler
+                </div>
+                <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
                     <!-- Görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
-            <!-- Bonus Görevler -->
-            <div style="margin-bottom: 12px;">
-                <div style="font-size: 0.75em; font-weight: 600; color: #f59e0b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">⭐ Bonus Görevler</div>
-                <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+            <!-- Bonus Görevler - Modern Tasarım -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 14px; font-weight: 600; color: #f59e0b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.2em;">⭐</span> Bonus Görevler
+                </div>
+                <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
                     <!-- Bonus görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
-            <!-- Ödül Toplama -->
-            <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 10px; padding: 12px; margin-top: 8px; text-align: center; border: 2px solid #4caf50;">
-                <div style="font-size: 1em; color: #2e7d2e; font-weight: 700; margin-bottom: 4px;">🎉 Tebrikler!</div>
-                <div style="font-size: 0.8em; color: #555; margin-bottom: 8px;">Tüm görevleri tamamladın!</div>
-                <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.85em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <!-- Ödül Toplama - Modern Tasarım -->
+            <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; border: 3px solid #4caf50; box-shadow: 0 4px 12px rgba(76,175,80,0.3);">
+                <div style="font-size: 24px; margin-bottom: 8px;">🎉</div>
+                <div style="font-size: 18px; color: #2e7d2e; font-weight: 700; margin-bottom: 8px;">Tebrikler!</div>
+                <div style="font-size: 14px; color: #555; margin-bottom: 16px;">Tüm görevleri tamamladın!</div>
+                <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     +2,500 Hasene Ödül Topla 🎁
                 </button>
             </div>
@@ -910,168 +915,169 @@
             <!-- Scroll Edilebilir İçerik -->
             <div id="statsScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
 
-            <!-- Genel Özet -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-bottom: 10px;">
-                    <div>
-                        <div style="font-size: 1.4em; font-weight: bold;" id="statsLevel">1</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">Mertebe</div>
+            <!-- Genel Özet - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
+                <h3 style="font-size: 16px; margin-bottom: 16px; opacity: 0.9; font-weight: 600;">📊 Genel Özet</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px;">
+                    <div class="stat-item">
+                        <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="statsLevel">1</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Mertebe</div>
                     </div>
-                    <div>
-                        <div style="font-size: 1.4em; font-weight: bold;" id="statsPoints">0</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">Hasene (Ana Sevap)</div>
+                    <div class="stat-item">
+                        <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="statsPoints">0</div>
+                        <div style="font-size: 12px; opacity: 0.9;">Hasene</div>
                     </div>
-                    <div>
-                        <div style="font-size: 1.4em; font-weight: bold;" id="statsStars">0</div>
-                        <div style="font-size: 0.7em; opacity: 0.9;">⭐ Yıldız (100 Hasene)</div>
+                    <div class="stat-item">
+                        <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="statsStars">0</div>
+                        <div style="font-size: 12px; opacity: 0.9;">⭐ Yıldız</div>
                     </div>
                 </div>
                 
-                <!-- Seviye İlerleme Barı -->
-                <div style="margin-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.75em; margin-bottom: 5px; opacity: 0.9;">
+                <!-- Seviye İlerleme Barı - Modern -->
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; opacity: 0.9; font-weight: 600;">
                         <span>Mertebe <span id="statsCurrentLevel">1</span></span>
                         <span>Mertebe <span id="statsNextLevel">2</span></span>
                     </div>
-                    <div style="background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; overflow: hidden;">
-                        <div id="statsLevelProgress" style="background: rgba(255,255,255,0.9); height: 100%; width: 0%; border-radius: 3px; transition: width 0.3s ease;"></div>
+                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="statsLevelProgress" style="background: rgba(255,255,255,0.95); height: 100%; width: 0%; border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
                     </div>
-                    <div style="font-size: 0.75em; margin-top: 4px; opacity: 0.8;">
+                    <div style="font-size: 12px; margin-top: 8px; opacity: 0.9; font-weight: 500;">
                         <span id="statsLevelPointsNeeded">0</span> hasene daha
                     </div>
                 </div>
             </div>
 
-            <!-- Rozet Sistemi -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 12px; margin: 12px 0; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
-                <h4 style="margin: 0 0 10px 0; color: white; font-size: 1em; text-align: center;">🏆 Hasene Bazlı Rozet Sistemi</h4>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center;">
-                    <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #cd7f32;">
-                        <div style="font-size: 1.3em;">🥉</div>
-                        <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Bronz</div>
-                        <div style="font-weight: bold; font-size: 0.85em; color: #cd7f32;" id="statsBronze">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">2K Hasene</div>
+            <!-- Rozet Sistemi - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
+                <h4 style="margin: 0 0 16px 0; color: white; font-size: 16px; text-align: center; font-weight: 600;">🏆 Hasene Bazlı Rozet Sistemi</h4>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center;">
+                    <div style="padding: 12px 8px; background: white; border-radius: 12px; border: 3px solid #cd7f32; box-shadow: 0 2px 8px rgba(205,127,50,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 2em; margin-bottom: 4px;">🥉</div>
+                        <div style="font-size: 12px; color: #666; margin: 4px 0; font-weight: 600;">Bronz</div>
+                        <div style="font-weight: bold; font-size: 18px; color: #cd7f32; margin: 4px 0;" id="statsBronze">0</div>
+                        <div style="font-size: 10px; color: #888; margin-top: 4px;">2K Hasene</div>
                     </div>
-                    <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #c0c0c0;">
-                        <div style="font-size: 1.3em;">🥈</div>
-                        <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Gümüş</div>
-                        <div style="font-weight: bold; font-size: 0.85em; color: #c0c0c0;" id="statsSilver">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">8.5K Hasene</div>
+                    <div style="padding: 12px 8px; background: white; border-radius: 12px; border: 3px solid #c0c0c0; box-shadow: 0 2px 8px rgba(192,192,192,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 2em; margin-bottom: 4px;">🥈</div>
+                        <div style="font-size: 12px; color: #666; margin: 4px 0; font-weight: 600;">Gümüş</div>
+                        <div style="font-weight: bold; font-size: 18px; color: #c0c0c0; margin: 4px 0;" id="statsSilver">0</div>
+                        <div style="font-size: 10px; color: #888; margin-top: 4px;">8.5K Hasene</div>
                     </div>
-                    <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #ffd700;">
-                        <div style="font-size: 1.3em;">🥇</div>
-                        <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Altın</div>
-                        <div style="font-weight: bold; font-size: 0.85em; color: #ffd700;" id="statsGold">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">25.5K Hasene</div>
+                    <div style="padding: 12px 8px; background: white; border-radius: 12px; border: 3px solid #ffd700; box-shadow: 0 2px 8px rgba(255,215,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 2em; margin-bottom: 4px;">🥇</div>
+                        <div style="font-size: 12px; color: #666; margin: 4px 0; font-weight: 600;">Altın</div>
+                        <div style="font-weight: bold; font-size: 18px; color: #ffd700; margin: 4px 0;" id="statsGold">0</div>
+                        <div style="font-size: 10px; color: #888; margin-top: 4px;">25.5K Hasene</div>
                     </div>
-                    <div style="padding: 6px 4px; background: white; border-radius: 8px; border: 2px solid #b9f2ff;">
-                        <div style="font-size: 1.3em;">💎</div>
-                        <div style="font-size: 0.65em; color: #666; margin: 2px 0;">Elmas</div>
-                        <div style="font-weight: bold; font-size: 0.85em; color: #00d9ff;" id="statsDiamond">0</div>
-                        <div style="font-size: 0.55em; color: #888; margin-top: 2px;">85K Hasene</div>
+                    <div style="padding: 12px 8px; background: white; border-radius: 12px; border: 3px solid #b9f2ff; box-shadow: 0 2px 8px rgba(185,242,255,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 2em; margin-bottom: 4px;">💎</div>
+                        <div style="font-size: 12px; color: #666; margin: 4px 0; font-weight: 600;">Elmas</div>
+                        <div style="font-weight: bold; font-size: 18px; color: #00d9ff; margin: 4px 0;" id="statsDiamond">0</div>
+                        <div style="font-size: 10px; color: #888; margin-top: 4px;">85K Hasene</div>
                     </div>
                 </div>
-                <div style="margin-top: 10px; padding: 8px; background: rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 0.75em; text-align: center;">
+                <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; color: white; font-size: 13px; text-align: center; font-weight: 500;">
                     💡 1 saat oyun = ~8500 Hasene (1 Müterakki)
                 </div>
             </div>
 
-            <!-- Başarı Analizi -->
-            <div style="background: #f0f8ff; padding: 8px; border-radius: 6px; margin: 8px 0;">
-                <h4 style="margin: 0 0 6px 0; color: #2980b9; font-size: 0.9em;">📈 Başarı Analizi</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #27ae60;" id="statsSuccessRate">0%</div>
-                        <div style="font-size: 0.7em; color: #666;">Başarı Oranı</div>
+            <!-- Başarı Analizi - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); padding: 16px; border-radius: 16px; margin-bottom: 20px; border-left: 4px solid #2980b9; box-shadow: 0 2px 8px rgba(41,128,185,0.1);">
+                <h4 style="margin: 0 0 12px 0; color: #2980b9; font-size: 16px; font-weight: 600;">📈 Başarı Analizi</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #27ae60; margin-bottom: 4px;" id="statsSuccessRate">0%</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Başarı Oranı</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #3498db;" id="statsAvgPointsPerDay">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Günlük Ort. Hasene</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #3498db; margin-bottom: 4px;" id="statsAvgPointsPerDay">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Günlük Ort. Hasene</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #e67e22;" id="statsPlayConsistency">0%</div>
-                        <div style="font-size: 0.7em; color: #666;">Talim Tutarlılığı</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #e67e22; margin-bottom: 4px;" id="statsPlayConsistency">0%</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Talim Tutarlılığı</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #9b59b6;" id="statsLevelProgressText">0%</div>
-                        <div style="font-size: 0.7em; color: #666;">Mertebe İlerlemesi</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #9b59b6; margin-bottom: 4px;" id="statsLevelProgressText">0%</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Mertebe İlerlemesi</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Devam (Streak) Bilgileri -->
-            <div style="background: #fff7e6; padding: 12px; border-radius: 8px; margin: 12px 0;">
-                <h4 style="margin: 0 0 8px 0; color: #d68910; font-size: 1em;">🔥 Muvazebet İstatistikleri</h4>
+            <!-- Devam (Streak) Bilgileri - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #fff7e6 0%, #ffe6d9 100%); padding: 16px; border-radius: 16px; margin-bottom: 20px; border-left: 4px solid #d68910; box-shadow: 0 2px 8px rgba(214,137,16,0.1);">
+                <h4 style="margin: 0 0 12px 0; color: #d68910; font-size: 16px; font-weight: 600;">🔥 Muvazebet İstatistikleri</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 28px; font-weight: bold; color: #e67e22; margin-bottom: 4px;" id="statsCurrentStreak">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Mevcut Devam</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 28px; font-weight: bold; color: #e67e22; margin-bottom: 4px;" id="statsBestStreak">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">En İyi Devam</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 28px; font-weight: bold; color: #27ae60; margin-bottom: 4px;" id="statsTotalDays">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Toplam Amel Günü</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 28px; font-weight: bold; color: #3498db; margin-bottom: 4px;" id="statsTodayProgress">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Bugünkü Amel</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oyun Türü İstatistikleri - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #f0fff4 0%, #e6ffe6 100%); padding: 16px; border-radius: 16px; margin-bottom: 20px; border-left: 4px solid #27ae60; box-shadow: 0 2px 8px rgba(39,174,96,0.1);">
+                <h4 style="margin: 0 0 12px 0; color: #27ae60; font-size: 16px; font-weight: 600;">🎮 Oyun Türü İstatistikleri (Bugün)</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
-                        <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsCurrentStreak">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Mevcut Devam</div>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">📚 Kelime Çevir:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsKelimeCevir">0</strong>
                     </div>
-                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
-                        <div style="font-size: 1.3em; font-weight: bold; color: #e67e22;" id="statsBestStreak">0</div>
-                        <div style="font-size: 0.8em; color: #666;">En İyi Devam</div>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">🎧 Dinle & Bul:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsDinleBul">0</strong>
                     </div>
-                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
-                        <div style="font-size: 1.3em; font-weight: bold; color: #27ae60;" id="statsTotalDays">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Toplam Amel Günü</div>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">📝 Boşluk Doldur:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsBoslukDoldur">0</strong>
                     </div>
-                    <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
-                        <div style="font-size: 1.3em; font-weight: bold; color: #3498db;" id="statsTodayProgress">0</div>
-                        <div style="font-size: 0.8em; color: #666;">Bugünkü Amel</div>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">📖 Ayet Oku:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsAyetOku">0</strong>
                     </div>
-                </div>
-            </div>
-
-            <!-- Oyun Türü İstatistikleri -->
-            <div style="background: #f0fff4; padding: 8px; border-radius: 6px; margin: 8px 0;">
-                <h4 style="margin: 0 0 6px 0; color: #27ae60; font-size: 0.9em;">🎮 Oyun Türü İstatistikleri (Bugün)</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.8em;">
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>📚 Kelime Çevir:</span>
-                        <strong id="statsKelimeCevir">0</strong>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">🤲 Dua Öğren:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsDuaOgre">0</strong>
                     </div>
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>🎧 Dinle & Bul:</span>
-                        <strong id="statsDinleBul">0</strong>
-                    </div>
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>📝 Boşluk Doldur:</span>
-                        <strong id="statsBoslukDoldur">0</strong>
-                    </div>
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>📖 Ayet Oku:</span>
-                        <strong id="statsAyetOku">0</strong>
-                    </div>
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>🤲 Dua Öğren:</span>
-                        <strong id="statsDuaOgre">0</strong>
-                    </div>
-                    <div style="padding: 5px; background: white; border-radius: 4px; display: flex; justify-content: space-between;">
-                        <span>📜 Hadis Oku:</span>
-                        <strong id="statsHadisOku">0</strong>
+                    <div style="padding: 10px; background: white; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                        <span style="font-size: 13px; font-weight: 500; color: #333;">📜 Hadis Oku:</span>
+                        <strong style="font-size: 16px; color: #27ae60;" id="statsHadisOku">0</strong>
                     </div>
                 </div>
             </div>
 
-            <!-- Bugünkü Toplam İstatistikler -->
-            <div style="background: #fef9e7; padding: 8px; border-radius: 6px; margin: 8px 0;">
-                <h4 style="margin: 0 0 6px 0; color: #b7950b; font-size: 0.9em;">⚡ Bugünkü Performans</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #27ae60;" id="statsTodayCorrect">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Toplam Sahih</div>
+            <!-- Bugünkü Toplam İstatistikler - Modern Tasarım -->
+            <div style="background: linear-gradient(135deg, #fef9e7 0%, #ffe6d9 100%); padding: 16px; border-radius: 16px; margin-bottom: 20px; border-left: 4px solid #b7950b; box-shadow: 0 2px 8px rgba(183,149,11,0.1);">
+                <h4 style="margin: 0 0 12px 0; color: #b7950b; font-size: 16px; font-weight: 600;">⚡ Bugünkü Performans</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #27ae60; margin-bottom: 4px;" id="statsTodayCorrect">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Toplam Sahih</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #f39c12;" id="statsTodayPoints">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Toplam Hasene</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin-bottom: 4px;" id="statsTodayPoints">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Toplam Hasene</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #e74c3c;" id="statsPerfectStreak">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Mükemmel Seri</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #e74c3c; margin-bottom: 4px;" id="statsPerfectStreak">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Mükemmel Seri</div>
                     </div>
-                    <div style="text-align: center; padding: 6px; background: white; border-radius: 5px;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #8e44ad;" id="statsDifficultyCount">0</div>
-                        <div style="font-size: 0.7em; color: #666;">Farklı Zorluk</div>
+                    <div style="text-align: center; padding: 12px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="font-size: 24px; font-weight: bold; color: #8e44ad; margin-bottom: 4px;" id="statsDifficultyCount">0</div>
+                        <div style="font-size: 12px; color: #666; font-weight: 500;">Farklı Zorluk</div>
                     </div>
                 </div>
             </div>
@@ -3418,6 +3424,11 @@ window.closeAllModals = closeAllModals;
     badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
 
     // =========================================
+    // 🔥 ACHIEVEMENT SİSTEMİ SIFIRLA
+    // =========================================
+    localStorage.removeItem('unlockedAchievements');
+
+    // =========================================
     // 🔥 STREAK + GÜNLÜK HEDEF SIFIRLA
     // =========================================
     streakData = {
@@ -3496,6 +3507,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     localStorage.removeItem('hasene_currentDifficulty');
     localStorage.removeItem('hasene_wordStats');
     localStorage.removeItem('dailyXP');
+    localStorage.removeItem('unlockedAchievements'); // Achievement sistemini de sıfırla
 
     // =========================================
     // 🔥 URL GEÇMİŞ TEMİZLE
@@ -4728,7 +4740,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
         
         function confirmResetStats() {
-            const confirmed = confirm('🚨 DİKKAT!\n\nTüm oyun verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm rozetler (silinir)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük görevler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK HEDEF XP (0\'a döner)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
+            const confirmed = confirm('🚨 DİKKAT!\n\nTüm oyun verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm rozetler (silinir)\n• Tüm başarılar/achievement\'lar (sıfırlanır)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük görevler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK HEDEF XP (0\'a döner)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
             
             if (confirmed) {
                 // İkinci onay
