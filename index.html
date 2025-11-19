@@ -1169,6 +1169,7 @@
                         <div>
                             <div style="color: #666; margin-bottom: 4px;">Soru/Saat</div>
                             <div style="font-weight: 600; color: #667eea;" id="analyticsQuestionPerHour">0</div>
+                            <div style="font-size: 0.7em; color: #999; margin-top: 2px; line-height: 1.2;">Mevcut hızınızla saatte çözebileceğiniz soru sayısı</div>
                         </div>
                     </div>
                 </div>
@@ -6034,6 +6035,48 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             } else {
                 log.error('❌ tasksBadge elementi bulunamadı!');
             }
+
+            // Görevlerin current değerlerini güncelle (dailyTasks.todayStats'tan)
+            const allTasks = [...dailyTasks.tasks, ...dailyTasks.bonusTasks];
+            allTasks.forEach(task => {
+                if (task.type === 'toplamPuan') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
+                } else if (task.type === 'toplamDogru') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.toplamDogru || 0);
+                } else if (task.type === 'kelimeCevir') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.kelimeCevir || 0);
+                } else if (task.type === 'dinleBul') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.dinleBul || 0);
+                } else if (task.type === 'boslukDoldur') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.boslukDoldur || 0);
+                } else if (task.type === 'ayetOku') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.ayetOku || 0);
+                } else if (task.type === 'duaOgre') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.duaOgre || 0);
+                } else if (task.type === 'hadisOku') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.hadisOku || 0);
+                } else if (task.type === 'perfectStreak') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.perfectStreak || 0);
+                } else if (task.type === 'farklıZorluk') {
+                    task.current = Math.min(task.target, dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0);
+                }
+                
+                // Görev tamamlandı mı?
+                if (task.current >= task.target && !dailyTasks.completedTasks.includes(task.id)) {
+                    dailyTasks.completedTasks.push(task.id);
+                    log.debug(`✅ Görev tamamlandı: ${task.id} (${task.name})`);
+                }
+            });
+            
+            // Tamamlanan görev sayısını güncelle
+            const updatedCompletedCount = dailyTasks.completedTasks.length;
+            const updatedTotalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
+            
+            // Genel ilerleme güncelle
+            document.getElementById('completedTasks').textContent = updatedCompletedCount;
+            document.getElementById('totalTasks').textContent = updatedTotalCount;
+            const updatedProgressPercent = (updatedCompletedCount / updatedTotalCount) * 100;
+            document.getElementById('taskProgress').style.width = updatedProgressPercent + '%';
 
             // Temel görevleri göster
             const dailyList = document.getElementById('dailyTasksList');
