@@ -3657,9 +3657,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         
         // İlerleme barını sıfırla - !important ile zorla
         if (progressFill) {
-            progressFill.style.width = '0% !important';
+            // Transition'ı kaldır ki anında sıfırlansın
+            const originalTransition = progressFill.style.transition;
+            progressFill.style.transition = 'none';
             progressFill.style.setProperty('width', '0%', 'important');
             progressFill.style.background = '#ccc';
+            // Sonra transition'ı geri ekle
+            setTimeout(() => {
+                if (progressFill) {
+                    progressFill.style.transition = originalTransition || 'width 0.5s ease';
+                }
+            }, 50);
         }
         
         // İlerleme metnini sıfırla
