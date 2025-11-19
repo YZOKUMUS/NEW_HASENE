@@ -687,7 +687,7 @@
 
     <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: none;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
@@ -706,7 +706,7 @@
             </div>
 
             <!-- Görevler Container - Scroll Edilebilir -->
-            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;">
             <!-- Temel Görevler -->
                 <div style="margin-bottom: 12px;">
                     <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
@@ -4654,6 +4654,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         let calendarModalTouchStart = { x: 0, y: 0, time: 0 };
         let calendarModalIsScrolling = false;
         
+        // Touch event tracking for daily tasks modal scroll detection
+        let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+        let dailyTasksModalIsScrolling = false;
+        
         // Calendar modal için touch event'leri
         function initCalendarModalTouchEvents() {
             const calendarModal = document.getElementById('calendarModal');
@@ -5194,6 +5198,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.display = 'flex';
                 // Body scroll'u engelle
                 document.body.style.overflow = 'hidden';
+                // Touch event'leri başlat
+                initDailyTasksModalTouchEvents();
             }
         }
 
@@ -5229,10 +5235,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             }
         }
-        
-        // Touch event tracking for daily tasks modal scroll detection
-        let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-        let dailyTasksModalIsScrolling = false;
         
         // Daily tasks modal için touch event'leri
         function initDailyTasksModalTouchEvents() {
@@ -5328,6 +5330,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
         function handleDailyTasksModalClick(event) {
+            // Scroll yapılıyorsa, modal'ı kapatma
+            if (dailyTasksModalIsScrolling) {
+                return;
+            }
+            
             // X butonuna veya ödül toplama butonuna tıklanırsa kapatma
             const target = event.target;
             if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
@@ -5347,6 +5354,79 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeDailyTasksModal();
+        }
+        
+        // Daily tasks modal için touch event'leri
+        function initDailyTasksModalTouchEvents() {
+            const dailyTasksModal = document.getElementById('dailyTasksModal');
+            const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
+            if (!dailyTasksModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
+            dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (dailyTasksScrollableContent) {
+                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
+                    dailyTasksModalIsScrolling = false;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    dailyTasksModalIsScrolling = true;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('touchend', function(e) {
+                    // Touch bittiğinde kısa bir süre sonra scroll durumunu sıfırla
+                    setTimeout(() => {
+                        dailyTasksModalIsScrolling = false;
+                    }, 100);
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            dailyTasksModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                dailyTasksModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                dailyTasksModalIsScrolling = false;
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    dailyTasksModalIsScrolling = true;
+                    return;
+                }
+                
+                if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
+                    
+                    // Dikey hareket yataydan fazlaysa, bu bir scroll olabilir
+                    if (deltaY > deltaX && deltaY > 10) {
+                        dailyTasksModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchend', function(e) {
+                // Touch bittiğinde kısa bir süre sonra scroll durumunu sıfırla
+                setTimeout(() => {
+                    dailyTasksModalIsScrolling = false;
+                    dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                }, 100);
+            }, { passive: true });
         }
 
         function updateTasksDisplay() {
