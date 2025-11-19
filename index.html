@@ -628,14 +628,10 @@
             </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
 
-            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
-            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-                Herhangi bir yere tıklayarak kapatabilirsiniz
-            </div>
         </div>
     </div>
 
-    <!-- Takvim Modal - Duolingo Style, Her Yere Tıklayınca Kapanır -->
+    <!-- Takvim Modal - Duolingo Style -->
     <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)">
         <div class="modal-content calendar-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
@@ -678,14 +674,11 @@
                         </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
 
-            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
-            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-                Herhangi bir yere tıklayarak kapatabilirsiniz
-                    </div>
-                </div>
             </div>
+        </div>
+    </div>
 
-    <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <!-- Günlük Görevler Modal -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
         <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
@@ -733,14 +726,10 @@
                 </div>
             </div>
 
-            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
-            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-                Herhangi bir yere tıklayarak kapatabilirsiniz
-            </div>
         </div>
     </div>
 
-    <!-- İstatistikler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <!-- İstatistikler Modal -->
     <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)">
         <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
@@ -1081,10 +1070,6 @@
             </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
 
-            <!-- Alt Bilgi - Her Yere Tıklayarak Kapat -->
-            <div style="text-align: center; font-size: 0.7em; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
-                Herhangi bir yere tıklayarak kapatabilirsiniz
-            </div>
         </div>
     </div>
 
@@ -5358,66 +5343,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
             dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
             
-            // Scroll edilebilir içerik alanında scroll algılama
+            // Scroll edilebilir içerik alanında scroll algılama (sadece scroll algılama için)
             if (dailyTasksScrollableContent) {
-                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
-                    dailyTasksModalIsScrolling = false;
-                }, { passive: true });
-                
                 dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
                     // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                     dailyTasksModalIsScrolling = true;
                 }, { passive: true });
-                
-                dailyTasksScrollableContent.addEventListener('touchend', function(e) {
-                    // Touch bittiğinde kısa bir süre sonra scroll durumunu sıfırla
-                    setTimeout(() => {
-                        dailyTasksModalIsScrolling = false;
-                    }, 100);
-                }, { passive: true });
             }
             
-            // Modal overlay için touch event'leri
-            dailyTasksModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
-                    return;
-                }
-                
-                const touch = e.touches[0];
-                dailyTasksModalTouchStart = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                    time: Date.now()
-                };
-                dailyTasksModalIsScrolling = false;
-            }, { passive: true });
-            
+            // Modal overlay için touch event'leri (sadece scroll algılama için)
             dailyTasksModal.addEventListener('touchmove', function(e) {
                 // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                 if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
                     dailyTasksModalIsScrolling = true;
-                    return;
                 }
-                
-                if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
-                    const touch = e.touches[0];
-                    const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
-                    const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-                    
-                    // Dikey hareket yataydan fazlaysa, bu bir scroll olabilir
-                    if (deltaY > deltaX && deltaY > 10) {
-                        dailyTasksModalIsScrolling = true;
-                    }
-                }
-            }, { passive: true });
-            
-            dailyTasksModal.addEventListener('touchend', function(e) {
-                // Touch bittiğinde kısa bir süre sonra scroll durumunu sıfırla
-                setTimeout(() => {
-                    dailyTasksModalIsScrolling = false;
-                    dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-                }, 100);
             }, { passive: true });
         }
 
