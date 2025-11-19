@@ -686,13 +686,17 @@
             </div>
 
     <!-- Günlük Görevler Modal -->
+    <!-- Günlük Görevler Modal - İstatistikler Modalı ile Aynı Yapı -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
         <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
                 <button onclick="event.stopPropagation(); closeDailyTasksModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
-    </div>
+            </div>
+
+            <!-- Scroll Edilebilir İçerik -->
+            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
 
             <!-- Genel İlerleme - Kompakt -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 10px; margin-bottom: 12px; text-align: center;">
@@ -705,34 +709,32 @@
                 </div>
             </div>
 
-            <!-- Görevler Container - Scroll Edilebilir -->
-            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
             <!-- Temel Görevler -->
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
-                    <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
+                <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
                     <!-- Görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
             <!-- Bonus Görevler -->
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 0.75em; font-weight: 600; color: #f59e0b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">⭐ Bonus Görevler</div>
-                    <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 0.75em; font-weight: 600; color: #f59e0b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">⭐ Bonus Görevler</div>
+                <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 6px;">
                     <!-- Bonus görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
             <!-- Ödül Toplama -->
-                <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 10px; padding: 12px; margin-top: 8px; text-align: center; border: 2px solid #4caf50;">
-                    <div style="font-size: 1em; color: #2e7d2e; font-weight: 700; margin-bottom: 4px;">🎉 Tebrikler!</div>
-                    <div style="font-size: 0.8em; color: #555; margin-bottom: 8px;">Tüm görevleri tamamladın!</div>
-                    <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.85em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        +2,500 Hasene Ödül Topla 🎁
+            <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 10px; padding: 12px; margin-top: 8px; text-align: center; border: 2px solid #4caf50;">
+                <div style="font-size: 1em; color: #2e7d2e; font-weight: 700; margin-bottom: 4px;">🎉 Tebrikler!</div>
+                <div style="font-size: 0.8em; color: #555; margin-bottom: 8px;">Tüm görevleri tamamladın!</div>
+                <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.85em; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    +2,500 Hasene Ödül Topla 🎁
                 </button>
-                </div>
             </div>
 
+            </div>
         </div>
     </div>
 
@@ -5370,7 +5372,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
         }
         
-        // Daily tasks modal için touch event'leri
+        // Daily tasks modal için touch event'leri (İstatistikler modalı ile aynı yapı)
         function initDailyTasksModalTouchEvents() {
             const dailyTasksModal = document.getElementById('dailyTasksModal');
             const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
