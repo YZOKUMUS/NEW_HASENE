@@ -1717,6 +1717,22 @@ body {
     font-weight: normal !important;
 }
 
+/* Boşluk Doldur - Vurgulanan kelime için özel stil */
+.bosluk-mode .golden-highlight {
+    color: #FF6B35 !important;
+    font-weight: 700 !important;
+    font-size: 1.15em !important;
+    text-shadow: 0 2px 8px rgba(255, 107, 53, 0.6) !important;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(255, 193, 7, 0.25) 100%) !important;
+    padding: 3px 6px !important;
+    border-radius: 6px !important;
+    border: 2px solid rgba(255, 107, 53, 0.4) !important;
+    display: inline-block !important;
+    transform: scale(1.05) !important;
+    transition: all 0.3s ease !important;
+    font-family: 'Uthmani', 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', serif !important;
+}
+
 .bosluk-mode .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;

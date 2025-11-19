@@ -8256,27 +8256,54 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showAnswerWithGoldenHighlight() {
-            // Doğru kelimeyi altın sarısı renkte vurgulayarak tam ayeti göster
+            // Doğru kelimeyi belirgin renkte vurgulayarak tam ayeti göster
             const fullText = currentBoslukQuestion.ayet_metni;
-            const highlightedText = fullText.replace(
-                new RegExp(`\\b${missingWord}\\b`, 'g'), 
-                `<span class="golden-highlight" style="color: #FFD700 !important; font-weight: bold !important; text-shadow: 0 0 5px rgba(255, 215, 0, 0.8) !important; background-color: rgba(255, 215, 0, 0.15) !important; padding: 1px 3px !important; border-radius: 3px !important; font-family: 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', serif !important;">${missingWord}</span>`
-            );
-            elements.boslukAyetText.innerHTML = highlightedText;
             
-            log.debug(`🌟 Doğru kelime "${missingWord}" altın sarısı ile vurgulandı!`);
-            log.debug(`📄 Tam metin: ${highlightedText}`);
+            log.debug(`🔍 Vurgulanacak kelime: "${missingWord}"`);
+            log.debug(`📄 Tam metin uzunluğu: ${fullText.length}`);
+            log.debug(`📄 Tam metin (ilk 50 karakter): "${fullText.substring(0, 50)}"`);
+            
+            // Arapça metinlerde direkt string replacement kullan (en güvenilir yöntem)
+            // Kelimeyi bul ve tüm eşleşmeleri değiştir
+            const highlightStyle = `style="color: #FF6B35 !important; font-weight: 700 !important; font-size: 1.15em !important; text-shadow: 0 2px 8px rgba(255, 107, 53, 0.6) !important; background: linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(255, 193, 7, 0.25) 100%) !important; padding: 3px 6px !important; border-radius: 6px !important; border: 2px solid rgba(255, 107, 53, 0.4) !important; display: inline-block !important; font-family: 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', serif !important; transform: scale(1.05) !important; transition: all 0.3s ease !important;"`;
+            
+            // Direkt string replacement - tüm eşleşmeleri değiştir
+            const highlightedWord = `<span class="golden-highlight" ${highlightStyle}>${missingWord}</span>`;
+            const finalText = fullText.split(missingWord).join(highlightedWord);
+            
+            log.debug(`✅ Vurgulama yapıldı. Yeni metin uzunluğu: ${finalText.length}`);
+            log.debug(`📄 Vurgulanmış metin (ilk 100 karakter): "${finalText.substring(0, 100)}"`);
+            
+            // innerHTML ile set et
+            elements.boslukAyetText.innerHTML = finalText;
             
             // Ekstra güvenlik için direct style da uygula
             setTimeout(() => {
                 const goldenSpans = elements.boslukAyetText.querySelectorAll('.golden-highlight');
-                goldenSpans.forEach(span => {
-                    span.style.color = '#FFD700';
-                    span.style.fontWeight = 'bold';
-                    span.style.textShadow = '0 0 5px rgba(255, 215, 0, 0.8)';
-                    span.style.backgroundColor = 'rgba(255, 215, 0, 0.1)';
+                log.debug(`🔍 Bulunan span sayısı: ${goldenSpans.length}`);
+                
+                goldenSpans.forEach((span, index) => {
+                    span.style.color = '#FF6B35';
+                    span.style.fontWeight = '700';
+                    span.style.fontSize = '1.15em';
+                    span.style.textShadow = '0 2px 8px rgba(255, 107, 53, 0.6)';
+                    span.style.background = 'linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(255, 193, 7, 0.25) 100%)';
+                    span.style.padding = '3px 6px';
+                    span.style.borderRadius = '6px';
+                    span.style.border = '2px solid rgba(255, 107, 53, 0.4)';
+                    span.style.display = 'inline-block';
+                    span.style.transform = 'scale(1.05)';
+                    span.style.transition = 'all 0.3s ease';
+                    
+                    log.debug(`✨ Span #${index + 1} stil uygulandı. İçerik: "${span.textContent}"`);
                 });
-                log.debug(`✨ ${goldenSpans.length} altın span bulundu ve stil uygulandı!`);
+                
+                if (goldenSpans.length === 0) {
+                    log.error(`❌ Hiç span bulunamadı! Kelime eşleşmedi: "${missingWord}"`);
+                    log.error(`📄 Metin içinde kelime var mı kontrol: ${fullText.includes(missingWord)}`);
+                } else {
+                    log.debug(`✅ ${goldenSpans.length} vurgulu span bulundu ve stil uygulandı!`);
+                }
             }, 100);
         }
 
