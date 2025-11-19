@@ -553,9 +553,9 @@
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
                 <button onclick="event.stopPropagation(); closeBadgesModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
-            
+
             <!-- Scroll Edilebilir İçerik -->
-            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
                 
                 <!-- Terakki Özeti -->
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
@@ -643,9 +643,9 @@
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
                 <button onclick="event.stopPropagation(); closeCalendarModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
-            
+
             <!-- Scroll Edilebilir İçerik -->
-            <div id="calendarScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+            <div id="calendarScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
                 
                 <!-- Streak Bilgisi -->
                 <div style="text-align: center; margin-bottom: 24px;">
@@ -687,7 +687,7 @@
 
     <!-- Günlük Görevler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: none;">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
@@ -706,7 +706,7 @@
             </div>
 
             <!-- Görevler Container - Scroll Edilebilir -->
-            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;">
+            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
             <!-- Temel Görevler -->
                 <div style="margin-bottom: 12px;">
                     <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">📋 Temel Görevler</div>
@@ -750,7 +750,7 @@
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
-            <div id="statsScrollableContent" style="flex: 1; overflow-y: auto; min-height: 0; padding-right: 4px; margin-bottom: 12px;">
+            <div id="statsScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
 
             <!-- Genel Özet -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center;">
