@@ -10192,6 +10192,20 @@ function showMainMenu() {
     let deferredPrompt;
     let pwaInstallBtn;
     
+    // localStorage kontrolü - daha önce yükleme yapıldı mı?
+    function hasPWAInstallBeenShown() {
+        return localStorage.getItem('pwaInstallShown') === 'true' || localStorage.getItem('pwaInstalled') === 'true';
+    }
+    
+    function markPWAInstallShown() {
+        localStorage.setItem('pwaInstallShown', 'true');
+    }
+    
+    function markPWAInstalled() {
+        localStorage.setItem('pwaInstalled', 'true');
+        localStorage.setItem('pwaInstallShown', 'true');
+    }
+    
     // Sayfa yüklendiğinde butonu al
     window.addEventListener('DOMContentLoaded', () => {
         pwaInstallBtn = document.getElementById('pwaInstallBtn');
@@ -10205,36 +10219,47 @@ function showMainMenu() {
             if (pwaInstallBtn) {
                 pwaInstallBtn.style.display = 'none';
             }
+            markPWAInstalled();
             log.debug('📱 Uygulama standalone modda çalışıyor (zaten yüklü)');
             return;
         }
         
-        // Sadece mobil cihazlarda butonu göster
-        // Masaüstünde PWA install tarayıcının kendi UI'sı ile yapılır
-        if (pwaInstallBtn) {
-            if (isMobile) {
-                // Mobil cihazlarda butonu göster (beforeinstallprompt event'i geldiğinde de görünecek)
-                pwaInstallBtn.style.display = 'block';
-                log.debug('📲 PWA install butonu görünür (mobil cihaz)');
-            } else {
-                // Masaüstünde butonu gizle
+        // Eğer daha önce yükleme yapıldıysa veya gösterildiyse, butonu gizle
+        if (hasPWAInstallBeenShown()) {
+            if (pwaInstallBtn) {
                 pwaInstallBtn.style.display = 'none';
-                log.debug('💻 Masaüstü cihaz - PWA install butonu gizli (tarayıcı UI kullanılır)');
             }
+            log.debug('📱 PWA install butonu daha önce gösterildi, tekrar gösterilmiyor');
+            return;
+        }
+        
+        // Buton başlangıçta gizli, sadece beforeinstallprompt event'i geldiğinde gösterilecek
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'none';
         }
     });
     
     // beforeinstallprompt event'i yakala
     window.addEventListener('beforeinstallprompt', (e) => {
+        // Eğer daha önce yükleme yapıldıysa, event'i ignore et
+        if (hasPWAInstallBeenShown()) {
+            log.debug('📱 PWA install daha önce gösterildi, event ignore ediliyor');
+            return;
+        }
+        
         // Varsayılan prompt'u engelle
         e.preventDefault();
         // Event'i sakla
         deferredPrompt = e;
-        // Butonu göster
-        if (pwaInstallBtn) {
+        
+        // Mobil cihaz kontrolü
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Sadece mobil cihazlarda butonu göster
+        if (pwaInstallBtn && isMobile) {
             pwaInstallBtn.style.display = 'block';
+            log.debug('📲 PWA install butonu görünür (mobil cihaz, beforeinstallprompt)');
         }
-        log.debug('📲 PWA install prompt hazır');
     });
     
     // Uygulama zaten yüklüyse butonu gizle
@@ -10243,6 +10268,7 @@ function showMainMenu() {
             pwaInstallBtn.style.display = 'none';
         }
         deferredPrompt = null;
+        markPWAInstalled();
         log.debug('✅ PWA başarıyla yüklendi');
     });
     
@@ -10294,8 +10320,10 @@ function showMainMenu() {
         
         if (outcome === 'accepted') {
             log.debug('✅ Kullanıcı PWA yüklemeyi kabul etti');
+            markPWAInstalled();
         } else {
             log.debug('❌ Kullanıcı PWA yüklemeyi reddetti');
+            markPWAInstallShown(); // Reddettiğinde de gösterildi olarak işaretle, tekrar çıkmasın
         }
         
         // Prompt'u temizle
@@ -10311,23 +10339,27 @@ function showMainMenu() {
 <button id="pwaInstallBtn" onclick="window.triggerPWAInstall()"
     style="
         position: fixed;
-        bottom: 90px;
-        right: 20px;
-        padding: 12px 18px;
+        bottom: 100px;
+        right: 15px;
+        left: 15px;
+        max-width: 300px;
+        margin: 0 auto;
+        padding: 14px 20px;
         background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
         border: none;
-        border-radius: 12px;
-        font-size: clamp(13px, 3vw, 15px);
+        border-radius: 14px;
+        font-size: clamp(14px, 3.5vw, 16px);
         font-weight: bold;
         color: #1a1a1a;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-        z-index: 9999;
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        z-index: 10000;
         display: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        text-align: center;
     "
-    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(255, 215, 0, 0.5)'"
-    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(255, 215, 0, 0.4)'">
+    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(255, 215, 0, 0.6)'"
+    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 215, 0, 0.5)'">
     📲 Uygulamayı Yükle
 </button>
 
