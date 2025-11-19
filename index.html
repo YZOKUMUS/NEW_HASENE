@@ -688,15 +688,15 @@
     <!-- Günlük Görevler Modal -->
     <!-- Günlük Görevler Modal - İstatistikler Modalı ile Aynı Yapı -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y; box-sizing: border-box;">
             <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
                 <button onclick="event.stopPropagation(); closeDailyTasksModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
-            <div id="dailyTasksScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
+            <div id="dailyTasksScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
 
             <!-- Genel İlerleme - Kompakt -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 10px; margin-bottom: 12px; text-align: center;">
@@ -740,15 +740,15 @@
 
     <!-- İstatistikler Modal -->
     <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)">
-        <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+        <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y; box-sizing: border-box;">
             <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
                 <button onclick="event.stopPropagation(); closeStatsModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
-            <div id="statsScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
+            <div id="statsScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
 
             <!-- Genel Özet -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border-radius: 8px; margin: 8px 0; text-align: center;">
