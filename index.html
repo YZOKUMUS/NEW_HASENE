@@ -440,7 +440,13 @@
                     <div style="font-size: 1.5em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
                 </div>
                 <div class="sure-info" id="dinleSureInfo" style="text-align: center; color: var(--md-on-surface-variant); font-size: 12px; margin: 8px 0;">ID: 0</div>
-                <button class="audio-btn" id="dinleAudioBtn"></button>
+                <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 12px;">
+                    <button class="audio-btn" id="dinleAudioBtn" title="Sesi tekrar çal"></button>
+                    <button class="audio-btn" id="dinleMicBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: all 0.3s;" title="Ses tanıma ile cevap ver">
+                        <span style="font-size: 1.5em;">🎤</span>
+                    </button>
+                </div>
+                <div id="speechStatus" style="text-align: center; font-size: 0.85em; color: #666; margin-bottom: 8px; min-height: 20px;"></div>
                 <div class="options" id="dinleOptions"></div>
                 <div class="feedback" id="dinleFeedback"></div>
                 <button class="flutter-btn flutter-btn-primary" id="dinleNextBtn" style="width: 100%; max-width: 100%; margin-top: 16px; min-height: 44px; font-size: clamp(12px, 3vw, 14px); box-sizing: border-box;" aria-label="Sonraki soruya geç">Sonraki Soru →</button>
@@ -976,6 +982,102 @@
 
             </div>
             <!-- Kelime İstatistikleri Bölümü Sonu -->
+            
+            <!-- Detaylı Analitik Bölümü -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <h4 style="margin: 0 0 15px 0; font-size: 1.1em; color: #667eea; font-weight: 600;">📊 Detaylı Analitik</h4>
+                
+                <!-- Zaman Analizi -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9em; font-weight: 600; color: #333; margin-bottom: 10px;">⏰ Bugünkü Aktiflik</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85em;">
+                        <div>
+                            <div style="color: #666; margin-bottom: 4px;">Süre</div>
+                            <div style="font-weight: 600; color: #667eea;" id="analyticsTodayTime">0 dk</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; margin-bottom: 4px;">Soru/Saat</div>
+                            <div style="font-weight: 600; color: #667eea;" id="analyticsQuestionPerHour">0</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hedef Tahmini -->
+                <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9em; font-weight: 600; color: #333; margin-bottom: 10px;">🎯 Günlük Hedef Durumu</div>
+                    <div style="font-size: 0.85em; color: #555; margin-bottom: 8px;">
+                        <div style="margin-bottom: 6px;">
+                            <span style="color: #666;">Hedef:</span> <strong id="analyticsDailyGoal">0</strong> Hasene
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <span style="color: #666;">İlerleme:</span> <strong id="analyticsTodayProgress">0</strong> / <span id="analyticsDailyGoalTotal">0</span> Hasene
+                        </div>
+                        <div style="background: rgba(255,255,255,0.5); height: 8px; border-radius: 4px; margin: 8px 0; overflow: hidden;">
+                            <div id="analyticsGoalProgressBar" style="background: #f39c12; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                        <div style="font-size: 0.8em; color: #856404;">
+                            <span id="analyticsTimeToGoal">Tahmini süre hesaplanıyor...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kelime Performans Özeti -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9em; font-weight: 600; color: #333; margin-bottom: 10px;">📈 Kelime Performansı</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85em;">
+                        <div>
+                            <div style="color: #666; margin-bottom: 4px;">Ortalama Başarı</div>
+                            <div style="font-weight: 600; color: #27ae60;" id="analyticsAvgSuccess">%0</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; margin-bottom: 4px;">En Zor Kelime</div>
+                            <div style="font-weight: 600; color: #e74c3c; font-size: 0.8em;" id="analyticsHardestWord">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Öğrenme Haritası -->
+                <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9em; font-weight: 600; color: #333; margin-bottom: 10px;">🗺️ Öğrenme Haritası</div>
+                    <div style="font-size: 0.85em; color: #555;">
+                        <div style="margin-bottom: 8px;">
+                            <span style="color: #27ae60;">●</span> <strong>Öğrenildi:</strong> <span id="analyticsLearnedCount">0</span> kelime
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <span style="color: #f39c12;">●</span> <strong>Pratik Gerekli:</strong> <span id="analyticsPracticeCount">0</span> kelime
+                        </div>
+                        <div>
+                            <span style="color: #e74c3c;">●</span> <strong>Zorlanılan:</strong> <span id="analyticsStrugglingCount">0</span> kelime
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Detaylı Analitik Bölümü Sonu -->
+            
+            <!-- Liderlik Tablosu Bölümü -->
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                <h4 style="margin: 0 0 15px 0; font-size: 1.1em; color: #667eea; font-weight: 600;">🏆 Liderlik Tablosu</h4>
+                
+                <div style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="font-size: 0.9em; font-weight: 600; color: #333; margin-bottom: 10px; text-align: center;">📊 Sıralaman</div>
+                    <div style="text-align: center; font-size: 1.5em; font-weight: bold; color: #8b4513;" id="leaderboardYourRank">-</div>
+                    <div style="text-align: center; font-size: 0.85em; color: #555; margin-top: 8px;" id="leaderboardYourScore">Hasene: 0</div>
+                </div>
+                
+                <!-- Liderlik Listesi -->
+                <div id="leaderboardList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                    <div style="text-align: center; padding: 20px; color: #666; font-size: 0.9em;">
+                        Henüz liderlik tablosu verisi yok. Oyun oynayarak sıralamaya katıl!
+                    </div>
+                </div>
+                
+                <!-- Not: Bu basit bir yerel liderlik tablosudur. Gerçek bir sosyal özellik için sunucu desteği gerekir. -->
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 0.75em; color: #666; text-align: center;">
+                    💡 Bu yerel bir liderlik tablosudur. Daha gelişmiş sosyal özellikler için sunucu desteği gereklidir.
+                </div>
+            </div>
+            <!-- Liderlik Tablosu Bölümü Sonu -->
+            
             </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
 
@@ -1156,7 +1258,9 @@
             debugElements: false,       // DOM element kontrolleri
             debugAudio: false,          // Ses sistemi debug'ları
             debugGameFlow: false,       // Oyun akışı debug'ları
-            showCriticalErrors: true    // Kritik hataları her zaman göster
+            showCriticalErrors: true,   // Kritik hataları her zaman göster
+            hapticEnabled: true,        // Haptic feedback (titreme) aktif mi
+            swipeGesturesEnabled: true  // Swipe jestleri aktif mi
         };
         
         // Helper fonksiyon - güvenli console.log
@@ -1187,6 +1291,91 @@
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+        
+        // ============ MOBİL DENEYİM - HAPTIC FEEDBACK ============
+        function hapticFeedback(type = 'light') {
+            if (!CONFIG.hapticEnabled || !navigator.vibrate) return;
+            
+            const patterns = {
+                light: 10,           // Hafif titreşim (buton tıklama)
+                medium: 20,          // Orta titreşim (doğru cevap)
+                heavy: 50,           // Güçlü titreşim (yanlış cevap, önemli olay)
+                success: [20, 50, 20],  // Başarılı işlem (combo, seviye atlama)
+                error: [50, 100, 50],   // Hata (yanlış cevap)
+                warning: [30, 50, 30]   // Uyarı (can azalması)
+            };
+            
+            const pattern = patterns[type] || patterns.light;
+            navigator.vibrate(pattern);
+        }
+        
+        // ============ MOBİL DENEYİM - SWIPE GESTURES ============
+        function initSwipeGestures(element, callbacks) {
+            if (!CONFIG.swipeGesturesEnabled || !element) return;
+            
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchEndX = 0;
+            let touchEndY = 0;
+            let isScrolling = false;
+            
+            const minSwipeDistance = 50; // Minimum swipe mesafesi (px)
+            const maxVerticalDistance = 100; // Dikey scroll için maksimum mesafe
+            
+            element.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
+                isScrolling = false;
+            }, { passive: true });
+            
+            element.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                const deltaY = Math.abs(touch.clientY - touchStartY);
+                // Eğer dikey hareket fazlaysa, bu bir scroll'dur
+                if (deltaY > maxVerticalDistance) {
+                    isScrolling = true;
+                }
+            }, { passive: true });
+            
+            element.addEventListener('touchend', (e) => {
+                if (isScrolling) return;
+                
+                const touch = e.changedTouches[0];
+                touchEndX = touch.clientX;
+                touchEndY = touch.clientY;
+                
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                const absDeltaX = Math.abs(deltaX);
+                const absDeltaY = Math.abs(deltaY);
+                
+                // Dikey swipe (yukarı/aşağı)
+                if (absDeltaY > absDeltaX && absDeltaY > minSwipeDistance) {
+                    if (deltaY > 0 && callbacks.onSwipeDown) {
+                        // Swipe down (aşağı kaydırma)
+                        callbacks.onSwipeDown();
+                        hapticFeedback('light');
+                    } else if (deltaY < 0 && callbacks.onSwipeUp) {
+                        // Swipe up (yukarı kaydırma)
+                        callbacks.onSwipeUp();
+                        hapticFeedback('light');
+                    }
+                }
+                // Yatay swipe (sağa/sola)
+                else if (absDeltaX > absDeltaY && absDeltaX > minSwipeDistance) {
+                    if (deltaX > 0 && callbacks.onSwipeRight) {
+                        // Swipe right (sağa kaydırma)
+                        callbacks.onSwipeRight();
+                        hapticFeedback('light');
+                    } else if (deltaX < 0 && callbacks.onSwipeLeft) {
+                        // Swipe left (sola kaydırma)
+                        callbacks.onSwipeLeft();
+                        hapticFeedback('light');
+                    }
+                }
+            }, { passive: true });
         }
         
         // ============ SECURITY - HTML SANITIZATION ============
@@ -1286,7 +1475,13 @@
             iconEl.textContent = config.icon;
             titleEl.textContent = title || config.title;
             titleEl.style.color = config.color;
-            messageEl.textContent = message;
+            
+            // HTML içeriği varsa innerHTML kullan, yoksa textContent
+            if (message.includes('<') && message.includes('>')) {
+                safeSetHTML(messageEl, message, true);
+            } else {
+                messageEl.textContent = message;
+            }
             
             // Show modal
             modal.style.display = 'flex';
@@ -3049,6 +3244,11 @@ window.hideAllGameScreens = hideAllGameScreens;
                     saveToURL();
                 } catch(e) { log.error('URL save failed:', e); }
                 
+                // 4. Hedef tamamlama bildirimi kontrolü
+                if (typeof checkGoalCompletion === 'function') {
+                    checkGoalCompletion();
+                }
+                
                 log.debug('💾 ÜÇLÜ KORUMA: IndexedDB + localStorage + URL ile kaydedildi!', totalPoints);
                 
             } catch (error) {
@@ -3693,7 +3893,245 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 updateWordStatistics();
             }
             
+            // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
+            updateAnalyticsData();
+            
+            // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
+            updateLeaderboard();
+            
             log.debug('📊 İstatistikler modalı açıldı');
+        }
+        
+        // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
+        function updateAnalyticsData() {
+            // Zaman analizi
+            const todayTotalQuestions = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
+            // Ortalama bir soru ~10 saniye sürer (kelime çevir için)
+            const todayMinutes = Math.round((todayTotalQuestions * 10) / 60);
+            const questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions / todayMinutes) * 60) : 0;
+            
+            const analyticsTodayTime = document.getElementById('analyticsTodayTime');
+            const analyticsQuestionPerHour = document.getElementById('analyticsQuestionPerHour');
+            if (analyticsTodayTime) analyticsTodayTime.textContent = todayMinutes + ' dk';
+            if (analyticsQuestionPerHour) analyticsQuestionPerHour.textContent = questionsPerHour;
+            
+            // Günlük hedef durumu
+            const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || '2700');
+            const todayProgress = dailyTasks.todayStats.toplamPuan || 0;
+            const goalProgressPercent = dailyGoalHasene > 0 ? Math.min(100, Math.round((todayProgress / dailyGoalHasene) * 100)) : 0;
+            
+            const analyticsDailyGoal = document.getElementById('analyticsDailyGoal');
+            const analyticsTodayProgress = document.getElementById('analyticsTodayProgress');
+            const analyticsDailyGoalTotal = document.getElementById('analyticsDailyGoalTotal');
+            const analyticsGoalProgressBar = document.getElementById('analyticsGoalProgressBar');
+            const analyticsTimeToGoal = document.getElementById('analyticsTimeToGoal');
+            
+            if (analyticsDailyGoal) analyticsDailyGoal.textContent = dailyGoalHasene.toLocaleString();
+            if (analyticsTodayProgress) analyticsTodayProgress.textContent = todayProgress.toLocaleString();
+            if (analyticsDailyGoalTotal) analyticsDailyGoalTotal.textContent = dailyGoalHasene.toLocaleString();
+            if (analyticsGoalProgressBar) analyticsGoalProgressBar.style.width = goalProgressPercent + '%';
+            
+            // Hedef için tahmini süre hesapla
+            if (analyticsTimeToGoal) {
+                const remainingPoints = Math.max(0, dailyGoalHasene - todayProgress);
+                if (remainingPoints === 0) {
+                    analyticsTimeToGoal.textContent = '🎉 Hedef tamamlandı!';
+                } else if (questionsPerHour > 0 && todayProgress > 0) {
+                    // Ortalama puan/soru: bugünkü puan / bugünkü soru sayısı
+                    const avgPointsPerQuestion = todayTotalQuestions > 0 ? todayProgress / todayTotalQuestions : 20;
+                    const remainingQuestions = Math.ceil(remainingPoints / avgPointsPerQuestion);
+                    const estimatedMinutes = Math.ceil((remainingQuestions * 10) / 60);
+                    
+                    if (estimatedMinutes < 60) {
+                        analyticsTimeToGoal.textContent = `Tahmini: ${estimatedMinutes} dakika kaldı`;
+                    } else {
+                        const hours = Math.floor(estimatedMinutes / 60);
+                        const mins = estimatedMinutes % 60;
+                        analyticsTimeToGoal.textContent = `Tahmini: ${hours} saat ${mins} dakika kaldı`;
+                    }
+                } else {
+                    analyticsTimeToGoal.textContent = 'Oyun oynayarak başla!';
+                }
+            }
+            
+            // Kelime performansı
+            const wordStats = loadWordStats();
+            const wordStatsArray = Object.values(wordStats);
+            
+            if (wordStatsArray.length > 0) {
+                // Ortalama başarı oranı
+                const totalSuccessRate = wordStatsArray.reduce((sum, stat) => sum + (stat.successRate || 0), 0);
+                const avgSuccessRate = Math.round((totalSuccessRate / wordStatsArray.length) * 100);
+                
+                // En zor kelime (en düşük başarı oranı ve en çok deneme)
+                const hardestWord = wordStatsArray
+                    .filter(s => s.attempts > 0)
+                    .sort((a, b) => {
+                        const scoreA = (a.successRate || 0) * (a.attempts || 1);
+                        const scoreB = (b.successRate || 0) * (b.attempts || 1);
+                        return scoreA - scoreB; // En düşük skor en zor
+                    })[0];
+                
+                const analyticsAvgSuccess = document.getElementById('analyticsAvgSuccess');
+                const analyticsHardestWord = document.getElementById('analyticsHardestWord');
+                
+                if (analyticsAvgSuccess) analyticsAvgSuccess.textContent = '%' + avgSuccessRate;
+                if (analyticsHardestWord && hardestWord) {
+                    // Kelime verisini bul
+                    const wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
+                    if (wordData) {
+                        analyticsHardestWord.textContent = wordData.kelime || '-';
+                    } else {
+                        analyticsHardestWord.textContent = '-';
+                    }
+                }
+            }
+            
+            // Öğrenme haritası
+            const masteredWords = wordStatsArray.filter(s => s.masteryLevel >= 3.0 && s.successRate >= 0.6).length;
+            const practiceWords = wordStatsArray.filter(s => s.masteryLevel >= 1.5 && s.masteryLevel < 3.0 && s.successRate >= 0.5).length;
+            const strugglingWords = wordStatsArray.filter(s => s.successRate < 0.6 || s.masteryLevel < 1.0).length;
+            
+            const analyticsLearnedCount = document.getElementById('analyticsLearnedCount');
+            const analyticsPracticeCount = document.getElementById('analyticsPracticeCount');
+            const analyticsStrugglingCount = document.getElementById('analyticsStrugglingCount');
+            
+            if (analyticsLearnedCount) analyticsLearnedCount.textContent = masteredWords;
+            if (analyticsPracticeCount) analyticsPracticeCount.textContent = practiceWords;
+            if (analyticsStrugglingCount) analyticsStrugglingCount.textContent = strugglingWords;
+        }
+        
+        // ============ LİDERLİK TABLOSU SİSTEMİ ============
+        // Liderlik tablosu verisini yükle
+        function loadLeaderboard() {
+            try {
+                const data = localStorage.getItem('haseneLeaderboard');
+                if (data) {
+                    return JSON.parse(data);
+                }
+            } catch (error) {
+                log.error('Liderlik tablosu yükleme hatası:', error);
+            }
+            return [];
+        }
+        
+        // Liderlik tablosu verisini kaydet
+        function saveLeaderboard(leaderboard) {
+            try {
+                // Maksimum 100 kayıt tut
+                const sorted = leaderboard
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 100);
+                localStorage.setItem('haseneLeaderboard', JSON.stringify(sorted));
+                return sorted;
+            } catch (error) {
+                log.error('Liderlik tablosu kaydetme hatası:', error);
+                return leaderboard;
+            }
+        }
+        
+        // Liderlik tablosuna kullanıcı ekle/güncelle
+        function updateLeaderboardEntry(userName, score) {
+            const leaderboard = loadLeaderboard();
+            const now = new Date().toISOString();
+            
+            // Kullanıcı adını localStorage'dan al veya varsayılan kullan
+            const defaultName = userName || 'Kullanıcı';
+            
+            // Mevcut kullanıcıyı bul
+            let userIndex = leaderboard.findIndex(entry => entry.name === defaultName);
+            
+            if (userIndex >= 0) {
+                // Güncelle
+                if (score > leaderboard[userIndex].score) {
+                    leaderboard[userIndex].score = score;
+                    leaderboard[userIndex].updatedAt = now;
+                }
+            } else {
+                // Yeni ekle
+                leaderboard.push({
+                    name: defaultName,
+                    score: score,
+                    createdAt: now,
+                    updatedAt: now
+                });
+            }
+            
+            return saveLeaderboard(leaderboard);
+        }
+        
+        // Liderlik tablosunu güncelle ve göster
+        function updateLeaderboard() {
+            // Önce mevcut kullanıcıyı güncelle
+            const userName = localStorage.getItem('haseneUserName') || 'Kullanıcı';
+            updateLeaderboardEntry(userName, totalPoints);
+            
+            // Liderlik tablosunu yükle
+            const leaderboard = loadLeaderboard();
+            const sortedLeaderboard = leaderboard.sort((a, b) => b.score - a.score);
+            
+            // Kullanıcının sıralamasını bul
+            const userIndex = sortedLeaderboard.findIndex(entry => entry.name === userName);
+            const userRank = userIndex >= 0 ? userIndex + 1 : '-';
+            const userScore = totalPoints;
+            
+            // Kullanıcı bilgilerini güncelle
+            const leaderboardYourRank = document.getElementById('leaderboardYourRank');
+            const leaderboardYourScore = document.getElementById('leaderboardYourScore');
+            
+            if (leaderboardYourRank) {
+                if (userRank === 1) {
+                    leaderboardYourRank.textContent = '🥇 ' + userRank;
+                } else if (userRank === 2) {
+                    leaderboardYourRank.textContent = '🥈 ' + userRank;
+                } else if (userRank === 3) {
+                    leaderboardYourRank.textContent = '🥉 ' + userRank;
+                } else {
+                    leaderboardYourRank.textContent = '#' + userRank;
+                }
+            }
+            if (leaderboardYourScore) {
+                leaderboardYourScore.textContent = 'Hasene: ' + userScore.toLocaleString();
+            }
+            
+            // Liderlik listesini göster
+            const leaderboardList = document.getElementById('leaderboardList');
+            if (leaderboardList) {
+                if (sortedLeaderboard.length === 0) {
+                    leaderboardList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #666; font-size: 0.9em;">
+                            Henüz liderlik tablosu verisi yok. Oyun oynayarak sıralamaya katıl!
+                        </div>
+                    `;
+                } else {
+                    leaderboardList.innerHTML = sortedLeaderboard.slice(0, 10).map((entry, index) => {
+                        const rank = index + 1;
+                        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                        const isCurrentUser = entry.name === userName;
+                        
+                        return `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: ${isCurrentUser ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8f9fa'}; border-radius: 8px; border: ${isCurrentUser ? '2px solid #667eea' : '1px solid #e0e0e0'};">
+                                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                                    <div style="font-size: 1.2em; font-weight: bold; color: ${isCurrentUser ? 'white' : '#667eea'}; min-width: 40px; text-align: center;">
+                                        ${rankEmoji || '#' + rank}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: ${isCurrentUser ? 'bold' : '600'}; color: ${isCurrentUser ? 'white' : '#333'}; font-size: 0.9em;">
+                                            ${sanitizeHTML(entry.name)}${isCurrentUser ? ' (Sen)' : ''}
+                                        </div>
+                                        <div style="font-size: 0.75em; color: ${isCurrentUser ? 'rgba(255,255,255,0.9)' : '#666'}; margin-top: 2px;">
+                                            ${new Date(entry.updatedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="font-size: 1.1em; font-weight: bold; color: ${isCurrentUser ? 'white' : '#667eea'};">
+                                    ${entry.score.toLocaleString()}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
         }
 
         function getDaysFromFirstPlay() {
@@ -5264,6 +5702,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.mainMenu) elements.mainMenu.style.display = 'none';
             if (elements.dinleMode) {
                 elements.dinleMode.style.display = 'block';
+                
+                // Ses tanıma sistemini başlat
+                initSpeechRecognition();
                 elements.dinleMode.style.zIndex = '';
             }
             log.game('✅ UI değişikliği tamamlandı');
@@ -5284,6 +5725,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
                 }
             };
+            
+            // Mikrofon butonu event listener
+            const dinleMicBtn = document.getElementById('dinleMicBtn');
+            if (dinleMicBtn) {
+                dinleMicBtn.onclick = () => {
+                    startSpeechRecognition();
+                };
+            }
             
             // Next butonu event handler'ını buraya taşıdık
             elements.dinleNextBtn.onclick = () => {
@@ -6266,6 +6715,580 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         let currentDinleQuestion = null;
         let dinleQuestionCount = 0;
         const DINLE_MAX_QUESTIONS = 10;
+        
+        // ============ SES TANIMA SİSTEMİ ============
+        let recognition = null;
+        let isListening = false;
+        
+        // Mikrofon iznini kontrol et
+        async function checkMicrophonePermission() {
+            try {
+                // Permissions API desteği var mı? (Chrome/Edge için)
+                if (navigator.permissions && navigator.permissions.query) {
+                    try {
+                        // Chrome/Edge için 'microphone' kullan
+                        const permission = await navigator.permissions.query({ name: 'microphone' });
+                        log.debug('Mikrofon izin durumu (Permissions API):', permission.state);
+                        return permission.state;
+                    } catch (permError) {
+                        // Permissions API'de 'microphone' desteklenmiyorsa getUserMedia ile test et
+                        log.debug('Permissions API mikrofon desteği yok, getUserMedia ile test ediliyor');
+                    }
+                }
+                
+                // Permissions API yoksa veya desteklenmiyorsa, getUserMedia ile test et
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        stream.getTracks().forEach(track => track.stop()); // Stream'i hemen kapat
+                        log.debug('Mikrofon izin durumu (getUserMedia): granted');
+                        return 'granted';
+                    } catch (error) {
+                        log.debug('Mikrofon izin hatası:', error.name, error.message);
+                        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                            return 'denied';
+                        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                            return 'not-found';
+                        }
+                        return 'prompt';
+                    }
+                }
+                
+                return 'unknown';
+            } catch (error) {
+                log.error('Mikrofon izin kontrolü hatası:', error);
+                return 'unknown';
+            }
+        }
+        
+        // Mobil cihaz tespiti
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
+        }
+        
+        // Web Speech API desteğini kontrol et ve başlat
+        function initSpeechRecognition() {
+            const isMobile = isMobileDevice();
+            
+            // HTTPS kontrolü (mobil cihazlarda daha esnek)
+            const isSecureContext = location.protocol === 'https:' || 
+                                   location.hostname === 'localhost' || 
+                                   location.hostname === '127.0.0.1' ||
+                                   location.hostname === '0.0.0.0' ||
+                                   window.isSecureContext;
+            
+            if (!isSecureContext) {
+                log.warn('Ses tanıma için HTTPS gerekli');
+                const micBtn = document.getElementById('dinleMicBtn');
+                const statusEl = document.getElementById('speechStatus');
+                if (micBtn) {
+                    micBtn.style.display = 'none';
+                }
+                if (statusEl) {
+                    if (isMobile) {
+                        statusEl.textContent = '⚠️ Ses tanıma için güvenli bağlantı gerekli. Lütfen HTTPS üzerinden erişin veya uygulamayı ana ekrana ekleyin.';
+                    } else {
+                        statusEl.textContent = '⚠️ Ses tanıma için HTTPS gerekli';
+                    }
+                    statusEl.style.color = '#f39c12';
+                }
+                return false;
+            }
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                log.warn('Ses tanıma API desteği yok');
+                const micBtn = document.getElementById('dinleMicBtn');
+                const statusEl = document.getElementById('speechStatus');
+                if (micBtn) {
+                    micBtn.style.display = 'none';
+                }
+                if (statusEl) {
+                    if (isMobile) {
+                        statusEl.textContent = '⚠️ Bu tarayıcı ses tanımayı desteklemiyor. Chrome veya Safari kullanmayı deneyin.';
+                    } else {
+                        statusEl.textContent = '⚠️ Bu tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı deneyin.';
+                    }
+                    statusEl.style.color = '#f39c12';
+                }
+                return false;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            // Türkçe ve Arapça dil desteği
+            recognition.lang = 'tr-TR,ar-SA';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 3;
+            
+            recognition.onstart = () => {
+                isListening = true;
+                const statusEl = document.getElementById('speechStatus');
+                const micBtn = document.getElementById('dinleMicBtn');
+                if (statusEl) {
+                    statusEl.textContent = '🎤 Dinleniyor...';
+                    statusEl.style.color = '#667eea';
+                }
+                if (micBtn) {
+                    micBtn.style.background = 'linear-gradient(135deg, #f44336 0%, #e91e63 100%)';
+                    micBtn.style.transform = 'scale(1.1)';
+                }
+                triggerHaptic('light');
+            };
+            
+            recognition.onresult = (event) => {
+                const results = event.results;
+                let recognizedText = '';
+                
+                // En iyi sonucu al
+                for (let i = 0; i < results.length; i++) {
+                    recognizedText = results[i][0].transcript.trim();
+                    log.debug('Ses tanıma sonucu:', recognizedText);
+                }
+                
+                // Kelimeyi bul ve eşleştir
+                if (recognizedText && currentDinleQuestion) {
+                    matchSpeechToAnswer(recognizedText);
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                isListening = false;
+                const statusEl = document.getElementById('speechStatus');
+                const micBtn = document.getElementById('dinleMicBtn');
+                
+                let errorMsg = 'Ses tanıma hatası';
+                let helpText = '';
+                
+                if (event.error === 'no-speech') {
+                    errorMsg = 'Konuşma algılanamadı';
+                    helpText = 'Daha yüksek sesle konuşmayı deneyin';
+                } else if (event.error === 'audio-capture') {
+                    errorMsg = 'Mikrofon bulunamadı';
+                    helpText = 'Mikrofonun bağlı olduğundan emin olun. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.';
+                } else if (event.error === 'not-allowed') {
+                    errorMsg = 'Mikrofon izni verilmedi';
+                    helpText = 'Tarayıcı ayarlarından mikrofon izni verin';
+                } else if (event.error === 'aborted') {
+                    errorMsg = 'Ses tanıma durduruldu';
+                    helpText = '';
+                } else if (event.error === 'network') {
+                    errorMsg = 'Bağlantı hatası';
+                    helpText = 'Ses tanıma servisine bağlanılamıyor. İnternet bağlantınızı kontrol edin veya birkaç saniye sonra tekrar deneyin.';
+                } else {
+                    // Bilinmeyen hata
+                    errorMsg = 'Ses tanıma hatası';
+                    helpText = `Hata kodu: ${event.error}. Lütfen sayfayı yenileyip tekrar deneyin.`;
+                }
+                
+                if (statusEl) {
+                    statusEl.innerHTML = '❌ ' + errorMsg + (helpText ? '<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">' + helpText + '</small>' : '');
+                    statusEl.style.color = '#f44336';
+                    
+                    // Network hatası için yardım butonu ekle
+                    if (event.error === 'network') {
+                        const retryBtn = document.createElement('button');
+                        retryBtn.textContent = '🔄 Tekrar Dene';
+                        retryBtn.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 600;';
+                        retryBtn.onclick = () => {
+                            statusEl.innerHTML = '🔄 Tekrar deneniyor...';
+                            statusEl.style.color = '#f39c12';
+                            setTimeout(() => {
+                                if (window.startSpeechRecognition) {
+                                    window.startSpeechRecognition();
+                                }
+                            }, 500);
+                        };
+                        // Önceki butonu kaldır
+                        const oldBtn = statusEl.querySelector('button');
+                        if (oldBtn) oldBtn.remove();
+                        statusEl.appendChild(retryBtn);
+                    }
+                }
+                if (micBtn) {
+                    micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    micBtn.style.transform = 'scale(1)';
+                }
+                
+                log.error('Ses tanıma hatası:', event.error, event);
+                triggerHaptic('error');
+                
+                // İzin hatası ise kullanıcıya yardım göster
+                if (event.error === 'not-allowed') {
+                    setTimeout(() => {
+                        showMicrophonePermissionHelp();
+                    }, 1000);
+                } else if (event.error === 'audio-capture') {
+                    // Mikrofon bulunamadı hatası için Bluetooth yardımı göster
+                    setTimeout(() => {
+                        showBluetoothMicrophoneHelp();
+                    }, 1500);
+                } else if (event.error === 'network') {
+                    // Network hatası için de yardım göster
+                    setTimeout(() => {
+                        showNetworkErrorHelp();
+                    }, 1500);
+                }
+            };
+            
+            recognition.onend = () => {
+                isListening = false;
+                const micBtn = document.getElementById('dinleMicBtn');
+                if (micBtn) {
+                    micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    micBtn.style.transform = 'scale(1)';
+                }
+                // Stream'i temizle (Bluetooth mikrofon için)
+                if (microphoneStream) {
+                    microphoneStream.getTracks().forEach(track => track.stop());
+                    microphoneStream = null;
+                }
+            };
+            
+            return true;
+        }
+        
+        // Bluetooth mikrofon yardımı göster
+        function showBluetoothMicrophoneHelp() {
+            const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
+<strong style="color: #667eea; font-size: 1.1em;">🎧 Bluetooth Mikrofon Sorunu</strong><br><br>
+
+<strong style="color: #333;">1️⃣ Sistem Ayarları:</strong><br>
+• <strong>Windows:</strong> Ayarlar > Sistem > Ses > Giriş > Bluetooth kulaklığınızı seçin<br>
+• <strong>Mac:</strong> Sistem Tercihleri > Ses > Giriş > Bluetooth kulaklığınızı seçin<br>
+• <strong>Android:</strong> Ayarlar > Bağlantılar > Bluetooth > Kulaklık ayarları > Mikrofon izni<br>
+• <strong>iOS:</strong> Ayarlar > Bluetooth > Kulaklık > Mikrofon izni<br><br>
+
+<strong style="color: #333;">2️⃣ Tarayıcı Ayarları:</strong><br>
+• Chrome/Edge: Adres çubuğundaki 🔒 simgesine tıklayın<br>
+• "Mikrofon" iznini <strong>"İzin ver"</strong> yapın<br>
+• Sayfayı yenileyin (F5)<br><br>
+
+<strong style="color: #333;">3️⃣ Bluetooth Bağlantısı:</strong><br>
+• Bluetooth kulaklığın tam olarak bağlı olduğundan emin olun<br>
+• Kulaklığı çıkarıp tekrar takmayı deneyin<br>
+• Bluetooth'u kapatıp açmayı deneyin<br><br>
+
+<strong style="color: #333;">4️⃣ Alternatif Çözüm:</strong><br>
+• Bilgisayarın dahili mikrofonunu kullanmayı deneyin<br>
+• Farklı bir Bluetooth kulaklık deneyin<br>
+• Manuel olarak cevap seçeneklerinden birini seçebilirsiniz<br><br>
+
+<small style="color: #666;">💡 <strong>Not:</strong> Bazı Bluetooth kulaklıklar sadece ses çıkışı için tasarlanmıştır ve mikrofon özelliği olmayabilir.</small>
+</div>`;
+            showCustomAlert(helpMsg, 'warning', '🎧 Bluetooth Mikrofon');
+        }
+        
+        // Network hatası yardımı göster
+        function showNetworkErrorHelp() {
+            const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
+<strong style="color: #667eea; font-size: 1.1em;">🌐 Bağlantı Hatası Çözümleri</strong><br><br>
+
+<strong style="color: #333;">1️⃣ İnternet Bağlantısını Kontrol Edin:</strong><br>
+• WiFi veya mobil veri bağlantınızın aktif olduğundan emin olun<br>
+• Başka bir web sitesine bağlanmayı deneyin<br>
+• Modemi yeniden başlatmayı deneyin<br><br>
+
+<strong style="color: #333;">2️⃣ Tarayıcı Ayarları:</strong><br>
+• Sayfayı yenileyin (F5 veya Cmd+R)<br>
+• Tarayıcı önbelleğini temizleyin<br>
+• Farklı bir tarayıcı deneyin (Chrome, Edge, Firefox)<br><br>
+
+<strong style="color: #333;">3️⃣ Güvenlik Duvarı / VPN:</strong><br>
+• VPN kullanıyorsanız kapatmayı deneyin<br>
+• Güvenlik duvarının ses tanıma servisini engellemediğinden emin olun<br><br>
+
+<strong style="color: #333;">4️⃣ Alternatif Çözüm:</strong><br>
+• Birkaç saniye bekleyip tekrar deneyin<br>
+• Ses tanıma servisi geçici olarak kullanılamıyor olabilir<br>
+• Manuel olarak cevap seçeneklerinden birini seçebilirsiniz<br><br>
+
+<small style="color: #666;">💡 <strong>Not:</strong> Web Speech API, Google'ın ses tanıma servisini kullanır ve aktif internet bağlantısı gerektirir.</small>
+</div>`;
+            showCustomAlert(helpMsg, 'warning', '🌐 Bağlantı Sorunu');
+        }
+        
+        // Mikrofon izin yardımı göster
+        function showMicrophonePermissionHelp() {
+            const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
+<strong style="color: #667eea; font-size: 1.1em;">🎤 Mikrofon İzni Nasıl Verilir?</strong><br><br>
+
+<strong style="color: #333;">🌐 Chrome/Edge:</strong><br>
+1️⃣ Adres çubuğundaki <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🔒</span> veya <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🎤</span> simgesine tıklayın<br>
+2️⃣ "Mikrofon" seçeneğini <strong>"İzin ver"</strong> yapın<br>
+3️⃣ Sayfayı yenileyin (F5)<br><br>
+
+<strong style="color: #333;">🍎 Safari:</strong><br>
+1️⃣ <strong>Safari</strong> > <strong>Ayarlar</strong> > <strong>Web Siteleri</strong> > <strong>Mikrofon</strong><br>
+2️⃣ Bu site için <strong>"İzin ver"</strong> seçin<br>
+3️⃣ Sayfayı yenileyin (Cmd+R)<br><br>
+
+<strong style="color: #333;">🦊 Firefox:</strong><br>
+1️⃣ Adres çubuğundaki <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🔒</span> simgesine tıklayın<br>
+2️⃣ "İzinler" bölümünde <strong>"Mikrofon"</strong>u <strong>"İzin ver"</strong> yapın<br>
+3️⃣ Sayfayı yenileyin (F5)<br><br>
+
+<small style="color: #666;">💡 <strong>Not:</strong> İzin verdikten sonra sayfayı yenilemeyi unutmayın!</small>
+</div>`;
+            showCustomAlert(helpMsg, 'info', '🎤 Mikrofon İzni Gerekli');
+        }
+        
+        // Mikrofon stream'i (Bluetooth mikrofon desteği için)
+        let microphoneStream = null;
+        
+        // Ses tanımayı başlat (global erişim için)
+        window.startSpeechRecognition = async function() {
+            if (!currentDinleQuestion) {
+                showCustomAlert('Önce bir soru yüklenmeli!', 'warning');
+                return;
+            }
+            
+            if (isListening) {
+                // Eğer zaten dinleniyorsa durdur
+                if (recognition) {
+                    recognition.stop();
+                }
+                if (microphoneStream) {
+                    microphoneStream.getTracks().forEach(track => track.stop());
+                    microphoneStream = null;
+                }
+                return;
+            }
+            
+            // İzin kontrolü
+            const statusEl = document.getElementById('speechStatus');
+            if (statusEl) {
+                statusEl.textContent = '🔍 Mikrofon hazırlanıyor...';
+                statusEl.style.color = '#f39c12';
+            }
+            
+            const permission = await checkMicrophonePermission();
+            if (permission === 'denied') {
+                if (statusEl) {
+                    statusEl.textContent = '❌ Mikrofon izni reddedildi';
+                    statusEl.style.color = '#f44336';
+                }
+                showMicrophonePermissionHelp();
+                return;
+            } else if (permission === 'not-found') {
+                if (statusEl) {
+                    statusEl.textContent = '❌ Mikrofon bulunamadı';
+                    statusEl.style.color = '#f44336';
+                }
+                showCustomAlert('Mikrofon cihazı bulunamadı. Lütfen mikrofonun bağlı olduğundan emin olun.', 'error');
+                return;
+            } else if (permission === 'unknown') {
+                // Bilinmeyen durum - yine de denemeye devam et
+                log.warn('Mikrofon izin durumu bilinmiyor, denemeye devam ediliyor');
+            }
+            
+            // Mobil cihaz tespiti
+            const isMobile = isMobileDevice();
+            
+            // Mobil cihazlarda getUserMedia'ya gerek olmayabilir (direkt Speech Recognition çalışabilir)
+            // Ancak masaüstünde Bluetooth mikrofon için getUserMedia gerekli
+            const needsGetUserMedia = !isMobile; // Masaüstünde getUserMedia kullan
+            
+            if (needsGetUserMedia && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Bluetooth mikrofon desteği: getUserMedia ile mikrofonu aktif hale getir (sadece masaüstü)
+                try {
+                    if (statusEl) {
+                        statusEl.textContent = '🎤 Mikrofon bağlanıyor...';
+                        statusEl.style.color = '#f39c12';
+                    }
+                    
+                    // Önceki stream varsa kapat
+                    if (microphoneStream) {
+                        microphoneStream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    // Mikrofonu aktif hale getir (Bluetooth dahil tüm mikrofonlar için)
+                    microphoneStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true,
+                            // Tüm mikrofonları kabul et (Bluetooth dahil)
+                            sampleRate: 44100
+                        } 
+                    });
+                    
+                    const audioTracks = microphoneStream.getAudioTracks();
+                    const trackInfo = audioTracks.map(t => ({
+                        label: t.label,
+                        kind: t.kind,
+                        enabled: t.enabled,
+                        readyState: t.readyState
+                    }));
+                    
+                    log.debug('Mikrofon stream aktif:', trackInfo);
+                    
+                    // Kullanıcıya hangi mikrofonun kullanıldığını göster
+                    const micLabel = audioTracks[0]?.label || 'Bilinmeyen mikrofon';
+                    const isBluetooth = micLabel.toLowerCase().includes('bluetooth') || 
+                                       micLabel.toLowerCase().includes('bt') ||
+                                       micLabel.toLowerCase().includes('wireless');
+                    
+                    if (statusEl) {
+                        if (isBluetooth) {
+                            statusEl.innerHTML = `✅ Bluetooth mikrofon hazır: <small style="font-size: 0.75em; color: #666;">${micLabel}</small>`;
+                        } else {
+                            statusEl.innerHTML = `✅ Mikrofon hazır: <small style="font-size: 0.75em; color: #666;">${micLabel}</small>`;
+                        }
+                        statusEl.style.color = '#4caf50';
+                    }
+                    
+                    // Kısa bir gecikme ile Speech Recognition'ı başlat
+                    // (Mikrofonun tam olarak hazır olması için)
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                } catch (mediaError) {
+                    log.error('Mikrofon erişim hatası:', mediaError);
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Mikrofon erişilemedi';
+                        statusEl.style.color = '#f44336';
+                    }
+                    
+                    if (mediaError.name === 'NotAllowedError' || mediaError.name === 'PermissionDeniedError') {
+                        showMicrophonePermissionHelp();
+                    } else if (mediaError.name === 'NotFoundError' || mediaError.name === 'DevicesNotFoundError') {
+                        showBluetoothMicrophoneHelp();
+                    } else {
+                        showCustomAlert('Mikrofon erişilemedi. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.', 'error');
+                    }
+                    return;
+                }
+            } else if (isMobile) {
+                // Mobil cihazlarda direkt Speech Recognition başlat (getUserMedia'ya gerek yok)
+                if (statusEl) {
+                    statusEl.textContent = '🎤 Hazırlanıyor...';
+                    statusEl.style.color = '#f39c12';
+                }
+                // Kısa bir gecikme (mobil cihazlarda daha hızlı)
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    showCustomAlert('Ses tanıma özelliği bu tarayıcıda desteklenmiyor.', 'error');
+                    return;
+                }
+            }
+            
+            try {
+                if (statusEl) {
+                    if (isMobile) {
+                        statusEl.textContent = '🎤 Dinleniyor... (Mobil)';
+                    } else {
+                        statusEl.textContent = '🎤 Dinleniyor...';
+                    }
+                    statusEl.style.color = '#667eea';
+                }
+                recognition.start();
+            } catch (error) {
+                log.error('Ses tanıma başlatma hatası:', error);
+                
+                // Stream'i temizle
+                if (microphoneStream) {
+                    microphoneStream.getTracks().forEach(track => track.stop());
+                    microphoneStream = null;
+                }
+                
+                if (error.name === 'NotAllowedError' || error.message.includes('not allowed')) {
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Mikrofon izni verilmedi';
+                        statusEl.style.color = '#f44336';
+                    }
+                    showMicrophonePermissionHelp();
+                } else {
+                    if (isMobile) {
+                        showCustomAlert('Ses tanıma başlatılamadı. Mobil cihazlarda genellikle daha iyi çalışır. Lütfen tekrar deneyin veya tarayıcı ayarlarından mikrofon iznini kontrol edin.', 'error');
+                    } else {
+                        showCustomAlert('Ses tanıma başlatılamadı. Lütfen tekrar deneyin.', 'error');
+                    }
+                }
+            }
+        };
+        
+        // Konuşulan metni cevaplarla eşleştir
+        function matchSpeechToAnswer(spokenText) {
+            const statusEl = document.getElementById('speechStatus');
+            const allBtns = elements.dinleOptions.querySelectorAll('.option');
+            
+            if (!allBtns || allBtns.length === 0) {
+                if (statusEl) {
+                    statusEl.textContent = '❌ Seçenekler bulunamadı';
+                    statusEl.style.color = '#f44336';
+                }
+                return;
+            }
+            
+            // Konuşulan metni normalize et (küçük harf, boşlukları temizle)
+            const normalizedSpoken = spokenText.toLowerCase().trim();
+            
+            if (statusEl) {
+                statusEl.textContent = '🔍 "' + spokenText + '" aranıyor...';
+                statusEl.style.color = '#f39c12';
+            }
+            
+            // Doğru cevabı bul
+            const correctWord = currentDinleQuestion.kelime;
+            const correctWordNormalized = correctWord.toLowerCase().trim();
+            
+            // Tüm seçenekleri kontrol et
+            let matchedButton = null;
+            let bestMatch = null;
+            let bestScore = 0;
+            
+            allBtns.forEach(btn => {
+                const btnText = btn.textContent.trim();
+                const btnTextNormalized = btnText.toLowerCase().trim();
+                
+                // Tam eşleşme
+                if (btnTextNormalized === normalizedSpoken || 
+                    normalizedSpoken.includes(btnTextNormalized) || 
+                    btnTextNormalized.includes(normalizedSpoken)) {
+                    const score = Math.max(
+                        btnTextNormalized.length / normalizedSpoken.length,
+                        normalizedSpoken.length / btnTextNormalized.length
+                    );
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = btn;
+                    }
+                }
+            });
+            
+            matchedButton = bestMatch;
+            
+            if (matchedButton) {
+                // Butonu bulundu, tıkla
+                setTimeout(() => {
+                    matchedButton.click();
+                    if (statusEl) {
+                        statusEl.textContent = '✅ Eşleşme bulundu!';
+                        statusEl.style.color = '#4caf50';
+                    }
+                    triggerHaptic('success');
+                }, 300);
+            } else {
+                // Eşleşme bulunamadı
+                if (statusEl) {
+                    statusEl.textContent = '❌ Eşleşme bulunamadı: "' + spokenText + '"';
+                    statusEl.style.color = '#f44336';
+                }
+                triggerHaptic('error');
+                
+                // Kullanıcıya doğru kelimeyi hatırlat
+                setTimeout(() => {
+                    if (statusEl) {
+                        statusEl.textContent = '💡 Doğru kelime: ' + correctWord;
+                        statusEl.style.color = '#667eea';
+                    }
+                }, 2000);
+            }
+        }
 
         function loadDinleQuestion() {
             // Önceki ses varsa durdur
@@ -6420,6 +7443,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.dinleFeedback.textContent = '✅ Mâşâallah!';
                 elements.dinleFeedback.className = 'feedback correct';
                 
+                // Haptic feedback - doğru cevap
+                triggerHaptic('success');
+                
                 const points = currentDinleQuestion.difficulty * 2;
                 log.debug(`💰 Puan hesaplama: ${currentDinleQuestion.difficulty} × 2 = ${points} puan`);
                 
@@ -6448,6 +7474,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 button.classList.add('wrong');
                 elements.dinleFeedback.textContent = `❌ Hatalı! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
                 elements.dinleFeedback.className = 'feedback wrong';
+                
+                // Haptic feedback - yanlış cevap
+                triggerHaptic('error');
                 
                 log.debug(`📊 Dinle wrong güncelleniyor: ${dinleWrong} + 1 = ${dinleWrong + 1}`);
                 dinleWrong++;
@@ -6665,6 +7694,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.boslukFeedback.textContent = '✅ Mâşâallah!';
                 elements.boslukFeedback.className = 'feedback correct';
                 
+                // Haptic feedback - doğru cevap
+                triggerHaptic('success');
+                
                 log.debug(`💰 Boşluk Doldur sabit puan: 10 puan ekleniyor`);
                 log.debug(`📊 Boşluk score güncelleniyor: ${boslukScore} + 10 = ${boslukScore + 10}`);
                 boslukScore += 10; // Local oyun puanı
@@ -6691,6 +7723,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 button.classList.add('wrong');
                 elements.boslukFeedback.textContent = `❌ Hatalı! Doğru kelime: ${missingWord}`;
                 elements.boslukFeedback.className = 'feedback wrong';
+                
+                // Haptic feedback - yanlış cevap
+                triggerHaptic('error');
                 
                 log.debug(`📊 Boşluk wrong güncelleniyor: ${boslukWrong} + 1 = ${boslukWrong + 1}`);
                 boslukWrong++;
@@ -7395,6 +8430,102 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Not: Touch event'ler artık initStatsModalTouchEvents, initBadgesModalTouchEvents, 
             // initCalendarModalTouchEvents, initDailyTasksModalTouchEvents fonksiyonları tarafından yönetiliyor
+            
+            // ============ MODAL SWIPE GESTURES ============
+            // Modal'lara swipe down ile kapatma özelliği ekle
+            const modals = ['badgesModal', 'statsModal', 'calendarModal', 'dailyTasksModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && CONFIG.swipeGesturesEnabled) {
+                    initSwipeGestures(modal, {
+                        onSwipeDown: () => {
+                            // Swipe down ile modal'ı kapat
+                            if (modalId === 'badgesModal') closeBadgesModal();
+                            else if (modalId === 'statsModal') closeStatsModal();
+                            else if (modalId === 'calendarModal') closeCalendarModal();
+                            else if (modalId === 'dailyTasksModal') closeDailyTasksModal();
+                        }
+                    });
+                }
+            });
+            
+            // ============ BUTON HAPTIC FEEDBACK ============
+            // Ana butonlara haptic feedback ekle
+            const mainButtons = document.querySelectorAll('.flutter-btn, .game-card, .nav-btn, .back-btn');
+            mainButtons.forEach(btn => {
+                if (CONFIG.hapticEnabled) {
+                    btn.addEventListener('click', () => {
+                        triggerHaptic('light');
+                    }, { passive: true });
+                }
+            });
+            
+            // ============ MODE SWIPE GESTURES ============
+            // Ayet Oku, Dua Et, Hadis Oku modlarına swipe jestleri ekle
+            if (CONFIG.swipeGesturesEnabled) {
+                // Ayet Oku modu - swipe left/right ile önceki/sonraki ayet
+                const ayetMode = document.getElementById('ayetMode');
+                if (ayetMode) {
+                    initSwipeGestures(ayetMode, {
+                        onSwipeLeft: () => {
+                            // Swipe left = sonraki ayet
+                            const nextBtn = document.getElementById('nextAyetBtn');
+                            if (nextBtn && !nextBtn.disabled) {
+                                nextBtn.click();
+                            }
+                        },
+                        onSwipeRight: () => {
+                            // Swipe right = önceki ayet
+                            const prevBtn = document.getElementById('prevAyetBtn');
+                            if (prevBtn && !prevBtn.disabled) {
+                                prevBtn.click();
+                            }
+                        }
+                    });
+                }
+                
+                // Dua Et modu - swipe left/right ile önceki/sonraki dua
+                const duaMode = document.getElementById('duaMode');
+                if (duaMode) {
+                    initSwipeGestures(duaMode, {
+                        onSwipeLeft: () => {
+                            // Swipe left = sonraki dua
+                            const nextBtn = document.getElementById('nextDuaBtn');
+                            if (nextBtn && !nextBtn.disabled) {
+                                nextBtn.click();
+                            }
+                        },
+                        onSwipeRight: () => {
+                            // Swipe right = önceki dua
+                            const prevBtn = document.getElementById('prevDuaBtn');
+                            if (prevBtn && !prevBtn.disabled) {
+                                prevBtn.click();
+                            }
+                        }
+                    });
+                }
+                
+                // Hadis Oku modu - swipe left/right ile önceki/sonraki hadis
+                const hadisMode = document.getElementById('hadisMode');
+                if (hadisMode) {
+                    initSwipeGestures(hadisMode, {
+                        onSwipeLeft: () => {
+                            // Swipe left = sonraki hadis
+                            const nextBtn = document.getElementById('nextHadisBtn');
+                            if (nextBtn && !nextBtn.disabled) {
+                                nextBtn.click();
+                            }
+                        },
+                        onSwipeRight: () => {
+                            // Swipe right = önceki hadis
+                            const prevBtn = document.getElementById('prevHadisBtn');
+                            if (prevBtn && !prevBtn.disabled) {
+                                prevBtn.click();
+                            }
+                        }
+                    });
+                }
+            }
         
         }); // DOMContentLoaded event listener sonu
 
@@ -7779,16 +8910,20 @@ function showMainMenu() {
 
         // 📱 HAPTIC FEEDBACK SYSTEM
         function triggerHaptic(type = 'medium') {
+            // CONFIG kontrolü ile haptic feedback
+            if (!CONFIG.hapticEnabled) return;
+            
             try {
                 // Modern haptic feedback API
                 if ('vibrate' in navigator) {
                     const patterns = {
-                        light: [50],
-                        medium: [100],
-                        heavy: [200],
-                        success: [100, 30, 100],
-                        error: [200, 100, 200],
-                        combo: [50, 25, 50, 25, 100]
+                        light: [10],
+                        medium: [20],
+                        heavy: [50],
+                        success: [20, 50, 20],
+                        error: [50, 100, 50],
+                        combo: [20, 30, 20, 30, 50],
+                        warning: [30, 50, 30]
                     };
                     navigator.vibrate(patterns[type] || patterns.medium);
                 }
@@ -7841,6 +8976,260 @@ function showMainMenu() {
             .then(() => console.log("SW registered ✔"))
             .catch(err => console.log("SW registration failed ❌", err));
     }
+</script>
+
+<!-- PUSH NOTIFICATIONS SYSTEM -->
+<script>
+    // ============ PUSH BİLDİRİMLERİ SİSTEMİ ============
+    let notificationPermission = 'default';
+    let notificationSettings = {
+        dailyReminder: true,
+        streakWarning: true,
+        goalCompletion: true,
+        customEvents: true,
+        reminderTime: '20:00' // Varsayılan: 20:00
+    };
+    
+    // Bildirim ayarlarını yükle
+    function loadNotificationSettings() {
+        try {
+            const saved = localStorage.getItem('haseneNotificationSettings');
+            if (saved) {
+                notificationSettings = { ...notificationSettings, ...JSON.parse(saved) };
+            }
+        } catch (e) {
+            log.error('Bildirim ayarları yükleme hatası:', e);
+        }
+    }
+    
+    // Bildirim ayarlarını kaydet
+    function saveNotificationSettings() {
+        try {
+            localStorage.setItem('haseneNotificationSettings', JSON.stringify(notificationSettings));
+        } catch (e) {
+            log.error('Bildirim ayarları kaydetme hatası:', e);
+        }
+    }
+    
+    // Bildirim izni kontrolü ve isteme
+    async function requestNotificationPermission() {
+        if (!('Notification' in window)) {
+            log.warn('Bu tarayıcı bildirimleri desteklemiyor');
+            return false;
+        }
+        
+        notificationPermission = Notification.permission;
+        
+        if (notificationPermission === 'default') {
+            try {
+                const permission = await Notification.requestPermission();
+                notificationPermission = permission;
+                log.debug('Bildirim izni:', permission);
+                return permission === 'granted';
+            } catch (e) {
+                log.error('Bildirim izni hatası:', e);
+                return false;
+            }
+        }
+        
+        return notificationPermission === 'granted';
+    }
+    
+    // Bildirim göster (Service Worker üzerinden)
+    async function showNotification(title, options = {}) {
+        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+            log.warn('Bildirimler desteklenmiyor');
+            return;
+        }
+        
+        if (Notification.permission !== 'granted') {
+            const granted = await requestNotificationPermission();
+            if (!granted) {
+                log.warn('Bildirim izni verilmedi');
+                return;
+            }
+        }
+        
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            
+            const notificationOptions = {
+                body: options.body || '',
+                icon: options.icon || './icon-192-v4-RED-MUSHAF.png',
+                badge: options.badge || './icon-192-v4-RED-MUSHAF.png',
+                tag: options.tag || 'hasene-notification',
+                requireInteraction: options.requireInteraction || false,
+                data: {
+                    url: options.url || window.location.href,
+                    ...options.data
+                },
+                vibrate: options.vibrate || [200, 100, 200],
+                ...options
+            };
+            
+            await registration.showNotification(title, notificationOptions);
+            log.debug('Bildirim gösterildi:', title);
+        } catch (e) {
+            log.error('Bildirim gösterilirken hata:', e);
+        }
+    }
+    
+    // Günlük hatırlatıcı zamanlayıcısı
+    let dailyReminderTimer = null;
+    
+    function scheduleDailyReminder() {
+        if (!notificationSettings.dailyReminder) return;
+        
+        // Mevcut zamanlayıcıyı temizle
+        if (dailyReminderTimer) {
+            clearTimeout(dailyReminderTimer);
+        }
+        
+        const [hours, minutes] = notificationSettings.reminderTime.split(':').map(Number);
+        const now = new Date();
+        const reminderTime = new Date();
+        reminderTime.setHours(hours, minutes, 0, 0);
+        
+        // Eğer bugünün saati geçtiyse, yarın için ayarla
+        if (reminderTime <= now) {
+            reminderTime.setDate(reminderTime.getDate() + 1);
+        }
+        
+        const msUntilReminder = reminderTime.getTime() - now.getTime();
+        
+        dailyReminderTimer = setTimeout(async () => {
+            // Bugün oyun oynanmış mı kontrol et
+            const today = getLocalDateString();
+            const lastPlayDate = localStorage.getItem('haseneLastPlayDate');
+            const todayStats = dailyTasks.todayStats || {};
+            const hasPlayedToday = lastPlayDate === today && (todayStats.toplamPuan > 0 || todayStats.kelimeCevir > 0);
+            
+            if (!hasPlayedToday) {
+                await showNotification('📚 Günlük Hatırlatıcı', {
+                    body: 'Bugün henüz oyun oynamadınız! Serinizi bozmamak için hemen oyuna başlayın. 🔥',
+                    tag: 'daily-reminder',
+                    requireInteraction: false,
+                    vibrate: [200, 100, 200]
+                });
+            }
+            
+            // Yarın için tekrar zamanla
+            scheduleDailyReminder();
+        }, msUntilReminder);
+        
+        log.debug('Günlük hatırlatıcı zamanlandı:', reminderTime);
+    }
+    
+    // Seri bozulma uyarısı kontrolü
+    function checkStreakWarning() {
+        if (!notificationSettings.streakWarning) return;
+        
+        try {
+            const streakDataStr = localStorage.getItem('haseneStreakData');
+            if (!streakDataStr) return;
+            
+            const streakData = JSON.parse(streakDataStr);
+            const currentStreak = streakData.currentStreak || 0;
+            const lastPlayDate = localStorage.getItem('haseneLastPlayDate');
+            const today = getLocalDateString();
+            
+            // Eğer seri varsa ve bugün oyun oynanmamışsa uyar
+            if (currentStreak > 0 && lastPlayDate !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = getLocalDateString(yesterday);
+                
+                // Dün oynanmışsa, bugün uyarı ver
+                if (lastPlayDate === yesterdayStr) {
+                    showNotification('⚠️ Seri Bozulma Uyarısı!', {
+                        body: `${currentStreak} günlük seriniz bozulmak üzere! Bugün oyun oynamayı unutmayın. 🔥`,
+                        tag: 'streak-warning',
+                        requireInteraction: false,
+                        vibrate: [300, 100, 300]
+                    });
+                }
+            }
+        } catch (e) {
+            log.error('Seri uyarısı kontrolü hatası:', e);
+        }
+    }
+    
+    // Hedef tamamlama bildirimi
+    function checkGoalCompletion() {
+        if (!notificationSettings.goalCompletion) return;
+        
+        try {
+            const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || '2700');
+            const todayProgress = dailyTasks.todayStats?.toplamPuan || 0;
+            
+            // Hedef tamamlandıysa bildirim göster
+            if (todayProgress >= dailyGoalHasene && dailyGoalHasene > 0) {
+                // Sadece bir kez bildirim göster (bugün için)
+                const goalNotificationShown = localStorage.getItem(`goalNotification_${getLocalDateString()}`);
+                if (!goalNotificationShown) {
+                    showNotification('🎉 Günlük Hedef Tamamlandı!', {
+                        body: `Tebrikler! Günlük hedefinizi tamamladınız (${dailyGoalHasene} puan). Devam edin! 🏆`,
+                        tag: 'goal-completion',
+                        requireInteraction: false,
+                        vibrate: [200, 100, 200, 100, 200]
+                    });
+                    localStorage.setItem(`goalNotification_${getLocalDateString()}`, 'true');
+                }
+            }
+        } catch (e) {
+            log.error('Hedef tamamlama kontrolü hatası:', e);
+        }
+    }
+    
+    // Özel etkinlik bildirimi gönder
+    function sendCustomEventNotification(title, body, options = {}) {
+        if (!notificationSettings.customEvents) return;
+        
+        showNotification(title, {
+            body: body,
+            tag: options.tag || 'custom-event',
+            requireInteraction: options.requireInteraction || false,
+            vibrate: options.vibrate || [200, 100, 200],
+            ...options
+        });
+    }
+    
+    // Sayfa yüklendiğinde bildirim sistemini başlat
+    window.addEventListener('DOMContentLoaded', () => {
+        loadNotificationSettings();
+        
+        // Bildirim izni kontrolü
+        if ('Notification' in window) {
+            notificationPermission = Notification.permission;
+            
+            // İzin verilmişse zamanlayıcıları başlat
+            if (notificationPermission === 'granted') {
+                scheduleDailyReminder();
+                checkStreakWarning();
+            }
+        }
+        
+        // Her 30 dakikada bir seri uyarısı kontrol et
+        setInterval(() => {
+            if (notificationPermission === 'granted') {
+                checkStreakWarning();
+            }
+        }, 30 * 60 * 1000); // 30 dakika
+        
+        // Her 5 dakikada bir hedef tamamlama kontrolü
+        setInterval(() => {
+            if (notificationPermission === 'granted') {
+                checkGoalCompletion();
+            }
+        }, 5 * 60 * 1000); // 5 dakika
+    });
+    
+    // Global erişim için
+    window.requestNotificationPermission = requestNotificationPermission;
+    window.showNotification = showNotification;
+    window.sendCustomEventNotification = sendCustomEventNotification;
+    window.notificationSettings = notificationSettings;
+    window.saveNotificationSettings = saveNotificationSettings;
 </script>
 
 <!-- PWA INSTALL PROMPT -->
