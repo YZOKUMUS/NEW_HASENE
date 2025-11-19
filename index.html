@@ -4094,10 +4094,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 if (analyticsAvgSuccess) analyticsAvgSuccess.textContent = '%' + avgSuccessRate;
                 if (analyticsHardestWord && hardestWord) {
-                    // Kelime verisini bul
-                    const wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
-                    if (wordData) {
-                        analyticsHardestWord.textContent = wordData.kelime || '-';
+                    // Kelime verisini bul (null kontrolü ile)
+                    if (kelimeBulData && Array.isArray(kelimeBulData)) {
+                        const wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
+                        if (wordData) {
+                            analyticsHardestWord.textContent = wordData.kelime || '-';
+                        } else {
+                            analyticsHardestWord.textContent = '-';
+                        }
                     } else {
                         analyticsHardestWord.textContent = '-';
                     }
