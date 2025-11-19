@@ -5386,21 +5386,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                     dailyTasksModalIsScrolling = true;
                 }, { passive: true });
-                
-                dailyTasksScrollableContent.addEventListener('scroll', function(e) {
-                    // Scroll yapılıyorsa işaretle
-                    dailyTasksModalIsScrolling = true;
-                }, { passive: true });
             }
             
-            // Modal overlay için touch event'leri (scroll container'a dokunmadan)
+            // Modal overlay için touch event'leri
             dailyTasksModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına veya modal-content'e tıklanmışsa, ignore et
-                if (e.target && (
-                    e.target.id === 'dailyTasksScrollableContent' || 
-                    e.target.closest('#dailyTasksScrollableContent') ||
-                    e.target.closest('.modal-content')
-                )) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
                     return;
                 }
                 
@@ -5424,8 +5415,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     const touch = e.touches[0];
                     const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
                     const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-                    // Dikey hareket yataydan fazlaysa, bu bir scroll olabilir
-                    if (deltaY > deltaX && deltaY > 10) {
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
                         dailyTasksModalIsScrolling = true;
                     }
                 }
@@ -5435,10 +5426,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Touch end'de scroll kontrolü yap
                 if (dailyTasksModalIsScrolling) {
                     // Scroll oldu, kapatma
-                    // Scroll bitene kadar bekle
-                    setTimeout(() => {
                     dailyTasksModalIsScrolling = false;
-                    }, 100);
                     dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
                     return;
                 }
@@ -5460,10 +5448,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     
                     // Panel üzerine veya dış arka plana tap yapıldı, kapat
                     closeDailyTasksModal();
-                    // Ana sayfanın görünür olduğundan emin ol
-                    if (elements && elements.mainMenu) {
-                        elements.mainMenu.style.display = 'block';
-                    }
                 }
                 
                 dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
@@ -5472,12 +5456,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
         function handleDailyTasksModalClick(event) {
-            // Scroll yapılıyorsa, modal'ı kapatma
-            if (dailyTasksModalIsScrolling) {
-                return;
-            }
-            
-            // X butonuna veya ödül toplama butonuna tıklanırsa kapatma
+            // X butonuna veya ödül toplama butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
             const target = event.target;
             if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
                 return;
@@ -5494,7 +5473,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            // Sadece modal overlay'e (arka plana) tıklanırsa kapat
+            // Arka plana tıklanırsa, modal'ı kapat
             closeDailyTasksModal();
         }
 
