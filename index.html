@@ -552,85 +552,245 @@
         </div>
     </div>
 
-    <!-- Başarılar/Rozetler Modal - Tek Sayfa, Her Yere Tıklayınca Kapanır -->
+    <!-- Başarılar/Rozetler Modal - Duolingo Tarzı Yeni Tasarım -->
     <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)">
         <div class="modal-content badges-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar</h3>
                 <button onclick="event.stopPropagation(); closeBadgesModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
             
             <!-- Scroll Edilebilir İçerik -->
-            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
+            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position;">
                 
-                <!-- Terakki Özeti -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 10px; margin-bottom: 16px; text-align: center;">
-                    <div style="font-size: 0.85em; font-weight: 600; margin-bottom: 8px; opacity: 0.9;">📊 Terakkiniz</div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px;">
-                        <div>
-                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalStars">0</div>
-                            <div style="font-size: 0.7em; opacity: 0.9;">⭐ Yıldız</div>
+                <!-- İstatistikler Özeti -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; opacity: 0.9; font-weight: 600;">📊 İlerleme Özeti</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div class="stat-item">
+                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesUnlockedCount">0</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Açılan Rozet</div>
                         </div>
-                        <div>
-                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalLevel">1</div>
-                            <div style="font-size: 0.7em; opacity: 0.9;">📈 Mertebe</div>
+                        <div class="stat-item">
+                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesTotalCount">20</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Toplam Rozet</div>
                         </div>
-                        <div>
-                            <div style="font-size: 1.3em; font-weight: bold;" id="badgesModalPoints">0</div>
-                            <div style="font-size: 0.7em; opacity: 0.9;">📿 Hasene</div>
+                        <div class="stat-item">
+                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesProgressPercent">0%</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Tamamlanma</div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Rozetler Grid -->
-                <div style="margin-bottom: 16px;">
-                    <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">🏅 Mertebe Rozetleri</div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                <!-- Mütebahhir -->
-                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%); border: 2px solid #00bcd4; box-shadow: 0 2px 8px rgba(0,188,212,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            <div style="font-size: 2em; margin-bottom: 4px;">💎</div>
-                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #00bcd4;">Mütebahhir</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #00bcd4;" id="diamondBadgeCount">0</div>
-                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Mütecaviz = 1</div>
+
+                <!-- Kategori Sekmeleri -->
+                <div class="category-tabs" style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; flex-wrap: wrap;">
+                    <button class="badge-tab active" onclick="showBadgeCategory('daily', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s;">📅 Günlük</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('special', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">⭐ Özel</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('streak', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">🔥 Seri</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('level', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">🏅 Mertebe</button>
                 </div>
-                
-                <!-- Mütecaviz -->
-                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 2px solid #ff9800; box-shadow: 0 2px 8px rgba(255,152,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            <div style="font-size: 2em; margin-bottom: 4px;">🥇</div>
-                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #ff9800;">Mütecaviz</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #ff9800;" id="goldBadgeCount">0</div>
-                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Müterakki = 1</div>
-                </div>
-                
-                <!-- Müterakki -->
-                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 2px solid #9c27b0; box-shadow: 0 2px 8px rgba(156,39,176,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            <div style="font-size: 2em; margin-bottom: 4px;">🥈</div>
-                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #9c27b0;">Müterakki</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #9c27b0;" id="silverBadgeCount">0</div>
-                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Mübtedi = 1</div>
-                </div>
-                
-                <!-- Mübtedi -->
-                        <div style="text-align: center; padding: 12px; border-radius: 10px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); border: 2px solid #ff5722; box-shadow: 0 2px 8px rgba(255,87,34,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            <div style="font-size: 2em; margin-bottom: 4px;">🥉</div>
-                            <div style="font-weight: bold; margin: 4px 0; font-size: 0.85em; color: #ff5722;">Mübtedi</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #ff5722;" id="bronzeBadgeCount">0</div>
-                            <div style="font-size: 0.65em; color: #666; margin-top: 4px;">5 Yıldız = 1</div>
+
+                <!-- Günlük Başarılar -->
+                <div id="badgeCategoryDaily" class="badge-category-content" style="display: block;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                        <!-- İlk Zafer -->
+                        <div class="achievement-card" id="achievement-first_win" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🎯</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">İlk Zafer</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">İlk sahih cevabin</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">Kilitli</div>
                         </div>
-                </div>
-            </div>
-            
-                <!-- Bilgi Kutusu -->
-                <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #3b82f6;">
-                    <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Rozet Sistemi</div>
-                    <div style="font-size: 0.75em; color: #555; line-height: 1.5;">
-                        • 5 Yıldız = 1 Mübtedi Rozeti<br>
-                        • 5 Mübtedi = 1 Müterakki Rozeti<br>
-                        • 5 Müterakki = 1 Mütecaviz Rozeti<br>
-                        • 5 Mütecaviz = 1 Mütebahhir Rozeti
+
+                        <!-- Günlük Kahraman -->
+                        <div class="achievement-card" id="achievement-daily_goal" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">⭐</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Günlük Kahraman</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Günlük hedefini tamamla</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">Kilitli</div>
+                        </div>
                     </div>
-            </div>
+                </div>
+
+                <!-- Özel Başarılar -->
+                <div id="badgeCategorySpecial" class="badge-category-content" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                        <!-- Combo Ustası -->
+                        <div class="achievement-card" id="achievement-combo_master" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🔥</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Combo Ustası</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">5x combo yap</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/5</div>
+                        </div>
+
+                        <!-- İlk Adım -->
+                        <div class="achievement-card" id="achievement-xp_500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🌱</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">İlk Adım</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">500 Hasene topla</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/500</div>
+                        </div>
+
+                        <!-- Bronz Yolcu -->
+                        <div class="achievement-card" id="achievement-xp_2000" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥉</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Bronz Yolcu</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">2,000 Hasene</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/2000</div>
+                        </div>
+
+                        <!-- Gümüş Master -->
+                        <div class="achievement-card" id="achievement-xp_8500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥈</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Gümüş Master</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">8,500 Hasene</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/8500</div>
+                        </div>
+
+                        <!-- Altın Master -->
+                        <div class="achievement-card" id="achievement-xp_25500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥇</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Altın Master</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">25,500 Hasene</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/25500</div>
+                        </div>
+
+                        <!-- Elmas Master -->
+                        <div class="achievement-card" id="achievement-xp_85000" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">💎</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Elmas Master</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">85,000 Hasene</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/85000</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seri Başarılar -->
+                <div id="badgeCategoryStreak" class="badge-category-content" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                        <!-- 7 Gün Streak -->
+                        <div class="achievement-card" id="achievement-streak_7" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🔥</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">7 Gün Seri</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">7 gün üst üste oyna</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/7</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mertebe Başarılar -->
+                <div id="badgeCategoryLevel" class="badge-category-content" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                        <!-- Seviye 5 -->
+                        <div class="achievement-card" id="achievement-level_5" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🏆</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 5</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 5'e ulaş</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/5</div>
+                        </div>
+
+                        <!-- Seviye 10 -->
+                        <div class="achievement-card" id="achievement-level_10" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">💎</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 10</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 10'a ulaş</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/10</div>
+                        </div>
+
+                        <!-- Seviye 20 -->
+                        <div class="achievement-card" id="achievement-level_20" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
+                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🌟</div>
+                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 20</div>
+                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 20'ye ulaş</div>
+                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
+                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/20</div>
+                        </div>
+                    </div>
+
+                    <!-- Mertebe Rozetleri (Mevcut Sistem) -->
+                    <div style="margin-top: 24px; margin-bottom: 16px;">
+                        <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">🏅 Mertebe Rozetleri</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <!-- Mütebahhir -->
+                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%); border: 3px solid #00bcd4; box-shadow: 0 2px 8px rgba(0,188,212,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">💎</div>
+                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #00bcd4;">Mütebahhir</div>
+                                <div style="font-size: 1.5em; font-weight: bold; color: #00bcd4; margin: 8px 0;" id="diamondBadgeCount">0</div>
+                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Mütecaviz = 1</div>
+                            </div>
+                            
+                            <!-- Mütecaviz -->
+                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 3px solid #ff9800; box-shadow: 0 2px 8px rgba(255,152,0,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥇</div>
+                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #ff9800;">Mütecaviz</div>
+                                <div style="font-size: 1.5em; font-weight: bold; color: #ff9800; margin: 8px 0;" id="goldBadgeCount">0</div>
+                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Müterakki = 1</div>
+                            </div>
+                            
+                            <!-- Müterakki -->
+                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 3px solid #9c27b0; box-shadow: 0 2px 8px rgba(156,39,176,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥈</div>
+                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #9c27b0;">Müterakki</div>
+                                <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0; margin: 8px 0;" id="silverBadgeCount">0</div>
+                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Mübtedi = 1</div>
+                            </div>
+                            
+                            <!-- Mübtedi -->
+                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); border: 3px solid #ff5722; box-shadow: 0 2px 8px rgba(255,87,34,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥉</div>
+                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #ff5722;">Mübtedi</div>
+                                <div style="font-size: 1.5em; font-weight: bold; color: #ff5722; margin: 8px 0;" id="bronzeBadgeCount">0</div>
+                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Yıldız = 1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bilgi Kutusu -->
+                    <div style="background: #f0f9ff; padding: 12px; border-radius: 12px; margin-top: 16px; border-left: 4px solid #3b82f6;">
+                        <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Rozet Sistemi</div>
+                        <div style="font-size: 0.75em; color: #555; line-height: 1.5;">
+                            • 5 Yıldız = 1 Mübtedi Rozeti<br>
+                            • 5 Mübtedi = 1 Müterakki Rozeti<br>
+                            • 5 Müterakki = 1 Mütecaviz Rozeti<br>
+                            • 5 Mütecaviz = 1 Mütebahhir Rozeti
+                        </div>
+                    </div>
+                </div>
             
             </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
@@ -3631,18 +3791,155 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             document.body.style.overflow = 'hidden';
             
             // Tüm rozet sayılarını güncelle
-            document.getElementById('diamondBadgeCount').textContent = badges.diamond;
-            document.getElementById('goldBadgeCount').textContent = badges.gold;
-            document.getElementById('silverBadgeCount').textContent = badges.silver;
-            document.getElementById('bronzeBadgeCount').textContent = badges.bronze;
+            const diamondEl = document.getElementById('diamondBadgeCount');
+            const goldEl = document.getElementById('goldBadgeCount');
+            const silverEl = document.getElementById('silverBadgeCount');
+            const bronzeEl = document.getElementById('bronzeBadgeCount');
             
-            // İlerleme bilgilerini güncelle
-            document.getElementById('badgesModalStars').textContent = starPoints;
-            document.getElementById('badgesModalLevel').textContent = level;
-            document.getElementById('badgesModalPoints').textContent = totalPoints.toLocaleString();
+            if (diamondEl) diamondEl.textContent = badges.diamond;
+            if (goldEl) goldEl.textContent = badges.gold;
+            if (silverEl) silverEl.textContent = badges.silver;
+            if (bronzeEl) bronzeEl.textContent = badges.bronze;
+            
+            // Yeni tasarım için istatistikleri güncelle
+            updateBadgesModalStats();
+            
+            // Tüm achievement'ları güncelle
+            updateAllAchievements();
+            
+            // İlk kategoriyi göster
+            showBadgeCategory('daily');
             
             // Modal'ı göster
             document.getElementById('badgesModal').style.display = 'flex';
+        }
+
+        // Kategori değiştirme fonksiyonu
+        function showBadgeCategory(category, clickedElement) {
+            // Tüm sekmeleri ve içerikleri gizle
+            document.querySelectorAll('.badge-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.background = 'transparent';
+                tab.style.color = '#999';
+            });
+            document.querySelectorAll('.badge-category-content').forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // Seçilen sekme ve içeriği göster
+            const activeTab = clickedElement || document.querySelector(`.badge-tab[onclick*="'${category}'"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                activeTab.style.color = 'white';
+            }
+            
+            const categoryContent = document.getElementById(`badgeCategory${category.charAt(0).toUpperCase() + category.slice(1)}`);
+            if (categoryContent) {
+                categoryContent.style.display = 'block';
+            }
+        }
+
+        // Başarılar modal istatistiklerini güncelle
+        function updateBadgesModalStats() {
+            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+            const totalAchievements = 20; // Toplam achievement sayısı
+            const unlockedCount = unlockedAchievements.length;
+            const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
+
+            const unlockedEl = document.getElementById('badgesUnlockedCount');
+            const totalEl = document.getElementById('badgesTotalCount');
+            const progressEl = document.getElementById('badgesProgressPercent');
+
+            if (unlockedEl) unlockedEl.textContent = unlockedCount;
+            if (totalEl) totalEl.textContent = totalAchievements;
+            if (progressEl) progressEl.textContent = progressPercent + '%';
+        }
+
+        // Tüm achievement'ları güncelle
+        function updateAllAchievements() {
+            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+            const achievements = [
+                { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
+                { id: 'combo_master', name: 'Combo Ustası', desc: '5x combo yap', icon: '🔥', condition: () => comboCount >= 5, progress: () => Math.min(comboCount || 0, 5) },
+                { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük hedefini tamamla', icon: '⭐', condition: () => {
+                    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                    return dailyHasene >= goalHasene;
+                }, progress: () => {
+                    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                    return Math.min((dailyHasene / goalHasene) * 100, 100);
+                }},
+                { id: 'streak_7', name: '7 Gün Seri', desc: '7 gün üst üste oyna', icon: '🔥', condition: () => streakData.currentStreak >= 7, progress: () => Math.min((streakData.currentStreak || 0) / 7 * 100, 100) },
+                { id: 'level_5', name: 'Seviye 5', desc: 'Seviye 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => Math.min((level || 1) / 5 * 100, 100) },
+                { id: 'level_10', name: 'Seviye 10', desc: 'Seviye 10\'a ulaş', icon: '💎', condition: () => level >= 10, progress: () => Math.min((level || 1) / 10 * 100, 100) },
+                { id: 'level_20', name: 'Seviye 20', desc: 'Seviye 20\'ye ulaş', icon: '🌟', condition: () => level >= 20, progress: () => Math.min((level || 1) / 20 * 100, 100) },
+                { id: 'xp_500', name: 'İlk Adım', desc: '500 Hasene topla', icon: '🌱', condition: () => totalPoints >= 500, progress: () => Math.min((totalPoints || 0) / 500 * 100, 100) },
+                { id: 'xp_2000', name: 'Bronz Yolcu', desc: '2,000 Hasene', icon: '🥉', condition: () => totalPoints >= 2000, progress: () => Math.min((totalPoints || 0) / 2000 * 100, 100) },
+                { id: 'xp_8500', name: 'Gümüş Master', desc: '8,500 Hasene', icon: '🥈', condition: () => totalPoints >= 8500, progress: () => Math.min((totalPoints || 0) / 8500 * 100, 100) },
+                { id: 'xp_25500', name: 'Altın Master', desc: '25,500 Hasene', icon: '🥇', condition: () => totalPoints >= 25500, progress: () => Math.min((totalPoints || 0) / 25500 * 100, 100) },
+                { id: 'xp_85000', name: 'Elmas Master', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) }
+            ];
+
+            achievements.forEach(ach => {
+                const card = document.getElementById(`achievement-${ach.id}`);
+                if (!card) return;
+
+                const isUnlocked = unlockedAchievements.includes(ach.id);
+                const progressFill = card.querySelector('.achievement-progress-fill');
+                const progressText = card.querySelector('.progress-text');
+
+                if (isUnlocked) {
+                    card.classList.add('unlocked');
+                    card.classList.remove('locked');
+                    card.style.background = 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)';
+                    card.style.borderColor = '#667eea';
+                    card.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
+                    if (progressFill) progressFill.style.width = '100%';
+                    if (progressText) progressText.textContent = '✓ Tamamlandı';
+                    if (progressText) progressText.style.color = '#667eea';
+                    if (progressText) progressText.style.fontWeight = '600';
+                } else {
+                    card.classList.add('locked');
+                    card.classList.remove('unlocked');
+                    card.style.background = '#f8f9fa';
+                    card.style.borderColor = 'transparent';
+                    card.style.opacity = '0.6';
+                    card.style.filter = 'grayscale(50%)';
+                    
+                    // İlerleme göster
+                    if (ach.progress && progressFill) {
+                        const progress = ach.progress();
+                        progressFill.style.width = progress + '%';
+                        progressFill.style.background = progress > 0 ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)' : '#ccc';
+                    }
+                    
+                    // İlerleme metni
+                    if (progressText && ach.progress) {
+                        const progress = ach.progress();
+                        if (ach.id === 'combo_master') {
+                            progressText.textContent = `${comboCount || 0}/5`;
+                        } else if (ach.id === 'daily_goal') {
+                            const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                            progressText.textContent = `${dailyHasene}/${goalHasene}`;
+                        } else if (ach.id === 'streak_7') {
+                            progressText.textContent = `${streakData.currentStreak || 0}/7`;
+                        } else if (ach.id.startsWith('level_')) {
+                            const targetLevel = parseInt(ach.id.split('_')[1]);
+                            progressText.textContent = `${level || 1}/${targetLevel}`;
+                        } else if (ach.id.startsWith('xp_')) {
+                            const targetXP = parseInt(ach.id.split('_')[1]);
+                            progressText.textContent = `${(totalPoints || 0).toLocaleString()}/${targetXP.toLocaleString()}`;
+                        } else {
+                            progressText.textContent = 'Kilitli';
+                        }
+                        progressText.style.color = '#999';
+                        progressText.style.fontWeight = 'normal';
+                    }
+                }
+            });
         }
 
         function closeBadgesModal() {
@@ -4452,6 +4749,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         window.handleBadgesModalClick = handleBadgesModalClick;
         window.handleDailyTasksModalClick = handleDailyTasksModalClick;
         window.confirmResetStats = confirmResetStats;
+        window.showBadgeCategory = showBadgeCategory;
+        window.showBadgesModal = showBadgesModal;
+        window.closeBadgesModal = closeBadgesModal;
         
         // ============ ONBOARDING/TUTORIAL SİSTEMİ ============
         let currentOnboardingSlide = 1;

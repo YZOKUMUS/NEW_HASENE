@@ -556,6 +556,139 @@ body {
     background: #5568d3;
 }
 
+/* Badges Modal - Yeni Duolingo Tarzı Tasarım */
+#badgesScrollableContent {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    will-change: scroll-position !important;
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f1f1;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+#badgesScrollableContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+#badgesScrollableContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#badgesScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#badgesScrollableContent::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* Kategori Sekmeleri */
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.badge-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.badge-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.badge-tab:hover:not(.active) {
+    background: #f5f5f5;
+    color: #667eea;
+}
+
+/* Başarılar Grid */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.achievement-card {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+    border: 3px solid transparent;
+    cursor: pointer;
+}
+
+.achievement-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.achievement-card.unlocked {
+    background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+.achievement-card.locked {
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+.achievement-progress {
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.achievement-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 10px;
+    color: #999;
+    margin-top: 4px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
 /* Calendar Modal - Özel Stil */
 .calendar-content {
     max-width: 500px !important;
