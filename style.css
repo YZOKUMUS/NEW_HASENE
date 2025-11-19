@@ -426,23 +426,21 @@ body {
     background: #5568d3;
 }
 
-/* Daily Tasks Scrollable Content - İstatistikler ile Aynı */
+/* Daily Tasks Scrollable Content - İstatistikler ile TAMAMEN AYNI */
 #dailyTasksScrollableContent {
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important;
+    overscroll-behavior: contain;
     will-change: scroll-position;
     scroll-behavior: smooth;
     /* Scroll bar stilleri */
     scrollbar-width: thin;
     scrollbar-color: #667eea #f1f1f1;
-    /* Height ve overflow ayarları - kritik */
+    /* Height ve overflow ayarları - İSTATİSTİKLER İLE AYNI */
     min-height: 0 !important;
-    height: 100% !important;
+    max-height: 100% !important;
+    height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    flex: 1 1 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
 }
 
 #dailyTasksScrollableContent::-webkit-scrollbar {
@@ -2387,9 +2385,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     padding: 20px;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
     text-align: center;
     z-index: 99999;
     overflow-y: auto;
@@ -3069,26 +3067,25 @@ body {
     100% { background-position: -200% 0; }
 }
 
-/* Footer */
+/* Footer - Tüm cihazlarda görünür olması için */
 .loading-footer-text {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.8);
     text-align: center;
-    margin-top: auto;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 10px 0;
     text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
     position: relative;
     z-index: 100;
     width: 100%;
     flex-shrink: 0;
-    min-height: 40px;
+    min-height: 30px;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    /* Tüm cihazlarda görünürlük garantisi */
     box-sizing: border-box;
     line-height: 1.5;
+    /* Tüm cihazlarda görünürlük garantisi */
+    margin: 0;
 }
 
 /* Flying Letters */
