@@ -426,6 +426,13 @@ body {
     background: #5568d3;
 }
 
+/* Daily Tasks Scrollable Content */
+#dailyTasksScrollableContent {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+    will-change: scroll-position;
+}
+
 /* Stats Modal - Özel Stil */
 .stats-content {
     max-width: 500px !important;

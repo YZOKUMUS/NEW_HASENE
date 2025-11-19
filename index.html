@@ -5246,22 +5246,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
             dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
             
-            // Scroll edilebilir içerik alanında scroll algılama
-            if (dailyTasksScrollableContent) {
-                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
-                    dailyTasksModalIsScrolling = false;
-                }, { passive: true });
-                
-                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
-                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                    dailyTasksModalIsScrolling = true;
-                }, { passive: true });
-            }
-            
-            // Modal overlay için touch event'leri
+            // Modal overlay için touch event'leri (scroll container'a dokunmadan)
             dailyTasksModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                // Eğer scroll edilebilir içerik alanına veya modal-content'e tıklanmışsa, ignore et
+                if (e.target && (
+                    e.target.id === 'dailyTasksScrollableContent' || 
+                    e.target.closest('#dailyTasksScrollableContent') ||
+                    e.target.closest('.modal-content')
+                )) {
                     return;
                 }
                 
@@ -5285,8 +5277,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     const touch = e.touches[0];
                     const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
                     const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-                    if (deltaX > 10 || deltaY > 10) {
+                    // Dikey hareket yataydan fazlaysa, bu bir scroll olabilir
+                    if (deltaY > deltaX && deltaY > 10) {
                         dailyTasksModalIsScrolling = true;
                     }
                 }
