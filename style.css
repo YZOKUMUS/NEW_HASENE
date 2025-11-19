@@ -3076,6 +3076,11 @@ body {
     position: relative;
     z-index: 100;
     width: 100%;
+    flex-shrink: 0;
+    min-height: 40px;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Flying Letters */
@@ -3114,12 +3119,41 @@ body {
     .loading-screen-new {
         padding: 15px;
         padding-bottom: 30px;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
     }
     
     .loading-footer-text {
         font-size: 11px;
         padding-top: 15px;
         padding-bottom: 15px;
+        margin-top: auto !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 100 !important;
+    }
+}
+
+/* Samsung ve küçük ekranlar için özel ayarlar */
+@media (max-width: 600px) and (max-height: 800px) {
+    .loading-screen-new {
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        padding-bottom: 20px;
+    }
+    
+    .loading-footer-text {
+        margin-top: auto !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        z-index: 100 !important;
+        flex-shrink: 0 !important;
     }
 }
 
