@@ -429,7 +429,7 @@ body {
 /* Daily Tasks Scrollable Content - İstatistikler ile Aynı */
 #dailyTasksScrollableContent {
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain;
+    overscroll-behavior: contain !important;
     will-change: scroll-position;
     scroll-behavior: smooth;
     /* Scroll bar stilleri */
@@ -437,10 +437,12 @@ body {
     scrollbar-color: #667eea #f1f1f1;
     /* Height ve overflow ayarları - kritik */
     min-height: 0 !important;
-    max-height: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 #dailyTasksScrollableContent::-webkit-scrollbar {
@@ -2379,10 +2381,13 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height - modern cihazlar için */
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari için */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 20px;
     padding-bottom: 40px;
     text-align: center;
@@ -3081,6 +3086,9 @@ body {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    /* Tüm cihazlarda görünürlük garantisi */
+    box-sizing: border-box;
+    line-height: 1.5;
 }
 
 /* Flying Letters */
