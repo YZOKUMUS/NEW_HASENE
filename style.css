@@ -2372,12 +2372,16 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px;
+    padding-bottom: 40px;
     text-align: center;
     z-index: 99999;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     background-size: 200% 200%;
     animation: gradientShift 8s ease infinite;
+    box-sizing: border-box;
 }
 
 @keyframes gradientShift {
@@ -3053,8 +3057,13 @@ body {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.8);
     text-align: center;
-    margin-top: 20px;
+    margin-top: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
     text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 100;
+    width: 100%;
 }
 
 /* Flying Letters */
@@ -3088,6 +3097,17 @@ body {
 
     .flying-letter {
         font-size: 20px;
+    }
+    
+    .loading-screen-new {
+        padding: 15px;
+        padding-bottom: 30px;
+    }
+    
+    .loading-footer-text {
+        font-size: 11px;
+        padding-top: 15px;
+        padding-bottom: 15px;
     }
 }
 
