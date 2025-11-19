@@ -3637,6 +3637,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     if (badgesProgressPercentEl) badgesProgressPercentEl.textContent = '0%';
 
     // Başarılar Modal - Achievement kartlarını manuel olarak sıfırla
+    // ÖNEMLİ: Bu işlem updateAllAchievements() çağrılmadan ÖNCE yapılmalı
     const achievementIds = ['first_win', 'combo_master', 'daily_goal', 'streak_7', 'level_5', 'level_10', 'level_20', 'xp_500', 'xp_2000', 'xp_8500', 'xp_25500', 'xp_85000'];
     
     achievementIds.forEach(achId => {
@@ -3654,9 +3655,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         card.style.opacity = '0.6';
         card.style.filter = 'grayscale(50%)';
         
-        // İlerleme barını sıfırla
+        // İlerleme barını sıfırla - !important ile zorla
         if (progressFill) {
-            progressFill.style.width = '0%';
+            progressFill.style.width = '0% !important';
+            progressFill.style.setProperty('width', '0%', 'important');
             progressFill.style.background = '#ccc';
         }
         
@@ -3684,6 +3686,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             progressText.style.fontWeight = 'normal';
         }
     });
+    
+    // Sıfırlama işaretini localStorage'a kaydet (updateAllAchievements bu işareti kontrol edecek)
+    localStorage.setItem('achievementsJustReset', 'true');
 
     // Takvim Modal - Streak bilgisi
     const calendarStreakCountEl = document.getElementById('calendarStreakCount');
@@ -4024,6 +4029,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Tüm achievement'ları güncelle
         function updateAllAchievements() {
+            // Sıfırlama işareti varsa, achievement kartlarını güncelleme (zaten sıfırlandı)
+            const justReset = localStorage.getItem('achievementsJustReset');
+            if (justReset === 'true') {
+                localStorage.removeItem('achievementsJustReset');
+                // Sıfırlama sonrası ilk güncelleme, sadece kilitli durumu koru
+                return;
+            }
+            
             const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
             const achievements = [
                 { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
@@ -4038,9 +4051,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     return Math.min((dailyHasene / goalHasene) * 100, 100);
                 }},
                 { id: 'streak_7', name: '7 Gün Seri', desc: '7 gün üst üste oyna', icon: '🔥', condition: () => streakData.currentStreak >= 7, progress: () => Math.min((streakData.currentStreak || 0) / 7 * 100, 100) },
-                { id: 'level_5', name: 'Seviye 5', desc: 'Seviye 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => Math.min((level || 1) / 5 * 100, 100) },
-                { id: 'level_10', name: 'Seviye 10', desc: 'Seviye 10\'a ulaş', icon: '💎', condition: () => level >= 10, progress: () => Math.min((level || 1) / 10 * 100, 100) },
-                { id: 'level_20', name: 'Seviye 20', desc: 'Seviye 20\'ye ulaş', icon: '🌟', condition: () => level >= 20, progress: () => Math.min((level || 1) / 20 * 100, 100) },
+                { id: 'level_5', name: 'Seviye 5', desc: 'Seviye 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => {
+                    // Level 1 ise 0% göster, 1/5 değil
+                    if (level <= 1) return 0;
+                    return Math.min((level / 5) * 100, 100);
+                }},
+                { id: 'level_10', name: 'Seviye 10', desc: 'Seviye 10\'a ulaş', icon: '💎', condition: () => level >= 10, progress: () => {
+                    // Level 1 ise 0% göster, 1/10 değil
+                    if (level <= 1) return 0;
+                    return Math.min((level / 10) * 100, 100);
+                }},
+                { id: 'level_20', name: 'Seviye 20', desc: 'Seviye 20\'ye ulaş', icon: '🌟', condition: () => level >= 20, progress: () => {
+                    // Level 1 ise 0% göster, 1/20 değil
+                    if (level <= 1) return 0;
+                    return Math.min((level / 20) * 100, 100);
+                }},
                 { id: 'xp_500', name: 'İlk Adım', desc: '500 Hasene topla', icon: '🌱', condition: () => totalPoints >= 500, progress: () => Math.min((totalPoints || 0) / 500 * 100, 100) },
                 { id: 'xp_2000', name: 'Bronz Yolcu', desc: '2,000 Hasene', icon: '🥉', condition: () => totalPoints >= 2000, progress: () => Math.min((totalPoints || 0) / 2000 * 100, 100) },
                 { id: 'xp_8500', name: 'Gümüş Master', desc: '8,500 Hasene', icon: '🥈', condition: () => totalPoints >= 8500, progress: () => Math.min((totalPoints || 0) / 8500 * 100, 100) },
