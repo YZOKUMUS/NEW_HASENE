@@ -4119,7 +4119,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             progressText.textContent = `${streakData.currentStreak || 0}/7`;
                         } else if (ach.id.startsWith('level_')) {
                             const targetLevel = parseInt(ach.id.split('_')[1]);
-                            progressText.textContent = `${level || 1}/${targetLevel}`;
+                            // Level 1 ise 0/X göster, 1/X değil
+                            const currentLevel = (level <= 1) ? 0 : level;
+                            progressText.textContent = `${currentLevel}/${targetLevel}`;
                         } else if (ach.id.startsWith('xp_')) {
                             const targetXP = parseInt(ach.id.split('_')[1]);
                             progressText.textContent = `${(totalPoints || 0).toLocaleString()}/${targetXP.toLocaleString()}`;
