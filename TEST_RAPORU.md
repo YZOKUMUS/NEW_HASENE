@@ -1,7 +1,7 @@
 # 🧪 KAPSAMLI TEST RAPORU - HASENE ARAPÇA OYUNU
 
-**Test Tarihi:** 18 Kasım 2025  
-**Test Versiyonu:** 1.0.0  
+**Test Tarihi:** 19 Kasım 2025  
+**Test Versiyonu:** 1.0.1  
 **Başarı Oranı:** 96.20%
 
 ---

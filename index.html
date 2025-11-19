@@ -38,8 +38,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Google Fonts with error handling - loads asynchronously to prevent blocking on certificate errors -->
-    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.onerror=null; this.remove();">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.onerror=null; this.remove();">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     
     <!-- Material Icons (served via Google Fonts) -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.onerror=null; this.remove();">
@@ -437,7 +437,7 @@
 
             <div class="game-box">
                 <div style="text-align: center; margin: 30px 0;">
-                    <div style="font-size: 4em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
+                    <div style="font-size: 1.5em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
                 </div>
                 <div class="sure-info" id="dinleSureInfo" style="text-align: center; color: var(--md-on-surface-variant); font-size: 12px; margin: 8px 0;">ID: 0</div>
                 <button class="audio-btn" id="dinleAudioBtn"></button>
@@ -514,7 +514,7 @@
             <img src="clue.png" alt="İpucu" style="width: 24px; height: 24px;">
         </button>
     </div>
-    <div class="options" id="options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; width: 100%; max-width: 100%; box-sizing: border-box;">
+    <div class="options" id="options" style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 100%; box-sizing: border-box;">
         <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">tepe taklak atılırlar</button>
         <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">öğüdüm</button>
         <button class="option flutter-option-btn" style="font-size: clamp(12px, 3vw, 16px); padding: 12px 8px; width: 100%; max-width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; white-space: normal;">onların çevresinden</button>
@@ -2591,6 +2591,9 @@ function hideAllGameScreens() {
     });
 }
 
+// Global olarak erişilebilir yap
+window.hideAllGameScreens = hideAllGameScreens;
+
 
 
 
@@ -3453,6 +3456,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Tüm oyun ekranlarını ve modlarını gizle
+                if (typeof hideAllGameScreens === 'function') {
+                    hideAllGameScreens();
+                }
+                if (typeof hideAllModes === 'function') {
+                    hideAllModes();
+                } else {
+                    // Fallback: Manuel olarak modları gizle
+                    const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
+                    modeIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.style.display = 'none';
+                            el.style.zIndex = '';
+                        }
+                    });
+                }
+                
                 // Ana sayfanın görünür olduğundan emin ol
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
@@ -3691,6 +3713,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Tüm oyun ekranlarını ve modlarını gizle
+                if (typeof hideAllGameScreens === 'function') {
+                    hideAllGameScreens();
+                }
+                if (typeof hideAllModes === 'function') {
+                    hideAllModes();
+                } else {
+                    // Fallback: Manuel olarak modları gizle
+                    const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
+                    modeIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.style.display = 'none';
+                            el.style.zIndex = '';
+                        }
+                    });
+                }
+                
                 // Ana sayfanın görünür olduğundan emin ol
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
@@ -4140,6 +4181,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Tüm oyun ekranlarını ve modlarını gizle
+                if (typeof hideAllGameScreens === 'function') {
+                    hideAllGameScreens();
+                }
+                if (typeof hideAllModes === 'function') {
+                    hideAllModes();
+                } else {
+                    // Fallback: Manuel olarak modları gizle
+                    const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
+                    modeIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.style.display = 'none';
+                            el.style.zIndex = '';
+                        }
+                    });
+                }
+                
                 // Ana sayfanın görünür olduğundan emin ol
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
@@ -4701,6 +4761,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Tüm oyun ekranlarını ve modlarını gizle
+                if (typeof hideAllGameScreens === 'function') {
+                    hideAllGameScreens();
+                }
+                if (typeof hideAllModes === 'function') {
+                    hideAllModes();
+                } else {
+                    // Fallback: Manuel olarak modları gizle
+                    const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
+                    modeIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.style.display = 'none';
+                            el.style.zIndex = '';
+                        }
+                    });
+                }
+                
                 // Ana sayfanın görünür olduğundan emin ol
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
@@ -4825,10 +4904,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeDailyTasksModal();
-            // Ana sayfanın görünür olduğundan emin ol
-            if (elements && elements.mainMenu) {
-                elements.mainMenu.style.display = 'block';
-            }
         }
 
         function updateTasksDisplay() {
@@ -5753,6 +5828,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             allOptions.forEach((opt, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'option flutter-option-btn';
+                // Türkçe kelimeler için özel class ekle (Arapça değilse)
+                if (!isArabic(opt.text)) {
+                    btn.classList.add('turkish-option');
+                }
                 btn.textContent = opt.text;
                 btn.onclick = () => checkAnswer(btn, opt.correct);
                 elements.options.appendChild(btn);

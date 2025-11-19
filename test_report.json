@@ -1,0 +1,493 @@
+{
+  "timestamp": "2025-11-19T04:43:35.365Z",
+  "summary": {
+    "total": 79,
+    "passed": 76,
+    "failed": 0,
+    "warnings": 3,
+    "errors": 0,
+    "successRate": "96.20%"
+  },
+  "results": {
+    "passed": [
+      {
+        "name": "Dosya mevcut: index.html",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.169Z"
+      },
+      {
+        "name": "Dosya mevcut: style.css",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.177Z"
+      },
+      {
+        "name": "Dosya mevcut: manifest.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.177Z"
+      },
+      {
+        "name": "Dosya mevcut: sw.js",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: server.js",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: package.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: kelimebul.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: ayetoku_formatted.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: duaet.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.178Z"
+      },
+      {
+        "name": "Dosya mevcut: hadisoku.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.179Z"
+      },
+      {
+        "name": "Dosya mevcut: icon-192-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.179Z"
+      },
+      {
+        "name": "Dosya mevcut: icon-512-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.179Z"
+      },
+      {
+        "name": "JSON geçerli: manifest.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.179Z"
+      },
+      {
+        "name": "JSON geçerli: package.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.179Z"
+      },
+      {
+        "name": "JSON geçerli: kelimebul.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.208Z"
+      },
+      {
+        "name": "JSON geçerli: ayetoku_formatted.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.235Z"
+      },
+      {
+        "name": "JSON geçerli: duaet.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.236Z"
+      },
+      {
+        "name": "JSON geçerli: hadisoku.json",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.266Z"
+      },
+      {
+        "name": "DOCTYPE bildirimi",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "HTML lang attribute",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Meta tag: viewport",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Meta tag: charset",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Meta tag: theme-color",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Critical element: mainMenu",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Critical element: gameScreen",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Critical element: kelimeCevirBtn",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Critical element: dinleBulBtn",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Critical element: boslukDoldurBtn",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Script tags",
+        "status": "PASS",
+        "message": "6 script tag bulundu",
+        "timestamp": "2025-11-19T04:43:35.268Z"
+      },
+      {
+        "name": "Link tags",
+        "status": "PASS",
+        "message": "12 link tag bulundu",
+        "timestamp": "2025-11-19T04:43:35.269Z"
+      },
+      {
+        "name": "CSS dosyası okunabilir",
+        "status": "PASS",
+        "message": "60234 karakter",
+        "timestamp": "2025-11-19T04:43:35.269Z"
+      },
+      {
+        "name": "Media queries",
+        "status": "PASS",
+        "message": "7 media query bulundu",
+        "timestamp": "2025-11-19T04:43:35.269Z"
+      },
+      {
+        "name": "Responsive: @media",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Responsive: max-width",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Responsive: min-width",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Responsive: clamp",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Responsive: vw",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Responsive: vh",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "CSS selector: .game-screen",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "CSS selector: .dinle-mode",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "CSS selector: .bosluk-mode",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "CSS selector: .game-box",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "CSS selector: .option",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.270Z"
+      },
+      {
+        "name": "Script blokları",
+        "status": "PASS",
+        "message": "6 script bloğu bulundu",
+        "timestamp": "2025-11-19T04:43:35.271Z"
+      },
+      {
+        "name": "JavaScript function: DOMContentLoaded",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "JavaScript function: addEventListener",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "JavaScript function: getElementById",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "JavaScript function: localStorage",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "JavaScript function: fetch",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "Error handling",
+        "status": "PASS",
+        "message": "Try-catch blokları mevcut",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "Manifest field: name",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Manifest field: short_name",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Manifest field: start_url",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Manifest field: display",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Manifest field: icons",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Icon mevcut: icon-192-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Icon mevcut: icon-512-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Service Worker kaydı",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "Manifest link",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.274Z"
+      },
+      {
+        "name": "eval() kullanımı",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.277Z"
+      },
+      {
+        "name": "CSP meta tag",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.277Z"
+      },
+      {
+        "name": "HTML boyutu",
+        "status": "PASS",
+        "message": "412.08KB",
+        "timestamp": "2025-11-19T04:43:35.279Z"
+      },
+      {
+        "name": "CSS boyutu",
+        "status": "PASS",
+        "message": "59.01KB",
+        "timestamp": "2025-11-19T04:43:35.279Z"
+      },
+      {
+        "name": "Image boyutu: icon-192-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "8.83KB",
+        "timestamp": "2025-11-19T04:43:35.279Z"
+      },
+      {
+        "name": "Image boyutu: icon-512-v4-RED-MUSHAF.png",
+        "status": "PASS",
+        "message": "26.91KB",
+        "timestamp": "2025-11-19T04:43:35.280Z"
+      },
+      {
+        "name": "Async/Defer scripts",
+        "status": "PASS",
+        "message": "0/6 script async/defer",
+        "timestamp": "2025-11-19T04:43:35.280Z"
+      },
+      {
+        "name": "Image alt text",
+        "status": "PASS",
+        "message": "Tüm 3 image'de alt text var",
+        "timestamp": "2025-11-19T04:43:35.281Z"
+      },
+      {
+        "name": "ARIA attributes",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.282Z"
+      },
+      {
+        "name": "Form inputs",
+        "status": "PASS",
+        "message": "Form input yok",
+        "timestamp": "2025-11-19T04:43:35.283Z"
+      },
+      {
+        "name": "Kelime verisi",
+        "status": "PASS",
+        "message": "14837 kelime bulundu",
+        "timestamp": "2025-11-19T04:43:35.309Z"
+      },
+      {
+        "name": "Kelime field: kelime",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.309Z"
+      },
+      {
+        "name": "Kelime field: anlam",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.309Z"
+      },
+      {
+        "name": "Kelime field: id",
+        "status": "PASS",
+        "message": "",
+        "timestamp": "2025-11-19T04:43:35.309Z"
+      },
+      {
+        "name": "Ayet verisi",
+        "status": "PASS",
+        "message": "6236 ayet bulundu",
+        "timestamp": "2025-11-19T04:43:35.333Z"
+      },
+      {
+        "name": "Dua verisi",
+        "status": "PASS",
+        "message": "45 dua bulundu",
+        "timestamp": "2025-11-19T04:43:35.334Z"
+      },
+      {
+        "name": "Hadis verisi",
+        "status": "PASS",
+        "message": "5972 hadis bulundu",
+        "timestamp": "2025-11-19T04:43:35.365Z"
+      }
+    ],
+    "failed": [],
+    "warnings": [
+      {
+        "name": "Tag dengesi",
+        "status": "WARN",
+        "message": "Dengesizlik olabilir: Açılış: 940, Kapanış: 711",
+        "timestamp": "2025-11-19T04:43:35.269Z"
+      },
+      {
+        "name": "Console statements",
+        "status": "WARN",
+        "message": "22 console statement bulundu (production'da azaltılmalı)",
+        "timestamp": "2025-11-19T04:43:35.272Z"
+      },
+      {
+        "name": "XSS koruması",
+        "status": "WARN",
+        "message": "innerHTML kullanımı var, sanitization kontrol edilmeli",
+        "timestamp": "2025-11-19T04:43:35.276Z"
+      }
+    ],
+    "errors": []
+  }
+}
