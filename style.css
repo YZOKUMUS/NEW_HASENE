@@ -1152,6 +1152,11 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .game-screen .duolingo-audio-btn:hover {
@@ -1167,6 +1172,14 @@ body {
 /* Duolingo Tarzı Seçenek Butonları */
 .game-screen .duolingo-options-container {
     padding: 0 20px 20px 20px;
+}
+
+/* Next butonları için mobil touch desteği */
+#nextBtn, #dinleNextBtn, #boslukNextBtn {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }
 
 .game-screen .duolingo-option {
@@ -1186,6 +1199,11 @@ body {
     word-break: break-word;
     overflow-wrap: break-word;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .game-screen .duolingo-option:hover:not(.disabled) {
@@ -1400,6 +1418,11 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .dinle-mode .duolingo-audio-btn:hover {
@@ -1433,6 +1456,11 @@ body {
     word-break: break-word;
     overflow-wrap: break-word;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .dinle-mode .duolingo-option:hover:not(.disabled) {
@@ -1646,6 +1674,11 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .bosluk-mode .duolingo-audio-btn:hover {
@@ -1679,6 +1712,11 @@ body {
     word-break: break-word;
     overflow-wrap: break-word;
     font-family: 'Roboto', 'Segoe UI', sans-serif;
+    /* Mobil touch desteği */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .bosluk-mode .duolingo-option:hover:not(.disabled) {

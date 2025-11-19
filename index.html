@@ -5901,30 +5901,54 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.game(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
             
             // Audio butonu event handler
-            elements.dinleAudioBtn.onclick = () => {
+            const handleDinleAudioClick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 if (currentDinleQuestion && currentDinleQuestion.ses_dosyasi) {
                     playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
                 }
             };
+            if (elements.dinleAudioBtn) {
+                elements.dinleAudioBtn.onclick = handleDinleAudioClick;
+                elements.dinleAudioBtn.addEventListener('touchend', handleDinleAudioClick, { passive: false });
+            }
             
             // Mikrofon butonu event listener
             const dinleMicBtn = document.getElementById('dinleMicBtn');
             if (dinleMicBtn) {
-                dinleMicBtn.onclick = () => {
+                const handleMicClick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                     startSpeechRecognition();
                 };
+                dinleMicBtn.onclick = handleMicClick;
+                dinleMicBtn.addEventListener('touchend', handleMicClick, { passive: false });
             }
             
             // Next butonu event handler'ını buraya taşıdık
-            elements.dinleNextBtn.onclick = () => {
+            const handleDinleNextClick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
                 log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
                 log.debug(`🎯 Bir sonraki soru yükleniyor...`);
                 // Butonu hemen gizle
-                elements.dinleNextBtn.style.display = 'none';
-                elements.dinleNextBtn.classList.remove("next-appear");
+                if (elements.dinleNextBtn) {
+                    elements.dinleNextBtn.style.display = 'none';
+                    elements.dinleNextBtn.classList.remove("next-appear");
+                }
                 loadDinleQuestion();
             };
+            if (elements.dinleNextBtn) {
+                elements.dinleNextBtn.onclick = handleDinleNextClick;
+                elements.dinleNextBtn.addEventListener('touchend', handleDinleNextClick, { passive: false });
+            }
             
             updateDinleUI();
             loadDinleQuestion();
@@ -6582,7 +6606,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     btn.classList.add('turkish-option');
                 }
                 btn.textContent = opt.text;
-                btn.onclick = () => checkAnswer(btn, opt.correct);
+                
+                // Mobil ve masaüstü için event handler
+                const handleClick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (!btn.classList.contains('disabled')) {
+                        checkAnswer(btn, opt.correct);
+                    }
+                };
+                
+                btn.onclick = handleClick;
+                btn.addEventListener('touchend', handleClick, { passive: false });
+                
                 elements.options.appendChild(btn);
             });
             
@@ -6890,26 +6928,44 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         // ============ SES ÇALMA ============
-        elements.audioBtn.onclick = () => {
+        const handleAudioClick = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             if (currentQuestion && currentQuestion.ses_dosyasi) {
                 playAudio(currentQuestion.ses_dosyasi, elements.audioBtn);
             }
         };
+        if (elements.audioBtn) {
+            elements.audioBtn.onclick = handleAudioClick;
+            elements.audioBtn.addEventListener('touchend', handleAudioClick, { passive: false });
+        }
 
         // ============ SONRAKİ SORU ============
-        elements.nextBtn.onclick = () => {
+        const handleNextClick = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             // ⚡ Speed animation ve haptic feedback
             addSpeedAnimation(elements.gameScreen, 'fade-in');
             triggerHaptic('light');
             
             // Butonu hemen gizle
-            elements.nextBtn.style.display = 'none';
-            elements.nextBtn.style.visibility = 'hidden';
-            // display: none olduğunda aria-hidden gerekmez, zaten erişilebilirlik ağacından çıkar
-            elements.nextBtn.classList.remove("next-appear");
+            if (elements.nextBtn) {
+                elements.nextBtn.style.display = 'none';
+                elements.nextBtn.style.visibility = 'hidden';
+                // display: none olduğunda aria-hidden gerekmez, zaten erişilebilirlik ağacından çıkar
+                elements.nextBtn.classList.remove("next-appear");
+            }
             
             loadQuestion();
         };
+        if (elements.nextBtn) {
+            elements.nextBtn.onclick = handleNextClick;
+            elements.nextBtn.addEventListener('touchend', handleNextClick, { passive: false });
+        }
 
         // ============ İLERLEME GÜNCELLE ============
         function updateProgress() {
@@ -6963,7 +7019,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ İPUCU ============
         if (elements.hintBtn) {
-            elements.hintBtn.onclick = () => {
+            const handleHintClick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 // currentQuestion kontrolü
                 if (!currentQuestion || !currentQuestion.anlam) {
                     console.warn('⚠️ İpucu: currentQuestion bulunamadı!');
@@ -7003,6 +7063,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     console.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
                 }
             };
+            elements.hintBtn.onclick = handleHintClick;
+            elements.hintBtn.addEventListener('touchend', handleHintClick, { passive: false });
         }
 
         // ============ SEVİYE ATLAMA ============
@@ -7796,7 +7858,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 } else {
                     btn.textContent = opt.text;
                 }
-                btn.onclick = () => checkDinleAnswer(btn, opt.correct);
+                
+                // Mobil ve masaüstü için event handler
+                const handleClick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (!btn.classList.contains('disabled')) {
+                        checkDinleAnswer(btn, opt.correct);
+                    }
+                };
+                
+                btn.onclick = handleClick;
+                btn.addEventListener('touchend', handleClick, { passive: false });
+                
                 elements.dinleOptions.appendChild(btn);
             });
             
@@ -8082,7 +8158,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     btn.classList.add('arabic-option');
                     btn.innerHTML = `<span style="direction: rtl;">${opt.text}</span>`;
                 }
-                btn.onclick = () => checkBoslukAnswer(btn, opt.correct);
+                
+                // Mobil ve masaüstü için event handler
+                const handleClick = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    if (!btn.classList.contains('disabled')) {
+                        checkBoslukAnswer(btn, opt.correct);
+                    }
+                };
+                
+                btn.onclick = handleClick;
+                btn.addEventListener('touchend', handleClick, { passive: false });
+                
                 elements.boslukOptions.appendChild(btn);
             });
             
@@ -8127,11 +8217,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         if (elements.boslukAudioBtn) {
-            elements.boslukAudioBtn.onclick = () => {
+            const handleBoslukAudioClick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
                     playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
                 }
             };
+            elements.boslukAudioBtn.onclick = handleBoslukAudioClick;
+            elements.boslukAudioBtn.addEventListener('touchend', handleBoslukAudioClick, { passive: false });
         }
 
         function checkBoslukAnswer(button, isCorrect) {
@@ -8235,7 +8331,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         if (elements.boslukNextBtn) {
-            elements.boslukNextBtn.onclick = () => {
+            const handleBoslukNextClick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 // Butonu hemen gizle
                 if (elements.boslukNextBtn) {
                     elements.boslukNextBtn.style.display = 'none';
@@ -8244,6 +8344,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 loadBoslukQuestion();
             };
+            elements.boslukNextBtn.onclick = handleBoslukNextClick;
+            elements.boslukNextBtn.addEventListener('touchend', handleBoslukNextClick, { passive: false });
         }
 
         function updateBoslukUI() {
