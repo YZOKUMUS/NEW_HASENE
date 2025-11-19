@@ -8178,10 +8178,32 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
 
             log.debug(`🔍 Ayet filtreleme başlıyor...`);
+            log.debug(`🎯 Seçili zorluk: ${currentDifficulty}`);
+            
             // Rastgele ayet seç (ayet_metni olan ayetleri filtrele)
-            const validAyets = ayetOkuData.filter(a => a.ayet_metni && a.ayet_metni.trim());
+            let validAyets = ayetOkuData.filter(a => a.ayet_metni && a.ayet_metni.trim());
             log.debug(`📦 Toplam ayet sayısı: ${ayetOkuData.length}`);
             log.debug(`✅ Geçerli ayet sayısı: ${validAyets.length}`);
+            
+            // Zorluk seviyesine göre filtrele (kelime sayısına göre)
+            const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
+            log.debug(`📋 Zorluk aralığı: ${diffLevel.minDiff}-${diffLevel.maxDiff} (kelime sayısı)`);
+            
+            // Ayetleri kelime sayısına göre filtrele
+            validAyets = validAyets.filter(ayet => {
+                const words = ayet.ayet_metni.split(' ').filter(w => w && w.trim());
+                const wordCount = words.length;
+                // Kelime sayısını zorluk aralığına göre filtrele
+                return wordCount >= diffLevel.minDiff && wordCount <= diffLevel.maxDiff;
+            });
+            
+            log.debug(`✅ Zorluk filtresi sonrası: ${validAyets.length} ayet`);
+            
+            // Eğer filtrelenmiş ayet yoksa, tüm geçerli ayetleri kullan
+            if (validAyets.length === 0) {
+                log.warn('⚠️ Zorluk filtresine uygun ayet bulunamadı, tüm ayetler kullanılacak');
+                validAyets = ayetOkuData.filter(a => a.ayet_metni && a.ayet_metni.trim());
+            }
             
             if (validAyets.length === 0) {
                 log.error('❌ Geçerli ayet bulunamadı!');

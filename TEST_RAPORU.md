@@ -40,6 +40,7 @@
 - [x] Kelime vurgulama (altın renk)
 - [x] Next butonu
 - [x] Geri butonu
+- [x] **Zorluk seviyesi desteği (Kolay/Orta/Zor) - Kelime sayısına göre filtreleme**
 
 ---
 
@@ -207,6 +208,20 @@
 2. ✅ Bir kelimeyi favorilere ekle
 3. ✅ Favoriler filtresine tıkla - kelime görünüyor mu?
 4. ✅ Favorilerden çıkar - listeden kalktı mı?
+
+### Senaryo 6: Zorluk Seviyeleri Test
+1. ✅ Ana menüde "Kolay" seç - buton aktif oldu mu?
+2. ✅ Ana menüde "Orta" seç - buton aktif oldu mu?
+3. ✅ Ana menüde "Zor" seç - buton aktif oldu mu?
+4. ✅ Kelime Çevir oyununu başlat (Kolay) - kolay kelimeler mi geldi? (5-9 difficulty)
+5. ✅ Kelime Çevir oyununu başlat (Orta) - orta kelimeler mi geldi? (10-11 difficulty)
+6. ✅ Kelime Çevir oyununu başlat (Zor) - zor kelimeler mi geldi? (12-21 difficulty)
+7. ✅ Dinle ve Bul oyununu başlat (Kolay) - kolay kelimeler mi geldi?
+8. ✅ Dinle ve Bul oyununu başlat (Orta) - orta kelimeler mi geldi?
+9. ✅ Dinle ve Bul oyununu başlat (Zor) - zor kelimeler mi geldi?
+10. ✅ **Boşluk Doldur oyununu başlat (Kolay) - kısa ayetler mi geldi? (5-9 kelime)**
+11. ✅ **Boşluk Doldur oyununu başlat (Orta) - orta ayetler mi geldi? (10-11 kelime)**
+12. ✅ **Boşluk Doldur oyununu başlat (Zor) - uzun ayetler mi geldi? (12-21 kelime)**
 
 ---
 
