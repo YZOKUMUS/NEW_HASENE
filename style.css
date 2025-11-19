@@ -429,9 +429,9 @@ body {
 /* Daily Tasks Scrollable Content - İstatistikler ile TAMAMEN AYNI */
 #dailyTasksScrollableContent {
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain;
-    will-change: scroll-position;
-    scroll-behavior: smooth;
+    overscroll-behavior: contain !important;
+    will-change: scroll-position !important;
+    /* scroll-behavior: smooth kaldırıldı - daha akıcı scroll için */
     /* Scroll bar stilleri */
     scrollbar-width: thin;
     scrollbar-color: #667eea #f1f1f1;
@@ -441,6 +441,11 @@ body {
     height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    /* Performans optimizasyonları */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 #dailyTasksScrollableContent::-webkit-scrollbar {
@@ -464,9 +469,9 @@ body {
 /* Stats Scrollable Content */
 #statsScrollableContent {
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain;
-    will-change: scroll-position;
-    scroll-behavior: smooth;
+    overscroll-behavior: contain !important;
+    will-change: scroll-position !important;
+    /* scroll-behavior: smooth kaldırıldı - daha akıcı scroll için */
     /* Scroll bar stilleri */
     scrollbar-width: thin;
     scrollbar-color: #667eea #f1f1f1;
@@ -476,6 +481,11 @@ body {
     height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    /* Performans optimizasyonları */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 #statsScrollableContent::-webkit-scrollbar {
