@@ -431,6 +431,57 @@ body {
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior: contain;
     will-change: scroll-position;
+    scroll-behavior: smooth;
+    /* Scroll bar stilleri */
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f1f1;
+}
+
+#dailyTasksScrollableContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+#dailyTasksScrollableContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#dailyTasksScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#dailyTasksScrollableContent::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* Stats Scrollable Content */
+#statsScrollableContent {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+    will-change: scroll-position;
+    scroll-behavior: smooth;
+    /* Scroll bar stilleri */
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f1f1;
+}
+
+#statsScrollableContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+#statsScrollableContent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#statsScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#statsScrollableContent::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
 }
 
 /* Stats Modal - Özel Stil */

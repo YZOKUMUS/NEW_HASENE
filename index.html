@@ -6603,20 +6603,65 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
                 btn.textContent = opt.text;
                 
-                // Masaüstü için onclick handler (preventDefault olmadan)
+                // Touch event tracking (scroll/tap ayrımı için)
+                let touchStart = { x: 0, y: 0, time: 0 };
+                let isScrolling = false;
+                
+                // Masaüstü için onclick handler
                 btn.onclick = () => {
                     if (!btn.classList.contains('disabled')) {
                         checkAnswer(btn, opt.correct);
                     }
                 };
                 
-                // Mobil için touchend handler (preventDefault ile)
-                btn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!btn.classList.contains('disabled')) {
-                        checkAnswer(btn, opt.correct);
+                // Mobil için touch event'leri
+                btn.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    touchStart = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now()
+                    };
+                    isScrolling = false;
+                }, { passive: true });
+                
+                btn.addEventListener('touchmove', (e) => {
+                    if (touchStart.x !== 0 || touchStart.y !== 0) {
+                        const touch = e.touches[0];
+                        const deltaX = Math.abs(touch.clientX - touchStart.x);
+                        const deltaY = Math.abs(touch.clientY - touchStart.y);
+                        // 10px'den fazla hareket varsa scroll'dur
+                        if (deltaX > 10 || deltaY > 10) {
+                            isScrolling = true;
+                        }
                     }
+                }, { passive: true });
+                
+                btn.addEventListener('touchend', (e) => {
+                    // Scroll yapıldıysa tıklamayı engelle
+                    if (isScrolling) {
+                        touchStart = { x: 0, y: 0, time: 0 };
+                        isScrolling = false;
+                        return;
+                    }
+                    
+                    // Scroll değilse, tap olarak kabul et
+                    const touch = e.changedTouches[0];
+                    const deltaTime = Date.now() - touchStart.time;
+                    const deltaX = Math.abs(touch.clientX - touchStart.x);
+                    const deltaY = Math.abs(touch.clientY - touchStart.y);
+                    
+                    // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                    if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!btn.classList.contains('disabled')) {
+                            checkAnswer(btn, opt.correct);
+                        }
+                    }
+                    
+                    touchStart = { x: 0, y: 0, time: 0 };
+                    isScrolling = false;
                 }, { passive: false });
                 
                 elements.options.appendChild(btn);
@@ -7874,20 +7919,65 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     btn.textContent = opt.text;
                 }
                 
-                // Masaüstü için onclick handler (preventDefault olmadan)
+                // Touch event tracking (scroll/tap ayrımı için)
+                let touchStart = { x: 0, y: 0, time: 0 };
+                let isScrolling = false;
+                
+                // Masaüstü için onclick handler
                 btn.onclick = () => {
                     if (!btn.classList.contains('disabled')) {
                         checkDinleAnswer(btn, opt.correct);
                     }
                 };
                 
-                // Mobil için touchend handler (preventDefault ile)
-                btn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!btn.classList.contains('disabled')) {
-                        checkDinleAnswer(btn, opt.correct);
+                // Mobil için touch event'leri
+                btn.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    touchStart = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now()
+                    };
+                    isScrolling = false;
+                }, { passive: true });
+                
+                btn.addEventListener('touchmove', (e) => {
+                    if (touchStart.x !== 0 || touchStart.y !== 0) {
+                        const touch = e.touches[0];
+                        const deltaX = Math.abs(touch.clientX - touchStart.x);
+                        const deltaY = Math.abs(touch.clientY - touchStart.y);
+                        // 10px'den fazla hareket varsa scroll'dur
+                        if (deltaX > 10 || deltaY > 10) {
+                            isScrolling = true;
+                        }
                     }
+                }, { passive: true });
+                
+                btn.addEventListener('touchend', (e) => {
+                    // Scroll yapıldıysa tıklamayı engelle
+                    if (isScrolling) {
+                        touchStart = { x: 0, y: 0, time: 0 };
+                        isScrolling = false;
+                        return;
+                    }
+                    
+                    // Scroll değilse, tap olarak kabul et
+                    const touch = e.changedTouches[0];
+                    const deltaTime = Date.now() - touchStart.time;
+                    const deltaX = Math.abs(touch.clientX - touchStart.x);
+                    const deltaY = Math.abs(touch.clientY - touchStart.y);
+                    
+                    // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                    if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!btn.classList.contains('disabled')) {
+                            checkDinleAnswer(btn, opt.correct);
+                        }
+                    }
+                    
+                    touchStart = { x: 0, y: 0, time: 0 };
+                    isScrolling = false;
                 }, { passive: false });
                 
                 elements.dinleOptions.appendChild(btn);
@@ -8176,20 +8266,65 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     btn.innerHTML = `<span style="direction: rtl;">${opt.text}</span>`;
                 }
                 
-                // Masaüstü için onclick handler (preventDefault olmadan)
+                // Touch event tracking (scroll/tap ayrımı için)
+                let touchStart = { x: 0, y: 0, time: 0 };
+                let isScrolling = false;
+                
+                // Masaüstü için onclick handler
                 btn.onclick = () => {
                     if (!btn.classList.contains('disabled')) {
                         checkBoslukAnswer(btn, opt.correct);
                     }
                 };
                 
-                // Mobil için touchend handler (preventDefault ile)
-                btn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!btn.classList.contains('disabled')) {
-                        checkBoslukAnswer(btn, opt.correct);
+                // Mobil için touch event'leri
+                btn.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    touchStart = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now()
+                    };
+                    isScrolling = false;
+                }, { passive: true });
+                
+                btn.addEventListener('touchmove', (e) => {
+                    if (touchStart.x !== 0 || touchStart.y !== 0) {
+                        const touch = e.touches[0];
+                        const deltaX = Math.abs(touch.clientX - touchStart.x);
+                        const deltaY = Math.abs(touch.clientY - touchStart.y);
+                        // 10px'den fazla hareket varsa scroll'dur
+                        if (deltaX > 10 || deltaY > 10) {
+                            isScrolling = true;
+                        }
                     }
+                }, { passive: true });
+                
+                btn.addEventListener('touchend', (e) => {
+                    // Scroll yapıldıysa tıklamayı engelle
+                    if (isScrolling) {
+                        touchStart = { x: 0, y: 0, time: 0 };
+                        isScrolling = false;
+                        return;
+                    }
+                    
+                    // Scroll değilse, tap olarak kabul et
+                    const touch = e.changedTouches[0];
+                    const deltaTime = Date.now() - touchStart.time;
+                    const deltaX = Math.abs(touch.clientX - touchStart.x);
+                    const deltaY = Math.abs(touch.clientY - touchStart.y);
+                    
+                    // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                    if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!btn.classList.contains('disabled')) {
+                            checkBoslukAnswer(btn, opt.correct);
+                        }
+                    }
+                    
+                    touchStart = { x: 0, y: 0, time: 0 };
+                    isScrolling = false;
                 }, { passive: false });
                 
                 elements.boslukOptions.appendChild(btn);
