@@ -12,6 +12,7 @@
 9. [Ceza Sistemi](#ceza-sistemi)
 10. [Oyun Modlarına Göre Puan Kazanma](#oyun-modlarına-göre-puan-kazanma)
 11. [Sistemlerin Senkronizasyonu](#sistemlerin-senkronizasyonu)
+12. [Bildirim Tetikleyicileri](#bildirim-tetikleyicileri)
 
 ---
 
@@ -419,6 +420,35 @@ Hasene Arapça Oyunu'nda tüm puanlar **Hasene (XP)** olarak adlandırılır ve 
 
 ---
 
+## 🔔 BİLDİRİM TETİKLEYİCİLERİ
+
+Puan sistemi artık bildirim altyapısıyla doğrudan konuşuyor. Aşağıdaki fonksiyonlar Hasene kazanımı ve günlük istatistikler üzerinden tetikleniyor:
+
+1. **`scheduleDailyReminder()`**
+   - Kullanıcının o gün oyun oynayıp oynamadığını `dailyTasks.todayStats` ile kontrol eder.
+   - Henüz Hasene kazanılmadıysa planlanan saatte `📚 Günlük Hatırlatıcı` bildirimi gönderir.
+   - `notificationSettings.dailyReminder` bayrağı kapalıysa çalışmaz.
+
+2. **`checkGoalCompletion()`**
+   - `saveStats()` çağrısının sonunda tetiklenir.
+   - Günlük hedef (`dailyGoalHasene`) `dailyTasks` veya `hasene_dailyTasks`/`dailyHasene` kayıtlarından karşılanmışsa tek seferlik `goalNotification_<tarih>` kaydıyla bildirim gösterilir.
+   - `notificationSettings.goalCompletion` kapalıysa atlanır.
+
+3. **`checkStreakWarning()`**
+   - Günlük streak verilerini `dailyTasks.playDates` üzerinden okur.
+   - Seri bozulmadan önce kullanıcıyı `Seri uyarısı` bildirimiyle haberdar eder.
+
+4. **`sendCustomEventNotification(title, body, options)`**
+   - Analitik panelindeki özel etkinlikler veya yönetici tetiklemeleri için kullanılır.
+   - `notificationSettings.customEvents` ile kontrol edilir ve Notification API'ye doğrudan iletilir.
+
+5. **Bluetooth/Ses Tanıma Yardımcıları**
+   - `showNetworkErrorHelp`, `showMicrophonePermissionHelp`, `showBluetoothMicrophoneHelp` fonksiyonları bildirim sistemindeki aynı UI stilini kullanır; haptik destek ve `triggerHaptic()` ile paralel çalışır.
+
+> **Not:** Bu entegrasyonlar sayesinde günlük hedef, görevler ve combo gibi puan olayları yalnızca UI'da değil, push bildirimlerinde de real-time yansır. `window.dailyTasks` global referansı, bildirim servis worker'ı dahil farklı betiklerde aynı istatistiklerin okunmasına izin verir.
+
+---
+
 ## 📝 NOTLAR
 
 1. **Hasene = XP = Puan**: Tüm sistemlerde aynı değer kullanılır
@@ -429,6 +459,6 @@ Hasene Arapça Oyunu'nda tüm puanlar **Hasene (XP)** olarak adlandırılır ve 
 
 ---
 
-**Son Güncelleme**: 2025-01-18
-**Versiyon**: 1.0
+**Son Güncelleme**: 2025-01-19
+**Versiyon**: 1.1
 

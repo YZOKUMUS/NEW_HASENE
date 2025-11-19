@@ -5284,6 +5284,23 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
             dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
             
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (dailyTasksScrollableContent) {
+                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
+                    dailyTasksModalIsScrolling = false;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    dailyTasksModalIsScrolling = true;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('scroll', function(e) {
+                    // Scroll yapılıyorsa işaretle
+                    dailyTasksModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
             // Modal overlay için touch event'leri (scroll container'a dokunmadan)
             dailyTasksModal.addEventListener('touchstart', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya modal-content'e tıklanmışsa, ignore et
@@ -5326,7 +5343,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Touch end'de scroll kontrolü yap
                 if (dailyTasksModalIsScrolling) {
                     // Scroll oldu, kapatma
-                    dailyTasksModalIsScrolling = false;
+                    // Scroll bitene kadar bekle
+                    setTimeout(() => {
+                        dailyTasksModalIsScrolling = false;
+                    }, 100);
                     dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
                     return;
                 }
@@ -5384,33 +5404,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Sadece modal overlay'e (arka plana) tıklanırsa kapat
             closeDailyTasksModal();
-        }
-        
-        // Daily tasks modal için touch event'leri
-        function initDailyTasksModalTouchEvents() {
-            const dailyTasksModal = document.getElementById('dailyTasksModal');
-            const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
-            if (!dailyTasksModal) return;
-            
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
-            dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
-            
-            // Scroll edilebilir içerik alanında scroll algılama (sadece scroll algılama için)
-            if (dailyTasksScrollableContent) {
-                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
-                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                    dailyTasksModalIsScrolling = true;
-                }, { passive: true });
-            }
-            
-            // Modal overlay için touch event'leri (sadece scroll algılama için)
-            dailyTasksModal.addEventListener('touchmove', function(e) {
-                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
-                    dailyTasksModalIsScrolling = true;
-                }
-            }, { passive: true });
         }
 
         function updateTasksDisplay() {

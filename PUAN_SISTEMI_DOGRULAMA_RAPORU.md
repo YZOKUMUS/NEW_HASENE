@@ -87,6 +87,16 @@
 | Günlük puana ekleniyor mu? | ✅ | `dailyTasks.todayStats.toplamPuan += bonusXP` |
 | Günlük hedefe ekleniyor mu? | ✅ | `addDailyXP(bonusXP)` |
 
+### ✅ Bildirim Tetikleyicileri (Yeni)
+
+| Kontrol | Durum | Açıklama |
+|---------|-------|----------|
+| Günlük hatırlatıcı planlanıyor mu? | ✅ | `scheduleDailyReminder()` günlük aktiviteyi `dailyTasks.todayStats` ile kontrol ediyor |
+| Streak uyarısı çalışıyor mu? | ✅ | `checkStreakWarning()` `dailyTasks.playDates` verisine göre push gönderiyor |
+| Günlük hedef bildirimi | ✅ | `checkGoalCompletion()` `saveStats()` içinde tetikleniyor, `hasene_dailyTasks` yedeğine düşüyor |
+| Custom event bildirimi | ✅ | `sendCustomEventNotification()` `notificationSettings.customEvents` bayrağına bağlı |
+| Bildirim tekrarları engelleniyor mu? | ✅ | `goalNotification_<tarih>` anahtarıyla aynı gün ikinci kez gönderilmiyor |
+
 ### ✅ Ceza Sistemi
 
 | Kontrol | Durum | Açıklama |
@@ -124,6 +134,11 @@
 - **Açıklama**: Bazı yerlerde `/500`, bazı yerlerde `/100` kullanılıyordu
 - **Çözüm**: Tüm yerlerde `/100` olarak standardize edildi
 
+### 2. ⚠️ Günlük Hedef Bildirimi `dailyTasks` Referansı
+- **Durum**: ✅ DÜZELTİLDİ
+- **Açıklama**: `checkGoalCompletion()` fonksiyonunda `dailyTasks` tanımı bulunamadığı için bildirim hatası veriyordu.
+- **Çözüm**: `window.dailyTasks` global olarak expose edildi ve fonksiyon localStorage'dan yedek okuma yapacak şekilde güncellendi.
+
 ---
 
 ## ✅ SONUÇ
@@ -134,6 +149,6 @@ Tüm puan, yıldız, seviye, rozet, combo ve bonus sistemleri **doğru çalış�
 
 ---
 
-**Doğrulama Tarihi**: 2025-01-18
-**Versiyon**: 1.0
+**Doğrulama Tarihi**: 2025-01-19
+**Versiyon**: 1.1
 
