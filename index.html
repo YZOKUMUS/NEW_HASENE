@@ -2567,6 +2567,9 @@
                 farklıZorluk: new Set()
             }
         };
+        
+        // Global erişim için (bildirim sistemi için)
+        window.dailyTasks = dailyTasks;
 
         // SESSION (OYUN İÇİ) PUANLAR
         let sessionScore = 0;     // Bu oyunun puanı
@@ -3123,6 +3126,7 @@ window.hideAllGameScreens = hideAllGameScreens;
             const savedTasks = savedTasksIndexedDB || localStorage.getItem('hasene_dailyTasks');
             if (savedTasks) {
                 dailyTasks = { ...dailyTasks, ...JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks)) };
+                window.dailyTasks = dailyTasks; // Global erişim için güncelle
                 // Set nesnelerini yeniden oluştur
                 dailyTasks.todayStats.farklıZorluk = new Set(dailyTasks.todayStats.farklıZorluk || []);
             }
@@ -3304,6 +3308,7 @@ window.hideAllGameScreens = hideAllGameScreens;
             farklıZorluk: new Set()
         }
     };
+    window.dailyTasks = dailyTasks; // Global erişim için güncelle
 
     // ================================
 // 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA
@@ -9099,9 +9104,27 @@ function showMainMenu() {
         
         dailyReminderTimer = setTimeout(async () => {
             // Bugün oyun oynanmış mı kontrol et
-            const today = getLocalDateString();
+            const today = typeof getLocalDateString === 'function' ? getLocalDateString() : new Date().toISOString().split('T')[0];
             const lastPlayDate = localStorage.getItem('haseneLastPlayDate');
-            const todayStats = dailyTasks.todayStats || {};
+            
+            // dailyTasks'tan veya localStorage'dan bugünkü istatistikleri al
+            let todayStats = {};
+            if (typeof window.dailyTasks !== 'undefined' && window.dailyTasks && window.dailyTasks.todayStats) {
+                todayStats = window.dailyTasks.todayStats;
+            } else {
+                try {
+                    const dailyTasksStr = localStorage.getItem('hasene_dailyTasks');
+                    if (dailyTasksStr) {
+                        const dailyTasks = JSON.parse(dailyTasksStr);
+                        if (dailyTasks && dailyTasks.todayStats) {
+                            todayStats = dailyTasks.todayStats;
+                        }
+                    }
+                } catch (e) {
+                    // Hata durumunda boş obje kullan
+                }
+            }
+            
             const hasPlayedToday = lastPlayDate === today && (todayStats.toplamPuan > 0 || todayStats.kelimeCevir > 0);
             
             if (!hasPlayedToday) {
@@ -9160,12 +9183,34 @@ function showMainMenu() {
         
         try {
             const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || '2700');
-            const todayProgress = dailyTasks.todayStats?.toplamPuan || 0;
+            
+            // dailyTasks'tan veya localStorage'dan bugünkü puanı al
+            let todayProgress = 0;
+            
+            // Önce global dailyTasks değişkenini kontrol et
+            if (typeof window.dailyTasks !== 'undefined' && window.dailyTasks && window.dailyTasks.todayStats) {
+                todayProgress = window.dailyTasks.todayStats.toplamPuan || 0;
+            } else {
+                // localStorage'dan oku
+                try {
+                    const dailyTasksStr = localStorage.getItem('hasene_dailyTasks');
+                    if (dailyTasksStr) {
+                        const dailyTasks = JSON.parse(dailyTasksStr);
+                        if (dailyTasks && dailyTasks.todayStats) {
+                            todayProgress = dailyTasks.todayStats.toplamPuan || 0;
+                        }
+                    }
+                } catch (e) {
+                    // localStorage'dan okuyamazsa, dailyHasene'yi kullan
+                    todayProgress = parseInt(localStorage.getItem('dailyHasene') || '0');
+                }
+            }
             
             // Hedef tamamlandıysa bildirim göster
             if (todayProgress >= dailyGoalHasene && dailyGoalHasene > 0) {
                 // Sadece bir kez bildirim göster (bugün için)
-                const goalNotificationShown = localStorage.getItem(`goalNotification_${getLocalDateString()}`);
+                const today = typeof getLocalDateString === 'function' ? getLocalDateString() : new Date().toISOString().split('T')[0];
+                const goalNotificationShown = localStorage.getItem(`goalNotification_${today}`);
                 if (!goalNotificationShown) {
                     showNotification('🎉 Günlük Hedef Tamamlandı!', {
                         body: `Tebrikler! Günlük hedefinizi tamamladınız (${dailyGoalHasene} puan). Devam edin! 🏆`,
@@ -9173,7 +9218,7 @@ function showMainMenu() {
                         requireInteraction: false,
                         vibrate: [200, 100, 200, 100, 200]
                     });
-                    localStorage.setItem(`goalNotification_${getLocalDateString()}`, 'true');
+                    localStorage.setItem(`goalNotification_${today}`, 'true');
                 }
             }
         } catch (e) {
