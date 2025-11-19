@@ -48,6 +48,13 @@
     <!-- Flutter Modern CSS -->
     <link rel="stylesheet" href="style.css">
     
+    <!-- Modüler JavaScript Dosyaları -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/data-loader.js"></script>
+    <script src="js/favorites.js"></script>
+    
     
     
 </head>
@@ -932,6 +939,12 @@
                 <button id="filterAll" class="filter-btn active" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #3498db; color: white; font-size: 0.85em; cursor: pointer;">
                     Hepsi
                 </button>
+                <button id="filterFavorites" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
+                    ⭐ Favoriler
+                </button>
+                <button id="filterReview" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
+                    🔄 Tekrar
+                </button>
                 <button id="filterMastered" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
                     Öğrenildi
                 </button>
@@ -1120,81 +1133,149 @@
     </div>
 
     <!-- Hasene Info Modal -->
-    <div class="modal" id="xpInfoModal">
-        <div class="modal-content" style="max-width: 400px;">
+    <div class="modal" id="xpInfoModal" onclick="handleXPInfoModalClick(event)">
+        <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
+            <!-- Başlık ve Kapat Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
+                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">💰 Hasene Sistemi</h3>
+                <button onclick="event.stopPropagation(); closeXPInfoModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
+            </div>
+
+            <!-- Scroll Edilebilir İçerik -->
+            <div id="xpInfoScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
             <h3 style="margin: 0 0 15px 0; font-size: 1.1em; text-align: center; color: #667eea;">� Hasene Sistemi</h3>
             
-            <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-                <div style="font-size: 0.8em; color: #555; font-weight: 600;">1 Saat Amel = ~8,500 Hasene</div>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">⭐ Yıldız Sistemi</h4>
-                <div style="font-size: 0.75em; color: #555; line-height: 1.6;">
-                    <strong>100 Hasene = 1 Yıldız</strong><br>
-                    Her sahih cevabın mükâfatı. Sürekli ilerleme görürsün!
+                <!-- Özet Bilgi -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
+                    <div style="font-size: 1.1em; font-weight: 700; margin-bottom: 8px;">⏱️ Hızlı Referans</div>
+                    <div style="font-size: 0.9em; opacity: 0.95;">1 Saat Amel = ~8,500 Hasene</div>
                 </div>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">🏆 Mertebe Sistemi</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.75em; color: #555;">
-                    <div>🥉 <strong>2,000 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mübtedi (~15 dk)</span></div>
-                    <div>🥈 <strong>8,500 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Müterakki (~1 saat)</span></div>
-                    <div>🥇 <strong>25,500 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mütecaviz (~3 gün)</span></div>
-                    <div>💎 <strong>85,000 Hasene</strong><br><span style="font-size: 0.85em; color: #888;">Mütebahhir (~10 gün)</span></div>
-                </div>
-            </div>
-            
-            <div style="background: #fff7e6; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 8px 0; color: #f97316; font-size: 0.9em;">🔥 Silsile Bonusu</h4>
-                <div style="font-size: 0.75em; color: #555;">
-                    <strong>Her 3 sahih cevap = +5 Hasene bonus!</strong><br>
-                    Tevali yap, ilave mükâfat kazan!
-                </div>
-            </div>
-            
-            <div style="background: #f0f9ff; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 0.9em;">🎯 Günlük Vird Bonusu</h4>
-                <div style="font-size: 0.75em; color: #555;">
-                    Günlük virdini tamamla:<br>
-                    <strong style="color: #3b82f6; font-size: 1.1em;">+1,000 Hasene Müjdesi!</strong>
-                </div>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 0.9em;">🎮 Oyun Modlarına Göre Puan</h4>
-                <div style="font-size: 0.75em; color: #555; line-height: 1.8;">
-                    <div style="margin-bottom: 8px;">
-                        <strong>🔤 Kelime Çevir:</strong><br>
-                        <span style="font-size: 0.9em;">Kelime Zorluğu × 2 Hasene</span><br>
-                        <span style="font-size: 0.85em; color: #888;">Kolay: 10-18 | Orta: 20-22 | Zor: 24-42</span>
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <strong>🎵 Dinle ve Bul:</strong><br>
-                        <span style="font-size: 0.9em;">Kelime Zorluğu × 2 Hasene</span>
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <strong>📝 Boşluk Doldur:</strong><br>
-                        <span style="font-size: 0.9em;">Sabit 10 Hasene</span>
-                    </div>
-                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
-                        <span style="font-size: 0.85em; color: #888;">📖 Ayet Oku, 🤲 Dua Öğren, 📚 Hadis Oku modlarında puan kazanılmaz (sadece günlük görev ilerlemesi)</span>
+                
+                <!-- Yıldız Sistemi -->
+                <div style="background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #ffc107; box-shadow: 0 2px 8px rgba(255,193,7,0.2);">
+                    <h4 style="margin: 0 0 10px 0; color: #f59e0b; font-size: 1em; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.3em;">⭐</span> Yıldız Sistemi
+                    </h4>
+                    <div style="font-size: 0.85em; color: #555; line-height: 1.7;">
+                        <div style="background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+                            <strong style="color: #f59e0b; font-size: 1.1em;">100 Hasene = 1 Yıldız</strong>
+                        </div>
+                        <div style="color: #666; font-size: 0.9em;">
+                            Her sahih cevabın mükâfatı. Sürekli ilerleme görürsün! 📈
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div style="background: #fef3c7; padding: 12px; border-radius: 10px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 8px 0; color: #d97706; font-size: 0.9em;">📋 Günlük Görevler</h4>
-                <div style="font-size: 0.75em; color: #555;">
-                    Tüm günlük görevleri tamamla:<br>
-                    <strong style="color: #d97706; font-size: 1.1em;">+2,500 Hasene Bonus!</strong>
+                
+                <!-- Mertebe Sistemi -->
+                <div style="background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.2);">
+                    <h4 style="margin: 0 0 12px 0; color: #667eea; font-size: 1em; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.3em;">🏆</span> Mertebe Sistemi
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8em;">
+                        <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.5em; margin-bottom: 5px;">🥉</div>
+                            <div style="font-weight: 700; color: #cd7f32; margin-bottom: 4px;">2,000 Hasene</div>
+                            <div style="font-size: 0.85em; color: #888;">Mübtedi</div>
+                            <div style="font-size: 0.75em; color: #aaa; margin-top: 2px;">~15 dk</div>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.5em; margin-bottom: 5px;">🥈</div>
+                            <div style="font-weight: 700; color: #c0c0c0; margin-bottom: 4px;">8,500 Hasene</div>
+                            <div style="font-size: 0.85em; color: #888;">Müterakki</div>
+                            <div style="font-size: 0.75em; color: #aaa; margin-top: 2px;">~1 saat</div>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.5em; margin-bottom: 5px;">🥇</div>
+                            <div style="font-weight: 700; color: #ffd700; margin-bottom: 4px;">25,500 Hasene</div>
+                            <div style="font-size: 0.85em; color: #888;">Mütecaviz</div>
+                            <div style="font-size: 0.75em; color: #aaa; margin-top: 2px;">~3 gün</div>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-size: 1.5em; margin-bottom: 5px;">💎</div>
+                            <div style="font-weight: 700; color: #00d9ff; margin-bottom: 4px;">85,000 Hasene</div>
+                            <div style="font-size: 0.85em; color: #888;">Mütebahhir</div>
+                            <div style="font-size: 0.75em; color: #aaa; margin-top: 2px;">~10 gün</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bonuslar -->
+                <div style="background: linear-gradient(135deg, #fff7e6 0%, #ffe6d9 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #f97316; box-shadow: 0 2px 8px rgba(249,115,22,0.2);">
+                    <h4 style="margin: 0 0 12px 0; color: #f97316; font-size: 1em; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.3em;">🎁</span> Bonus Sistemleri
+                    </h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #f97316; margin-bottom: 5px; font-size: 0.9em;">🔥 Silsile Bonusu</div>
+                            <div style="font-size: 0.85em; color: #555; line-height: 1.6;">
+                                <strong>Her 3 sahih cevap = +5 Hasene bonus!</strong><br>
+                                <span style="color: #888; font-size: 0.9em;">Tevali yap, ilave mükâfat kazan!</span>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #3b82f6; margin-bottom: 5px; font-size: 0.9em;">🎯 Günlük Vird Bonusu</div>
+                            <div style="font-size: 0.85em; color: #555; line-height: 1.6;">
+                                Günlük virdini tamamla:<br>
+                                <strong style="color: #3b82f6; font-size: 1.1em;">+1,000 Hasene Müjdesi!</strong>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #d97706; margin-bottom: 5px; font-size: 0.9em;">📋 Günlük Görevler</div>
+                            <div style="font-size: 0.85em; color: #555; line-height: 1.6;">
+                                Tüm günlük görevleri tamamla:<br>
+                                <strong style="color: #d97706; font-size: 1.1em;">+2,500 Hasene Bonus!</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Oyun Modlarına Göre Puan -->
+                <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.2);">
+                    <h4 style="margin: 0 0 12px 0; color: #667eea; font-size: 1em; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.3em;">🎮</span> Oyun Modlarına Göre Puan
+                    </h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85em;">
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #667eea; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                <span>🔤</span> Kelime Çevir
+                            </div>
+                            <div style="color: #555; line-height: 1.6;">
+                                <strong>Kelime Zorluğu × 2 Hasene</strong><br>
+                                <span style="font-size: 0.9em; color: #888;">Kolay: 10-18 | Orta: 20-22 | Zor: 24-42</span>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #667eea; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                <span>🎵</span> Dinle ve Bul
+                            </div>
+                            <div style="color: #555; line-height: 1.6;">
+                                <strong>Kelime Zorluğu × 2 Hasene</strong>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 700; color: #667eea; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                <span>📝</span> Boşluk Doldur
+                            </div>
+                            <div style="color: #555; line-height: 1.6;">
+                                <strong>Sabit 10 Hasene</strong>
+                            </div>
+                        </div>
+                        <div style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 8px; border-left: 3px solid #ffc107;">
+                            <div style="font-size: 0.8em; color: #856404; line-height: 1.5;">
+                                <strong>ℹ️ Not:</strong> 📖 Ayet Oku, 🤲 Dua Öğren, 📚 Hadis Oku modlarında puan kazanılmaz (sadece günlük görev ilerlemesi)
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <button id="closeXPInfoBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; margin: 20px auto 0; display: block;">
-                Bâreke'llahu fîke! 🤲
-            </button>
+            <!-- Scroll edilebilir içerik sonu -->
+
+            <!-- Kapat Butonu (Sabit) -->
+            <div style="flex-shrink: 0; margin-top: 12px; text-align: center;">
+                <button id="closeXPInfoBtn" style="width: auto; max-width: 200px; padding: 10px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 0.9em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(102,126,234,0.3); transition: transform 0.2s;">
+                    Bâreke'llahu fîke! 🤲
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1236,259 +1317,10 @@
     </style>
 
     <script>
-        // ============ PRODUCTION CONFIG - DEBUG SISTEMI ============
-        const CONFIG = {
-            debug: false,              // Ana debug modu (production'da false)
-            debugStats: false,          // İstatistik debug'ları (filterWordStats, updateWordStatistics)
-            debugElements: false,       // DOM element kontrolleri
-            debugAudio: false,          // Ses sistemi debug'ları
-            debugGameFlow: false,       // Oyun akışı debug'ları
-            showCriticalErrors: true,   // Kritik hataları her zaman göster
-            hapticEnabled: true,        // Haptic feedback (titreme) aktif mi
-            swipeGesturesEnabled: true  // Swipe jestleri aktif mi
-        };
-        
-        // Helper fonksiyon - güvenli console.log
-        // Keep a reference to the original console.log so we can gate raw calls
-        const __orig_console_log = console.log.bind(console);
-
-        const log = {
-            // Use the original console for wrapper logs so each wrapper flag works independently
-            debug: (...args) => { if (CONFIG.debug) __orig_console_log(...args); },
-            stats: (...args) => { if (CONFIG.debugStats) __orig_console_log(...args); },
-            elements: (...args) => { if (CONFIG.debugElements) __orig_console_log(...args); },
-            audio: (...args) => { if (CONFIG.debugAudio) __orig_console_log(...args); },
-            game: (...args) => { if (CONFIG.debugGameFlow) __orig_console_log(...args); },
-            error: (...args) => { if (CONFIG.showCriticalErrors) console.error(...args); },
-            warn: (...args) => { if (CONFIG.showCriticalErrors) console.warn(...args); }
-        };
-
-        // Gate any remaining raw console.log calls via CONFIG.debug (global toggle).
-        // This lets us avoid replacing hundreds of console.log occurrences while keeping
-        // a single control to enable verbose logs during debugging.
-        console.log = (...args) => { if (typeof CONFIG !== 'undefined' && CONFIG.debug) __orig_console_log(...args); };
-        const forceLog = (...args) => __orig_console_log(...args);
-        
-        // ============ YARDIMCI FONKSİYONLAR ============
-        // Yerel tarih formatı (YYYY-MM-DD) - UTC yerine yerel saat dilimi kullanır
-        function getLocalDateString(date = new Date()) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        
-        // ============ MOBİL DENEYİM - HAPTIC FEEDBACK ============
-        function hapticFeedback(type = 'light') {
-            if (!CONFIG.hapticEnabled || !navigator.vibrate) return;
-            
-            const patterns = {
-                light: 10,           // Hafif titreşim (buton tıklama)
-                medium: 20,          // Orta titreşim (doğru cevap)
-                heavy: 50,           // Güçlü titreşim (yanlış cevap, önemli olay)
-                success: [20, 50, 20],  // Başarılı işlem (combo, seviye atlama)
-                error: [50, 100, 50],   // Hata (yanlış cevap)
-                warning: [30, 50, 30]   // Uyarı (can azalması)
-            };
-            
-            const pattern = patterns[type] || patterns.light;
-            navigator.vibrate(pattern);
-        }
-        
-        // ============ MOBİL DENEYİM - SWIPE GESTURES ============
-        function initSwipeGestures(element, callbacks) {
-            if (!CONFIG.swipeGesturesEnabled || !element) return;
-            
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let touchEndX = 0;
-            let touchEndY = 0;
-            let isScrolling = false;
-            
-            const minSwipeDistance = 50; // Minimum swipe mesafesi (px)
-            const maxVerticalDistance = 100; // Dikey scroll için maksimum mesafe
-            
-            element.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                touchStartX = touch.clientX;
-                touchStartY = touch.clientY;
-                isScrolling = false;
-            }, { passive: true });
-            
-            element.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                const deltaY = Math.abs(touch.clientY - touchStartY);
-                // Eğer dikey hareket fazlaysa, bu bir scroll'dur
-                if (deltaY > maxVerticalDistance) {
-                    isScrolling = true;
-                }
-            }, { passive: true });
-            
-            element.addEventListener('touchend', (e) => {
-                if (isScrolling) return;
-                
-                const touch = e.changedTouches[0];
-                touchEndX = touch.clientX;
-                touchEndY = touch.clientY;
-                
-                const deltaX = touchEndX - touchStartX;
-                const deltaY = touchEndY - touchStartY;
-                const absDeltaX = Math.abs(deltaX);
-                const absDeltaY = Math.abs(deltaY);
-                
-                // Dikey swipe (yukarı/aşağı)
-                if (absDeltaY > absDeltaX && absDeltaY > minSwipeDistance) {
-                    if (deltaY > 0 && callbacks.onSwipeDown) {
-                        // Swipe down (aşağı kaydırma)
-                        callbacks.onSwipeDown();
-                        hapticFeedback('light');
-                    } else if (deltaY < 0 && callbacks.onSwipeUp) {
-                        // Swipe up (yukarı kaydırma)
-                        callbacks.onSwipeUp();
-                        hapticFeedback('light');
-                    }
-                }
-                // Yatay swipe (sağa/sola)
-                else if (absDeltaX > absDeltaY && absDeltaX > minSwipeDistance) {
-                    if (deltaX > 0 && callbacks.onSwipeRight) {
-                        // Swipe right (sağa kaydırma)
-                        callbacks.onSwipeRight();
-                        hapticFeedback('light');
-                    } else if (deltaX < 0 && callbacks.onSwipeLeft) {
-                        // Swipe left (sola kaydırma)
-                        callbacks.onSwipeLeft();
-                        hapticFeedback('light');
-                    }
-                }
-            }, { passive: true });
-        }
-        
-        // ============ SECURITY - HTML SANITIZATION ============
-        function sanitizeHTML(input) {
-            // XSS koruması için HTML özel karakterlerini escape et
-            if (typeof input !== 'string') return '';
-            const div = document.createElement('div');
-            div.textContent = input;
-            return div.innerHTML;
-        }
-        
-        function safeSetHTML(element, html, isStaticTrusted = false) {
-            // innerHTML kullanımı için güvenli wrapper
-            if (!element) return;
-            if (isStaticTrusted) {
-                // Statik, güvenilir HTML için direkt set (template literals)
-                element.innerHTML = html;
-            } else {
-                // User input veya dinamik içerik için sanitize
-                element.innerHTML = sanitizeHTML(html);
-            }
-        }
-        
-        // ============ LOADING INDICATOR ============
-        function showLoading(message = 'Yükleniyor...') {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) {
-                spinner.style.display = 'flex';
-                const textEl = spinner.querySelector('div > div:last-child');
-                if (textEl) textEl.textContent = message;
-            }
-        }
-        
-        function hideLoading() {
-            const spinner = document.getElementById('loadingSpinner');
-            if (spinner) spinner.style.display = 'none';
-        }
-        
-        // ============ SECURITY - LOCALSTORAGE ENCRYPTION ============
-        function encryptData(data) {
-            // Basit Base64 encoding (production'da daha güçlü encryption kullanılabilir)
-            try {
-                const jsonStr = JSON.stringify(data);
-                return btoa(unescape(encodeURIComponent(jsonStr)));
-                } catch(e) {
-                log.error('Encryption error:', e);
-                return data;
-            }
-        }
-        
-        function decryptData(encrypted) {
-            // Base64 decoding
-            try {
-                const jsonStr = decodeURIComponent(escape(atob(encrypted)));
-                return JSON.parse(jsonStr);
-            } catch(e) {
-                log.error('Decryption error:', e);
-                // Eğer decrypt edilemezse, belki encrypt edilmemiş eski veri
-                try {
-                    return JSON.parse(encrypted);
-                } catch(e2) {
-                    return encrypted;
-                }
-            }
-        }
-        
-        function secureSetItem(key, value) {
-            // localStorage'a şifreli kaydet
-            const encrypted = encryptData(value);
-            localStorage.setItem(key, encrypted);
-        }
-        
-        function secureGetItem(key) {
-            // localStorage'dan şifreli oku
-            const encrypted = localStorage.getItem(key);
-            if (!encrypted) return null;
-            return decryptData(encrypted);
-        }
-        
-        // ============ CUSTOM ALERT SYSTEM (Professional UI) ============
-        function showCustomAlert(message, type = 'info', title = null) {
-            const modal = document.getElementById('customAlertModal');
-            const iconEl = document.getElementById('customAlertIcon');
-            const titleEl = document.getElementById('customAlertTitle');
-            const messageEl = document.getElementById('customAlertMessage');
-            const okBtn = document.getElementById('customAlertOKBtn');
-            
-            // Type-based styling
-            const types = {
-                success: { icon: '🎉', title: 'Başarılı!', color: '#4caf50' },
-                error: { icon: '❌', title: 'Hata!', color: '#f44336' },
-                warning: { icon: '⚠️', title: 'Uyarı!', color: '#ff9800' },
-                info: { icon: 'ℹ️', title: 'Bilgi', color: '#2196f3' }
-            };
-            
-            const config = types[type] || types.info;
-            iconEl.textContent = config.icon;
-            titleEl.textContent = title || config.title;
-            titleEl.style.color = config.color;
-            
-            // HTML içeriği varsa innerHTML kullan, yoksa textContent
-            if (message.includes('<') && message.includes('>')) {
-                safeSetHTML(messageEl, message, true);
-            } else {
-            messageEl.textContent = message;
-            }
-            
-            // Show modal
-            modal.style.display = 'flex';
-            
-            // OK button handler
-            const handleOK = () => {
-                modal.style.display = 'none';
-                okBtn.removeEventListener('click', handleOK);
-            };
-            
-            okBtn.addEventListener('click', handleOK);
-            
-            // ESC key to close
-            const handleEsc = (e) => {
-                if (e.key === 'Escape') {
-                    modal.style.display = 'none';
-                    okBtn.removeEventListener('click', handleOK);
-                    document.removeEventListener('keydown', handleEsc);
-                }
-            };
-            document.addEventListener('keydown', handleEsc);
-        }
+        // Modüler JavaScript dosyaları yüklendi (config.js ve utils.js)
+        // Artık CONFIG, log, getLocalDateString, hapticFeedback, initSwipeGestures,
+        // sanitizeHTML, safeSetHTML, showLoading, hideLoading, encryptData, decryptData,
+        // secureSetItem, secureGetItem, showCustomAlert fonksiyonları kullanılabilir
         
         // ============ GLOBAL FONKSİYONLAR (onclick için erişilebilir olmalı) ============
         
@@ -1789,9 +1621,15 @@
             
                 // Event listener'ları ekle (sadece bir kez) - null kontrolü ile
                 const filterAll = document.getElementById('filterAll');
+                const filterFavorites = document.getElementById('filterFavorites');
+                const filterReview = document.getElementById('filterReview');
                 const filterMastered = document.getElementById('filterMastered');
                 const filterStruggling = document.getElementById('filterStruggling');
                 const filterRecent = document.getElementById('filterRecent');
+                
+                // Favoriler ve tekrar listesini yükle
+                if (typeof loadFavorites === 'function') loadFavorites();
+                if (typeof loadReviewWords === 'function') loadReviewWords();
                 
                 if (filterAll && !filterAll.hasAttribute('data-listener-added')) {
                     filterAll.onclick = (e) => {
@@ -1800,6 +1638,24 @@
                         filterWordStats('all');
                     };
                     filterAll.setAttribute('data-listener-added', 'true');
+                }
+                if (filterFavorites && !filterFavorites.hasAttribute('data-listener-added')) {
+                    filterFavorites.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (typeof loadFavorites === 'function') loadFavorites();
+                        filterWordStats('favorites');
+                    };
+                    filterFavorites.setAttribute('data-listener-added', 'true');
+                }
+                if (filterReview && !filterReview.hasAttribute('data-listener-added')) {
+                    filterReview.onclick = (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        if (typeof loadReviewWords === 'function') loadReviewWords();
+                        filterWordStats('review');
+                    };
+                    filterReview.setAttribute('data-listener-added', 'true');
                 }
                 if (filterMastered && !filterMastered.hasAttribute('data-listener-added')) {
                     filterMastered.onclick = (e) => {
@@ -1882,8 +1738,16 @@
                         log.stats('⚠️ Kelime verisi bulunamadı, geçici veri oluşturuldu:', wordData);
                     }
                     
+                    // Favoriler kontrolü
+                    const isFav = typeof isFavorite !== 'undefined' && isFavorite(wordId);
+                    
+                    // Tekrar listesi kontrolü
+                    const needsReview = typeof reviewWords !== 'undefined' && reviewWords.includes(wordId);
+                    
                     const shouldShow = 
                         filterType === 'all' ||
+                        (filterType === 'favorites' && isFav) ||
+                        (filterType === 'review' && needsReview) ||
                         (filterType === 'mastered' && stat.masteryLevel >= 3.0 && stat.successRate >= 0.6) ||
                         (filterType === 'struggling' && (stat.successRate < 0.6 || stat.masteryLevel < 1.0)) ||
                         (filterType === 'recent' && (Date.now() - stat.lastSeen) < 7 * 24 * 60 * 60 * 1000); // Son 7 gün
@@ -1904,6 +1768,17 @@
                 filteredStats.sort((a, b) => {
                     if (filterType === 'recent') {
                         return b.lastSeen - a.lastSeen; // En son görülenler önce
+                    } else if (filterType === 'review') {
+                        // Tekrar listesi için özel öncelik sıralaması
+                        if (typeof calculateReviewPriority !== 'undefined') {
+                            const priorityA = calculateReviewPriority(a);
+                            const priorityB = calculateReviewPriority(b);
+                            return priorityB - priorityA;
+                        }
+                        return b.priority - a.priority;
+                    } else if (filterType === 'favorites') {
+                        // Favoriler için son görülme zamanına göre sırala
+                        return b.lastSeen - a.lastSeen;
                     }
                     return b.priority - a.priority; // Yüksek öncelik önce
                 });
@@ -1961,6 +1836,8 @@
                     log.stats('📋 Oyun oynanmış ama bu kategoride kelime yok - filtre mesajı gösteriliyor');
                     const filterMessages = {
                         'all': 'Henüz hiç kelime istatistiği yok',
+                        'favorites': 'Henüz favori kelime eklenmemiş. Kelime kartlarındaki ⭐ butonuna tıklayarak favorilere ekleyebilirsin!',
+                        'review': 'Harika! Tekrar gerektiren kelime yok. Tüm kelimeler iyi durumda! 🎉',
                         'mastered': 'Henüz öğrenilmiş kelime yok. Daha fazla pratik yap! 💪',
                         'struggling': 'Harika! Zorlandığın kelime yok. Devam et! 🎉',
                         'recent': 'Son 7 günde kelime çalışılmamış. Bugün pratik yap! 📅'
@@ -1997,14 +1874,22 @@
                 const masteryText = item.masteryLevel >= 3 ? 'Öğrenildi' : item.masteryLevel >= 1.5 ? 'Öğreniliyor' : 'Zorlanıyor';
                 const successPercent = Math.round(item.successRate * 100);
                 
+                const isFav = typeof isFavorite !== 'undefined' && isFavorite(item.wordId);
+                const needsReview = typeof reviewWords !== 'undefined' && reviewWords.includes(item.wordId);
+                
                 return `
-                    <div style="background: white; border-radius: 8px; padding: 12px; margin: 8px 0; border-left: 4px solid ${masteryColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="background: white; border-radius: 8px; padding: 12px; margin: 8px 0; border-left: 4px solid ${masteryColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="flex: 1;">
-                                <div style="font-size: 1.1em; font-weight: bold; color: #2c3e50; margin-bottom: 2px;">${item.wordData.kelime || item.wordId}</div>
+                                <div style="font-size: 1.1em; font-weight: bold; color: #2c3e50; margin-bottom: 2px;">
+                                    ${item.wordData.kelime || item.wordId}
+                                    ${isFav ? ' ⭐' : ''}
+                                    ${needsReview ? ' 🔄' : ''}
+                                </div>
                                 <div style="font-size: 0.9em; color: #666;">${item.wordData.anlam || 'Bilinmiyor'}</div>
                             </div>
-                            <div style="text-align: right;">
+                            <div style="text-align: right; display: flex; gap: 5px; align-items: flex-start;">
+                                <button class="favorite-btn-inline" data-word-id="${item.wordId}" onclick="if(typeof toggleFavorite !== 'undefined') { const newState = toggleFavorite('${item.wordId}'); this.innerHTML = newState ? '⭐' : '☆'; this.style.background = newState ? '#ffc107' : 'transparent'; this.style.borderColor = newState ? '#ffc107' : '#ccc'; if(newState && typeof showSuccessMessage !== 'undefined') showSuccessMessage('⭐ Favorilere eklendi!'); }" style="background: ${isFav ? '#ffc107' : 'transparent'}; border: 2px solid ${isFav ? '#ffc107' : '#ccc'}; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; padding: 0; margin: 0; transition: all 0.3s ease;">${isFav ? '⭐' : '☆'}</button>
                                 <div style="background: ${masteryColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold;">${masteryText}</div>
                             </div>
                         </div>
@@ -2100,6 +1985,11 @@
 
             saveWordStats(wordStats);
             log.stats(`📊 ${wordId} kelimesi istatistiği güncellendi:`, stats);
+            
+            // Tekrar listesini güncelle
+            if (typeof updateReviewList === 'function') {
+                updateReviewList();
+            }
         }
 
         function selectIntelligentWord(filteredData) {
@@ -2469,10 +2359,8 @@
         }
 
         // ============ OYUN DURUMU ============
-        let kelimeBulData = [];  // kelimebul.json
-        let ayetOkuData = [];    // ayetoku_formatted.json (optimized)
-        let duaData = [];        // duaet.json
-        let hadisData = [];      // hadisoku.json
+        // Veri değişkenleri artık js/data-loader.js'de tanımlı (lazy loading için)
+        // kelimeBulData, ayetOkuData, duaData, hadisData global olarak erişilebilir
         
         let currentQuestion = null;
         let currentAyetIndex = 0;
@@ -2950,38 +2838,18 @@ window.closeAllModals = closeAllModals;
 
 
         // ============ VERİ YÜKLEME ============
+        // Artık lazy loading kullanılıyor - veriler sadece ihtiyaç duyulduğunda yüklenir
+        // loadKelimeData(), loadAyetData(), loadDuaData(), loadHadisData() fonksiyonları
+        // js/data-loader.js dosyasında tanımlı
+        
         async function loadData() {
             try {
-                // Loading göster
-                showLoading('Veriler yükleniyor...');
-                
-                // Kelime verilerini yükle (Kelime Çevir ve Dinle ve Bul için) - 3x retry
-                kelimeBulData = await fetchWithRetry('kelimebul.json');
-                // (commented) kelimeBulData length log removed during cleanup
-                
-                // Ayet verilerini yükle (Boşluk Doldur ve Ayet Oku için) - 3x retry
-                ayetOkuData = await fetchWithRetry('ayetoku_formatted.json');
-                // (commented) ayetOkuData length log removed during cleanup
-                
-                // Dua verilerini yükle (Dua Et için) - 3x retry
-                duaData = await fetchWithRetry('duaet.json');
-                // (commented) duaData length log removed during cleanup
-                
-                // Hadis verilerini yükle (Hadis Oku için) - 3x retry
-                hadisData = await fetchWithRetry('hadisoku.json');
-                // (commented) hadisData length log removed during cleanup
-                
-                // Mod seçiciyi başlat
+                // Sadece mod seçiciyi ve butonları başlat
+                // Veriler lazy loading ile yüklenecek
                 initModeSelector();
-
-                // Ana menü zorluk butonlarını başlat
                 initMainMenuDifficultyButtons();
                 
-                // Loading gizle
-                hideLoading();
-                
             } catch (error) {
-                hideLoading();
                 log.error('Veri yükleme hatası:', error);
                 // NULL KONTROL - mainMenu varsa hata mesajı göster
                 if (elements.mainMenu) {
@@ -3830,12 +3698,122 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
         
         function showXPInfoModal() {
-            document.getElementById('xpInfoModal').style.display = 'flex';
+            const modal = document.getElementById('xpInfoModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Touch event'leri başlat
+                initXPInfoModalTouchEvents();
+            }
         }
         
         function closeXPInfoModal() {
-            document.getElementById('xpInfoModal').style.display = 'none';
+            const modal = document.getElementById('xpInfoModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
+        
+        // XP Info Modal için touch event'leri
+        let xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+        let xpInfoModalIsScrolling = false;
+        
+        function initXPInfoModalTouchEvents() {
+            const xpInfoModal = document.getElementById('xpInfoModal');
+            const xpInfoScrollableContent = document.getElementById('xpInfoScrollableContent');
+            if (!xpInfoModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (xpInfoModal.hasAttribute('data-touch-events-initialized')) return;
+            xpInfoModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (xpInfoScrollableContent) {
+                xpInfoScrollableContent.addEventListener('touchstart', function(e) {
+                    xpInfoModalIsScrolling = false;
+                }, { passive: true });
+                
+                xpInfoScrollableContent.addEventListener('touchmove', function(e) {
+                    xpInfoModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            xpInfoModal.addEventListener('touchstart', function(e) {
+                if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                xpInfoModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                xpInfoModalIsScrolling = false;
+            }, { passive: true });
+            
+            xpInfoModal.addEventListener('touchmove', function(e) {
+                if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
+                    xpInfoModalIsScrolling = true;
+                    return;
+                }
+                
+                if (xpInfoModalTouchStart.x !== 0 || xpInfoModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
+                    if (deltaX > 10 || deltaY > 10) {
+                        xpInfoModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            xpInfoModal.addEventListener('touchend', function(e) {
+                if (xpInfoModalIsScrolling) {
+                    xpInfoModalIsScrolling = false;
+                    xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - xpInfoModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
+                
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
+                        return;
+                    }
+                    if (e.target && (e.target.id === 'closeXPInfoBtn' || e.target.closest('#closeXPInfoBtn'))) {
+                        return;
+                    }
+                    if (e.target && e.target.closest('.modal-content')) {
+                        return;
+                    }
+                    closeXPInfoModal();
+                }
+                
+                xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
+        
+        // Her yere tıklayınca kapatma fonksiyonu
+        function handleXPInfoModalClick(event) {
+            const target = event.target;
+            if (target && target.closest('button[onclick*="closeXPInfoModal"]')) {
+                return;
+            }
+            if (target && target.closest('.modal-content')) {
+                return;
+            }
+            if (target && (target.id === 'xpInfoScrollableContent' || target.closest('#xpInfoScrollableContent'))) {
+                return;
+            }
+            closeXPInfoModal();
+        }
+        
+        // Global olarak erişilebilir yap
+        window.handleXPInfoModalClick = handleXPInfoModalClick;
 
         // ============ İSTATİSTİKLER SİSTEMİ ============
         function showStatsModal() {
@@ -5737,11 +5715,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ ANA MENÜ NAVİGASYONU ============
         // Kelime Çevir modu - oyun modları seçici ile başlar
-        elements.kelimeCevirBtn.onclick = () => {
+        elements.kelimeCevirBtn.onclick = async () => {
             log.game('📚 === KELİME ÇEVİR OYUNU BAŞLATILIYOR ===');
             log.game('📋 1. Veri kontrol ediliyor...');
             
-            if (kelimeBulData.length === 0) {
+            // Lazy loading: Kelime verilerini yükle
+            try {
+                await loadKelimeData();
+            } catch (error) {
+                log.warn('❌ Kelime verileri yüklenemedi!');
+                showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!kelimeBulData || kelimeBulData.length === 0) {
                 log.warn('❌ Kelime verileri yüklenemedi!');
                 showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
@@ -5762,14 +5749,23 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // Dinle ve Bul modu - Doğrudan başlat
-        elements.dinleBulBtn.onclick = () => {
+        elements.dinleBulBtn.onclick = async () => {
             // Önce tüm modalları kapat
             closeAllModals();
             
             log.game('🔥 === DINLE VE BUL OYUNU BAŞLATILIYOR ===');
             log.game('📋 1. Veri kontrol ediliyor...');
             
-            if (kelimeBulData.length === 0) {
+            // Lazy loading: Kelime verilerini yükle
+            try {
+                await loadKelimeData();
+            } catch (error) {
+                log.warn('❌ Kelime verileri yüklenemedi!');
+                showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!kelimeBulData || kelimeBulData.length === 0) {
                 log.warn('❌ Kelime verileri yüklenemedi!');
                 showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
@@ -5837,14 +5833,23 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // Boşluk Doldur modu
-        elements.boslukDoldurBtn.onclick = () => {
+        elements.boslukDoldurBtn.onclick = async () => {
             // Önce tüm modalları kapat
             closeAllModals();
             
             log.debug('📋 === BOŞLUK DOLDUR OYUNU BAŞLATILIYOR ===');
             log.debug('📋 1. Veri kontrol ediliyor...');
 
-            if (ayetOkuData.length === 0) {
+            // Lazy loading: Ayet verilerini yükle
+            try {
+                await loadAyetData();
+            } catch (error) {
+                log.error('❌ Ayet verileri yüklenemedi!');
+                showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!ayetOkuData || ayetOkuData.length === 0) {
                 log.error('❌ Ayet verileri yüklenemedi!');
                 showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
@@ -5880,11 +5885,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // Dua Et modu
-        elements.duaEtBtn.onclick = () => {
+        elements.duaEtBtn.onclick = async () => {
             // Önce tüm modalları kapat
             closeAllModals();
             
-            if (duaData.length === 0) {
+            // Lazy loading: Dua verilerini yükle
+            try {
+                await loadDuaData();
+            } catch (error) {
+                showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!duaData || duaData.length === 0) {
                 showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
@@ -5901,11 +5914,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // Ayet Oku modu
-        elements.ayetOkuBtn.onclick = () => {
+        elements.ayetOkuBtn.onclick = async () => {
             // Önce tüm modalları kapat
             closeAllModals();
             
-            if (ayetOkuData.length === 0) {
+            // Lazy loading: Ayet verilerini yükle
+            try {
+                await loadAyetData();
+            } catch (error) {
+                showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!ayetOkuData || ayetOkuData.length === 0) {
                 showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
@@ -5922,11 +5943,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // Hadis Oku modu
-        elements.hadisOkuBtn.onclick = () => {
+        elements.hadisOkuBtn.onclick = async () => {
             // Önce tüm modalları kapat
             closeAllModals();
             
-            if (hadisData.length === 0) {
+            // Lazy loading: Hadis verilerini yükle
+            try {
+                await loadHadisData();
+            } catch (error) {
+                showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
+            
+            if (!hadisData || hadisData.length === 0) {
                 showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
