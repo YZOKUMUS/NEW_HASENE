@@ -553,7 +553,7 @@
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar & Rozetler</h3>
                 <button onclick="event.stopPropagation(); closeBadgesModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
-
+            
             <!-- Scroll Edilebilir İçerik -->
             <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
                 
@@ -639,7 +639,7 @@
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
                 <button onclick="event.stopPropagation(); closeCalendarModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
             </div>
-
+            
             <!-- Scroll Edilebilir İçerik -->
             <div id="calendarScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch;">
                 
@@ -674,9 +674,9 @@
                         </div>
             <!-- Scroll Edilebilir İçerik Sonu -->
 
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
     <!-- Günlük Görevler Modal -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
@@ -983,7 +983,7 @@
                         <div>
                             <div style="color: #666; margin-bottom: 4px;">Süre</div>
                             <div style="font-weight: 600; color: #667eea;" id="analyticsTodayTime">0 dk</div>
-                        </div>
+            </div>
                         <div>
                             <div style="color: #666; margin-bottom: 4px;">Soru/Saat</div>
                             <div style="font-weight: 600; color: #667eea;" id="analyticsQuestionPerHour">0</div>
@@ -997,7 +997,7 @@
                     <div style="font-size: 0.85em; color: #555; margin-bottom: 8px;">
                         <div style="margin-bottom: 6px;">
                             <span style="color: #666;">Hedef:</span> <strong id="analyticsDailyGoal">0</strong> Hasene
-                        </div>
+            </div>
                         <div style="margin-bottom: 6px;">
                             <span style="color: #666;">İlerleme:</span> <strong id="analyticsTodayProgress">0</strong> / <span id="analyticsDailyGoalTotal">0</span> Hasene
                         </div>
@@ -1465,7 +1465,7 @@
             if (message.includes('<') && message.includes('>')) {
                 safeSetHTML(messageEl, message, true);
             } else {
-                messageEl.textContent = message;
+            messageEl.textContent = message;
             }
             
             // Show modal
@@ -2777,6 +2777,23 @@ function hideAllGameScreens() {
 // Global olarak erişilebilir yap
 window.hideAllGameScreens = hideAllGameScreens;
 
+// Tüm modalları kapat
+function closeAllModals() {
+    const modals = ['statsModal', 'badgesModal', 'calendarModal', 'dailyTasksModal', 'onboardingModal', 'dailyGoalModal', 'xpInfoModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+            modal.style.zIndex = '';
+        }
+    });
+    // Body scroll'u tekrar aktif et
+    document.body.style.overflow = '';
+}
+
+// Global olarak erişilebilir yap
+window.closeAllModals = closeAllModals;
+
 
 
 
@@ -3618,6 +3635,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showBadgesModal() {
+            // Önce tüm modalları ve oyun ekranlarını kapat
+            closeAllModals();
+            if (typeof hideAllGameScreens === 'function') {
+                hideAllGameScreens();
+            }
+            if (typeof hideAllModes === 'function') {
+                hideAllModes();
+            }
+            
             // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
             initBadgesModalTouchEvents();
             
@@ -3797,6 +3823,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ İSTATİSTİKLER SİSTEMİ ============
         function showStatsModal() {
+            // Önce tüm modalları ve oyun ekranlarını kapat
+            closeAllModals();
+            if (typeof hideAllGameScreens === 'function') {
+                hideAllGameScreens();
+            }
+            if (typeof hideAllModes === 'function') {
+                hideAllModes();
+            }
+            
             // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
             initStatsModalTouchEvents();
             
@@ -4590,6 +4625,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showCalendarModal() {
+            // Önce tüm modalları ve oyun ekranlarını kapat
+            closeAllModals();
+            if (typeof hideAllGameScreens === 'function') {
+                hideAllGameScreens();
+            }
+            if (typeof hideAllModes === 'function') {
+                hideAllModes();
+            }
+            
             // Body scroll'u engelle
             document.body.style.overflow = 'hidden';
             // Haftalık streak gösterimini oluştur
@@ -5159,6 +5203,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function showDailyTasksModal() {
+            // Önce tüm modalları ve oyun ekranlarını kapat
+            closeAllModals();
+            if (typeof hideAllGameScreens === 'function') {
+                hideAllGameScreens();
+            }
+            if (typeof hideAllModes === 'function') {
+                hideAllModes();
+            }
+            
             // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
             initDailyTasksModalTouchEvents();
             
@@ -5687,6 +5740,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.game(`✅ Kelime verileri OK: ${kelimeBulData.length} kelime mevcut`);
             log.game(`🎯 Mevcut zorluk: ${currentDifficulty}`);
             
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             log.game('📋 2. Mode Selector açılıyor...');
             hideAllModes();
             // Main menu'yu gizle
@@ -5698,6 +5754,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Dinle ve Bul modu - Doğrudan başlat
         elements.dinleBulBtn.onclick = () => {
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             log.game('🔥 === DINLE VE BUL OYUNU BAŞLATILIYOR ===');
             log.game('📋 1. Veri kontrol ediliyor...');
             
@@ -5767,6 +5826,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Boşluk Doldur modu
         elements.boslukDoldurBtn.onclick = () => {
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             log.debug('📋 === BOŞLUK DOLDUR OYUNU BAŞLATILIYOR ===');
             log.debug('📋 1. Veri kontrol ediliyor...');
 
@@ -5803,6 +5865,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Dua Et modu
         elements.duaEtBtn.onclick = () => {
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             if (duaData.length === 0) {
                 showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
@@ -5821,6 +5886,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Ayet Oku modu
         elements.ayetOkuBtn.onclick = () => {
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             if (ayetOkuData.length === 0) {
                 showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
@@ -5839,6 +5907,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Hadis Oku modu
         elements.hadisOkuBtn.onclick = () => {
+            // Önce tüm modalları kapat
+            closeAllModals();
+            
             if (hadisData.length === 0) {
                 showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
