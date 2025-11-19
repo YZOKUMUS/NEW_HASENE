@@ -3636,10 +3636,54 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     if (badgesTotalCountEl) badgesTotalCountEl.textContent = '20';
     if (badgesProgressPercentEl) badgesProgressPercentEl.textContent = '0%';
 
-    // Başarılar Modal - Achievement kartlarını güncelle
-    if (typeof updateAllAchievements === 'function') {
-        updateAllAchievements();
-    }
+    // Başarılar Modal - Achievement kartlarını manuel olarak sıfırla
+    const achievementIds = ['first_win', 'combo_master', 'daily_goal', 'streak_7', 'level_5', 'level_10', 'level_20', 'xp_500', 'xp_2000', 'xp_8500', 'xp_25500', 'xp_85000'];
+    
+    achievementIds.forEach(achId => {
+        const card = document.getElementById(`achievement-${achId}`);
+        if (!card) return;
+        
+        const progressFill = card.querySelector('.achievement-progress-fill');
+        const progressText = card.querySelector('.progress-text');
+        
+        // Kartı kilitli duruma getir
+        card.classList.add('locked');
+        card.classList.remove('unlocked');
+        card.style.background = '#f8f9fa';
+        card.style.borderColor = 'transparent';
+        card.style.opacity = '0.6';
+        card.style.filter = 'grayscale(50%)';
+        
+        // İlerleme barını sıfırla
+        if (progressFill) {
+            progressFill.style.width = '0%';
+            progressFill.style.background = '#ccc';
+        }
+        
+        // İlerleme metnini sıfırla
+        if (progressText) {
+            if (achId === 'level_5') {
+                progressText.textContent = '0/5';
+            } else if (achId === 'level_10') {
+                progressText.textContent = '0/10';
+            } else if (achId === 'level_20') {
+                progressText.textContent = '0/20';
+            } else if (achId === 'combo_master') {
+                progressText.textContent = '0/5';
+            } else if (achId === 'streak_7') {
+                progressText.textContent = '0/7';
+            } else if (achId === 'daily_goal') {
+                progressText.textContent = '0/2700';
+            } else if (achId.startsWith('xp_')) {
+                const targetXP = parseInt(achId.split('_')[1]);
+                progressText.textContent = `0/${targetXP.toLocaleString()}`;
+            } else {
+                progressText.textContent = 'Kilitli';
+            }
+            progressText.style.color = '#999';
+            progressText.style.fontWeight = 'normal';
+        }
+    });
 
     // Takvim Modal - Streak bilgisi
     const calendarStreakCountEl = document.getElementById('calendarStreakCount');
