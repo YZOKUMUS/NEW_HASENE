@@ -6822,8 +6822,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
             
-            // Türkçe ve Arapça dil desteği
-            recognition.lang = 'tr-TR,ar-SA';
+            // Dinle ve Bul modu Arapça telaffuz beklediğinden varsayılan dil Arapça (Suudi Arabistan)
+            // Web Speech API tek dil kabul ettiği için önceden verilen "tr-TR,ar-SA" değeri tarayıcının İngilizceye dönmesine neden olabiliyordu.
+            // İleride kullanıcı dil seçimi eklenene kadar lokalStorage üzerinden override imkanı bırakıyoruz.
+            const speechLang = localStorage.getItem('speechRecognitionLang') || 'ar-SA';
+            recognition.lang = speechLang;
             recognition.continuous = false;
             recognition.interimResults = false;
             recognition.maxAlternatives = 3;
