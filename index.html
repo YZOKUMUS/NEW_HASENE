@@ -5442,14 +5442,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 // Kısa süre (300ms) ve küçük hareket (10px) = tap
                 if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                    // X butonuna veya ödül toplama butonuna tıklanmışsa ignore et
-                    const target = e.target;
-                    if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
-                        dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                    // Scroll edilebilir içerik alanına tıklanmışsa ignore et
+                    if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
                         return;
                     }
-                    
-                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    // X butonuna veya ödül toplama butonuna tıklanmışsa ignore et
+                    if (e.target && (e.target.id === 'closeDailyTasksBtn' || e.target.id === 'claimRewardsBtn' || e.target.closest('#closeDailyTasksBtn') || e.target.closest('#claimRewardsBtn'))) {
+                        return;
+                    }
+                    // Modal içeriğine tıklanmışsa ignore et
+                    if (e.target && e.target.closest('.modal-content')) {
+                        return;
+                    }
+                    // Arka plana tap yapıldı, kapat
                     closeDailyTasksModal();
                 }
                 
@@ -5457,25 +5462,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
         }
         
-        // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
+        // Her yere tıklayınca kapatma fonksiyonu (Hasene Nasıl Kazanılır paneli ile aynı mantık)
         function handleDailyTasksModalClick(event) {
-            // X butonuna veya ödül toplama butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
             const target = event.target;
-            if (target && (target.id === 'closeDailyTasksBtn' || target.id === 'claimRewardsBtn' || target.closest('#closeDailyTasksBtn') || target.closest('#claimRewardsBtn'))) {
+            // Close button veya claim rewards button kontrolü
+            if (target && target.closest('button[onclick*="closeDailyTasksModal"]')) {
                 return;
             }
-            
-            // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
-            if (target && (target.closest('.modal-content'))) {
+            if (target && (target.id === 'claimRewardsBtn' || target.closest('#claimRewardsBtn'))) {
                 return;
             }
-            
-            // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
+            // Modal içeriğine tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
+            if (target && target.closest('.modal-content')) {
+                return;
+            }
+            // Scroll edilebilir içerik alanına tıklanırsa, kapatma
             if (target && (target.id === 'dailyTasksScrollableContent' || target.closest('#dailyTasksScrollableContent'))) {
-                // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
                 return;
             }
-            
             // Arka plana tıklanırsa, modal'ı kapat
             closeDailyTasksModal();
         }
