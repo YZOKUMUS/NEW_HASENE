@@ -4102,8 +4102,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // İlerleme göster
                     if (ach.progress && progressFill) {
                         const progress = ach.progress();
-                        progressFill.style.width = progress + '%';
-                        progressFill.style.background = progress > 0 ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)' : '#ccc';
+                        // Level achievement'ları için özel kontrol: level 1 ise 0% göster
+                        let finalProgress = progress;
+                        if (ach.id.startsWith('level_') && level <= 1) {
+                            finalProgress = 0;
+                        }
+                        progressFill.style.width = finalProgress + '%';
+                        progressFill.style.background = finalProgress > 0 ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)' : '#ccc';
                     }
                     
                     // İlerleme metni
