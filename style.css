@@ -1955,29 +1955,30 @@ body {
     white-space: nowrap;
 }
 
-/* Combo Indicator - Responsive */
+/* Combo Indicator - Standart Boyutlar (Tüm Combo Pop-up'ları için) */
 #comboIndicator {
-    padding: 8px 12px !important;
-    margin: 8px 4px !important;
-    font-size: clamp(12px, 2.5vw, 14px) !important;
+    padding: 10px 16px !important;
+    margin: 0 20px 12px 20px !important;
+    font-size: 13px !important;
     box-sizing: border-box;
     max-width: 100% !important;
     border-radius: 10px !important;
 }
 
 #comboIndicator > div:first-child {
-    font-size: clamp(14px, 3vw, 16px) !important;
-    line-height: 1.2 !important;
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    font-weight: bold !important;
 }
 
 #comboIndicator > div:nth-child(2) {
-    font-size: clamp(11px, 2.5vw, 13px) !important;
-    line-height: 1.2 !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
 }
 
 #comboIndicator > div:nth-child(3) {
-    font-size: clamp(9px, 2vw, 11px) !important;
-    line-height: 1.2 !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
 }
 
 /* Audio and Hint Buttons - Responsive */
@@ -2093,8 +2094,16 @@ body {
     
     /* Combo Indicator - Extra Compact */
     #comboIndicator {
-        padding: 8px !important;
-        margin: 6px 2px !important;
+        padding: 10px 14px !important;
+        margin: 0 15px 10px 15px !important;
+    }
+    
+    #comboIndicator > div:first-child {
+        font-size: 13px !important;
+    }
+    
+    #comboIndicator > div:nth-child(2) {
+        font-size: 11px !important;
     }
     
     /* Back Button - Extra Compact */
