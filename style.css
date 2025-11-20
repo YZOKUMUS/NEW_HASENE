@@ -4658,6 +4658,18 @@ body {
     }
 }
 
+/* Duolingo Tarzı Mikrofon Pulse Animasyonu */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1.15);
+        box-shadow: 0 0 20px rgba(244, 67, 54, 0.6);
+    }
+    50% {
+        transform: scale(1.25);
+        box-shadow: 0 0 30px rgba(244, 67, 54, 0.8);
+    }
+}
+
 .goal-settings-btn {
     position: relative;
     overflow: visible;

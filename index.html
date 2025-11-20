@@ -8015,24 +8015,31 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     statusEl.style.color = '#667eea';
                 }
                 if (micBtn) {
+                    // Duolingo tarzı: Mikrofon butonu animasyonu (pulse efekti)
                     micBtn.style.background = 'linear-gradient(135deg, #f44336 0%, #e91e63 100%)';
-                    micBtn.style.transform = 'scale(1.1)';
+                    micBtn.style.transform = 'scale(1.15)';
+                    micBtn.style.boxShadow = '0 0 20px rgba(244, 67, 54, 0.6)';
+                    micBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
                 }
                 triggerHaptic('light');
+                log.debug('✅ Ses tanıma başlatıldı');
             };
             
             recognition.onresult = (event) => {
                 const results = event.results;
                 let recognizedText = '';
                 
-                // En iyi sonucu al
+                // En iyi sonucu al (Duolingo gibi - en yüksek güvenilirlik skoruna sahip sonucu)
                 for (let i = 0; i < results.length; i++) {
-                    recognizedText = results[i][0].transcript.trim();
-                    log.debug('Ses tanıma sonucu:', recognizedText);
+                    const result = results[i][0];
+                    recognizedText = result.transcript.trim();
+                    const confidence = result.confidence || 0;
+                    log.debug('Ses tanıma sonucu:', recognizedText, 'Güvenilirlik:', confidence);
                 }
                 
-                // Kelimeyi bul ve eşleştir
+                // Kelimeyi bul ve eşleştir (Duolingo gibi anında)
                 if (recognizedText && currentDinleQuestion) {
+                    // Duolingo tarzı: Hemen eşleştir, gecikme yok
                     matchSpeechToAnswer(recognizedText);
                 }
             };
@@ -8119,17 +8126,34 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             recognition.onend = () => {
                 isListening = false;
                 const micBtn = document.getElementById('dinleMicBtn');
+                const statusEl = document.getElementById('speechStatus');
                 if (micBtn) {
+                    // Duolingo tarzı: Mikrofon butonu normal haline dön
                     micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                     micBtn.style.transform = 'scale(1)';
+                    micBtn.style.boxShadow = '';
+                    micBtn.style.animation = '';
+                }
+                // Status mesajını sadece hata durumunda değiştir, normal bitişte temizle
+                if (statusEl && !statusEl.textContent.includes('❌') && !statusEl.textContent.includes('⚠️') && !statusEl.textContent.includes('✅')) {
+                    statusEl.textContent = '';
                 }
                 // Stream'i temizle (Bluetooth mikrofon için)
                 if (microphoneStream) {
                     microphoneStream.getTracks().forEach(track => track.stop());
                     microphoneStream = null;
                 }
+                log.debug('🛑 Ses tanıma durduruldu');
             };
             
+            // Başarılı başlatma - status mesajını temizle (kullanıcı butona basana kadar mesaj gösterme)
+            const statusEl = document.getElementById('speechStatus');
+            if (statusEl) {
+                statusEl.textContent = '';
+                statusEl.style.color = '#666';
+            }
+            
+            log.debug('✅ Ses tanıma sistemi hazır');
             return true;
         }
         
@@ -8224,7 +8248,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // Ses tanımayı başlat (global erişim için)
         window.startSpeechRecognition = async function() {
             if (!currentDinleQuestion) {
+                const statusEl = document.getElementById('speechStatus');
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ Önce bir soru yüklenmeli!';
+                    statusEl.style.color = '#f39c12';
+                }
                 showCustomAlert('Önce bir soru yüklenmeli!', 'warning');
+                return;
+            }
+            
+            // Seçeneklerin yüklenip yüklenmediğini kontrol et
+            const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
+            if (!allBtns || allBtns.length === 0) {
+                const statusEl = document.getElementById('speechStatus');
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ Seçenekler henüz yüklenmedi. Lütfen bekleyin...';
+                    statusEl.style.color = '#f39c12';
+                }
+                showCustomAlert('Seçenekler henüz yüklenmedi. Lütfen bekleyin...', 'warning');
                 return;
             }
             
@@ -8384,26 +8425,64 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         statusEl.style.color = '#f44336';
                     }
                     showMicrophonePermissionHelp();
+                } else if (error.name === 'NotFoundError' || error.message.includes('not found')) {
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Mikrofon bulunamadı';
+                        statusEl.style.color = '#f44336';
+                    }
+                    showBluetoothMicrophoneHelp();
+                } else if (error.name === 'NetworkError' || error.message.includes('network')) {
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Bağlantı hatası';
+                        statusEl.style.color = '#f44336';
+                    }
+                    showNetworkErrorHelp();
                 } else {
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Ses tanıma başlatılamadı: ' + (error.message || error.name || 'Bilinmeyen hata');
+                        statusEl.style.color = '#f44336';
+                    }
                     if (isMobile) {
                         showCustomAlert('Ses tanıma başlatılamadı. Mobil cihazlarda genellikle daha iyi çalışır. Lütfen tekrar deneyin veya tarayıcı ayarlarından mikrofon iznini kontrol edin.', 'error');
                     } else {
-                        showCustomAlert('Ses tanıma başlatılamadı. Lütfen tekrar deneyin.', 'error');
+                        showCustomAlert('Ses tanıma başlatılamadı: ' + (error.message || error.name || 'Bilinmeyen hata') + '. Lütfen tekrar deneyin.', 'error');
                     }
                 }
             }
         };
         
+        // Duolingo tarzı benzerlik hesaplama (basit Levenshtein)
+        function calculateSimilarity(str1, str2) {
+            if (str1 === str2) return 100;
+            if (str1.length === 0 || str2.length === 0) return 0;
+            
+            const longer = str1.length > str2.length ? str1 : str2;
+            const shorter = str1.length > str2.length ? str2 : str1;
+            
+            // Basit karakter eşleşme skoru
+            let matches = 0;
+            for (let i = 0; i < shorter.length; i++) {
+                if (longer.includes(shorter[i])) {
+                    matches++;
+                }
+            }
+            
+            return (matches / longer.length) * 100;
+        }
+        
         // Konuşulan metni cevaplarla eşleştir
         function matchSpeechToAnswer(spokenText) {
             const statusEl = document.getElementById('speechStatus');
-            const allBtns = elements.dinleOptions.querySelectorAll('.option');
+            // Seçenekler .duolingo-option class'ı ile oluşturuluyor
+            const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
             
             if (!allBtns || allBtns.length === 0) {
                 if (statusEl) {
-                    statusEl.textContent = '❌ Seçenekler bulunamadı';
+                    statusEl.textContent = '❌ Seçenekler bulunamadı. Lütfen önce bir soru yükleyin.';
                     statusEl.style.color = '#f44336';
                 }
+                log.error('❌ Seçenekler bulunamadı! elements.dinleOptions:', elements.dinleOptions);
+                log.error('❌ DinleOptions içeriği:', elements.dinleOptions?.innerHTML);
                 return;
             }
             
@@ -8419,57 +8498,89 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const correctWord = currentDinleQuestion.kelime;
             const correctWordNormalized = correctWord.toLowerCase().trim();
             
-            // Tüm seçenekleri kontrol et
+            // Duolingo tarzı akıllı eşleştirme algoritması
             let matchedButton = null;
             let bestMatch = null;
             let bestScore = 0;
             
             allBtns.forEach(btn => {
-                const btnText = btn.textContent.trim();
+                // Buton metnini al (HTML içeriğinden temizle)
+                let btnText = btn.textContent.trim();
+                // Eğer HTML içeriği varsa (Arapça için), sadece metni al
+                if (btn.innerHTML && btn.innerHTML.includes('<span')) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = btn.innerHTML;
+                    btnText = tempDiv.textContent.trim();
+                }
+                
                 const btnTextNormalized = btnText.toLowerCase().trim();
                 
-                // Tam eşleşme
-                if (btnTextNormalized === normalizedSpoken || 
-                    normalizedSpoken.includes(btnTextNormalized) || 
-                    btnTextNormalized.includes(normalizedSpoken)) {
-                    const score = Math.max(
-                        btnTextNormalized.length / normalizedSpoken.length,
-                        normalizedSpoken.length / btnTextNormalized.length
-                    );
-                    if (score > bestScore) {
-                        bestScore = score;
+                // 1. Tam eşleşme (en yüksek öncelik)
+                if (btnTextNormalized === normalizedSpoken) {
+                    bestScore = 100;
+                    bestMatch = btn;
+                    return; // En iyi eşleşme bulundu, devam etme
+                }
+                
+                // 2. Kısmi eşleşme (içeriyor mu?)
+                if (normalizedSpoken.includes(btnTextNormalized) || btnTextNormalized.includes(normalizedSpoken)) {
+                    // Benzerlik skoru hesapla (Duolingo tarzı)
+                    const longer = Math.max(btnTextNormalized.length, normalizedSpoken.length);
+                    const shorter = Math.min(btnTextNormalized.length, normalizedSpoken.length);
+                    const similarity = (shorter / longer) * 100;
+                    
+                    if (similarity > bestScore) {
+                        bestScore = similarity;
                         bestMatch = btn;
                     }
+                }
+                
+                // 3. Levenshtein benzeri basit karşılaştırma (Arapça karakterler için)
+                const charSimilarity = calculateSimilarity(btnTextNormalized, normalizedSpoken);
+                if (charSimilarity > bestScore && charSimilarity > 70) { // %70'den fazla benzerlik
+                    bestScore = charSimilarity;
+                    bestMatch = btn;
                 }
             });
             
             matchedButton = bestMatch;
             
             if (matchedButton) {
-                // Butonu bulundu, tıkla
-                setTimeout(() => {
-                    matchedButton.click();
-                    if (statusEl) {
-                        statusEl.textContent = '✅ Eşleşme bulundu!';
-                        statusEl.style.color = '#4caf50';
-                    }
-                    triggerHaptic('success');
-                }, 300);
-            } else {
-                // Eşleşme bulunamadı
+                // Duolingo tarzı: Butonu vurgula (görsel geri bildirim)
+                matchedButton.style.transform = 'scale(1.05)';
+                matchedButton.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.4)';
+                
+                // Duolingo gibi: Hemen tıkla (gecikme yok)
+                matchedButton.click();
+                
                 if (statusEl) {
-                    statusEl.textContent = '❌ Eşleşme bulunamadı: "' + spokenText + '"';
+                    statusEl.textContent = '✅ "' + spokenText + '" eşleşti!';
+                    statusEl.style.color = '#4caf50';
+                }
+                triggerHaptic('success');
+                
+                // Animasyonu geri al
+                setTimeout(() => {
+                    if (matchedButton) {
+                        matchedButton.style.transform = '';
+                        matchedButton.style.boxShadow = '';
+                    }
+                }, 500);
+            } else {
+                // Eşleşme bulunamadı - Duolingo tarzı geri bildirim
+                if (statusEl) {
+                    statusEl.textContent = '❌ "' + spokenText + '" eşleşmedi';
                     statusEl.style.color = '#f44336';
                 }
                 triggerHaptic('error');
                 
-                // Kullanıcıya doğru kelimeyi hatırlat
+                // Duolingo gibi: Kullanıcıya doğru kelimeyi göster (kısa süre)
                 setTimeout(() => {
                     if (statusEl) {
-                        statusEl.textContent = '💡 Doğru kelime: ' + correctWord;
+                        statusEl.innerHTML = '💡 Doğru kelime: <strong style="color: #667eea;">' + correctWord + '</strong>';
                         statusEl.style.color = '#667eea';
                     }
-                }, 2000);
+                }, 1500);
             }
         }
 
