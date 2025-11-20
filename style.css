@@ -1174,9 +1174,13 @@ body {
 .daily-tasks-content {
     max-width: 500px !important;
     width: 90% !important;
+    max-height: 95vh !important;
+    height: auto !important;
     text-align: left !important;
     border-radius: 24px !important;
     overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .daily-tasks-content::-webkit-scrollbar {
