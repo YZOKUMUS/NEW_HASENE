@@ -6085,7 +6085,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             document.getElementById('completedTasks').textContent = updatedCompletedCount;
             document.getElementById('totalTasks').textContent = updatedTotalCount;
             const updatedProgressPercent = updatedTotalCount > 0 ? (updatedCompletedCount / updatedTotalCount) * 100 : 0;
-            const taskProgressBar = document.getElementById('taskProgress');
+            // taskProgressBar zaten yukarıda tanımlı, tekrar tanımlamaya gerek yok
             if (taskProgressBar) {
                 taskProgressBar.style.width = updatedProgressPercent + '%';
             }
