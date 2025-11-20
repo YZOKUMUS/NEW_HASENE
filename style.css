@@ -6497,6 +6497,7 @@ body {
     .onboarding-btn {
         width: 100%;
     }
+}
 
 /* ========== YENİ ROZETLER PANELİ TASARIMI ========== */
 
@@ -6610,7 +6611,7 @@ body {
     display: none !important;
 }
 
-#badgesModal .badge-tab {
+#badgesModal .category-tab {
     padding: 10px 16px !important;
     border: none !important;
     border-radius: 12px !important;
@@ -6626,16 +6627,15 @@ body {
     min-height: 44px !important;
 }
 
-#badgesModal .badge-tab.active {
+#badgesModal .category-tab.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     color: white !important;
     box-shadow: 0 4px 12px rgba(102,126,234,0.3) !important;
     transform: scale(1.05) !important;
 }
 
-#badgesModal .badge-tab:not(.active) {
-    background: transparent !important;
-    color: #999 !important;
+#badgesModal .category-tab:hover:not(.active) {
+    background: #e0e0e0 !important;
 }
 
 /* Badge Cards - Yeni Tasarım */
@@ -6846,4 +6846,361 @@ body {
         font-size: 48px !important;
     }
 }
+
+/* ============================================
+   BADGES MODAL - PREVIEW TASARIM STİLLERİ
+   Preview dosyasındaki tasarımı tam olarak uyguluyoruz
+   ============================================ */
+
+/* Badges Container - Preview Tasarım */
+#badgesModal .badges-container {
+    background: white;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+/* Badges Header - Preview Tasarım */
+#badgesModal .badges-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#badgesModal .badges-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: badgeHeaderRotate 20s linear infinite;
+}
+
+@keyframes badgeHeaderRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#badgesModal .badges-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: white;
+}
+
+/* Close Button - Preview Tasarım */
+#badgesModal .close-btn {
+    background: rgba(255,255,255,0.2) !important;
+    border: none !important;
+    color: white !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 50% !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s !important;
+    z-index: 1 !important;
+    touch-action: manipulation !important;
+}
+
+#badgesModal .close-btn:hover {
+    background: rgba(255,255,255,0.3) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Stats Summary - Preview Tasarım */
+#badgesModal .stats-summary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    margin: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    box-shadow: 0 8px 20px rgba(245,87,108,0.3);
+}
+
+#badgesModal .stats-summary .stat-item {
+    text-align: center;
+    color: white;
+}
+
+#badgesModal .stats-summary .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+#badgesModal .stats-summary .stat-label {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* Category Tabs - Preview Tasarım */
+#badgesModal .category-tab {
+    padding: 10px 16px !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    white-space: nowrap !important;
+    background: #f0f0f0 !important;
+    color: #666 !important;
+    touch-action: manipulation !important;
+    min-width: fit-content !important;
+    min-height: 44px !important;
+}
+
+#badgesModal .category-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.3) !important;
+    transform: scale(1.05) !important;
+}
+
+#badgesModal .category-tab:hover:not(.active) {
+    background: #e0e0e0 !important;
+}
+
+/* Badges Content - Preview Tasarım */
+#badgesModal .badges-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 0 20px 20px !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* Badges Grid - Preview Tasarım */
+#badgesModal .badges-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)) !important;
+    gap: 16px !important;
+}
+
+/* Badge Card - Preview Tasarım */
+#badgesModal .badge-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border-radius: 20px !important;
+    padding: 20px 16px !important;
+    text-align: center !important;
+    position: relative !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    border: 3px solid transparent !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+}
+
+#badgesModal .badge-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+#badgesModal .badge-card:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+    border-color: #667eea !important;
+}
+
+#badgesModal .badge-card:hover::before {
+    opacity: 1;
+}
+
+/* Unlocked Badge Card - Preview Tasarım */
+#badgesModal .badge-card.unlocked {
+    background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%) !important;
+    border-color: #ffd700 !important;
+    box-shadow: 0 8px 25px rgba(255,215,0,0.3) !important;
+}
+
+#badgesModal .badge-card.unlocked::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.5);
+    z-index: 1;
+}
+
+/* Badge Icon - Preview Tasarım */
+#badgesModal .badge-icon {
+    font-size: 56px !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    transition: transform 0.3s !important;
+}
+
+#badgesModal .badge-card:hover .badge-icon {
+    transform: scale(1.15) rotate(5deg) !important;
+}
+
+/* Badge Title - Preview Tasarım */
+#badgesModal .badge-title {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #333 !important;
+    margin-bottom: 6px !important;
+    line-height: 1.3 !important;
+}
+
+/* Badge Description - Preview Tasarım */
+#badgesModal .badge-desc {
+    font-size: 11px !important;
+    color: #666 !important;
+    line-height: 1.4 !important;
+    margin-bottom: 12px !important;
+    min-height: 30px !important;
+}
+
+/* Badge Progress - Preview Tasarım */
+#badgesModal .badge-progress {
+    width: 100% !important;
+    height: 6px !important;
+    background: #e0e0e0 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    margin-bottom: 8px !important;
+    position: relative !important;
+}
+
+#badgesModal .badge-progress-fill {
+    height: 100% !important;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 10px !important;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+#badgesModal .badge-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: badgeShimmer 2s infinite;
+}
+
+@keyframes badgeShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Badge Status - Preview Tasarım */
+#badgesModal .badge-status {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #999 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+#badgesModal .badge-card.unlocked .badge-status {
+    color: #ff9800 !important;
+}
+
+#badgesModal .badge-card.unlocked .badge-progress-fill {
+    background: linear-gradient(90deg, #ffd700 0%, #ffa500 100%) !important;
+    width: 100% !important;
+}
+
+/* Scrollbar Styling - Preview Tasarım */
+#badgesModal .badges-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#badgesModal .badges-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#badgesModal .badges-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+#badgesModal .badges-content::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+
+/* Mobile Responsive - Preview Tasarım */
+@media (max-width: 480px) {
+    #badgesModal .badges-container {
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    #badgesModal .badges-header {
+        padding: 20px 16px !important;
+    }
+
+    #badgesModal .badges-header h2 {
+        font-size: 20px !important;
+    }
+
+    #badgesModal .stats-summary {
+        margin: 16px !important;
+        padding: 16px !important;
+    }
+
+    #badgesModal .stats-summary .stat-value {
+        font-size: 28px !important;
+    }
+
+    #badgesModal .badges-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    #badgesModal .badge-card {
+        padding: 16px 12px !important;
+    }
+
+    #badgesModal .badge-icon {
+        font-size: 48px !important;
+    }
 }

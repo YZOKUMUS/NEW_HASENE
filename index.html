@@ -553,244 +553,165 @@
 
     <!-- Başarılar/Rozetler Modal - Yeni Modern Tasarım -->
     <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)">
-        <div class="modal-content badges-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y;">
-            <!-- Yeni Header -->
-            <div class="badges-header-new">
-                <h3>🏆 Başarılar</h3>
-                <button id="closeBadgesBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeBadgesModal();">×</button>
+        <div class="modal-content badges-container" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y;">
+            <!-- Header -->
+            <div class="badges-header">
+                <h2>🏆 Başarılar</h2>
+                <button id="closeBadgesBtn" class="close-btn" onclick="event.stopPropagation(); closeBadgesModal();">×</button>
             </div>
-            
-            <!-- Scroll Edilebilir İçerik -->
-            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position;">
-                
-                <!-- Yeni İstatistikler Özeti -->
-                <div class="stats-summary-new">
-                    <div class="stat-item">
-                        <div class="stat-value" id="badgesUnlockedCount">0</div>
-                        <div class="stat-label">Açılan</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="badgesTotalCount">20</div>
-                        <div class="stat-label">Toplam</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="badgesProgressPercent">0%</div>
-                        <div class="stat-label">İlerleme</div>
-                    </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-summary">
+                <div class="stat-item">
+                    <div class="stat-value" id="badgesUnlockedCount">0</div>
+                    <div class="stat-label">Açılan</div>
                 </div>
-
-                <!-- Kategori Sekmeleri -->
-                <div class="category-tabs">
-                    <button class="badge-tab active" onclick="showBadgeCategory('daily', this); event.stopPropagation();">📅 Günlük</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('special', this); event.stopPropagation();">⭐ Özel</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('streak', this); event.stopPropagation();">🔥 Seri</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('level', this); event.stopPropagation();">🏅 Mertebe</button>
+                <div class="stat-item">
+                    <div class="stat-value" id="badgesTotalCount">20</div>
+                    <div class="stat-label">Toplam</div>
                 </div>
-
-                <!-- Günlük Başarılar -->
-                <div id="badgeCategoryDaily" class="badge-category-content" style="display: block; padding: 0 20px 20px;">
-                    <div>
-                        <!-- İlk Zafer -->
-                        <div class="achievement-card" id="achievement-first_win" onclick="event.stopPropagation();">
-                            <div>🎯</div>
-                            <div>İlk Zafer</div>
-                            <div>İlk sahih cevabin</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">Kilitli</div>
-                        </div>
-
-                        <!-- Günlük Kahraman -->
-                        <div class="achievement-card" id="achievement-daily_goal" onclick="event.stopPropagation();">
-                            <div>⭐</div>
-                            <div>Günlük Kahraman</div>
-                            <div>Günlük hedefini tamamla</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">Kilitli</div>
-                        </div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="badgesProgressPercent">0%</div>
+                    <div class="stat-label">İlerleme</div>
                 </div>
-
-                <!-- Özel Başarılar -->
-                <div id="badgeCategorySpecial" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
-                    <div>
-                        <!-- Combo Ustası -->
-                        <div class="achievement-card" id="achievement-combo_master" onclick="event.stopPropagation();">
-                            <div>🔥</div>
-                            <div>Combo Ustası</div>
-                            <div>5x combo yap</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/5</div>
-                        </div>
-
-                        <!-- İlk Adım -->
-                        <div class="achievement-card" id="achievement-xp_500" onclick="event.stopPropagation();">
-                            <div>🌱</div>
-                            <div>İlk Adım</div>
-                            <div>500 Hasene topla</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/500</div>
-                        </div>
-
-                        <!-- Bronz Yolcu -->
-                        <div class="achievement-card" id="achievement-xp_2000" onclick="event.stopPropagation();">
-                            <div>🥉</div>
-                            <div>Bronz Yolcu</div>
-                            <div>2,000 Hasene</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/2000</div>
-                        </div>
-
-                        <!-- Gümüş Master -->
-                        <div class="achievement-card" id="achievement-xp_8500" onclick="event.stopPropagation();">
-                            <div>🥈</div>
-                            <div>Gümüş Master</div>
-                            <div>8,500 Hasene</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/8500</div>
-                        </div>
-
-                        <!-- Altın Master -->
-                        <div class="achievement-card" id="achievement-xp_25500" onclick="event.stopPropagation();">
-                            <div>🥇</div>
-                            <div>Altın Master</div>
-                            <div>25,500 Hasene</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/25500</div>
-                        </div>
-
-                        <!-- Elmas Master -->
-                        <div class="achievement-card" id="achievement-xp_85000" onclick="event.stopPropagation();">
-                            <div>💎</div>
-                            <div>Elmas Master</div>
-                            <div>85,000 Hasene</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/85000</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seri Başarılar -->
-                <div id="badgeCategoryStreak" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
-                    <div>
-                        <!-- 7 Gün Streak -->
-                        <div class="achievement-card" id="achievement-streak_7" onclick="event.stopPropagation();">
-                            <div>🔥</div>
-                            <div>7 Gün Seri</div>
-                            <div>7 gün üst üste oyna</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/7</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mertebe Başarılar -->
-                <div id="badgeCategoryLevel" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
-                    <div>
-                        <!-- Seviye 5 -->
-                        <div class="achievement-card" id="achievement-level_5" onclick="event.stopPropagation();">
-                            <div>🏆</div>
-                            <div>Seviye 5</div>
-                            <div>Seviye 5'e ulaş</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/5</div>
-                        </div>
-
-                        <!-- Seviye 10 -->
-                        <div class="achievement-card" id="achievement-level_10" onclick="event.stopPropagation();">
-                            <div>💎</div>
-                            <div>Seviye 10</div>
-                            <div>Seviye 10'a ulaş</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/10</div>
-                        </div>
-
-                        <!-- Seviye 20 -->
-                        <div class="achievement-card" id="achievement-level_20" onclick="event.stopPropagation();">
-                            <div>🌟</div>
-                            <div>Seviye 20</div>
-                            <div>Seviye 20'ye ulaş</div>
-                            <div class="achievement-progress">
-                                <div class="achievement-progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/20</div>
-                        </div>
-                    </div>
-
-                    <!-- Mertebe Rozetleri (Mevcut Sistem) -->
-                    <div style="margin-top: 24px; margin-bottom: 16px;">
-                        <div style="font-size: 0.75em; font-weight: 600; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">🏅 Mertebe Rozetleri</div>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-                            <!-- Mütebahhir -->
-                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%); border: 3px solid #00bcd4; box-shadow: 0 2px 8px rgba(0,188,212,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
-                                <div style="font-size: 2.5em; margin-bottom: 8px;">💎</div>
-                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #00bcd4;">Mütebahhir</div>
-                                <div style="font-size: 1.5em; font-weight: bold; color: #00bcd4; margin: 8px 0;" id="diamondBadgeCount">0</div>
-                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Mütecaviz = 1</div>
-                            </div>
-                            
-                            <!-- Mütecaviz -->
-                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border: 3px solid #ff9800; box-shadow: 0 2px 8px rgba(255,152,0,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
-                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥇</div>
-                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #ff9800;">Mütecaviz</div>
-                                <div style="font-size: 1.5em; font-weight: bold; color: #ff9800; margin: 8px 0;" id="goldBadgeCount">0</div>
-                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Müterakki = 1</div>
-                            </div>
-                            
-                            <!-- Müterakki -->
-                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border: 3px solid #9c27b0; box-shadow: 0 2px 8px rgba(156,39,176,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
-                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥈</div>
-                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #9c27b0;">Müterakki</div>
-                                <div style="font-size: 1.5em; font-weight: bold; color: #9c27b0; margin: 8px 0;" id="silverBadgeCount">0</div>
-                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Mübtedi = 1</div>
-                            </div>
-                            
-                            <!-- Mübtedi -->
-                            <div style="text-align: center; padding: 16px 12px; border-radius: 16px; background: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); border: 3px solid #ff5722; box-shadow: 0 2px 8px rgba(255,87,34,0.2); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="event.stopPropagation();">
-                                <div style="font-size: 2.5em; margin-bottom: 8px;">🥉</div>
-                                <div style="font-weight: bold; margin: 4px 0; font-size: 0.9em; color: #ff5722;">Mübtedi</div>
-                                <div style="font-size: 1.5em; font-weight: bold; color: #ff5722; margin: 8px 0;" id="bronzeBadgeCount">0</div>
-                                <div style="font-size: 0.7em; color: #666; margin-top: 4px;">5 Yıldız = 1</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bilgi Kutusu -->
-                    <div style="background: #f0f9ff; padding: 12px; border-radius: 12px; margin-top: 16px; border-left: 4px solid #3b82f6;">
-                        <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 4px;">💡 Rozet Sistemi</div>
-                        <div style="font-size: 0.75em; color: #555; line-height: 1.5;">
-                            • 5 Yıldız = 1 Mübtedi Rozeti<br>
-                            • 5 Mübtedi = 1 Müterakki Rozeti<br>
-                            • 5 Müterakki = 1 Mütecaviz Rozeti<br>
-                            • 5 Mütecaviz = 1 Mütebahhir Rozeti
-                        </div>
-                    </div>
-                </div>
-            
             </div>
-            <!-- Scroll Edilebilir İçerik Sonu -->
 
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="daily">📅 Günlük</button>
+                <button class="category-tab" data-category="special">⭐ Özel</button>
+                <button class="category-tab" data-category="streak">🔥 Seri</button>
+                <button class="category-tab" data-category="level">🏅 Mertebe</button>
+            </div>
+
+            <!-- Badges Content -->
+            <div class="badges-content" id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position;">
+                <div id="badgesGrid" class="badges-grid">
+                    <!-- Günlük Başarılar -->
+                    <div class="badge-card" id="achievement-first_win" data-category="daily" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🎯</span>
+                        <div class="badge-title">İlk Zafer</div>
+                        <div class="badge-desc">İlk sahih cevabın</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-daily_goal" data-category="daily" onclick="event.stopPropagation();">
+                        <span class="badge-icon">⭐</span>
+                        <div class="badge-title">Günlük Kahraman</div>
+                        <div class="badge-desc">Günlük hedefini tamamla</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <!-- Özel Başarılar -->
+                    <div class="badge-card" id="achievement-combo_master" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🔥</span>
+                        <div class="badge-title">Combo Ustası</div>
+                        <div class="badge-desc">5x combo yap</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/5</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-xp_500" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🌱</span>
+                        <div class="badge-title">İlk Adım</div>
+                        <div class="badge-desc">500 Hasene topla</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/500</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-xp_2000" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🥉</span>
+                        <div class="badge-title">Bronz Yolcu</div>
+                        <div class="badge-desc">2,000 Hasene</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/2000</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-xp_8500" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🥈</span>
+                        <div class="badge-title">Gümüş Master</div>
+                        <div class="badge-desc">8,500 Hasene</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/8500</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-xp_25500" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🥇</span>
+                        <div class="badge-title">Altın Master</div>
+                        <div class="badge-desc">25,500 Hasene</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/25500</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-xp_85000" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">💎</span>
+                        <div class="badge-title">Elmas Master</div>
+                        <div class="badge-desc">85,000 Hasene</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/85000</div>
+                    </div>
+
+                    <!-- Seri Başarılar -->
+                    <div class="badge-card" id="achievement-streak_7" data-category="streak" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🔥</span>
+                        <div class="badge-title">7 Gün Seri</div>
+                        <div class="badge-desc">7 gün üst üste oyna</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/7</div>
+                    </div>
+
+                    <!-- Mertebe Başarılar -->
+                    <div class="badge-card" id="achievement-level_5" data-category="level" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🏆</span>
+                        <div class="badge-title">Seviye 5</div>
+                        <div class="badge-desc">Seviye 5'e ulaş</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/5</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-level_10" data-category="level" onclick="event.stopPropagation();">
+                        <span class="badge-icon">💎</span>
+                        <div class="badge-title">Seviye 10</div>
+                        <div class="badge-desc">Seviye 10'a ulaş</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/10</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-level_20" data-category="level" onclick="event.stopPropagation();">
+                        <span class="badge-icon">🌟</span>
+                        <div class="badge-title">Seviye 20</div>
+                        <div class="badge-desc">Seviye 20'ye ulaş</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">0/20</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -3701,68 +3622,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     if (badgesTotalCountEl) badgesTotalCountEl.textContent = '20';
     if (badgesProgressPercentEl) badgesProgressPercentEl.textContent = '0%';
 
-    // Başarılar Modal - Achievement kartlarını manuel olarak sıfırla
-    // ÖNEMLİ: Bu işlem updateAllAchievements() çağrılmadan ÖNCE yapılmalı
-    const achievementIds = ['first_win', 'combo_master', 'daily_goal', 'streak_7', 'level_5', 'level_10', 'level_20', 'xp_500', 'xp_2000', 'xp_8500', 'xp_25500', 'xp_85000'];
-    
-    achievementIds.forEach(achId => {
-        const card = document.getElementById(`achievement-${achId}`);
-        if (!card) return;
-        
-        const progressFill = card.querySelector('.achievement-progress-fill');
-        const progressText = card.querySelector('.progress-text');
-        
-        // Kartı kilitli duruma getir
-        card.classList.add('locked');
-        card.classList.remove('unlocked');
-        card.style.background = '#f8f9fa';
-        card.style.borderColor = 'transparent';
-        card.style.opacity = '0.6';
-        card.style.filter = 'grayscale(50%)';
-        
-        // İlerleme barını sıfırla - !important ile zorla
-        if (progressFill) {
-            // Transition'ı kaldır ki anında sıfırlansın
-            const originalTransition = progressFill.style.transition;
-            progressFill.style.transition = 'none';
-            progressFill.style.setProperty('width', '0%', 'important');
-            progressFill.style.background = '#ccc';
-            // Sonra transition'ı geri ekle
-            setTimeout(() => {
-                if (progressFill) {
-                    progressFill.style.transition = originalTransition || 'width 0.5s ease';
-                }
-            }, 50);
-        }
-        
-        // İlerleme metnini sıfırla
-        if (progressText) {
-            if (achId === 'level_5') {
-                progressText.textContent = '0/5';
-            } else if (achId === 'level_10') {
-                progressText.textContent = '0/10';
-            } else if (achId === 'level_20') {
-                progressText.textContent = '0/20';
-            } else if (achId === 'combo_master') {
-                progressText.textContent = '0/5';
-            } else if (achId === 'streak_7') {
-                progressText.textContent = '0/7';
-            } else if (achId === 'daily_goal') {
-                progressText.textContent = '0/2700';
-            } else if (achId.startsWith('xp_')) {
-                const targetXP = parseInt(achId.split('_')[1]);
-                progressText.textContent = `0/${targetXP.toLocaleString()}`;
-            } else {
-                progressText.textContent = 'Kilitli';
-            }
-            progressText.style.color = '#999';
-            progressText.style.fontWeight = 'normal';
-        }
-    });
-    
-    // Sıfırlama işaretini localStorage'a kaydet (updateAllAchievements bu işareti kontrol edecek)
-    localStorage.setItem('achievementsJustReset', 'true');
-
     // Takvim Modal - Streak bilgisi
     const calendarStreakCountEl = document.getElementById('calendarStreakCount');
     if (calendarStreakCountEl) calendarStreakCountEl.textContent = '0';
@@ -3770,11 +3629,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     // =========================================
     // 🔥 YENİ BADGES PANEL TASARIMI GÜNCELLEMELERİ
     // =========================================
-    // Achievement kartlarını güncelle (yeni tasarım için)
+    // Achievement sıfırlama flag'i set et (updateAllAchievements için)
+    localStorage.setItem('achievementsJustReset', 'true');
+    
+    // Achievement kartlarını güncelle (yeni tasarım için - tüm rozetleri kilitli yap)
     if (typeof updateAllAchievements === 'function') {
-        // Flag'i kaldır ki updateAllAchievements çalışsın
-        localStorage.removeItem('achievementsJustReset');
         updateAllAchievements();
+    }
+    
+    // Başarılar Modal istatistiklerini güncelle (sıfırlanmış durumda)
+    if (typeof updateBadgesModalStats === 'function') {
+        updateBadgesModalStats();
     }
 
     showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");
@@ -4082,8 +3947,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Tüm achievement'ları güncelle
                 updateAllAchievements();
                 
-                // İlk kategoriyi göster
-                showBadgeCategory('daily');
+                // İlk kategoriyi göster (kısa bir gecikme ile, DOM'un hazır olması için)
+                setTimeout(() => {
+                    showBadgeCategory('daily');
+                }, 50);
                 
                 // Modal'ı göster
                 const badgesModal = document.getElementById('badgesModal');
@@ -4097,28 +3964,37 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Kategori değiştirme fonksiyonu
         function showBadgeCategory(category, clickedElement) {
-            // Tüm sekmeleri ve içerikleri gizle
-            document.querySelectorAll('.badge-tab').forEach(tab => {
+            // Remove active class from all tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
                 tab.classList.remove('active');
-                tab.style.background = 'transparent';
-                tab.style.color = '#999';
             });
-            document.querySelectorAll('.badge-category-content').forEach(content => {
-                content.style.display = 'none';
-            });
-
-            // Seçilen sekme ve içeriği göster
-            const activeTab = clickedElement || document.querySelector(`.badge-tab[onclick*="'${category}'"]`);
-            if (activeTab) {
-                activeTab.classList.add('active');
-                activeTab.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                activeTab.style.color = 'white';
+            
+            // Add active class to clicked tab
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            } else {
+                const tab = document.querySelector(`.category-tab[data-category="${category}"]`);
+                if (tab) tab.classList.add('active');
             }
             
-            const categoryContent = document.getElementById(`badgeCategory${category.charAt(0).toUpperCase() + category.slice(1)}`);
-            if (categoryContent) {
-                categoryContent.style.display = 'block';
-            }
+            // Hide all badges
+            document.querySelectorAll('.badge-card').forEach(card => {
+                card.style.display = 'none';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+            });
+            
+            // Show badges of selected category
+            const categoryCards = document.querySelectorAll(`.badge-card[data-category="${category}"]`);
+            categoryCards.forEach((card, index) => {
+                card.style.display = 'block';
+                // Animate cards
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
         }
 
         // Başarılar modal istatistiklerini güncelle
@@ -4139,14 +4015,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Tüm achievement'ları güncelle
         function updateAllAchievements() {
-            // Sıfırlama işareti varsa, achievement kartlarını güncelleme (zaten sıfırlandı)
-            const justReset = localStorage.getItem('achievementsJustReset');
-            if (justReset === 'true') {
-                localStorage.removeItem('achievementsJustReset');
-                // Sıfırlama sonrası ilk güncelleme, sadece kilitli durumu koru
-                return;
-            }
-            
             const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
             const achievements = [
                 { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
@@ -4189,8 +4057,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (!card) return;
 
                 const isUnlocked = unlockedAchievements.includes(ach.id);
-                const progressFill = card.querySelector('.achievement-progress-fill');
-                const progressText = card.querySelector('.progress-text');
+                const progressFill = card.querySelector('.badge-progress-fill');
+                const statusText = card.querySelector('.badge-status');
+                const iconEl = card.querySelector('.badge-icon');
+                const titleEl = card.querySelector('.badge-title');
+                const descEl = card.querySelector('.badge-desc');
+
+                // Icon, title, desc güncelle
+                if (iconEl) iconEl.textContent = ach.icon;
+                if (titleEl) titleEl.textContent = ach.name;
+                if (descEl) descEl.textContent = ach.desc;
 
                 if (isUnlocked) {
                     card.classList.add('unlocked');
@@ -4205,10 +4081,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         progressFill.style.width = '100%';
                         progressFill.style.background = '';
                     }
-                    if (progressText) {
-                        progressText.textContent = 'Tamamlandı';
-                        progressText.style.color = '';
-                        progressText.style.fontWeight = '';
+                    if (statusText) {
+                        statusText.textContent = 'Tamamlandı';
+                        statusText.style.color = '';
+                        statusText.style.fontWeight = '';
                     }
                 } else {
                     card.classList.remove('unlocked');
@@ -4232,29 +4108,31 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     }
                     
                     // İlerleme metni
-                    if (progressText && ach.progress) {
+                    if (statusText && ach.progress) {
                         const progress = ach.progress();
                         if (ach.id === 'combo_master') {
-                            progressText.textContent = `${comboCount || 0}/5`;
+                            statusText.textContent = `${comboCount || 0}/5`;
                         } else if (ach.id === 'daily_goal') {
                             const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
                             const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
-                            progressText.textContent = `${dailyHasene}/${goalHasene}`;
+                            statusText.textContent = `${dailyHasene}/${goalHasene}`;
                         } else if (ach.id === 'streak_7') {
-                            progressText.textContent = `${streakData.currentStreak || 0}/7`;
+                            statusText.textContent = `${streakData.currentStreak || 0}/7`;
                         } else if (ach.id.startsWith('level_')) {
                             const targetLevel = parseInt(ach.id.split('_')[1]);
                             // Level 1 ise 0/X göster, 1/X değil
                             const currentLevel = (level <= 1) ? 0 : level;
-                            progressText.textContent = `${currentLevel}/${targetLevel}`;
+                            statusText.textContent = `Seviye ${currentLevel}/${targetLevel}`;
                         } else if (ach.id.startsWith('xp_')) {
                             const targetXP = parseInt(ach.id.split('_')[1]);
-                            progressText.textContent = `${(totalPoints || 0).toLocaleString()}/${targetXP.toLocaleString()}`;
+                            statusText.textContent = `${(totalPoints || 0).toLocaleString()}/${targetXP.toLocaleString()}`;
                         } else {
-                            progressText.textContent = 'Kilitli';
+                            statusText.textContent = 'Kilitli';
                         }
-                        progressText.style.color = '#999';
-                        progressText.style.fontWeight = 'normal';
+                        statusText.style.color = '';
+                        statusText.style.fontWeight = '';
+                    } else if (statusText) {
+                        statusText.textContent = 'Kilitli';
                     }
                 }
             });
@@ -4308,7 +4186,31 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const badgesScrollableContent = document.getElementById('badgesScrollableContent');
             if (!badgesModal) return;
             
-            // Eğer zaten eklenmişse, tekrar ekleme
+            // Category tab event listener'larını ekle (her modal açılışında)
+            // Modal içindeki category-tabs container'ını bul
+            const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
+            if (categoryTabsContainer) {
+                // Önce mevcut listener'ı kaldır (varsa) - clone ile
+                const newContainer = categoryTabsContainer.cloneNode(true);
+                categoryTabsContainer.parentNode.replaceChild(newContainer, categoryTabsContainer);
+                
+                // Yeni listener ekle - capture phase'de (diğer listener'lardan önce çalışır)
+                newContainer.addEventListener('click', function(e) {
+                    const tab = e.target.closest('.category-tab');
+                    if (tab) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation(); // Tüm diğer listener'ları durdur
+                        const category = tab.getAttribute('data-category');
+                        if (category) {
+                            showBadgeCategory(category, tab);
+                        }
+                        return false; // Ekstra güvenlik
+                    }
+                }, true); // Capture phase (bubbling'den önce)
+            }
+            
+            // Touch event'leri için sadece bir kez ekle
             if (badgesModal.hasAttribute('data-touch-events-initialized')) return;
             badgesModal.setAttribute('data-touch-events-initialized', 'true');
             
@@ -4398,6 +4300,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
+            // Category tab butonlarına tıklanırsa, kapatma (zaten kendi handler'ı var)
+            if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return;
+            }
+            
+            // Category tabs container'ına tıklanırsa
+            if (target && target.closest('.category-tabs')) {
+                return;
+            }
+            
             // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
             if (target && (target.closest('.modal-content'))) {
                 return;
@@ -4406,6 +4321,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
             if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
                 // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
+                return;
+            }
+            
+            // Badge kartlarına tıklanırsa, kapatma
+            if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
                 return;
             }
             
