@@ -4195,7 +4195,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const newContainer = categoryTabsContainer.cloneNode(true);
                 categoryTabsContainer.parentNode.replaceChild(newContainer, categoryTabsContainer);
                 
-                // Yeni listener ekle - capture phase'de (diğer listener'lardan önce çalışır)
+                // Click event listener - capture phase'de (diğer listener'lardan önce çalışır)
                 newContainer.addEventListener('click', function(e) {
                     const tab = e.target.closest('.category-tab');
                     if (tab) {
@@ -4209,6 +4209,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         return false; // Ekstra güvenlik
                     }
                 }, true); // Capture phase (bubbling'den önce)
+                
+                // Touch event listener - mobil için özel handler
+                newContainer.addEventListener('touchend', function(e) {
+                    const tab = e.target.closest('.category-tab');
+                    if (tab) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation(); // Tüm diğer listener'ları durdur
+                        const category = tab.getAttribute('data-category');
+                        if (category) {
+                            showBadgeCategory(category, tab);
+                        }
+                        return false; // Ekstra güvenlik
+                    }
+                }, { passive: false, capture: true }); // Capture phase (bubbling'den önce)
             }
             
             // Touch event'leri için sadece bir kez ekle
@@ -4229,8 +4244,22 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Modal overlay için touch event'leri
             badgesModal.addEventListener('touchstart', function(e) {
+                const target = e.target;
+                
+                // Category tab'a dokunulmuşsa, scroll algılama yapma
+                if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
+                    const touch = e.touches[0];
+                    badgesModalTouchStart = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now()
+                    };
+                    badgesModalIsScrolling = false;
+                    return;
+                }
+                
                 // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'badgesScrollableContent' || e.target.closest('#badgesScrollableContent'))) {
+                if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
                     return;
                 }
                 
@@ -4244,8 +4273,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
             
             badgesModal.addEventListener('touchmove', function(e) {
+                const target = e.target;
+                
+                // Category tab üzerinde hareket varsa, scroll algılama yapma
+                if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
+                    return;
+                }
+                
                 // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (e.target && (e.target.id === 'badgesScrollableContent' || e.target.closest('#badgesScrollableContent'))) {
+                if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
                     badgesModalIsScrolling = true;
                     return;
                 }
@@ -4278,19 +4314,58 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 // Kısa süre (300ms) ve küçük hareket (10px) = tap
                 if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                    // X butonuna tıklanmışsa ignore et
                     const target = e.target;
+                    
+                    // X butonuna tıklanmışsa ignore et
                     if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
                         badgesModalTouchStart = { x: 0, y: 0, time: 0 };
                         return;
                     }
                     
-                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    // Category tab'a tıklanmışsa, kategoriyi göster ve modal'ı kapatma
+                    const categoryTab = target && (target.closest('.category-tab') || target.classList.contains('category-tab'));
+                    if (categoryTab) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        const category = categoryTab.getAttribute('data-category');
+                        if (category) {
+                            showBadgeCategory(category, categoryTab);
+                        }
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Category tabs container'ına tıklanmışsa, modal'ı kapatma
+                    if (target && target.closest('.category-tabs')) {
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Scroll edilebilir içerik alanına tıklanmışsa, modal'ı kapatma
+                    if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Badge kartlarına tıklanmışsa, modal'ı kapatma
+                    if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Modal içeriğine tıklanmışsa, modal'ı kapatma
+                    if (target && target.closest('.modal-content')) {
+                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
                     closeBadgesModal();
                 }
                 
                 badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-            }, { passive: true });
+            }, { passive: false });
         }
         
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
