@@ -1550,13 +1550,18 @@ body {
     flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
-    /* Touch action - scroll için */
+    /* Touch action - scroll için - TÜM ALANDA ÇALIŞSIN */
     touch-action: pan-y !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
     /* Performans optimizasyonları */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* Scroll için pointer events */
+    pointer-events: auto !important;
 }
 
 #dailyTasksScrollableContent::-webkit-scrollbar {
