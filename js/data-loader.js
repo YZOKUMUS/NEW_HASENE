@@ -2,7 +2,7 @@
 // JSON dosyaları sadece ihtiyaç duyulduğunda yüklenir (performans optimizasyonu)
 
 let kelimeBulData = null;  // kelimebul.json - Kelime Çevir ve Dinle ve Bul için
-let ayetOkuData = null;    // ayetoku_formatted.json - Boşluk Doldur ve Ayet Oku için
+let ayetOkuData = null;    // ayetoku.json - Boşluk Doldur ve Ayet Oku için
 let duaData = null;        // duaet.json - Dua Et için
 let hadisData = null;      // hadisoku.json - Hadis Oku için
 
@@ -53,7 +53,7 @@ async function loadKelimeData() {
     try {
         dataLoadStatus.kelimeBul.loading = true;
         showLoadingWithProgress('Kelime verileri yükleniyor...', 0);
-        kelimeBulData = await fetchWithRetry('kelimebul.json');
+        kelimeBulData = await fetchWithRetry('data/kelimebul.json');
         dataLoadStatus.kelimeBul.loaded = true;
         showLoadingWithProgress('Kelime verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
@@ -84,7 +84,7 @@ async function loadAyetData() {
     try {
         dataLoadStatus.ayetOku.loading = true;
         showLoadingWithProgress('Ayet verileri yükleniyor...', 0);
-        ayetOkuData = await fetchWithRetry('ayetoku_formatted.json');
+        ayetOkuData = await fetchWithRetry('data/ayetoku.json');
         dataLoadStatus.ayetOku.loaded = true;
         showLoadingWithProgress('Ayet verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
@@ -115,7 +115,7 @@ async function loadDuaData() {
     try {
         dataLoadStatus.dua.loading = true;
         showLoadingWithProgress('Dua verileri yükleniyor...', 0);
-        duaData = await fetchWithRetry('duaet.json');
+        duaData = await fetchWithRetry('data/duaet.json');
         dataLoadStatus.dua.loaded = true;
         showLoadingWithProgress('Dua verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
@@ -146,7 +146,7 @@ async function loadHadisData() {
     try {
         dataLoadStatus.hadis.loading = true;
         showLoadingWithProgress('Hadis verileri yükleniyor...', 0);
-        hadisData = await fetchWithRetry('hadisoku.json');
+        hadisData = await fetchWithRetry('data/hadisoku.json');
         dataLoadStatus.hadis.loaded = true;
         showLoadingWithProgress('Hadis verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);

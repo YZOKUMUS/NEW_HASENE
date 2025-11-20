@@ -6,7 +6,7 @@
     <title>Hasene Arapça Oyunu</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="icon-192-v4-RED-MUSHAF.png">
+    <link rel="icon" type="image/png" href="assets/images/icon-192-v4-RED-MUSHAF.png">
     
     <script>
     const manifestPath = "manifest.json";
@@ -29,9 +29,9 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com; connect-src 'self' https://audios.quranwbw.com https://tanzil.net https://everyayah.com;">
     
     <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="icon-192-v4-RED-MUSHAF.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192-v4-RED-MUSHAF.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512-v4-RED-MUSHAF.png">
+    <link rel="apple-touch-icon" href="assets/images/icon-192-v4-RED-MUSHAF.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/images/icon-192-v4-RED-MUSHAF.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/images/icon-512-v4-RED-MUSHAF.png">
     
     <!-- Uthmani Kur'an Fonts -->
     <!-- Note: Uthmani font is loaded locally via style.css (KFGQPC Uthmanic Script HAFS Regular.otf) -->
@@ -64,7 +64,7 @@
     <div class="loading-screen-new" id="loadingScreen">
         <!-- Logo -->
         <div class="loading-logo-wrapper">
-            <img src="icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img">
+            <img src="assets/images/icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img">
         </div>
         
         <!-- Title -->
@@ -83,7 +83,7 @@
         
         <!-- Book Icon -->
         <div class="loading-book-wrapper">
-            <img src="OPENBOOK.png" alt="Book" class="loading-book-icon" id="bagIcon" onerror="this.onerror=null; this.src='OPENBOOK.PNG'; this.onerror=function(){this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:#999;font-size:14px;\'>📖</div>';};">
+            <img src="assets/images/OPENBOOK.png" alt="Book" class="loading-book-icon" id="bagIcon" onerror="this.onerror=null; this.src='assets/images/OPENBOOK.PNG'; this.onerror=function(){this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:#999;font-size:14px;\'>📖</div>';};">
         </div>
 
         <!-- Progress Section -->
@@ -364,7 +364,7 @@
                 
                 <div class="duolingo-audio-buttons">
                     <button class="duolingo-audio-btn" id="boslukAudioBtn" title="Sesi çal">
-                        <img src="hoparlor.png" alt="Ses">
+                        <img src="assets/images/hoparlor.png" alt="Ses">
                     </button>
                 </div>
                 </div>
@@ -412,7 +412,7 @@
                 
                 <div class="duolingo-audio-buttons">
                     <button class="duolingo-audio-btn" id="dinleAudioBtn" title="Sesi tekrar çal">
-                        <img src="hoparlor.png" alt="Ses">
+                        <img src="assets/images/hoparlor.png" alt="Ses">
                     </button>
                     <button class="duolingo-audio-btn" id="dinleMicBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid #667eea;" title="Ses tanıma ile cevap ver">
                         <span style="font-size: 1.5em;">🎤</span>
@@ -467,10 +467,10 @@
                 
                 <div class="duolingo-audio-buttons" style="margin-top: 20px;">
                     <button class="duolingo-audio-btn" id="audioBtn">
-                        <img src="hoparlor.png" alt="Ses">
+                        <img src="assets/images/hoparlor.png" alt="Ses">
                     </button>
                     <button class="duolingo-audio-btn" id="hintBtn">
-                        <img src="clue.png" alt="İpucu">
+                        <img src="assets/images/clue.png" alt="İpucu">
                     </button>
                 </div>
             </div>
@@ -8863,8 +8863,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug(`✅ Seçilen ayet index: ${randomIndex}/${validAyets.length}`);
             
             log.debug(`📝 === SORU #${boslukQuestionCount + 1} ===`);
-            log.debug(`📖 Sure: ${ayet.sure_adi || 'Bilinmiyor'}`);
-            log.debug(`🔢 Ayet No: ${ayet.ayet_no || 'Bilinmiyor'}`);
+            log.debug(`📖 Sure: ${ayet.sure_adı || 'Bilinmiyor'}`);
+            log.debug(`🔢 Ayet Kimliği: ${ayet.ayet_kimligi || 'Bilinmiyor'}`);
             log.debug(`📝 Ayet Metni: "${ayet.ayet_metni}"`);
             
             // Ayet metnini kelimelere böl
@@ -9010,7 +9010,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Sure info güncelle
             if (elements.boslukSureInfo && currentBoslukQuestion) {
-                elements.boslukSureInfo.textContent = `${currentBoslukQuestion.sure_adi || ''} ${currentBoslukQuestion.ayet_no || ''}`;
+                elements.boslukSureInfo.textContent = `${currentBoslukQuestion.sure_adı || ''} ${currentBoslukQuestion.ayet_kimligi || ''}`;
                 elements.boslukSureInfo.style.display = 'block';
             }
 
@@ -9393,7 +9393,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const ayet = ayetOkuData[currentAyetIndex];
             if (!ayet) return;
             
-            elements.ayetSureInfo.textContent = `${ayet.sure_adı || 'Sûre'} - Ayet`;
+            elements.ayetSureInfo.textContent = `${ayet.sure_adı || 'Sûre'} - ${ayet.ayet_kimligi || ''}`;
             elements.ayetArabic.textContent = ayet.ayet_metni || '';
             elements.ayetTranslation.textContent = ayet.meal || '';
             
@@ -9427,8 +9427,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 index: currentAyetIndex,
                 hasUrl: !!(ayet && ayet.ayet_ses_dosyasi),
                 url: ayet?.ayet_ses_dosyasi,
-                sure: ayet?.sure_adi,
-                ayetNo: ayet?.ayet_no
+                sure: ayet?.sure_adı,
+                ayetKimligi: ayet?.ayet_kimligi
             });
             
             if (ayet && ayet.ayet_ses_dosyasi) {
@@ -10642,8 +10642,8 @@ function showMainMenu() {
             
             const notificationOptions = {
                 body: options.body || '',
-                icon: options.icon || './icon-192-v4-RED-MUSHAF.png',
-                badge: options.badge || './icon-192-v4-RED-MUSHAF.png',
+                icon: options.icon || './assets/images/icon-192-v4-RED-MUSHAF.png',
+                badge: options.badge || './assets/images/icon-192-v4-RED-MUSHAF.png',
                 tag: options.tag || 'hasene-notification',
                 requireInteraction: options.requireInteraction || false,
                 data: {
