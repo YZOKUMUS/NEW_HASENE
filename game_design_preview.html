@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyun Sayfası Tasarım Örneği - Hasene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header - Modern ve Minimal */
+        .game-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .progress-info {
+            text-align: center;
+            flex: 1;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar-container {
+            width: 200px;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            width: 30%;
+            transition: width 0.3s;
+        }
+
+        .score-display {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Question Area - Kart Tasarımı */
+        .question-card {
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .question-number {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .question-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 36px;
+            box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+        }
+
+        .arabic-word {
+            font-family: 'Arial', sans-serif;
+            font-size: 42px;
+            color: #1a1a1a;
+            margin: 20px 0;
+            direction: rtl;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .question-hint {
+            color: #999;
+            font-size: 13px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* Options - Modern Butonlar */
+        .options-container {
+            padding: 0 30px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .option-btn:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option-btn:hover::before {
+            transform: scaleY(1);
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #58cc02 0%, #4db300 100%);
+            color: white;
+            border-color: #58cc02;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #ff3b30 0%, #e63946 100%);
+            color: white;
+            border-color: #ff3b30;
+        }
+
+        .option-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Hint Button */
+        .hint-section {
+            padding: 0 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hint-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+        }
+
+        .hint-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251,191,36,0.4);
+        }
+
+        .hint-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback Message */
+        .feedback-message {
+            text-align: center;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-message.correct {
+            color: #58cc02;
+            background: rgba(88,204,2,0.1);
+        }
+
+        .feedback-message.wrong {
+            color: #ff3b30;
+            background: rgba(255,59,48,0.1);
+        }
+
+        /* Stats Bar - Alt Kısım */
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Combo Indicator */
+        .combo-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px 40px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 24px;
+            box-shadow: 0 10px 40px rgba(245,87,108,0.5);
+            z-index: 1000;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .combo-indicator.show {
+            animation: comboPop 0.5s ease;
+        }
+
+        @keyframes comboPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .arabic-word {
+                font-size: 32px;
+            }
+            
+            .question-card {
+                padding: 30px 20px;
+            }
+            
+            .options-container {
+                padding: 0 20px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="game-header">
+            <button class="back-btn">←</button>
+            <div class="progress-info">
+                <div class="progress-text">İlerleme</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            <div class="score-display">⭐ 125</div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+            <div class="question-number">Soru 3 / 10</div>
+            <div class="question-icon">🔄</div>
+            <div class="arabic-word">فَكُبْكِبُوا۟</div>
+            <div class="question-hint">Bu kelimenin Türkçe karşılığı nedir?</div>
+        </div>
+
+        <!-- Feedback Message -->
+        <div class="feedback-message" id="feedback"></div>
+
+        <!-- Options -->
+        <div class="options-container">
+            <button class="option-btn" onclick="selectOption(this, true)">
+                Üst üste yığıldılar
+            </button>
+            <button class="option-btn" onclick="selectOption(this, false)">
+                Güzel bir şekilde
+            </button>
+            <button class="option-btn" onclick="selectOption(this, false)">
+                Hızlıca koştular
+            </button>
+            <button class="option-btn" onclick="selectOption(this, false)">
+                Sessizce durdular
+            </button>
+        </div>
+
+        <!-- Hint Button -->
+        <div class="hint-section">
+            <button class="hint-btn" onclick="useHint()">💡 İpucu Kullan (-10 Hasene)</button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">137</div>
+                <div class="stat-label">Hasene</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Doğru</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2</div>
+                <div class="stat-label">Yanlış</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">3x</div>
+                <div class="stat-label">Combo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Combo Indicator -->
+    <div class="combo-indicator" id="comboIndicator">
+        🔥 COMBO 3x 🔥<br>
+        <span style="font-size: 16px;">+5 Bonus Hasene!</span>
+    </div>
+
+    <script>
+        function selectOption(btn, isCorrect) {
+            const options = document.querySelectorAll('.option-btn');
+            const feedback = document.getElementById('feedback');
+            
+            // Tüm butonları devre dışı bırak
+            options.forEach(opt => {
+                opt.disabled = true;
+                opt.classList.add('disabled');
+            });
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                feedback.textContent = '✅ Doğru! +20 Hasene';
+                feedback.classList.add('correct');
+                feedback.classList.remove('wrong');
+            } else {
+                btn.classList.add('wrong');
+                // Doğru cevabı bul ve göster
+                options[0].classList.add('correct');
+                feedback.textContent = '❌ Yanlış! Doğru cevap: Üst üste yığıldılar';
+                feedback.classList.add('wrong');
+                feedback.classList.remove('correct');
+            }
+
+            // 2 saniye sonra sonraki soruya geç
+            setTimeout(() => {
+                resetQuestion();
+            }, 2000);
+        }
+
+        function useHint() {
+            const options = document.querySelectorAll('.option-btn');
+            const hintBtn = document.querySelector('.hint-btn');
+            
+            // Bir yanlış seçeneği devre dışı bırak
+            const wrongOptions = Array.from(options).filter(opt => !opt.classList.contains('correct'));
+            if (wrongOptions.length > 1) {
+                wrongOptions[1].style.opacity = '0.3';
+                wrongOptions[1].disabled = true;
+                hintBtn.disabled = true;
+            }
+        }
+
+        function resetQuestion() {
+            const options = document.querySelectorAll('.option-btn');
+            const feedback = document.getElementById('feedback');
+            
+            options.forEach(opt => {
+                opt.disabled = false;
+                opt.classList.remove('correct', 'wrong', 'disabled');
+                opt.style.opacity = '1';
+            });
+            
+            feedback.textContent = '';
+            feedback.classList.remove('correct', 'wrong');
+        }
+
+        // Combo gösterimi (demo)
+        function showCombo() {
+            const combo = document.getElementById('comboIndicator');
+            combo.classList.add('show');
+            setTimeout(() => {
+                combo.classList.remove('show');
+            }, 2000);
+        }
+
+        // Demo: 3 saniye sonra combo göster
+        setTimeout(showCombo, 1000);
+    </script>
+</body>
+</html>
+
