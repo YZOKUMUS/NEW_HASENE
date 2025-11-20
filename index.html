@@ -5293,10 +5293,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         let calendarModalTouchStart = { x: 0, y: 0, time: 0 };
         let calendarModalIsScrolling = false;
         
-        // Touch event tracking for daily tasks modal scroll detection
-        let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-        let dailyTasksModalIsScrolling = false;
-        
         // Calendar modal için touch event'leri
         function initCalendarModalTouchEvents() {
             const calendarModal = document.getElementById('calendarModal');
@@ -5843,8 +5839,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.display = 'flex';
                 // Body scroll'u engelle
                 document.body.style.overflow = 'hidden';
-                // Touch event'leri başlat
-                initDailyTasksModalTouchEvents();
             }
         }
 
@@ -5879,99 +5873,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.mainMenu.style.display = 'block';
                 }
             }
-        }
-        
-        // Daily tasks modal için touch event'leri (İstatistikler modalı ile aynı yapı)
-        function initDailyTasksModalTouchEvents() {
-            const dailyTasksModal = document.getElementById('dailyTasksModal');
-            const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
-            if (!dailyTasksModal) return;
-            
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
-            dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
-            
-            // Scroll edilebilir içerik alanında scroll algılama
-            if (dailyTasksScrollableContent) {
-                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
-                    dailyTasksModalIsScrolling = false;
-                }, { passive: true });
-                
-                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
-                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                    dailyTasksModalIsScrolling = true;
-                }, { passive: true });
-            }
-            
-            // Modal overlay için touch event'leri
-            dailyTasksModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
-                    return;
-                }
-                
-                const touch = e.touches[0];
-                dailyTasksModalTouchStart = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                    time: Date.now()
-                };
-                dailyTasksModalIsScrolling = false;
-            }, { passive: true });
-            
-            dailyTasksModal.addEventListener('touchmove', function(e) {
-                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
-                    dailyTasksModalIsScrolling = true;
-                    return;
-                }
-                
-                if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
-                    const touch = e.touches[0];
-                    const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
-                    const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-                    if (deltaX > 10 || deltaY > 10) {
-                        dailyTasksModalIsScrolling = true;
-                    }
-                }
-            }, { passive: true });
-            
-            dailyTasksModal.addEventListener('touchend', function(e) {
-                // Touch end'de scroll kontrolü yap
-                if (dailyTasksModalIsScrolling) {
-                    // Scroll oldu, kapatma
-                    dailyTasksModalIsScrolling = false;
-                    dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-                    return;
-                }
-                
-                // Scroll değilse, normal click gibi davran
-                const touch = e.changedTouches[0];
-                const deltaTime = Date.now() - dailyTasksModalTouchStart.time;
-                const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
-                const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-                
-                // Kısa süre (300ms) ve küçük hareket (10px) = tap
-                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                    // Scroll edilebilir içerik alanına tıklanmışsa ignore et
-                    if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
-                        return;
-                    }
-                    // X butonuna veya ödül toplama butonuna tıklanmışsa ignore et
-                    if (e.target && (e.target.id === 'closeDailyTasksBtn' || e.target.id === 'claimRewardsBtn' || e.target.closest('#closeDailyTasksBtn') || e.target.closest('#claimRewardsBtn'))) {
-                        return;
-                    }
-                    // Modal içeriğine tıklanmışsa ignore et
-                    if (e.target && e.target.closest('.modal-content')) {
-                        return;
-                    }
-                    // Arka plana tap yapıldı, kapat
-                    closeDailyTasksModal();
-                }
-                
-                dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-            }, { passive: true });
         }
         
         // Her yere tıklayınca kapatma fonksiyonu (Hasene Nasıl Kazanılır paneli ile aynı mantık)
@@ -9885,8 +9786,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             if (closeXPInfoBtn) closeXPInfoBtn.onclick = closeXPInfoModal;
             
-            // Not: Touch event'ler artık initStatsModalTouchEvents, initBadgesModalTouchEvents, 
-            // initCalendarModalTouchEvents, initDailyTasksModalTouchEvents fonksiyonları tarafından yönetiliyor
+            // Not: Touch event'ler initStatsModalTouchEvents, initBadgesModalTouchEvents,
+            // initCalendarModalTouchEvents fonksiyonları tarafından yönetiliyor
             
             // ============ MODAL SWIPE GESTURES ============
             // Modal'lara swipe down ile kapatma özelliği ekle
