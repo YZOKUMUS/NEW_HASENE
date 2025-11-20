@@ -10232,28 +10232,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     </div>
 
     <!-- Flutter Bottom Navigation -->
-    <div class="flutter-top-nav" id="bottomNavBar">                                
-        <a class="flutter-nav-item" onclick="showMainMenu(); setActiveNavItem(0);">
-            <i class="material-icons">home</i>
-            <span>Ana Sayfa</span>
-        </a>
-        <a class="flutter-nav-item" onclick="showStatsModal(); setActiveNavItem(1);">
-            <i class="material-icons">analytics</i>
-            <span>İstatistik</span>
-        </a>
-        <a class="flutter-nav-item" onclick="showDailyTasksModal(); setActiveNavItem(2);" id="navTasks">
-            <i class="material-icons">task_alt</i>
-            <span>Görevler</span>
+    <!-- Bottom Navigation - Modern Design -->
+    <div class="bottom-nav" id="bottomNavBar">                                
+        <div class="nav-item active" onclick="showMainMenu(); setActiveNavItem(0);">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Ana Sayfa</div>
+        </div>
+        <div class="nav-item" onclick="showStatsModal(); setActiveNavItem(1);">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">İstatistikler</div>
+        </div>
+        <div class="nav-item" onclick="showBadgesModal(); setActiveNavItem(3);">
+            <div class="nav-icon">🏆</div>
+            <div class="nav-label">Başarılar</div>
+        </div>
+        <div class="nav-item" onclick="showDailyTasksModal(); setActiveNavItem(2);" id="navTasks">
+            <div class="nav-icon">✅</div>
+            <div class="nav-label">Görevler</div>
             <span class="nav-badge" id="tasksBadge" style="display: none;">!</span>
-        </a>
-        <a class="flutter-nav-item" onclick="showBadgesModal(); setActiveNavItem(3);">
-            <i class="material-icons">emoji_events</i>
-            <span>Başarılar</span>
-        </a>
-        <a class="flutter-nav-item" onclick="showCalendarModal(); setActiveNavItem(4);">
-            <i class="material-icons">calendar_today</i>
-            <span>Takvim</span>
-        </a>
+        </div>
+        <div class="nav-item" onclick="showCalendarModal(); setActiveNavItem(4);">
+            <div class="nav-icon">📅</div>
+            <div class="nav-label">Takvim</div>
+        </div>
     </div>
 
     <script>
@@ -10318,6 +10319,11 @@ function showMainMenu() {
 
         // Bottom navigation active state yönetimi
         function setActiveNavItem(index) {
+            // Yeni bottom-nav için
+            document.querySelectorAll('.bottom-nav .nav-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            // Eski flutter-nav-item için geriye dönük uyumluluk
             document.querySelectorAll('.flutter-nav-item').forEach((item, i) => {
                 item.classList.toggle('active', i === index);
             });

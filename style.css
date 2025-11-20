@@ -432,6 +432,18 @@ body {
     .welcome-title {
         font-size: 24px;
     }
+    
+    .nav-item {
+        padding: 8px 12px;
+    }
+    
+    .nav-icon {
+        font-size: 22px;
+    }
+    
+    .nav-label {
+        font-size: 10px;
+    }
 }
 
 .menu-item {
@@ -589,89 +601,78 @@ body {
 
 
 /* ----- BOTTOM NAV ----- */
-.flutter-top-nav {
+/* Bottom Navigation - Modern Design */
+.bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 75px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08);
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px;
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    border-radius: 24px 24px 0 0;
-    padding: 8px 12px 12px 12px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
     z-index: 1000;
 }
 
-.flutter-nav-item {
+.nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    color: #999;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    min-width: 60px;
     gap: 4px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s;
+    color: #999;
+    position: relative;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    flex: 1;
+    max-width: 100px;
 }
 
-.flutter-nav-item i {
+.nav-item:hover {
+    background: rgba(102,126,234,0.05);
+}
+
+.nav-item.active {
+    color: #667eea;
+    background: rgba(102,126,234,0.1);
+}
+
+.nav-icon {
     font-size: 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: block;
+    transition: transform 0.3s;
 }
 
-.flutter-nav-item span {
-    font-size: 11px;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-}
-
-.flutter-nav-item:hover {
-    background: rgba(88, 204, 2, 0.08);
-    color: #58cc02;
-    transform: translateY(-2px);
-}
-
-.flutter-nav-item:hover i {
+.nav-item.active .nav-icon {
     transform: scale(1.1);
 }
 
-.flutter-nav-item:active {
-    transform: translateY(0) scale(0.95);
-}
-
-.flutter-nav-item.active {
-    color: #58cc02;
-    background: linear-gradient(135deg, rgba(88, 204, 2, 0.15) 0%, rgba(88, 204, 2, 0.08) 100%);
+.nav-label {
+    font-size: 11px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
-.flutter-nav-item.active i {
-    transform: scale(1.15);
-    color: #58cc02;
-}
-
-.flutter-nav-item.active span {
-    font-weight: 600;
-    color: #58cc02;
+/* Responsive - küçük ekranlar için */
+@media (max-width: 600px) {
+    .nav-item {
+        padding: 8px 12px;
+    }
+    
+    .nav-icon {
+        font-size: 22px;
+    }
+    
+    .nav-label {
+        font-size: 10px;
+    }
 }
 
 /* Badge/Notification indicator */
-.flutter-nav-item .nav-badge {
+.nav-item .nav-badge {
     position: absolute;
     top: 4px;
     right: 8px;
@@ -688,6 +689,40 @@ body {
     justify-content: center;
     box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
     animation: pulse-badge 2s infinite;
+}
+
+/* Eski Flutter stilleri - geriye dönük uyumluluk için */
+.flutter-top-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.flutter-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s;
+    color: #999;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.flutter-nav-item.active {
+    color: #667eea;
+    background: rgba(102,126,234,0.1);
 }
 
 @keyframes pulse-badge {
