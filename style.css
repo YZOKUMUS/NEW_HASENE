@@ -332,8 +332,10 @@ body {
     gap: 16px;
 }
 
-/* Oyun Kartları - Modern Beyaz Tasarım */
+/* Oyun Kartları - Modern Beyaz Tasarım - TÜM EKRANLAR İÇİN ZORUNLU */
 .games-grid .game-card,
+.main-menu .game-card,
+#mainMenu .game-card,
 .game-card {
     background: white !important;
     border-radius: 20px;
@@ -345,9 +347,12 @@ body {
     border: none !important;
     position: relative;
     overflow: hidden;
-    /* Eski glass effect'i override et */
+    /* Eski glass effect'i override et - TÜM EKRANLAR İÇİN */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    /* Eski rgba stillerini override et */
+    background-color: white !important;
+    background-image: none !important;
 }
 
 .game-card::before {
@@ -473,7 +478,14 @@ body {
         gap: 12px !important;
     }
     
+    /* Oyun Kartları - Mobilde Beyaz Arka Plan ZORUNLU */
+    .games-grid .game-card,
+    .main-menu .game-card,
     .game-card {
+        background: white !important;
+        border: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
         padding: 20px 16px !important;
     }
     
@@ -492,6 +504,54 @@ body {
     .info-button {
         padding: 12px !important;
         font-size: 13px !important;
+    }
+    
+    /* Alt Navigasyon - Mobilde Yeni Tasarım ZORUNLU */
+    #bottomNavBar.bottom-nav,
+    .bottom-nav {
+        background: white !important;
+        padding: 12px !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important;
+        /* Eski flutter stillerini override et */
+        height: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        border-top: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    #bottomNavBar.bottom-nav .nav-item,
+    .bottom-nav .nav-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: #999 !important;
+        /* Eski flutter stillerini override et */
+        min-width: auto !important;
+        justify-content: center !important;
+    }
+    
+    #bottomNavBar.bottom-nav .nav-item.active,
+    .bottom-nav .nav-item.active {
+        color: #667eea !important;
+        background: rgba(102,126,234,0.1) !important;
+    }
+    
+    #bottomNavBar.bottom-nav .nav-icon,
+    .bottom-nav .nav-icon {
+        font-size: 22px !important;
+        display: block !important;
+    }
+    
+    #bottomNavBar.bottom-nav .nav-label,
+    .bottom-nav .nav-label {
+        font-size: 10px !important;
+        display: block !important;
     }
     
     /* Görevler Paneli - Mobil */
@@ -833,27 +893,33 @@ body {
 
 
 /* ----- BOTTOM NAV ----- */
-/* Bottom Navigation - Modern Design */
+/* Bottom Navigation - Modern Design - TÜM EKRANLAR İÇİN ZORUNLU */
 #bottomNavBar.bottom-nav,
+#bottomNavBar,
 .bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     background: white !important;
+    background-color: white !important;
+    background-image: none !important;
     padding: 12px !important;
     display: flex !important;
     justify-content: space-around !important;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important;
     z-index: 1000 !important;
-    /* Eski flutter stillerini override et */
+    /* Eski flutter stillerini override et - TÜM EKRANLAR İÇİN */
     height: auto !important;
     max-width: none !important;
+    width: 100% !important;
     transform: none !important;
     border-radius: 0 !important;
     border-top: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    /* Eski gradient stillerini override et */
+    background: white !important;
 }
 
 .bottom-nav .nav-item,
@@ -1002,9 +1068,27 @@ body {
     /* Bottom-nav için override - eski flutter stillerini etkilemesin */
     #bottomNavBar.bottom-nav,
     .bottom-nav {
+        background: white !important;
         height: auto !important;
         padding: 12px !important;
         border-radius: 0 !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important;
+        transform: none !important;
+        border-top: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Oyun kartları mobilde beyaz zorunlu */
+    .games-grid .game-card,
+    .main-menu .game-card,
+    .game-card {
+        background: white !important;
+        border: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
     }
     
     .flutter-nav-item {
