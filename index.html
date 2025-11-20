@@ -3713,6 +3713,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
+            // Veri doğrulama - totalPoints kontrolü
+            if (typeof totalPoints !== 'number' || isNaN(totalPoints) || totalPoints < 0) {
+                log.warn('⚠️ totalPoints geçersiz, sıfırlanıyor:', totalPoints);
+                totalPoints = 0;
+            }
+            
             // Üst bar güncelle
             gamePointsEl.textContent = totalPoints;
             
@@ -3720,11 +3726,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             starPoints = Math.floor(totalPoints / 100);
             starPointsEl.textContent = starPoints;
             
-            // Rozet sistemini güncelle
-            updateBadgeSystem();
+            // Rozet sistemini güncelle (null check ile)
+            if (typeof updateBadgeSystem === 'function') {
+                updateBadgeSystem();
+            }
             
             // Seviye güncelle (yeni hesaplama sistemi)
-            level = calculateLevel(totalPoints);
+            if (typeof calculateLevel === 'function') {
+                level = calculateLevel(totalPoints);
+            } else {
+                // Fallback: basit seviye hesaplama
+                level = Math.max(1, Math.floor(totalPoints / 1000) + 1);
+            }
             playerLevelEl.textContent = level;
             
             // Seviye ilerleme çubuğunu güncelle
@@ -4471,23 +4484,54 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (statsLevelPointsNeededEl) statsLevelPointsNeededEl.textContent = pointsNeeded.toLocaleString();
             
             // Rozet sayılarını güncelle (null check ile)
+            // badges kontrolü
+            if (!badges) {
+                log.warn('⚠️ badges bulunamadı, varsayılan değerler kullanılıyor');
+                badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
+            }
+            
             const statsBronzeEl = document.getElementById('statsBronze');
             const statsSilverEl = document.getElementById('statsSilver');
             const statsGoldEl = document.getElementById('statsGold');
             const statsDiamondEl = document.getElementById('statsDiamond');
-            if (statsBronzeEl) statsBronzeEl.textContent = badges.bronze;
-            if (statsSilverEl) statsSilverEl.textContent = badges.silver;
-            if (statsGoldEl) statsGoldEl.textContent = badges.gold;
-            if (statsDiamondEl) statsDiamondEl.textContent = badges.diamond;
+            if (statsBronzeEl) statsBronzeEl.textContent = badges.bronze || 0;
+            if (statsSilverEl) statsSilverEl.textContent = badges.silver || 0;
+            if (statsGoldEl) statsGoldEl.textContent = badges.gold || 0;
+            if (statsDiamondEl) statsDiamondEl.textContent = badges.diamond || 0;
             
-            // Başarı analizi hesapla
+            // Başarı analizi hesapla (null check ile)
+            // dailyTasks ve todayStats kontrolü
+            if (!dailyTasks || !dailyTasks.todayStats) {
+                log.warn('⚠️ dailyTasks.todayStats bulunamadı, varsayılan değerler kullanılıyor');
+                if (!dailyTasks) dailyTasks = {};
+                if (!dailyTasks.todayStats) {
+                    dailyTasks.todayStats = {
+                        kelimeCevir: 0, dinleBul: 0, boslukDoldur: 0,
+                        ayetOku: 0, duaOgre: 0, hadisOku: 0,
+                        toplamDogru: 0, toplamYanlis: 0, toplamPuan: 0,
+                        perfectStreak: 0, farklıZorluk: new Set()
+                    };
+                }
+            }
+            
+            // streakData kontrolü
+            if (!streakData) {
+                log.warn('⚠️ streakData bulunamadı, varsayılan değerler kullanılıyor');
+                streakData = {
+                    currentStreak: 0, bestStreak: 0, totalPlayDays: 0,
+                    todayProgress: 0, dailyGoal: 5
+                };
+            }
+            
             // Toplam deneme sayısı = Doğru + Yanlış
             const totalAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
             
             // Başarı oranı: Bugünkü toplam doğru cevap / Bugünkü toplam deneme sayısı
             const successRate = totalAttempts > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalAttempts) * 100) : 0;
             const avgPointsPerDay = streakData.totalPlayDays > 0 ? Math.round(totalPoints / streakData.totalPlayDays) : totalPoints;
-            const playConsistency = Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100);
+            const playConsistency = typeof getDaysFromFirstPlay === 'function' 
+                ? Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100)
+                : 0;
             const levelProgressPercent = Math.round(progressPercentage);
             
             // Başarı analizi güncelle (null check ile)
@@ -4505,10 +4549,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const statsBestStreakEl = document.getElementById('statsBestStreak');
             const statsTotalDaysEl = document.getElementById('statsTotalDays');
             const statsTodayProgressEl = document.getElementById('statsTodayProgress');
-            if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak;
-            if (statsBestStreakEl) statsBestStreakEl.textContent = streakData.bestStreak;
-            if (statsTotalDaysEl) statsTotalDaysEl.textContent = streakData.totalPlayDays;
-            if (statsTodayProgressEl) statsTodayProgressEl.textContent = Math.min(streakData.todayProgress, streakData.dailyGoal) + '/' + streakData.dailyGoal;
+            if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak || 0;
+            if (statsBestStreakEl) statsBestStreakEl.textContent = streakData.bestStreak || 0;
+            if (statsTotalDaysEl) statsTotalDaysEl.textContent = streakData.totalPlayDays || 0;
+            if (statsTodayProgressEl) {
+                const todayProgress = streakData.todayProgress || 0;
+                const dailyGoal = streakData.dailyGoal || 5;
+                statsTodayProgressEl.textContent = Math.min(todayProgress, dailyGoal) + '/' + dailyGoal;
+            }
             
             // Bugünkü oyun türü istatistikleri (null check ile)
             const statsKelimeCevirEl = document.getElementById('statsKelimeCevir');
@@ -4517,22 +4565,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const statsAyetOkuEl = document.getElementById('statsAyetOku');
             const statsDuaOgreEl = document.getElementById('statsDuaOgre');
             const statsHadisOkuEl = document.getElementById('statsHadisOku');
-            if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = dailyTasks.todayStats.kelimeCevir;
-            if (statsDinleBulEl) statsDinleBulEl.textContent = dailyTasks.todayStats.dinleBul;
-            if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = dailyTasks.todayStats.boslukDoldur;
-            if (statsAyetOkuEl) statsAyetOkuEl.textContent = dailyTasks.todayStats.ayetOku;
-            if (statsDuaOgreEl) statsDuaOgreEl.textContent = dailyTasks.todayStats.duaOgre;
-            if (statsHadisOkuEl) statsHadisOkuEl.textContent = dailyTasks.todayStats.hadisOku;
+            if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = dailyTasks.todayStats.kelimeCevir || 0;
+            if (statsDinleBulEl) statsDinleBulEl.textContent = dailyTasks.todayStats.dinleBul || 0;
+            if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = dailyTasks.todayStats.boslukDoldur || 0;
+            if (statsAyetOkuEl) statsAyetOkuEl.textContent = dailyTasks.todayStats.ayetOku || 0;
+            if (statsDuaOgreEl) statsDuaOgreEl.textContent = dailyTasks.todayStats.duaOgre || 0;
+            if (statsHadisOkuEl) statsHadisOkuEl.textContent = dailyTasks.todayStats.hadisOku || 0;
             
             // Bugünkü performans (null check ile)
             const statsTodayCorrectEl = document.getElementById('statsTodayCorrect');
             const statsTodayPointsEl = document.getElementById('statsTodayPoints');
             const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
             const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
-            if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = dailyTasks.todayStats.toplamDogru;
-            if (statsTodayPointsEl) statsTodayPointsEl.textContent = dailyTasks.todayStats.toplamPuan;
-            if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak;
-            if (statsDifficultyCountEl) statsDifficultyCountEl.textContent = dailyTasks.todayStats.farklıZorluk.size;
+            if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = dailyTasks.todayStats.toplamDogru || 0;
+            if (statsTodayPointsEl) statsTodayPointsEl.textContent = dailyTasks.todayStats.toplamPuan || 0;
+            if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak || 0;
+            if (statsDifficultyCountEl) {
+                const farkliZorluk = dailyTasks.todayStats.farklıZorluk;
+                if (farkliZorluk && typeof farkliZorluk.size === 'number') {
+                    statsDifficultyCountEl.textContent = farkliZorluk.size;
+                } else {
+                    statsDifficultyCountEl.textContent = 0;
+                }
+            }
             
             // Modal'ı göster (null check ile)
             const statsModal = document.getElementById('statsModal');
