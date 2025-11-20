@@ -348,26 +348,24 @@
 
         <!-- Boşluk Doldur Modu - Duolingo Tarzı -->
         <div class="bosluk-mode" id="boslukMode" style="display: none;">
-            <!-- Duolingo Tarzı Header -->
+            <!-- Modern Header -->
             <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromBoslukBtn">
-                    ←
-            </button>
+                <button class="duolingo-back-btn" id="backFromBoslukBtn">←</button>
                 <div class="duolingo-progress-container">
-                    <div class="duolingo-progress-bar" id="boslukProgressBar" style="width: 0%;"></div>
+                    <div class="progress-text">İlerleme</div>
+                    <div class="progress-bar-container">
+                        <div class="duolingo-progress-bar" id="boslukProgressBar" style="width: 0%;"></div>
+                    </div>
                 </div>
-                <div class="duolingo-hearts" id="boslukHearts" style="display: none;">
-                    <span>❤️</span>
-                    <span>❤️</span>
-                    <span>❤️</span>
-                </div>
+                <div class="score-display" id="boslukHeaderScore">⭐ 0</div>
             </div>
 
-            <!-- Duolingo Tarzı Soru Alanı -->
+            <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="boslukQuestionNumber">Soru 1 / 10</div>
+                <div class="question-icon">✏️</div>
                 <div class="arabic" id="boslukAyetText" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
-                <div class="duolingo-question-hint" id="boslukQuestionHint">Eksik kelimeyi seç</div>
+                <div class="duolingo-question-hint" id="boslukQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Eksik kelimeyi seç</div>
                 <div class="sure-info" id="boslukSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
                 
                 <div class="duolingo-audio-buttons">
@@ -405,28 +403,23 @@
 
         <!-- Dinle ve Bul Modu - Duolingo Tarzı -->
         <div class="dinle-mode" id="dinleMode" style="display: none;">
-            <!-- Duolingo Tarzı Header -->
+            <!-- Modern Header -->
             <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromDinleBtn">
-                    ←
-            </button>
+                <button class="duolingo-back-btn" id="backFromDinleBtn">←</button>
                 <div class="duolingo-progress-container">
-                    <div class="duolingo-progress-bar" id="dinleProgressBar" style="width: 0%;"></div>
+                    <div class="progress-text">İlerleme</div>
+                    <div class="progress-bar-container">
+                        <div class="duolingo-progress-bar" id="dinleProgressBar" style="width: 0%;"></div>
+                    </div>
                 </div>
-                <div class="duolingo-hearts" id="dinleHearts" style="display: none;">
-                    <span>❤️</span>
-                    <span>❤️</span>
-                    <span>❤️</span>
-                </div>
+                <div class="score-display" id="dinleHeaderScore">⭐ 0</div>
             </div>
 
-            <!-- Duolingo Tarzı Soru Alanı -->
+            <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="dinleQuestionNumber">Soru 1 / 10</div>
-                <div style="text-align: center; margin: 30px 0;">
-                    <div style="font-size: 3em; color: #00CED1; text-shadow: 0 0 10px #00CED1;">🎧</div>
-                </div>
-                <div class="duolingo-question-hint" id="dinleQuestionHint">Kelimeyi dinle ve sahih kelimeyi seç</div>
+                <div class="question-icon">🎧</div>
+                <div class="duolingo-question-hint" id="dinleQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Kelimeyi dinle ve sahih kelimeyi seç</div>
                 <div class="sure-info" id="dinleSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
                 
                 <div class="duolingo-audio-buttons">
@@ -468,38 +461,36 @@
 
         <!-- Oyun Ekranı - Duolingo Tarzı -->
         <div class="game-screen" id="gameScreen" style="display: none;">
-            <!-- Duolingo Tarzı Header -->
+            <!-- Modern Header -->
             <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromGameBtn">
-                    ←
-        </button>
+                <button class="duolingo-back-btn" id="backFromGameBtn">←</button>
                 <div class="duolingo-progress-container">
-                    <div class="duolingo-progress-bar" id="duolingoProgressBar" style="width: 0%;"></div>
-            </div>
-                <div class="duolingo-hearts" id="duolingoHearts" style="display: none;">
-                    <span>❤️</span>
-                    <span>❤️</span>
-                    <span>❤️</span>
-            </div>
+                    <div class="progress-text">İlerleme</div>
+                    <div class="progress-bar-container">
+                        <div class="duolingo-progress-bar" id="duolingoProgressBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="score-display" id="headerScore">⭐ 0</div>
             </div>
 
-            <!-- Duolingo Tarzı Soru Alanı -->
+            <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="duolingoQuestionNumber">Soru 1 / 10</div>
+                <div class="question-icon">🔄</div>
                 <div class="arabic-text arabic-large" id="arabicWord" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(28px, 6vw, 42px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.6;">
                     فَكُبْكِبُوا۟
-        </div>
-                <div class="duolingo-question-hint" id="duolingoQuestionHint">Bu kelimenin Türkçe karşılığı nedir?</div>
+                </div>
+                <div class="duolingo-question-hint" id="duolingoQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Bu kelimenin Türkçe karşılığı nedir?</div>
                 <div class="sure-info" id="sureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 26:94:1 | Zorluk: 13</div>
                 
-                <div class="duolingo-audio-buttons">
+                <div class="duolingo-audio-buttons" style="margin-top: 20px;">
                     <button class="duolingo-audio-btn" id="audioBtn">
                         <img src="hoparlor.png" alt="Ses">
                     </button>
                     <button class="duolingo-audio-btn" id="hintBtn">
                         <img src="clue.png" alt="İpucu">
                     </button>
-            </div>
+                </div>
             </div>
 
             <!-- Duolingo Tarzı Seçenekler -->
@@ -7593,6 +7584,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.correct) elements.correct.textContent = sessionCorrect;
             if (elements.wrong) elements.wrong.textContent = sessionWrong;
             // level elementi artık yok (Mertebe kaldırıldı), bu yüzden güncelleme yapılmıyor
+            
+            // Header score güncelle (yeni tasarım için)
+            const headerScore = document.getElementById('headerScore');
+            if (headerScore) {
+                headerScore.textContent = `⭐ ${starPoints}`;
+            }
         }
 
         // ============ SÜRE YÖNETİMİ ============
