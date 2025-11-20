@@ -417,20 +417,186 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
-    .games-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        gap: 8px;
-    }
-    
-    .stat-card {
-        padding: 12px 8px;
+    /* Ana Sayfa - Mobil */
+    .hero-section {
+        padding: 20px 16px !important;
+        border-radius: 20px !important;
     }
     
     .welcome-title {
-        font-size: 24px;
+        font-size: 20px !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 14px !important;
+    }
+    
+    .stats-grid {
+        gap: 8px !important;
+    }
+    
+    .stat-card {
+        padding: 12px 8px !important;
+    }
+    
+    .stat-value {
+        font-size: 20px !important;
+    }
+    
+    .stat-label {
+        font-size: 11px !important;
+    }
+    
+    .daily-goal-card {
+        padding: 16px !important;
+    }
+    
+    .goal-title {
+        font-size: 13px !important;
+    }
+    
+    .progress-text {
+        font-size: 11px !important;
+    }
+    
+    .difficulty-section {
+        padding: 12px !important;
+    }
+    
+    .diff-btn {
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+    }
+    
+    .games-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    .game-card {
+        padding: 20px 16px !important;
+    }
+    
+    .game-icon {
+        font-size: 40px !important;
+    }
+    
+    .game-title {
+        font-size: 15px !important;
+    }
+    
+    .game-desc {
+        font-size: 11px !important;
+    }
+    
+    .info-button {
+        padding: 12px !important;
+        font-size: 13px !important;
+    }
+    
+    /* Görevler Paneli - Mobil */
+    .daily-tasks-header {
+        padding: 16px 16px 12px 16px !important;
+    }
+    
+    .daily-tasks-title {
+        font-size: 20px !important;
+        gap: 8px !important;
+    }
+    
+    .daily-tasks-close-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 18px !important;
+    }
+    
+    .daily-tasks-content-scrollable {
+        padding: 16px !important;
+    }
+    
+    .daily-tasks-progress-card {
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+    }
+    
+    .daily-tasks-progress-title {
+        font-size: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .daily-tasks-progress-count {
+        font-size: 28px !important;
+    }
+    
+    .daily-tasks-progress-total {
+        font-size: 16px !important;
+    }
+    
+    .daily-tasks-progress-bar-container {
+        height: 10px !important;
+    }
+    
+    .daily-tasks-section-title {
+        font-size: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .daily-task-card {
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+    
+    .daily-task-icon {
+        font-size: 28px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .daily-task-name {
+        font-size: 15px !important;
+    }
+    
+    .daily-task-desc {
+        font-size: 12px !important;
+    }
+    
+    .daily-task-reward {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    .daily-task-progress-text {
+        font-size: 11px !important;
+        min-width: 45px !important;
+    }
+    
+    .daily-task-completed-badge {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 16px !important;
+        top: 12px !important;
+        right: 12px !important;
+    }
+    
+    .daily-tasks-reward-section {
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+    }
+    
+    .daily-tasks-reward-icon {
+        font-size: 40px !important;
+    }
+    
+    .daily-tasks-reward-title {
+        font-size: 18px !important;
+    }
+    
+    .daily-tasks-reward-desc {
+        font-size: 13px !important;
+    }
+    
+    .daily-tasks-reward-btn {
+        padding: 12px 24px !important;
+        font-size: 14px !important;
     }
     
     /* Bottom-nav responsive */
@@ -450,6 +616,65 @@ body {
     .bottom-nav .nav-label,
     .nav-label {
         font-size: 10px !important;
+    }
+}
+
+/* Çok küçük ekranlar için (360px ve altı) */
+@media (max-width: 360px) {
+    .hero-section {
+        padding: 16px 12px !important;
+    }
+    
+    .welcome-title {
+        font-size: 18px !important;
+    }
+    
+    .stat-card {
+        padding: 10px 6px !important;
+    }
+    
+    .stat-value {
+        font-size: 18px !important;
+    }
+    
+    .game-card {
+        padding: 16px 12px !important;
+    }
+    
+    .daily-tasks-header {
+        padding: 12px !important;
+    }
+    
+    .daily-tasks-title {
+        font-size: 18px !important;
+    }
+    
+    .daily-tasks-progress-card {
+        padding: 16px 12px !important;
+    }
+    
+    .daily-tasks-progress-count {
+        font-size: 24px !important;
+    }
+    
+    .daily-task-card {
+        padding: 12px !important;
+    }
+    
+    .bottom-nav {
+        padding: 8px !important;
+    }
+    
+    .nav-item {
+        padding: 6px 8px !important;
+    }
+    
+    .nav-icon {
+        font-size: 20px !important;
+    }
+    
+    .nav-label {
+        font-size: 9px !important;
     }
 }
 
