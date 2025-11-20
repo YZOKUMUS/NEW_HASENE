@@ -433,16 +433,23 @@ body {
         font-size: 24px;
     }
     
+    /* Bottom-nav responsive */
+    #bottomNavBar.bottom-nav .nav-item,
+    .bottom-nav .nav-item,
     .nav-item {
-        padding: 8px 12px;
+        padding: 8px 12px !important;
     }
     
+    #bottomNavBar.bottom-nav .nav-icon,
+    .bottom-nav .nav-icon,
     .nav-icon {
-        font-size: 22px;
+        font-size: 22px !important;
     }
     
+    #bottomNavBar.bottom-nav .nav-label,
+    .bottom-nav .nav-label,
     .nav-label {
-        font-size: 10px;
+        font-size: 10px !important;
     }
 }
 
@@ -602,72 +609,95 @@ body {
 
 /* ----- BOTTOM NAV ----- */
 /* Bottom Navigation - Modern Design */
+#bottomNavBar.bottom-nav,
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    padding: 12px;
-    display: flex;
-    justify-content: space-around;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-    z-index: 1000;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    padding: 12px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important;
+    z-index: 1000 !important;
+    /* Eski flutter stillerini override et */
+    height: auto !important;
+    max-width: none !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    border-top: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
+.bottom-nav .nav-item,
 .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    padding: 8px 16px;
-    border-radius: 12px;
-    transition: all 0.3s;
-    color: #999;
-    position: relative;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    flex: 1;
-    max-width: 100px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    cursor: pointer !important;
+    padding: 8px 16px !important;
+    border-radius: 12px !important;
+    transition: all 0.3s !important;
+    color: #999 !important;
+    position: relative !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    flex: 1 !important;
+    max-width: 100px !important;
+    /* Eski flutter stillerini override et */
+    min-width: auto !important;
+    justify-content: center !important;
 }
 
+.bottom-nav .nav-item:hover,
 .nav-item:hover {
-    background: rgba(102,126,234,0.05);
+    background: rgba(102,126,234,0.05) !important;
 }
 
+.bottom-nav .nav-item.active,
 .nav-item.active {
-    color: #667eea;
-    background: rgba(102,126,234,0.1);
+    color: #667eea !important;
+    background: rgba(102,126,234,0.1) !important;
 }
 
+.bottom-nav .nav-icon,
 .nav-icon {
-    font-size: 24px;
-    transition: transform 0.3s;
+    font-size: 24px !important;
+    transition: transform 0.3s !important;
+    display: block !important;
 }
 
+.bottom-nav .nav-item.active .nav-icon,
 .nav-item.active .nav-icon {
-    transform: scale(1.1);
+    transform: scale(1.1) !important;
 }
 
+.bottom-nav .nav-label,
 .nav-label {
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    display: block !important;
 }
 
 /* Responsive - küçük ekranlar için */
 @media (max-width: 600px) {
+    .bottom-nav .nav-item,
     .nav-item {
-        padding: 8px 12px;
+        padding: 8px 12px !important;
     }
     
+    .bottom-nav .nav-icon,
     .nav-icon {
-        font-size: 22px;
+        font-size: 22px !important;
     }
     
+    .bottom-nav .nav-label,
     .nav-label {
-        font-size: 10px;
+        font-size: 10px !important;
     }
 }
 
@@ -742,6 +772,14 @@ body {
         height: 70px;
         padding: 6px 8px 10px 8px;
         border-radius: 20px 20px 0 0;
+    }
+    
+    /* Bottom-nav için override - eski flutter stillerini etkilemesin */
+    #bottomNavBar.bottom-nav,
+    .bottom-nav {
+        height: auto !important;
+        padding: 12px !important;
+        border-radius: 0 !important;
     }
     
     .flutter-nav-item {
