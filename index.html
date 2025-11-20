@@ -2952,6 +2952,11 @@ function closeAllModals() {
     });
     // Body scroll'u tekrar aktif et
     document.body.style.overflow = '';
+    
+    // Bottom nav bar'ı tekrar göster (tüm modallar kapandığında)
+    if (typeof showBottomNavBar === 'function') {
+        showBottomNavBar();
+    }
 }
 
 // Global olarak erişilebilir yap
@@ -3972,6 +3977,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hideAllModes();
             }
             
+            // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+            if (typeof hideBottomNavBar === 'function') {
+                hideBottomNavBar();
+            }
+            
             // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
             initBadgesModalTouchEvents();
             
@@ -4164,6 +4174,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Bottom nav bar'ı tekrar göster (modal kapandığında)
+                if (typeof showBottomNavBar === 'function') {
+                    showBottomNavBar();
+                }
                 
                 // Tüm oyun ekranlarını ve modlarını gizle
                 if (typeof hideAllGameScreens === 'function') {
@@ -4436,6 +4451,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             if (typeof hideAllModes === 'function') {
                 hideAllModes();
+            }
+            
+            // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+            if (typeof hideBottomNavBar === 'function') {
+                hideBottomNavBar();
             }
             
             // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
@@ -4860,6 +4880,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Bottom nav bar'ı tekrar göster (modal kapandığında)
+                if (typeof showBottomNavBar === 'function') {
+                    showBottomNavBar();
+                }
                 
                 // Tüm oyun ekranlarını ve modlarını gizle
                 if (typeof hideAllGameScreens === 'function') {
@@ -5895,6 +5920,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hideAllModes();
             }
             
+            // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+            if (typeof hideBottomNavBar === 'function') {
+                hideBottomNavBar();
+            }
+            
             // Günlük görevleri kontrol et ve güncelle
             checkDailyTasks();
             
@@ -5928,6 +5958,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
                 document.body.style.overflow = '';
+                
+                // Bottom nav bar'ı tekrar göster (modal kapandığında)
+                if (typeof showBottomNavBar === 'function') {
+                    showBottomNavBar();
+                }
                 
                 // Tüm oyun ekranlarını ve modlarını gizle
                 if (typeof hideAllGameScreens === 'function') {
