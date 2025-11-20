@@ -2618,6 +2618,7 @@
         let currentAyetIndex = 0;
         let currentDuaIndex = 0;
         let currentHadisIndex = 0;
+        let hintUsed = false; // Her soru için ipucu kullanıldı mı? (genel scope)
         // Soru sayısı takibi (ayet, dua, hadis modları için)
         let ayetQuestionCount = 0;
         let duaQuestionCount = 0;
@@ -7141,6 +7142,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Önceki ses varsa durdur
             stopCurrentAudio();
             
+            // İpucu kullanımını sıfırla (yeni soru için)
+            hintUsed = false;
+            if (elements.hintBtn) {
+                elements.hintBtn.disabled = false;
+            }
+            
             log.debug('📚 === KELİME ÇEVİR SORU YÜKLENİYOR (AKILLI SEÇİM) ===');
             log.debug(`📊 Mevcut soru sayısı: ${questionCount}`);
             log.debug(`🎯 Mevcut mod: ${currentMode}`);
@@ -7721,7 +7728,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // ============ İPUCU ============
         if (elements.hintBtn) {
+            // hintUsed artık genel scope'ta tanımlı (yukarıda)
+            
             const handleHint = () => {
+                // İpucu zaten kullanıldıysa veya buton disabled ise çalışma
+                if (hintUsed || (elements.hintBtn && elements.hintBtn.disabled)) {
+                    log.debug('⚠️ İpucu zaten kullanıldı veya buton devre dışı');
+                    return;
+                }
+                
                 // currentQuestion kontrolü
                 if (!currentQuestion || !currentQuestion.anlam) {
                     console.warn('⚠️ İpucu: currentQuestion bulunamadı!');
@@ -7744,18 +7759,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     return !btnText.includes(currentQuestion.anlam);
                 });
             
-            if (wrongBtns.length > 0) {
-                const randomWrong = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
-                randomWrong.style.opacity = '0.3';
-                randomWrong.disabled = true;
+                if (wrongBtns.length > 0) {
+                    const randomWrong = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+                    randomWrong.style.opacity = '0.3';
+                    randomWrong.disabled = true;
                     randomWrong.classList.add('disabled');
-                
-                // İpucu puan cezası
-                score = Math.max(0, score - 10);
-                updateUI();
-                
+                    
+                    // İpucu puan cezası - Hasene puanından düş
+                    const hintPenalty = 10;
+                    sessionScore = Math.max(0, sessionScore - hintPenalty);
+                    totalPoints = Math.max(0, totalPoints - hintPenalty);
+                    
+                    log.game(`💡 İpucu kullanıldı! -${hintPenalty} Hasene`);
+                    log.game(`📊 Yeni puanlar: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
+                    
+                    // UI güncelle
+                    updateUI();
+                    updateStatsBar();
+                    saveStats(); // Hasene değişikliğini kaydet
+                    
+                    // İpucu kullanıldı olarak işaretle ve butonu devre dışı bırak
+                    hintUsed = true;
                     if (elements.hintBtn) {
-                elements.hintBtn.disabled = true;
+                        elements.hintBtn.disabled = true;
                     }
                 } else {
                     console.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
