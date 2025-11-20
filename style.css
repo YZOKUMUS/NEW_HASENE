@@ -1542,12 +1542,12 @@ body {
     scrollbar-color: #667eea #f1f1f1;
     /* Height ve overflow ayarları - İSTATİSTİKLER İLE AYNI */
     min-height: 0 !important;
-    max-height: 100% !important;
-    height: auto !important;
+    max-height: none !important;
+    height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     /* Flex ayarları - kritik */
-    flex: 1 1 0 !important;
+    flex: 1 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
     /* Touch action - scroll için */
@@ -5499,8 +5499,15 @@ body {
         font-size: 20px;
     }
     
+    .daily-tasks-content {
+        max-height: 98vh !important;
+        height: auto !important;
+    }
+    
     .daily-tasks-content-scrollable {
         padding: 16px 20px;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
     }
     
     .daily-tasks-progress-card {
