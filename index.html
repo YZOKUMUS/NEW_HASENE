@@ -8550,14 +8550,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 matchedButton.style.transform = 'scale(1.05)';
                 matchedButton.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.4)';
                 
-                // Duolingo gibi: Hemen tıkla (gecikme yok)
-                matchedButton.click();
+                // Butonun metnini al (doğru cevap kontrolü için)
+                let matchedBtnText = matchedButton.textContent.trim();
+                if (matchedButton.innerHTML && matchedButton.innerHTML.includes('<span')) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = matchedButton.innerHTML;
+                    matchedBtnText = tempDiv.textContent.trim();
+                }
+                
+                // Doğru cevap mı kontrol et
+                const isCorrect = matchedBtnText.trim() === correctWord.trim();
                 
                 if (statusEl) {
                     statusEl.textContent = '✅ "' + spokenText + '" eşleşti!';
                     statusEl.style.color = '#4caf50';
                 }
-                triggerHaptic('success');
+                
+                // Duolingo gibi: Doğrudan checkDinleAnswer fonksiyonunu çağır (click() yerine)
+                // Kısa bir gecikme ile (görsel geri bildirim için)
+                setTimeout(() => {
+                    if (matchedButton && !matchedButton.classList.contains('disabled')) {
+                        checkDinleAnswer(matchedButton, isCorrect);
+                    }
+                }, 200);
                 
                 // Animasyonu geri al
                 setTimeout(() => {
