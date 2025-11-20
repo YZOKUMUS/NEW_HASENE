@@ -332,18 +332,22 @@ body {
     gap: 16px;
 }
 
+/* Oyun Kartları - Modern Beyaz Tasarım */
+.games-grid .game-card,
 .game-card {
-    background: white;
+    background: white !important;
     border-radius: 20px;
     padding: 24px 20px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border: 3px solid transparent;
+    border: none !important;
     position: relative;
     overflow: hidden;
-    border: none;
+    /* Eski glass effect'i override et */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .game-card::before {
@@ -3869,24 +3873,12 @@ body {
 /* ================================
    🟣 PREMIUM GAME CARD UPDATE
    ================================ */
-.game-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-
-    background: rgba(255, 255, 255, 0.20);
-    border: 1px solid rgba(255, 255, 255, 0.40);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    border-radius: 22px;
-    padding: 22px 12px;
-    cursor: pointer;
-    text-align: center;
-
-    transition: all 0.25s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+/* Eski glass effect kaldırıldı - artık beyaz arka plan kullanılıyor */
+.games-grid .game-card {
+    background: white !important;
+    border: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .game-card:hover {
