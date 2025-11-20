@@ -8588,6 +8588,22 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Önceki ses varsa durdur
             stopCurrentAudio();
             
+            // Ses tanıma status mesajını temizle (önceki sorudan kalan mesajları kaldır)
+            const statusEl = document.getElementById('speechStatus');
+            if (statusEl) {
+                statusEl.textContent = '';
+                statusEl.style.color = '#666';
+            }
+            
+            // Ses tanımayı durdur (eğer aktifse)
+            if (isListening && recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    log.debug('Ses tanıma zaten durdurulmuş');
+                }
+            }
+            
             log.debug(`🎪 === SORU YÜKLENİYOR ===`);
             log.debug(`📊 Mevcut soru sayısı: ${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
             log.debug(`📊 Oyun durumu: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}`);
