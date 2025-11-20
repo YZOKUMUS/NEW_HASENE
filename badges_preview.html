@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Tarzı Başarılar Sistemi - Örnek</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Kategori Sekmeleri */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #f5f5f5;
+            color: #667eea;
+        }
+
+        /* Başarılar Grid */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .achievement-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px 12px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .achievement-card.unlocked {
+            background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .achievement-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+            animation: bounce 0.6s ease;
+        }
+
+        .achievement-card.unlocked .achievement-icon {
+            animation: celebrate 0.8s ease;
+        }
+
+        .achievement-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .achievement-desc {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .achievement-progress {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .achievement-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .achievement-card.locked .achievement-progress-fill {
+            background: #ccc;
+        }
+
+        .progress-text {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .achievement-card.unlocked .progress-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Özel Rozetler */
+        .special-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        /* İstatistikler Özeti */
+        .stats-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .stats-summary h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Animasyonlar */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            75% { transform: scale(1.1) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Kategori İçerikleri */
+        .category-content {
+            display: none;
+        }
+
+        .category-content.active {
+            display: block;
+        }
+
+        /* Kilit İkonu */
+        .lock-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            opacity: 0.3;
+        }
+
+        .achievement-card.unlocked .lock-icon {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Başarılar</h1>
+            <p>İlerlemenizi takip edin ve rozetlerinizi toplayın!</p>
+        </div>
+
+        <!-- İstatistikler Özeti -->
+        <div class="stats-summary">
+            <h3>📊 İlerleme Özeti</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Açılan Rozet</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Kalan Rozet</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">60%</div>
+                    <div class="stat-label">Tamamlanma</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategori Sekmeleri -->
+        <div class="category-tabs">
+            <button class="tab active" onclick="showCategory('daily')">📅 Günlük</button>
+            <button class="tab" onclick="showCategory('weekly')">📆 Haftalık</button>
+            <button class="tab" onclick="showCategory('special')">⭐ Özel</button>
+            <button class="tab" onclick="showCategory('streak')">🔥 Seri</button>
+        </div>
+
+        <!-- Günlük Başarılar -->
+        <div id="daily" class="category-content active">
+            <div class="achievements-grid">
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">☀️</div>
+                    <div class="achievement-name">Sabah Erken</div>
+                    <div class="achievement-desc">Sabah 6-9 arası oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">🎯</div>
+                    <div class="achievement-name">Günlük Hedef</div>
+                    <div class="achievement-desc">Günlük hedefi tamamla</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">💪</div>
+                    <div class="achievement-name">Güçlü Başlangıç</div>
+                    <div class="achievement-desc">10 soru üst üste doğru</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 70%"></div>
+                    </div>
+                    <div class="progress-text">7/10</div>
+                </div>
+
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">⭐</div>
+                    <div class="achievement-name">Yıldız Toplayıcı</div>
+                    <div class="achievement-desc">Günde 5 yıldız topla</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Haftalık Başarılar -->
+        <div id="weekly" class="category-content">
+            <div class="achievements-grid">
+                <div class="achievement-card unlocked">
+                    <div class="special-badge">👑</div>
+                    <div class="achievement-icon">📚</div>
+                    <div class="achievement-name">Haftalık Kahraman</div>
+                    <div class="achievement-desc">7 gün üst üste oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">🎓</div>
+                    <div class="achievement-name">Öğrenci</div>
+                    <div class="achievement-desc">Haftada 100 soru çöz</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-text">65/100</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">🏅</div>
+                    <div class="achievement-name">Mükemmel Hafta</div>
+                    <div class="achievement-desc">7 gün hedefi tamamla</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 57%"></div>
+                    </div>
+                    <div class="progress-text">4/7</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Özel Başarılar -->
+        <div id="special" class="category-content">
+            <div class="achievements-grid">
+                <div class="achievement-card unlocked">
+                    <div class="special-badge">💎</div>
+                    <div class="achievement-icon">🌟</div>
+                    <div class="achievement-name">İlk Adım</div>
+                    <div class="achievement-desc">İlk oyununu tamamla</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-name">Combo Ustası</div>
+                    <div class="achievement-desc">10x combo yap</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">👑</div>
+                    <div class="achievement-name">Efsane</div>
+                    <div class="achievement-desc">1000 soru çöz</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 42%"></div>
+                    </div>
+                    <div class="progress-text">420/1000</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">🎖️</div>
+                    <div class="achievement-name">Mükemmeliyetçi</div>
+                    <div class="achievement-desc">50 soru %100 doğru</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="progress-text">15/50</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seri Başarılar -->
+        <div id="streak" class="category-content">
+            <div class="achievements-grid">
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-name">3 Gün Seri</div>
+                    <div class="achievement-desc">3 gün üst üste oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card unlocked">
+                    <div class="achievement-icon">🔥🔥</div>
+                    <div class="achievement-name">7 Gün Seri</div>
+                    <div class="achievement-desc">7 gün üst üste oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="progress-text">✓ Tamamlandı</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">🔥🔥🔥</div>
+                    <div class="achievement-name">30 Gün Seri</div>
+                    <div class="achievement-desc">30 gün üst üste oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 23%"></div>
+                    </div>
+                    <div class="progress-text">7/30</div>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="lock-icon">🔒</div>
+                    <div class="achievement-icon">🔥🔥🔥🔥</div>
+                    <div class="achievement-name">100 Gün Seri</div>
+                    <div class="achievement-desc">100 gün üst üste oyna</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: 7%"></div>
+                    </div>
+                    <div class="progress-text">7/100</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCategory(category) {
+            // Tüm sekmeleri ve içerikleri gizle
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.category-content').forEach(content => content.classList.remove('active'));
+
+            // Seçilen sekme ve içeriği göster
+            event.target.classList.add('active');
+            document.getElementById(category).classList.add('active');
+        }
+
+        // Rozet kartlarına tıklama animasyonu
+        document.querySelectorAll('.achievement-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (!this.classList.contains('locked')) {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

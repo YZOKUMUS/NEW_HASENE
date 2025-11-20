@@ -20,6 +20,7 @@
   "homepage": "https://github.com/yzokumus/NEW_HASENE#readme",
   "devDependencies": {
     "jest": "^30.2.0",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "xlsx": "^0.18.5"
   }
 }
