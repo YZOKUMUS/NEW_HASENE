@@ -59,16 +59,62 @@ function safeGetElement(id, required = false) {
 function validateCriticalData() {
     const issues = [];
     
-    // totalPoints kontrolü
-    if (typeof totalPoints !== 'number' || isNaN(totalPoints) || totalPoints < 0) {
-        issues.push('totalPoints geçersiz');
-        totalPoints = 0; // Sıfırla
+    // totalPoints kontrolü (window üzerinden kontrol et)
+    let totalPointsToCheck;
+    try {
+        // Önce window'da kontrol et
+        if (typeof window.totalPoints !== 'undefined') {
+            totalPointsToCheck = window.totalPoints;
+        } else {
+            // window'da yoksa, global scope'ta kontrol et (try-catch ile güvenli)
+            totalPointsToCheck = typeof totalPoints !== 'undefined' ? totalPoints : null;
+        }
+        
+        if (totalPointsToCheck === null || typeof totalPointsToCheck !== 'number' || isNaN(totalPointsToCheck) || totalPointsToCheck < 0) {
+            issues.push('totalPoints geçersiz veya tanımlı değil');
+            const defaultValue = 0;
+            window.totalPoints = defaultValue;
+            // Eğer global scope'ta da tanımlıysa, oraya da at
+            if (typeof totalPoints !== 'undefined') {
+                totalPoints = defaultValue;
+            }
+        } else {
+            // Geçerli değer varsa, window'a da at
+            window.totalPoints = totalPointsToCheck;
+        }
+    } catch (e) {
+        issues.push('totalPoints tanımlı değil (catch)');
+        window.totalPoints = 0;
     }
     
-    // dailyTasks kontrolü
-    if (!dailyTasks || typeof dailyTasks !== 'object') {
-        issues.push('dailyTasks geçersiz');
-        // Varsayılan değerlerle yeniden oluştur
+    // dailyTasks kontrolü (tanımlı olup olmadığını kontrol et)
+    try {
+        if (typeof dailyTasks === 'undefined' || !dailyTasks || typeof dailyTasks !== 'object') {
+            issues.push('dailyTasks geçersiz veya tanımlı değil');
+            // Varsayılan değerlerle yeniden oluştur
+            dailyTasks = {
+                lastTaskDate: null,
+                tasks: [],
+                bonusTasks: [],
+                completedTasks: [],
+                rewardsClaimed: false,
+                todayStats: {
+                    kelimeCevir: 0,
+                    dinleBul: 0,
+                    boslukDoldur: 0,
+                    ayetOku: 0,
+                    duaOgre: 0,
+                    hadisOku: 0,
+                    toplamDogru: 0,
+                    toplamYanlis: 0,
+                    toplamPuan: 0,
+                    perfectStreak: 0,
+                    farklıZorluk: new Set()
+                }
+            };
+        }
+    } catch (e) {
+        issues.push('dailyTasks tanımlı değil (catch)');
         dailyTasks = {
             lastTaskDate: null,
             tasks: [],
@@ -91,15 +137,45 @@ function validateCriticalData() {
         };
     }
     
-    // streakData kontrolü
-    if (!streakData || typeof streakData !== 'object') {
-        issues.push('streakData geçersiz');
-        streakData = {
+    // streakData kontrolü (tanımlı olup olmadığını kontrol et - window üzerinden)
+    // streakData let/const ile tanımlı olabilir, bu yüzden window üzerinden kontrol et
+    let streakDataToCheck;
+    try {
+        // Önce window'da kontrol et
+        if (typeof window.streakData !== 'undefined') {
+            streakDataToCheck = window.streakData;
+        } else {
+            // window'da yoksa, global scope'ta kontrol et (try-catch ile güvenli)
+            streakDataToCheck = typeof streakData !== 'undefined' ? streakData : null;
+        }
+        
+        if (!streakDataToCheck || typeof streakDataToCheck !== 'object') {
+            issues.push('streakData geçersiz veya tanımlı değil');
+            // Varsayılan değerlerle oluştur
+            const defaultStreakData = {
+                currentStreak: 0,
+                bestStreak: 0,
+                totalPlayDays: 0,
+                playDates: [],
+                todayDate: typeof getLocalDateString === 'function' ? getLocalDateString() : new Date().toISOString().split('T')[0],
+                todayProgress: 0,
+                dailyGoal: 5
+            };
+            window.streakData = defaultStreakData;
+            // Eğer global scope'ta da tanımlıysa, oraya da at
+            if (typeof streakData !== 'undefined') {
+                streakData = defaultStreakData;
+            }
+        }
+    } catch (e) {
+        // streakData tanımlı değilse, window'a varsayılan değerleri at
+        issues.push('streakData tanımlı değil (catch)');
+        window.streakData = {
             currentStreak: 0,
             bestStreak: 0,
             totalPlayDays: 0,
             playDates: [],
-            todayDate: getLocalDateString(),
+            todayDate: typeof getLocalDateString === 'function' ? getLocalDateString() : new Date().toISOString().split('T')[0],
             todayProgress: 0,
             dailyGoal: 5
         };
@@ -130,16 +206,47 @@ function validateCriticalFunctions() {
     
     const missing = [];
     criticalFunctions.forEach(fnName => {
-        if (typeof window[fnName] !== 'function') {
-            missing.push(fnName);
+        // Önce window'da kontrol et, yoksa global scope'ta kontrol et
+        const func = window[fnName] || (typeof eval !== 'undefined' ? eval(`typeof ${fnName} !== 'undefined' ? ${fnName} : null`) : null);
+        if (typeof func !== 'function') {
+            // Eval kullanmadan kontrol et - sadece window'da yoksa eksik say
+            if (typeof window[fnName] !== 'function') {
+                missing.push(fnName);
+            }
         }
     });
     
     if (missing.length > 0) {
-        log.error('❌ Kritik fonksiyonlar eksik:', missing);
-        return false;
+        // Sadece gerçekten eksikse hata ver (fonksiyonlar henüz yüklenmemiş olabilir)
+        // 3 saniye sonra tekrar kontrol et
+        if (typeof window.healthCheckRetryCount === 'undefined') {
+            window.healthCheckRetryCount = 0;
+        }
+        
+        if (window.healthCheckRetryCount < 3) {
+            window.healthCheckRetryCount++;
+            // Debug modunda sadece bilgi ver
+            if (log && log.debug) {
+                log.debug(`⚠️ Bazı fonksiyonlar henüz yüklenmedi, tekrar kontrol edilecek (${window.healthCheckRetryCount}/3):`, missing);
+            }
+            // 2 saniye sonra tekrar dene
+            setTimeout(() => {
+                if (validateCriticalFunctions()) {
+                    if (log && log.debug) {
+                        log.debug('✅ Tüm kritik fonksiyonlar yüklendi!');
+                    }
+                }
+            }, 2000);
+            return false;
+        } else {
+            // 3 deneme sonrası hala eksikse gerçekten eksik demektir
+            log.error('❌ Kritik fonksiyonlar eksik (3 deneme sonrası):', missing);
+            return false;
+        }
     }
     
+    // Tüm fonksiyonlar yüklendi
+    window.healthCheckRetryCount = 0; // Reset
     return true;
 }
 
@@ -231,13 +338,13 @@ window.addEventListener('unhandledrejection', (event) => {
     recoverFromError(event.reason, 'unhandled-rejection');
 });
 
-// Health check'i sayfa yüklendiğinde çalıştır
+// Health check'i sayfa yüklendiğinde çalıştır (fonksiyonların yüklenmesi için daha fazla bekle)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => healthCheck(), 1000); // 1 saniye bekle (tüm scriptler yüklensin)
+        setTimeout(() => healthCheck(), 3000); // 3 saniye bekle (tüm scriptler yüklensin)
     });
 } else {
-    setTimeout(() => healthCheck(), 1000);
+    setTimeout(() => healthCheck(), 3000);
 }
 
 // Export functions
