@@ -253,7 +253,12 @@ body {
 
 .progress-text {
     font-size: 12px;
-    opacity: 0.9;
+    opacity: 1;
+    color: white !important;
+}
+
+.progress-text span {
+    color: white !important;
 }
 
 /* Difficulty Selector */
