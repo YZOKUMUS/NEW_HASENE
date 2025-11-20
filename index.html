@@ -836,56 +836,61 @@
                 </div>
             </div>
 
-    <!-- Günlük Görevler Modal -->
-    <!-- Günlük Görevler Modal - İstatistikler Modalı ile Aynı Yapı -->
+    <!-- Günlük Görevler Modal - Modern Tasarım -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y; box-sizing: border-box;">
-            <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
-                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🎯 Günlük Görevler</h3>
-                <button onclick="event.stopPropagation(); closeDailyTasksModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
+            <!-- Header -->
+            <div class="daily-tasks-header">
+                <div class="daily-tasks-title">
+                    <span>🎯</span>
+                    <span>Günlük Görevler</span>
+                </div>
+                <button class="daily-tasks-close-btn" onclick="event.stopPropagation(); closeDailyTasksModal();">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
-            <div id="dailyTasksScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
+            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable">
 
-            <!-- Genel İlerleme - Modern Tasarım -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
-                <h3 style="font-size: 16px; margin-bottom: 16px; opacity: 0.9; font-weight: 600;">📊 Bugünkü İlerleme</h3>
-                <div style="font-size: 28px; font-weight: 700; margin-bottom: 16px;">
-                    <span id="completedTasks">0</span>/<span id="totalTasks">11</span> Görev Tamamlandı
+            <!-- Progress Card -->
+            <div class="daily-tasks-progress-card">
+                <div class="daily-tasks-progress-title">📊 Bugünkü İlerleme</div>
+                <div class="daily-tasks-progress-stats">
+                    <div class="daily-tasks-progress-count" id="completedTasks">0</div>
+                    <div class="daily-tasks-progress-total">/ <span id="totalTasks">11</span> Görev</div>
                 </div>
-                <div style="background: rgba(255,255,255,0.2); border-radius: 12px; height: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                    <div id="taskProgress" style="background: rgba(255,255,255,0.95); height: 100%; border-radius: 12px; width: 0%; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
+                <div class="daily-tasks-progress-bar-container">
+                    <div class="daily-tasks-progress-bar" id="taskProgress" style="width: 0%;"></div>
                 </div>
             </div>
 
-            <!-- Temel Görevler - Modern Tasarım -->
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 14px; font-weight: 600; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2em;">📋</span> Temel Görevler
+            <!-- Temel Görevler -->
+            <div class="daily-tasks-section">
+                <div class="daily-tasks-section-title">
+                    <span>📋</span>
+                    <span>Temel Görevler</span>
                 </div>
-                <div id="dailyTasksList" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                <div id="dailyTasksList" class="daily-tasks-list">
                     <!-- Görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
-            <!-- Bonus Görevler - Modern Tasarım -->
-            <div style="margin-bottom: 20px;">
-                <div style="font-size: 14px; font-weight: 600; color: #f59e0b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.2em;">⭐</span> Bonus Görevler
+            <!-- Bonus Görevler -->
+            <div class="daily-tasks-section">
+                <div class="daily-tasks-section-title bonus">
+                    <span>⭐</span>
+                    <span>Bonus Görevler</span>
                 </div>
-                <div id="bonusTasksList" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                <div id="bonusTasksList" class="daily-tasks-list">
                     <!-- Bonus görevler buraya dinamik eklenecek -->
                 </div>
             </div>
 
-            <!-- Ödül Toplama - Modern Tasarım -->
-            <div id="rewardsSection" style="display: none; background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center; border: 3px solid #4caf50; box-shadow: 0 4px 12px rgba(76,175,80,0.3);">
-                <div style="font-size: 24px; margin-bottom: 8px;">🎉</div>
-                <div style="font-size: 18px; color: #2e7d2e; font-weight: 700; margin-bottom: 8px;">Tebrikler!</div>
-                <div style="font-size: 14px; color: #555; margin-bottom: 16px;">Tüm görevleri tamamladın!</div>
-                <button id="claimRewardsBtn" onclick="claimDailyRewards()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white; border: none; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(76,175,80,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <!-- Ödül Bölümü -->
+            <div id="rewardsSection" class="daily-tasks-reward-section" style="display: none;">
+                <div class="daily-tasks-reward-icon">🎉</div>
+                <div class="daily-tasks-reward-title">Tebrikler!</div>
+                <div class="daily-tasks-reward-desc">Tüm görevleri tamamladın!</div>
+                <button id="claimRewardsBtn" class="daily-tasks-reward-btn" onclick="claimDailyRewards()">
                     +2,500 Hasene Ödül Topla 🎁
                 </button>
             </div>
@@ -6016,8 +6021,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             document.getElementById('completedTasks').textContent = completedCount;
             document.getElementById('totalTasks').textContent = totalCount;
             
-            const progressPercent = (completedCount / totalCount) * 100;
-            document.getElementById('taskProgress').style.width = progressPercent + '%';
+            const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+            const taskProgressBar = document.getElementById('taskProgress');
+            if (taskProgressBar) {
+                taskProgressBar.style.width = progressPercent + '%';
+            }
             
             // Badge güncelle (tamamlanmamış görev varsa göster)
             const tasksBadge = document.getElementById('tasksBadge');
@@ -6076,8 +6084,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Genel ilerleme güncelle
             document.getElementById('completedTasks').textContent = updatedCompletedCount;
             document.getElementById('totalTasks').textContent = updatedTotalCount;
-            const updatedProgressPercent = (updatedCompletedCount / updatedTotalCount) * 100;
-            document.getElementById('taskProgress').style.width = updatedProgressPercent + '%';
+            const updatedProgressPercent = updatedTotalCount > 0 ? (updatedCompletedCount / updatedTotalCount) * 100 : 0;
+            const taskProgressBar = document.getElementById('taskProgress');
+            if (taskProgressBar) {
+                taskProgressBar.style.width = updatedProgressPercent + '%';
+            }
 
             // Temel görevleri göster
             const dailyList = document.getElementById('dailyTasksList');
@@ -6110,14 +6121,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const isCompleted = dailyTasks.completedTasks.includes(task.id);
             const progressPercent = (task.current / task.target) * 100;
             
+            // Task icon mapping
+            const taskIcons = {
+                'kelime5': '🔄', 'kelime10': '🔄',
+                'ayet3': '📖', 'ayetOku': '📖',
+                'dua2': '🤲', 'duaOgre': '🤲',
+                'hadis1': '📚', 'hadisOku': '📚',
+                'dinle2': '🎧', 'dinle3': '🎧', 'dinle5': '🎧', 'dinleBul': '🎧',
+                'bosluk1': '✏️', 'bosluk2': '✏️', 'bosluk3': '✏️', 'boslukDoldur': '✏️',
+                'dogru10': '⭐', 'dogru20': '⭐', 'toplamDogru': '⭐',
+                'puan100': '💰', 'puan200': '💰', 'toplamPuan': '💰',
+                'perfect5': '🔥', 'perfectStreak': '🔥',
+                'allDiff': '💎', 'farklıZorluk': '💎',
+                'combo15': '⚡'
+            };
+            
+            const taskIcon = taskIcons[task.id] || taskIcons[task.type] || '📋';
+            
             const div = document.createElement('div');
-            div.style.cssText = `
-                padding: 8px 10px; 
-                border: 2px solid ${isCompleted ? '#4caf50' : '#e0e0e0'}; 
-                border-radius: 8px; 
-                background: ${isCompleted ? '#f1f8e9' : 'white'};
-                transition: all 0.2s;
-            `;
+            div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
             
             // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
             div.onclick = function(e) {
@@ -6132,35 +6154,56 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Hover efekti
             div.onmouseover = function() {
                 if (!isCompleted) {
-                    this.style.borderColor = '#667eea';
-                    this.style.transform = 'translateY(-1px)';
-                    this.style.boxShadow = '0 2px 8px rgba(102,126,234,0.2)';
+                    this.style.transform = 'translateX(4px)';
+                    this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
                 }
             };
             div.onmouseout = function() {
-                if (!isCompleted) {
-                    this.style.borderColor = '#e0e0e0';
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                }
+                this.style.transform = '';
+                this.style.boxShadow = '';
             };
             
             div.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <span style="font-weight: 600; font-size: 0.8em; color: ${isCompleted ? '#2e7d2e' : '#333'}; line-height: 1.3;">
-                        ${isCompleted ? '✅' : '⏳'} ${getTaskDisplayName(task)}
-                    </span>
-                    <span style="font-size: 0.7em; color: ${isCompleted ? '#2e7d2e' : '#f59e0b'}; font-weight: 600;">+${task.reward} ⭐</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                    <div style="flex: 1; background: #f0f0f0; border-radius: 6px; height: 4px; overflow: hidden;">
-                        <div style="background: ${isCompleted ? '#4caf50' : '#2196f3'}; height: 100%; border-radius: 6px; width: ${progressPercent}%; transition: width 0.3s;"></div>
+                ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
+                <div class="daily-task-header">
+                    <div class="daily-task-info">
+                        <div class="daily-task-icon">${taskIcon}</div>
+                        <div class="daily-task-name">${getTaskDisplayName(task)}</div>
+                        <div class="daily-task-desc">${getTaskDescription(task)}</div>
                     </div>
-                    <span style="font-size: 0.65em; color: #666; font-weight: 600; white-space: nowrap;">${task.current}/${task.target}</span>
+                    <div class="daily-task-reward">+${task.reward * 100} Hasene</div>
+                </div>
+                <div class="daily-task-progress">
+                    <div class="daily-task-progress-bar">
+                        <div class="daily-task-progress-fill" style="width: ${progressPercent}%;"></div>
+                    </div>
+                    <div class="daily-task-progress-text">${task.current}/${task.target}</div>
                 </div>
             `;
             
             return div;
+        }
+        
+        function getTaskDescription(task) {
+            const descriptions = {
+                'kelime5': 'Herhangi bir modda 5 kelime çevir',
+                'kelime10': 'Herhangi bir modda 10 kelime çevir',
+                'ayet3': 'Ayet Oku modunda 3 ayet oku',
+                'dua2': 'Dua Et modunda 2 dua öğren',
+                'hadis1': 'Hadis Oku modunda 1 hadis oku',
+                'dinle2': 'Dinle ve Bul modunda 2 kelime dinle',
+                'dinle5': 'Dinle ve Bul modunda 5 kelime dinle',
+                'bosluk1': 'Boşluk Doldur modunda 1 soru çöz',
+                'bosluk3': 'Boşluk Doldur modunda 3 soru çöz',
+                'dogru10': 'Herhangi bir modda 10 doğru cevap ver',
+                'dogru20': 'Herhangi bir modda 20 doğru cevap ver',
+                'puan100': 'Günlük toplam 100 Hasene kazan',
+                'puan200': 'Günlük toplam 200 Hasene kazan',
+                'perfect5': 'Hiç yanlış yapmadan 5 soru çöz',
+                'allDiff': '3 farklı zorluk seviyesinde oyna',
+                'combo15': '15 doğru cevap ver (combo)'
+            };
+            return descriptions[task.id] || task.name;
         }
 
         function getTaskDisplayName(task) {
