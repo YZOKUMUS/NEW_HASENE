@@ -1181,6 +1181,7 @@ body {
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
+    touch-action: pan-y !important;
 }
 
 .daily-tasks-content::-webkit-scrollbar {
