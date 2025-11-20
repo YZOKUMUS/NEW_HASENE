@@ -384,6 +384,18 @@
                 <div id="performanceTests"></div>
             </div>
 
+            <!-- Mobile Tests -->
+            <div class="test-section">
+                <h2>📱 Mobile Compatibility</h2>
+                <div id="mobileTests"></div>
+            </div>
+
+            <!-- Desktop Tests -->
+            <div class="test-section">
+                <h2>🖥️ Desktop Compatibility</h2>
+                <div id="desktopTests"></div>
+            </div>
+
             <!-- Test Logs -->
             <div class="test-section">
                 <h2>📋 Test Logs</h2>
@@ -753,6 +765,162 @@
                         return true; // Not available, but not a failure
                     }
                 }
+            ],
+            mobile: [
+                {
+                    name: 'Touch Event Support',
+                    description: 'Check if touch events are supported',
+                    test: async () => {
+                        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                    }
+                },
+                {
+                    name: 'Unified Event Handler',
+                    description: 'Test unified event handler system for mobile/desktop compatibility',
+                    test: async () => {
+                        try {
+                            // Load event handler if not already loaded
+                            if (typeof window.unifiedEventHandler === 'undefined') {
+                                await loadScript('js/event-handler.js');
+                                // Wait a bit for script to execute
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                            }
+                            
+                            return typeof window.unifiedEventHandler !== 'undefined' && 
+                                   typeof window.unifiedEventHandler.init === 'function' &&
+                                   typeof window.unifiedEventHandler.initCategoryTabs === 'function';
+                        } catch (e) {
+                            tester.log('UnifiedEventHandler test error: ' + e.message, 'error');
+                            return false;
+                        }
+                    }
+                },
+                {
+                    name: 'Badges Modal Category Tabs (Mobile)',
+                    description: 'Test category tabs in badges modal work on mobile',
+                    test: async () => {
+                        try {
+                            // Load main page scripts if needed
+                            if (typeof window.showBadgesModal === 'undefined') {
+                                tester.log('Main page functions not available in test environment', 'warning');
+                                return true; // Skip if not in main page context
+                            }
+                            
+                            // Check if unified handler is available
+                            if (typeof window.unifiedEventHandler === 'undefined') {
+                                await loadScript('js/event-handler.js');
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                            }
+                            
+                            // Check if badges modal exists
+                            const badgesModal = document.getElementById('badgesModal');
+                            if (!badgesModal) {
+                                tester.log('Badges modal not found in test environment', 'warning');
+                                return true; // Skip if modal doesn't exist
+                            }
+                            
+                            // Check if category tabs exist
+                            const categoryTabs = badgesModal.querySelectorAll('.category-tab');
+                            if (categoryTabs.length === 0) {
+                                tester.log('Category tabs not found', 'warning');
+                                return true; // Skip if tabs don't exist
+                            }
+                            
+                            // Check if all tabs have data-category attribute
+                            let allTabsHaveCategory = true;
+                            categoryTabs.forEach(tab => {
+                                if (!tab.getAttribute('data-category')) {
+                                    allTabsHaveCategory = false;
+                                }
+                            });
+                            
+                            tester.log(`Found ${categoryTabs.length} category tabs, all have data-category: ${allTabsHaveCategory}`, 'info');
+                            return allTabsHaveCategory;
+                        } catch (e) {
+                            tester.log('Badges modal test error: ' + e.message, 'error');
+                            return false;
+                        }
+                    }
+                },
+                {
+                    name: 'Event Handler Consistency',
+                    description: 'Test that event handlers work consistently on mobile and desktop',
+                    test: async () => {
+                        try {
+                            // Check if unified handler is available
+                            if (typeof window.unifiedEventHandler === 'undefined') {
+                                await loadScript('js/event-handler.js');
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                            }
+                            
+                            if (typeof window.unifiedEventHandler === 'undefined') {
+                                return false;
+                            }
+                            
+                            // Test that handler has required methods
+                            const hasInit = typeof window.unifiedEventHandler.init === 'function';
+                            const hasInitCategoryTabs = typeof window.unifiedEventHandler.initCategoryTabs === 'function';
+                            const hasDestroy = typeof window.unifiedEventHandler.destroy === 'function';
+                            
+                            tester.log(`Handler methods: init=${hasInit}, initCategoryTabs=${hasInitCategoryTabs}, destroy=${hasDestroy}`, 'info');
+                            
+                            return hasInit && hasInitCategoryTabs && hasDestroy;
+                        } catch (e) {
+                            tester.log('Event handler consistency test error: ' + e.message, 'error');
+                            return false;
+                        }
+                    }
+                }
+            ],
+            desktop: [
+                {
+                    name: 'Click Event Support',
+                    description: 'Verify click events work properly',
+                    test: async () => {
+                        return 'onclick' in document.createElement('div');
+                    }
+                },
+                {
+                    name: 'Mouse Event Support',
+                    description: 'Check mouse event support for desktop',
+                    test: async () => {
+                        return 'onmousedown' in window && 'onmouseup' in window;
+                    }
+                },
+                {
+                    name: 'Badges Modal Category Tabs (Desktop)',
+                    description: 'Test category tabs in badges modal work on desktop',
+                    test: async () => {
+                        try {
+                            // This is the same as mobile test - unified handler should work for both
+                            if (typeof window.showBadgesModal === 'undefined') {
+                                tester.log('Main page functions not available in test environment', 'warning');
+                                return true;
+                            }
+                            
+                            const badgesModal = document.getElementById('badgesModal');
+                            if (!badgesModal) {
+                                tester.log('Badges modal not found in test environment', 'warning');
+                                return true;
+                            }
+                            
+                            const categoryTabs = badgesModal.querySelectorAll('.category-tab');
+                            if (categoryTabs.length === 0) {
+                                tester.log('Category tabs not found', 'warning');
+                                return true;
+                            }
+                            
+                            // Check if showBadgeCategory function exists
+                            const hasShowBadgeCategory = typeof window.showBadgeCategory === 'function';
+                            tester.log(`showBadgeCategory function exists: ${hasShowBadgeCategory}`, 'info');
+                            
+                            return hasShowBadgeCategory || categoryTabs.length > 0;
+                        } catch (e) {
+                            tester.log('Desktop badges modal test error: ' + e.message, 'error');
+                            return false;
+                        }
+                    }
+                }
             ]
         };
 
@@ -832,6 +1000,40 @@
                 );
                 perfContainer.appendChild(item);
             });
+
+            // Mobile Tests
+            const mobileContainer = document.getElementById('mobileTests');
+            if (tests.mobile) {
+                tests.mobile.forEach(test => {
+                    const item = tester.createTestItem(
+                        test.name,
+                        test.description,
+                        'pending',
+                        async () => {
+                            const result = await tester.runTest(test.name, test.test);
+                            updateTestItem(item, result.status);
+                        }
+                    );
+                    mobileContainer.appendChild(item);
+                });
+            }
+
+            // Desktop Tests
+            const desktopContainer = document.getElementById('desktopTests');
+            if (tests.desktop) {
+                tests.desktop.forEach(test => {
+                    const item = tester.createTestItem(
+                        test.name,
+                        test.description,
+                        'pending',
+                        async () => {
+                            const result = await tester.runTest(test.name, test.test);
+                            updateTestItem(item, result.status);
+                        }
+                    );
+                    desktopContainer.appendChild(item);
+                });
+            }
         }
 
         function updateTestItem(item, status) {

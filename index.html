@@ -51,6 +51,7 @@
     <script src="js/utils.js"></script>
     <script src="js/error-handler.js"></script>
     <script src="js/safety-checks.js"></script>
+    <script src="js/event-handler.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="js/favorites.js"></script>
     
@@ -4181,191 +4182,111 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         let badgesModalTouchStart = { x: 0, y: 0, time: 0 };
         let badgesModalIsScrolling = false;
         
-        // Badges modal için touch event'leri
+        // Badges modal için unified event handler sistemi
         function initBadgesModalTouchEvents() {
             const badgesModal = document.getElementById('badgesModal');
             const badgesScrollableContent = document.getElementById('badgesScrollableContent');
             if (!badgesModal) return;
             
-            // Category tab event listener'larını ekle (her modal açılışında)
-            // Modal içindeki category-tabs container'ını bul
-            const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
-            if (categoryTabsContainer) {
-                // Önce mevcut listener'ı kaldır (varsa) - clone ile
-                const newContainer = categoryTabsContainer.cloneNode(true);
-                categoryTabsContainer.parentNode.replaceChild(newContainer, categoryTabsContainer);
+            // Unified event handler kullan
+            if (window.unifiedEventHandler) {
+                // Category tabs için unified handler
+                const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
+                if (categoryTabsContainer) {
+                    window.unifiedEventHandler.initCategoryTabs(categoryTabsContainer, function(category, tab, e) {
+                        showBadgeCategory(category, tab);
+                    });
+                }
                 
-                // Click event listener - capture phase'de (diğer listener'lardan önce çalışır)
-                newContainer.addEventListener('click', function(e) {
-                    const tab = e.target.closest('.category-tab');
-                    if (tab) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation(); // Tüm diğer listener'ları durdur
-                        const category = tab.getAttribute('data-category');
-                        if (category) {
-                            showBadgeCategory(category, tab);
-                        }
-                        return false; // Ekstra güvenlik
-                    }
-                }, true); // Capture phase (bubbling'den önce)
+                // Modal overlay için unified handler (sadece bir kez initialize et)
+                if (!badgesModal.hasAttribute('data-unified-events-initialized')) {
+                    badgesModal.setAttribute('data-unified-events-initialized', 'true');
+                    
+                    window.unifiedEventHandler.init(badgesModal, {
+                        onTap: (e, target) => {
+                            // X butonuna tıklanmışsa ignore et
+                            if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
+                                return;
+                            }
+                            
+                            // Category tab'a tıklanmışsa ignore et (zaten category tabs handler'ı var)
+                            if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
+                                return;
+                            }
+                            
+                            // Category tabs container'ına tıklanmışsa ignore et
+                            if (target && target.closest('.category-tabs')) {
+                                return;
+                            }
+                            
+                            // Scroll edilebilir içerik alanına tıklanmışsa ignore et
+                            if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
+                                return;
+                            }
+                            
+                            // Badge kartlarına tıklanmışsa ignore et
+                            if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
+                                return;
+                            }
+                            
+                            // Modal içeriğine tıklanmışsa ignore et
+                            if (target && target.closest('.modal-content')) {
+                                return;
+                            }
+                            
+                            // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
+                            closeBadgesModal();
+                        },
+                        ignoreSelectors: [
+                            'button[onclick="closeBadgesModal()"]',
+                            '.category-tab',
+                            '.category-tabs',
+                            '#badgesScrollableContent',
+                            '.badge-card',
+                            '.modal-content'
+                        ],
+                        scrollableContent: badgesScrollableContent
+                    });
+                }
+            } else {
+                // Fallback: Eğer unifiedEventHandler yüklenmemişse eski sistemi kullan
+                console.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor');
                 
-                // Touch event listener - mobil için özel handler
-                newContainer.addEventListener('touchend', function(e) {
-                    const tab = e.target.closest('.category-tab');
-                    if (tab) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation(); // Tüm diğer listener'ları durdur
-                        const category = tab.getAttribute('data-category');
-                        if (category) {
-                            showBadgeCategory(category, tab);
+                // Category tab event listener'larını ekle (her modal açılışında)
+                const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
+                if (categoryTabsContainer) {
+                    const newContainer = categoryTabsContainer.cloneNode(true);
+                    categoryTabsContainer.parentNode.replaceChild(newContainer, categoryTabsContainer);
+                    
+                    newContainer.addEventListener('click', function(e) {
+                        const tab = e.target.closest('.category-tab');
+                        if (tab) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            const category = tab.getAttribute('data-category');
+                            if (category) {
+                                showBadgeCategory(category, tab);
+                            }
+                            return false;
                         }
-                        return false; // Ekstra güvenlik
-                    }
-                }, { passive: false, capture: true }); // Capture phase (bubbling'den önce)
+                    }, true);
+                    
+                    newContainer.addEventListener('touchend', function(e) {
+                        const tab = e.target.closest('.category-tab');
+                        if (tab) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            const category = tab.getAttribute('data-category');
+                            if (category) {
+                                showBadgeCategory(category, tab);
+                            }
+                            return false;
+                        }
+                    }, { passive: false, capture: true });
+                }
             }
-            
-            // Touch event'leri için sadece bir kez ekle
-            if (badgesModal.hasAttribute('data-touch-events-initialized')) return;
-            badgesModal.setAttribute('data-touch-events-initialized', 'true');
-            
-            // Scroll edilebilir içerik alanında scroll algılama
-            if (badgesScrollableContent) {
-                badgesScrollableContent.addEventListener('touchstart', function(e) {
-                    badgesModalIsScrolling = false;
-                }, { passive: true });
-                
-                badgesScrollableContent.addEventListener('touchmove', function(e) {
-                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                    badgesModalIsScrolling = true;
-                }, { passive: true });
-            }
-            
-            // Modal overlay için touch event'leri
-            badgesModal.addEventListener('touchstart', function(e) {
-                const target = e.target;
-                
-                // Category tab'a dokunulmuşsa, scroll algılama yapma
-                if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
-                    const touch = e.touches[0];
-                    badgesModalTouchStart = {
-                        x: touch.clientX,
-                        y: touch.clientY,
-                        time: Date.now()
-                    };
-                    badgesModalIsScrolling = false;
-                    return;
-                }
-                
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
-                    return;
-                }
-                
-                const touch = e.touches[0];
-                badgesModalTouchStart = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                    time: Date.now()
-                };
-                badgesModalIsScrolling = false;
-            }, { passive: true });
-            
-            badgesModal.addEventListener('touchmove', function(e) {
-                const target = e.target;
-                
-                // Category tab üzerinde hareket varsa, scroll algılama yapma
-                if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
-                    return;
-                }
-                
-                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
-                    badgesModalIsScrolling = true;
-                    return;
-                }
-                
-                if (badgesModalTouchStart.x !== 0 || badgesModalTouchStart.y !== 0) {
-                    const touch = e.touches[0];
-                    const deltaX = Math.abs(touch.clientX - badgesModalTouchStart.x);
-                    const deltaY = Math.abs(touch.clientY - badgesModalTouchStart.y);
-                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-                    if (deltaX > 10 || deltaY > 10) {
-                        badgesModalIsScrolling = true;
-                    }
-                }
-            }, { passive: true });
-            
-            badgesModal.addEventListener('touchend', function(e) {
-                // Touch end'de scroll kontrolü yap
-                if (badgesModalIsScrolling) {
-                    // Scroll oldu, kapatma
-                    badgesModalIsScrolling = false;
-                    badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                    return;
-                }
-                
-                // Scroll değilse, normal click gibi davran
-                const touch = e.changedTouches[0];
-                const deltaTime = Date.now() - badgesModalTouchStart.time;
-                const deltaX = Math.abs(touch.clientX - badgesModalTouchStart.x);
-                const deltaY = Math.abs(touch.clientY - badgesModalTouchStart.y);
-                
-                // Kısa süre (300ms) ve küçük hareket (10px) = tap
-                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                    const target = e.target;
-                    
-                    // X butonuna tıklanmışsa ignore et
-                    if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Category tab'a tıklanmışsa, kategoriyi göster ve modal'ı kapatma
-                    const categoryTab = target && (target.closest('.category-tab') || target.classList.contains('category-tab'));
-                    if (categoryTab) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        const category = categoryTab.getAttribute('data-category');
-                        if (category) {
-                            showBadgeCategory(category, categoryTab);
-                        }
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Category tabs container'ına tıklanmışsa, modal'ı kapatma
-                    if (target && target.closest('.category-tabs')) {
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Scroll edilebilir içerik alanına tıklanmışsa, modal'ı kapatma
-                    if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Badge kartlarına tıklanmışsa, modal'ı kapatma
-                    if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Modal içeriğine tıklanmışsa, modal'ı kapatma
-                    if (target && target.closest('.modal-content')) {
-                        badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-                        return;
-                    }
-                    
-                    // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
-                    closeBadgesModal();
-                }
-                
-                badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-            }, { passive: false });
         }
         
         // Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
@@ -4429,88 +4350,123 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         window.closeXPInfoModal = closeXPInfoModal;
         window.showXPInfoModal = showXPInfoModal;
         
-        // XP Info Modal için touch event'leri
-        let xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-        let xpInfoModalIsScrolling = false;
-        
+        // XP Info Modal için unified event handler sistemi
         function initXPInfoModalTouchEvents() {
             const xpInfoModal = document.getElementById('xpInfoModal');
             const xpInfoScrollableContent = document.getElementById('xpInfoScrollableContent');
             if (!xpInfoModal) return;
             
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (xpInfoModal.hasAttribute('data-touch-events-initialized')) return;
-            xpInfoModal.setAttribute('data-touch-events-initialized', 'true');
-            
-            // Scroll edilebilir içerik alanında scroll algılama
-            if (xpInfoScrollableContent) {
-                xpInfoScrollableContent.addEventListener('touchstart', function(e) {
-                    xpInfoModalIsScrolling = false;
-                }, { passive: true });
-                
-                xpInfoScrollableContent.addEventListener('touchmove', function(e) {
-                    xpInfoModalIsScrolling = true;
-                }, { passive: true });
-            }
-            
-            // Modal overlay için touch event'leri
-            xpInfoModal.addEventListener('touchstart', function(e) {
-                if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
-                    return;
+            // Unified event handler kullan
+            if (window.unifiedEventHandler) {
+                if (!xpInfoModal.hasAttribute('data-unified-events-initialized')) {
+                    xpInfoModal.setAttribute('data-unified-events-initialized', 'true');
+                    
+                    window.unifiedEventHandler.init(xpInfoModal, {
+                        onTap: (e, target) => {
+                            // X butonuna tıklanmışsa ignore et
+                            if (target && (target.id === 'closeXPInfoBtn' || target.closest('#closeXPInfoBtn'))) {
+                                return;
+                            }
+                            
+                            // Scroll edilebilir içerik alanına tıklanmışsa ignore et
+                            if (target && (target.id === 'xpInfoScrollableContent' || target.closest('#xpInfoScrollableContent'))) {
+                                return;
+                            }
+                            
+                            // Modal içeriğine tıklanmışsa ignore et
+                            if (target && target.closest('.modal-content')) {
+                                return;
+                            }
+                            
+                            // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
+                            closeXPInfoModal();
+                        },
+                        ignoreSelectors: [
+                            '#closeXPInfoBtn',
+                            '#xpInfoScrollableContent',
+                            '.modal-content'
+                        ],
+                        scrollableContent: xpInfoScrollableContent
+                    });
                 }
+            } else {
+                // Fallback: Eğer unifiedEventHandler yüklenmemişse eski sistemi kullan
+                console.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor (xpInfoModal)');
                 
-                const touch = e.touches[0];
-                xpInfoModalTouchStart = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                    time: Date.now()
-                };
-                xpInfoModalIsScrolling = false;
-            }, { passive: true });
-            
-            xpInfoModal.addEventListener('touchmove', function(e) {
-                if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
-                    xpInfoModalIsScrolling = true;
-                    return;
-                }
+                if (xpInfoModal.hasAttribute('data-touch-events-initialized')) return;
+                xpInfoModal.setAttribute('data-touch-events-initialized', 'true');
                 
-                if (xpInfoModalTouchStart.x !== 0 || xpInfoModalTouchStart.y !== 0) {
-                    const touch = e.touches[0];
-                    const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
-                    const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
-                    if (deltaX > 10 || deltaY > 10) {
+                let xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+                let xpInfoModalIsScrolling = false;
+                
+                if (xpInfoScrollableContent) {
+                    xpInfoScrollableContent.addEventListener('touchstart', function(e) {
+                        xpInfoModalIsScrolling = false;
+                    }, { passive: true });
+                    
+                    xpInfoScrollableContent.addEventListener('touchmove', function(e) {
                         xpInfoModalIsScrolling = true;
-                    }
-                }
-            }, { passive: true });
-            
-            xpInfoModal.addEventListener('touchend', function(e) {
-                if (xpInfoModalIsScrolling) {
-                    xpInfoModalIsScrolling = false;
-                    xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-                    return;
+                    }, { passive: true });
                 }
                 
-                const touch = e.changedTouches[0];
-                const deltaTime = Date.now() - xpInfoModalTouchStart.time;
-                const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
-                const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
-                
-                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                xpInfoModal.addEventListener('touchstart', function(e) {
                     if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
                         return;
                     }
-                    if (e.target && (e.target.id === 'closeXPInfoBtn' || e.target.closest('#closeXPInfoBtn'))) {
-                        return;
-                    }
-                    if (e.target && e.target.closest('.modal-content')) {
-                        return;
-                    }
-                    closeXPInfoModal();
-                }
+                    
+                    const touch = e.touches[0];
+                    xpInfoModalTouchStart = {
+                        x: touch.clientX,
+                        y: touch.clientY,
+                        time: Date.now()
+                    };
+                    xpInfoModalIsScrolling = false;
+                }, { passive: true });
                 
-                xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-            }, { passive: true });
+                xpInfoModal.addEventListener('touchmove', function(e) {
+                    if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
+                        xpInfoModalIsScrolling = true;
+                        return;
+                    }
+                    
+                    if (xpInfoModalTouchStart.x !== 0 || xpInfoModalTouchStart.y !== 0) {
+                        const touch = e.touches[0];
+                        const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
+                        const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
+                        if (deltaX > 10 || deltaY > 10) {
+                            xpInfoModalIsScrolling = true;
+                        }
+                    }
+                }, { passive: true });
+                
+                xpInfoModal.addEventListener('touchend', function(e) {
+                    if (xpInfoModalIsScrolling) {
+                        xpInfoModalIsScrolling = false;
+                        xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    const touch = e.changedTouches[0];
+                    const deltaTime = Date.now() - xpInfoModalTouchStart.time;
+                    const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
+                    
+                    if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                        if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
+                            return;
+                        }
+                        if (e.target && (e.target.id === 'closeXPInfoBtn' || e.target.closest('#closeXPInfoBtn'))) {
+                            return;
+                        }
+                        if (e.target && e.target.closest('.modal-content')) {
+                            return;
+                        }
+                        closeXPInfoModal();
+                    }
+                    
+                    xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
+                }, { passive: true });
+            }
         }
         
         // Her yere tıklayınca kapatma fonksiyonu
