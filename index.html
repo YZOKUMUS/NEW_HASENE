@@ -4440,10 +4440,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Body scroll'u engelle
             document.body.style.overflow = 'hidden';
-            // Genel istatistikleri güncelle
-            document.getElementById('statsLevel').textContent = level;
-            document.getElementById('statsPoints').textContent = totalPoints.toLocaleString();
-            document.getElementById('statsStars').textContent = starPoints;
+            // Genel istatistikleri güncelle (null check ile)
+            const statsLevelEl = document.getElementById('statsLevel');
+            const statsPointsEl = document.getElementById('statsPoints');
+            const statsStarsEl = document.getElementById('statsStars');
+            if (statsLevelEl) statsLevelEl.textContent = level;
+            if (statsPointsEl) statsPointsEl.textContent = totalPoints.toLocaleString();
+            if (statsStarsEl) statsStarsEl.textContent = starPoints;
             
             // Seviye ilerleme barını hesapla
             let currentLevelStart, nextLevelStart;
@@ -4467,16 +4470,25 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const progressPercentage = Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100));
             const pointsNeeded = Math.max(0, nextLevelStart - totalPoints);
             
-            document.getElementById('statsCurrentLevel').textContent = level;
-            document.getElementById('statsNextLevel').textContent = nextLevel;
-            document.getElementById('statsLevelProgress').style.width = progressPercentage + '%';
-            document.getElementById('statsLevelPointsNeeded').textContent = pointsNeeded.toLocaleString();
+            // Seviye bilgilerini güncelle (null check ile)
+            const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
+            const statsNextLevelEl = document.getElementById('statsNextLevel');
+            const statsLevelProgressEl = document.getElementById('statsLevelProgress');
+            const statsLevelPointsNeededEl = document.getElementById('statsLevelPointsNeeded');
+            if (statsCurrentLevelEl) statsCurrentLevelEl.textContent = level;
+            if (statsNextLevelEl) statsNextLevelEl.textContent = nextLevel;
+            if (statsLevelProgressEl) statsLevelProgressEl.style.width = progressPercentage + '%';
+            if (statsLevelPointsNeededEl) statsLevelPointsNeededEl.textContent = pointsNeeded.toLocaleString();
             
-            // Rozet sayılarını güncelle
-            document.getElementById('statsBronze').textContent = badges.bronze;
-            document.getElementById('statsSilver').textContent = badges.silver;
-            document.getElementById('statsGold').textContent = badges.gold;
-            document.getElementById('statsDiamond').textContent = badges.diamond;
+            // Rozet sayılarını güncelle (null check ile)
+            const statsBronzeEl = document.getElementById('statsBronze');
+            const statsSilverEl = document.getElementById('statsSilver');
+            const statsGoldEl = document.getElementById('statsGold');
+            const statsDiamondEl = document.getElementById('statsDiamond');
+            if (statsBronzeEl) statsBronzeEl.textContent = badges.bronze;
+            if (statsSilverEl) statsSilverEl.textContent = badges.silver;
+            if (statsGoldEl) statsGoldEl.textContent = badges.gold;
+            if (statsDiamondEl) statsDiamondEl.textContent = badges.diamond;
             
             // Başarı analizi hesapla
             // Toplam deneme sayısı = Doğru + Yanlış
@@ -4488,33 +4500,53 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const playConsistency = Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100);
             const levelProgressPercent = Math.round(progressPercentage);
             
-            document.getElementById('statsSuccessRate').textContent = successRate + '%';
-            document.getElementById('statsAvgPointsPerDay').textContent = avgPointsPerDay.toLocaleString();
-            document.getElementById('statsPlayConsistency').textContent = Math.min(100, playConsistency) + '%';
-            document.getElementById('statsLevelProgressText').textContent = levelProgressPercent + '%';
+            // Başarı analizi güncelle (null check ile)
+            const statsSuccessRateEl = document.getElementById('statsSuccessRate');
+            const statsAvgPointsPerDayEl = document.getElementById('statsAvgPointsPerDay');
+            const statsPlayConsistencyEl = document.getElementById('statsPlayConsistency');
+            const statsLevelProgressTextEl = document.getElementById('statsLevelProgressText');
+            if (statsSuccessRateEl) statsSuccessRateEl.textContent = successRate + '%';
+            if (statsAvgPointsPerDayEl) statsAvgPointsPerDayEl.textContent = avgPointsPerDay.toLocaleString();
+            if (statsPlayConsistencyEl) statsPlayConsistencyEl.textContent = Math.min(100, playConsistency) + '%';
+            if (statsLevelProgressTextEl) statsLevelProgressTextEl.textContent = levelProgressPercent + '%';
             
-            // Streak bilgilerini güncelle
-            document.getElementById('statsCurrentStreak').textContent = streakData.currentStreak;
-            document.getElementById('statsBestStreak').textContent = streakData.bestStreak;
-            document.getElementById('statsTotalDays').textContent = streakData.totalPlayDays;
-            document.getElementById('statsTodayProgress').textContent = Math.min(streakData.todayProgress, streakData.dailyGoal) + '/' + streakData.dailyGoal;
+            // Streak bilgilerini güncelle (null check ile)
+            const statsCurrentStreakEl = document.getElementById('statsCurrentStreak');
+            const statsBestStreakEl = document.getElementById('statsBestStreak');
+            const statsTotalDaysEl = document.getElementById('statsTotalDays');
+            const statsTodayProgressEl = document.getElementById('statsTodayProgress');
+            if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak;
+            if (statsBestStreakEl) statsBestStreakEl.textContent = streakData.bestStreak;
+            if (statsTotalDaysEl) statsTotalDaysEl.textContent = streakData.totalPlayDays;
+            if (statsTodayProgressEl) statsTodayProgressEl.textContent = Math.min(streakData.todayProgress, streakData.dailyGoal) + '/' + streakData.dailyGoal;
             
-            // Bugünkü oyun türü istatistikleri
-            document.getElementById('statsKelimeCevir').textContent = dailyTasks.todayStats.kelimeCevir;
-            document.getElementById('statsDinleBul').textContent = dailyTasks.todayStats.dinleBul;
-            document.getElementById('statsBoslukDoldur').textContent = dailyTasks.todayStats.boslukDoldur;
-            document.getElementById('statsAyetOku').textContent = dailyTasks.todayStats.ayetOku;
-            document.getElementById('statsDuaOgre').textContent = dailyTasks.todayStats.duaOgre;
-            document.getElementById('statsHadisOku').textContent = dailyTasks.todayStats.hadisOku;
+            // Bugünkü oyun türü istatistikleri (null check ile)
+            const statsKelimeCevirEl = document.getElementById('statsKelimeCevir');
+            const statsDinleBulEl = document.getElementById('statsDinleBul');
+            const statsBoslukDoldurEl = document.getElementById('statsBoslukDoldur');
+            const statsAyetOkuEl = document.getElementById('statsAyetOku');
+            const statsDuaOgreEl = document.getElementById('statsDuaOgre');
+            const statsHadisOkuEl = document.getElementById('statsHadisOku');
+            if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = dailyTasks.todayStats.kelimeCevir;
+            if (statsDinleBulEl) statsDinleBulEl.textContent = dailyTasks.todayStats.dinleBul;
+            if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = dailyTasks.todayStats.boslukDoldur;
+            if (statsAyetOkuEl) statsAyetOkuEl.textContent = dailyTasks.todayStats.ayetOku;
+            if (statsDuaOgreEl) statsDuaOgreEl.textContent = dailyTasks.todayStats.duaOgre;
+            if (statsHadisOkuEl) statsHadisOkuEl.textContent = dailyTasks.todayStats.hadisOku;
             
-            // Bugünkü performans
-            document.getElementById('statsTodayCorrect').textContent = dailyTasks.todayStats.toplamDogru;
-            document.getElementById('statsTodayPoints').textContent = dailyTasks.todayStats.toplamPuan;
-            document.getElementById('statsPerfectStreak').textContent = dailyTasks.todayStats.perfectStreak;
-            document.getElementById('statsDifficultyCount').textContent = dailyTasks.todayStats.farklıZorluk.size;
+            // Bugünkü performans (null check ile)
+            const statsTodayCorrectEl = document.getElementById('statsTodayCorrect');
+            const statsTodayPointsEl = document.getElementById('statsTodayPoints');
+            const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
+            const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
+            if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = dailyTasks.todayStats.toplamDogru;
+            if (statsTodayPointsEl) statsTodayPointsEl.textContent = dailyTasks.todayStats.toplamPuan;
+            if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak;
+            if (statsDifficultyCountEl) statsDifficultyCountEl.textContent = dailyTasks.todayStats.farklıZorluk.size;
             
-            // Modal'ı göster
-            document.getElementById('statsModal').style.display = 'flex';
+            // Modal'ı göster (null check ile)
+            const statsModal = document.getElementById('statsModal');
+            if (statsModal) statsModal.style.display = 'flex';
             
             // Kelime istatistiklerini güncelle (artık tek sayfa olduğu için her zaman göster)
             if (typeof updateWordStatistics === 'function') {
@@ -5833,12 +5865,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Görev verilerini güncelle
             updateTasksDisplay();
             
-            // Modal'ı göster
+            // Modal'ı göster (null check ile)
             const modal = document.getElementById('dailyTasksModal');
             if (modal) {
                 modal.style.display = 'flex';
                 // Body scroll'u engelle
                 document.body.style.overflow = 'hidden';
+            } else {
+                log.error('❌ dailyTasksModal elementi bulunamadı!');
             }
         }
 
