@@ -3414,6 +3414,7 @@ window.closeAllModals = closeAllModals;
     // 🔥 ACHIEVEMENT SİSTEMİ SIFIRLA
     // =========================================
     localStorage.removeItem('unlockedAchievements');
+    localStorage.setItem('achievementsJustReset', 'true'); // UI güncellemesi için flag
 
     // =========================================
     // 🔥 STREAK + GÜNLÜK HEDEF SIFIRLA
