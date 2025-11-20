@@ -721,6 +721,33 @@ body {
         padding: 12px !important;
     }
     
+    /* Rozet Sistemi - Çok Küçük Ekranlar (360px) */
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 4px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div {
+        padding: 6px 3px !important;
+        min-width: 0 !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:first-child {
+        font-size: 1.3em !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(2) {
+        font-size: 9px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(3) {
+        font-size: 12px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(4) {
+        font-size: 7px !important;
+    }
+    
     .bottom-nav {
         padding: 8px !important;
     }
@@ -1515,6 +1542,12 @@ body {
     height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    /* Flex ayarları - kritik */
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* Touch action - scroll için */
+    touch-action: pan-y !important;
     /* Performans optimizasyonları */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -5472,6 +5505,33 @@ body {
     
     .daily-task-card {
         padding: 16px;
+    }
+    
+    /* Rozet Sistemi - Mobil Uyumluluk */
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div {
+        padding: 8px 4px !important;
+        min-width: 0 !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:first-child {
+        font-size: 1.5em !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(2) {
+        font-size: 10px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(3) {
+        font-size: 14px !important;
+    }
+    
+    #statsScrollableContent [style*="grid-template-columns: repeat(4, 1fr)"] > div > div:nth-child(4) {
+        font-size: 8px !important;
     }
     
     .onboarding-slides {

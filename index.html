@@ -838,7 +838,7 @@
 
     <!-- Günlük Görevler Modal - Modern Tasarım -->
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
-        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: none; box-sizing: border-box; border-radius: 24px;">
             <!-- Header -->
             <div class="daily-tasks-header">
                 <div class="daily-tasks-title">
@@ -849,7 +849,7 @@
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
-            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable">
+            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 0; overflow-y: auto; overflow-x: hidden; min-height: 0; touch-action: pan-y;">
 
             <!-- Progress Card -->
             <div class="daily-tasks-progress-card">
