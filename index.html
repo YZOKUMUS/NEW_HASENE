@@ -292,10 +292,10 @@
 
         <!-- Ayet Okuma Modu -->
         <div class="ayet-mode" id="ayetMode" style="display: none;">
-            <button class="back-btn" id="backFromAyetBtn">
-                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
-                <span>Ana Sayfa</span>
-            </button>
+            <!-- Modern Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromAyetBtn">←</button>
+            </div>
             <div class="ayet-card">
                 <div class="sure-info" id="ayetSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="ayetArabic">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
@@ -310,10 +310,10 @@
 
         <!-- Dua Modu -->
         <div class="dua-mode" id="duaMode" style="display: none;">
-            <button class="back-btn" id="backFromDuaBtn">
-                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
-                <span>Ana Sayfa</span>
-            </button>
+            <!-- Modern Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromDuaBtn">←</button>
+            </div>
             <div class="dua-card">
                 <div class="sure-info" id="duaSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="duaArabic">Arapça Metin</div>
@@ -328,10 +328,10 @@
 
         <!-- Hadis Oku Modu -->
         <div class="hadis-mode" id="hadisMode" style="display: none;">
-            <button class="back-btn" id="backFromHadisBtn">
-                <i class="material-icons" style="font-size: 16px;">arrow_back</i>
-                <span>Ana Sayfa</span>
-            </button>
+            <!-- Modern Header -->
+            <div class="duolingo-header">
+                <button class="duolingo-back-btn" id="backFromHadisBtn">←</button>
+            </div>
             <div class="hadis-card">
                 <div class="hadis-category" id="hadisCategory">Kategori</div>
                 <div class="hadis-title" id="hadisTitle">Başlık</div>
@@ -350,13 +350,7 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromBoslukBtn">←</button>
-                <div class="duolingo-progress-container">
-                    <div class="progress-text">İlerleme</div>
-                    <div class="progress-bar-container">
-                        <div class="duolingo-progress-bar" id="boslukProgressBar" style="width: 0%;"></div>
-                    </div>
-                </div>
-                <div class="score-display" id="boslukHeaderScore">⭐ 0</div>
+                <div class="score-display" id="boslukHeaderScore" style="margin-left: auto;">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
@@ -405,13 +399,7 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromDinleBtn">←</button>
-                <div class="duolingo-progress-container">
-                    <div class="progress-text">İlerleme</div>
-                    <div class="progress-bar-container">
-                        <div class="duolingo-progress-bar" id="dinleProgressBar" style="width: 0%;"></div>
-                    </div>
-                </div>
-                <div class="score-display" id="dinleHeaderScore">⭐ 0</div>
+                <div class="score-display" id="dinleHeaderScore" style="margin-left: auto;">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
@@ -463,13 +451,7 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromGameBtn">←</button>
-                <div class="duolingo-progress-container">
-                    <div class="progress-text">İlerleme</div>
-                    <div class="progress-bar-container">
-                        <div class="duolingo-progress-bar" id="duolingoProgressBar" style="width: 0%;"></div>
-                    </div>
-                </div>
-                <div class="score-display" id="headerScore">⭐ 0</div>
+                <div class="score-display" id="headerScore" style="margin-left: auto;">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
@@ -2635,6 +2617,13 @@
         let currentAyetIndex = 0;
         let currentDuaIndex = 0;
         let currentHadisIndex = 0;
+        // Soru sayısı takibi (ayet, dua, hadis modları için)
+        let ayetQuestionCount = 0;
+        let duaQuestionCount = 0;
+        let hadisQuestionCount = 0;
+        const AYET_MAX_QUESTIONS = 10;
+        const DUA_MAX_QUESTIONS = 10;
+        const HADIS_MAX_QUESTIONS = 10;
         
         // Cevap pozisyon takibi (tahmin edilmesini zorlaştırmak için)
         let recentAnswerPositions = []; // Son 10 sorunun doğru cevap pozisyonları
@@ -6426,6 +6415,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.game(`✅ Yeni değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
             log.game(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
             
+            // Header score güncelle (oyun başında)
+            const dinleHeaderScore = document.getElementById('dinleHeaderScore');
+            if (dinleHeaderScore) {
+                const currentStarPoints = Math.floor(totalPoints / 100);
+                dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
+            }
+            
             // Audio butonu event handler
             if (elements.dinleAudioBtn) {
                 // Masaüstü için onclick
@@ -6539,6 +6535,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             boslukCorrect = 0;
             boslukWrong = 0;
             log.debug(`✅ Yeni değerler: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
+            
+            // Header score güncelle (oyun başında)
+            const boslukHeaderScore = document.getElementById('boslukHeaderScore');
+            if (boslukHeaderScore) {
+                const currentStarPoints = Math.floor(totalPoints / 100);
+                boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
+            }
             log.debug(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
             
             updateBoslukUI();
@@ -6569,9 +6572,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.duaMode.style.display = 'block';
                 elements.duaMode.style.zIndex = '';
             }
+            // Soru sayısını başlat (ilk gösterim 1. soru)
+            duaQuestionCount = 1;
             // Rastgele dua ile başla
             currentDuaIndex = Math.floor(Math.random() * duaData.length);
-            showDua();
+            showDua(false); // İlk gösterimde soru sayısını artırma
         };
 
         // Ayet Oku modu
@@ -6598,9 +6603,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.ayetMode.style.display = 'block';
                 elements.ayetMode.style.zIndex = '';
             }
+            // Soru sayısını başlat (ilk gösterim 1. soru)
+            ayetQuestionCount = 1;
             // Rastgele ayet ile başla
             currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
-            showAyet();
+            showAyet(false); // İlk gösterimde soru sayısını artırma
         };
 
         // Hadis Oku modu
@@ -6627,9 +6634,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.hadisMode.style.display = 'block';
                 elements.hadisMode.style.zIndex = '';
             }
+            // Soru sayısını başlat (ilk gösterim 1. soru)
+            hadisQuestionCount = 1;
             // Rastgele hadis ile başla
             currentHadisIndex = Math.floor(Math.random() * hadisData.length);
-            showHadis();
+            showHadis(false); // İlk gösterimde soru sayısını artırma
         };
 
         // Geri butonları
@@ -7216,12 +7225,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 duolingoQuestionNumber.textContent = `Soru ${questionCount + 1} / ${mode.questionsPerLevel}`;
             }
             
-            // Duolingo tarzı ilerleme çubuğunu güncelle
-            const duolingoProgressBar = document.getElementById('duolingoProgressBar');
-            if (duolingoProgressBar) {
-                const progress = ((questionCount + 1) / mode.questionsPerLevel) * 100;
-                duolingoProgressBar.style.width = progress + '%';
-            }
+            // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
             
             // Kalplerin görünürlüğünü kontrol et (her soru yüklendiğinde)
             const duolingoHearts = document.getElementById('duolingoHearts');
@@ -8539,11 +8543,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // Duolingo tarzı ilerleme çubuğunu güncelle
-            const dinleProgressBar = document.getElementById('dinleProgressBar');
-            if (dinleProgressBar) {
-                const progress = ((dinleQuestionCount + 1) / DINLE_MAX_QUESTIONS) * 100;
-                dinleProgressBar.style.width = progress + '%';
-            }
+            // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
 
             if (elements.dinleFeedback) {
             elements.dinleFeedback.textContent = '';
@@ -8612,6 +8612,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 log.debug(`📊 addSessionPoints(${points}) çağrılıyor...`);
                 addSessionPoints(points); // Session puanına ekle
+                
+                // Header score güncelle (yıldız gösterimi)
+                const dinleHeaderScore = document.getElementById('dinleHeaderScore');
+                if (dinleHeaderScore) {
+                    const currentStarPoints = Math.floor(totalPoints / 100);
+                    dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
+                }
                 
                 // Daily task progress - her doğru cevap için
                 updateTaskProgress('dinleBul', 1);
@@ -8908,11 +8915,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // Duolingo tarzı ilerleme çubuğunu güncelle
-            const boslukProgressBar = document.getElementById('boslukProgressBar');
-            if (boslukProgressBar) {
-                const progress = ((boslukQuestionCount + 1) / BOSLUK_MAX_QUESTIONS) * 100;
-                boslukProgressBar.style.width = progress + '%';
-            }
+            // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
             
             // Sure info güncelle
             if (elements.boslukSureInfo && currentBoslukQuestion) {
@@ -8995,6 +8998,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 log.debug(`📊 addSessionPoints(10) çağrılıyor...`);
                 addSessionPoints(10); // Session puanına ekle
+                
+                // Header score güncelle (yıldız gösterimi)
+                const boslukHeaderScore = document.getElementById('boslukHeaderScore');
+                if (boslukHeaderScore) {
+                    const currentStarPoints = Math.floor(totalPoints / 100);
+                    boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
+                }
                 
                 // Daily task progress - her doğru cevap için
                 updateTaskProgress('boslukDoldur', 1);
@@ -9145,7 +9155,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         // ============ DUA ET MODU ============
-        function showDua() {
+        function showDua(shouldIncrement = false) {
             const dua = duaData[currentDuaIndex];
             if (!dua) return;
 
@@ -9155,6 +9165,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
             elements.prevDuaBtn.disabled = currentDuaIndex === 0;
             elements.nextDuaBtn.disabled = currentDuaIndex === duaData.length - 1;
+            
+            // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
+            if (shouldIncrement) {
+                duaQuestionCount++;
+            }
+            // Soru sayacı kaldırıldı - bu modlar günlük görev için
         }
 
         elements.prevDuaBtn.onclick = () => {
@@ -9163,7 +9179,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 log.debug('📍 Önceki duaya geçiliyor:', currentDuaIndex, '->', currentDuaIndex - 1);
                 stopCurrentAudio(); // Mevcut ses varsa durdur
                 currentDuaIndex--;
-                showDua();
+                showDua(false); // Soru sayısını artırma
                 log.debug('✅ Önceki dua gösterildi');
                 // Navigasyon - görev sayılmaz
             }
@@ -9175,7 +9191,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 log.debug('📍 Sonraki duaya geçiliyor:', currentDuaIndex, '->', currentDuaIndex + 1);
                 stopCurrentAudio(); // Mevcut ses varsa durdur
                 currentDuaIndex++;
-                showDua();
+                showDua(true); // Soru sayısını artır
                 log.debug('✅ Sonraki dua gösterildi');
                 // Navigasyon - görev sayılmaz
             }
@@ -9280,7 +9296,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // ============ AYET OKU MODU (RASTGELE) ============
-        function showAyet() {
+        function showAyet(shouldIncrement = false) {
             // Rastgele ayet seç
             currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
             const ayet = ayetOkuData[currentAyetIndex];
@@ -9289,12 +9305,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             elements.ayetSureInfo.textContent = `${ayet.sure_adı || 'Sûre'} - Ayet`;
             elements.ayetArabic.textContent = ayet.ayet_metni || '';
             elements.ayetTranslation.textContent = ayet.meal || '';
+            
+            // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
+            if (shouldIncrement) {
+                ayetQuestionCount++;
+            }
+            // Soru sayacı kaldırıldı - bu modlar günlük görev için
         }
 
         elements.prevAyetBtn.onclick = () => {
             log.debug('⬅️ Önceki ayet butonuna tıklandı');
             stopCurrentAudio(); // Mevcut ses varsa durdur
-            showAyet(); // Rastgele önceki ayet
+            showAyet(false); // Rastgele önceki ayet, soru sayısını artırma
             log.debug('✅ Önceki ayet gösterildi');
             // Navigasyon - görev sayılmaz
         };
@@ -9302,7 +9324,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         elements.nextAyetBtn.onclick = () => {
             log.debug('➡️ Sonraki ayet butonuna tıklandı');
             stopCurrentAudio(); // Mevcut ses varsa durdur
-            showAyet(); // Rastgele sonraki ayet
+            showAyet(true); // Rastgele sonraki ayet, soru sayısını artır
             log.debug('✅ Sonraki ayet gösterildi');
             // Navigasyon - görev sayılmaz
         };
@@ -9450,7 +9472,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         };
 
         // ============ HADİS OKU MODU (RASTGELE) ============
-        function showHadis() {
+        function showHadis(shouldIncrement = false) {
             // Rastgele hadis seç
             currentHadisIndex = Math.floor(Math.random() * hadisData.length);
             const hadis = hadisData[currentHadisIndex];
@@ -9461,18 +9483,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             elements.hadisHeader.textContent = hadis.header || '';
             elements.hadisText.textContent = hadis.text || '';
             elements.hadisRef.textContent = hadis.refno || '';
+            
+            // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
+            if (shouldIncrement) {
+                hadisQuestionCount++;
+            }
+            // Soru sayacı kaldırıldı - bu modlar günlük görev için
         }
 
         elements.prevHadisBtn.onclick = () => {
             stopCurrentAudio(); // Mevcut ses varsa durdur
-            showHadis(); // Rastgele önceki hadis
-            // Daily task progress - hadis okuma
+            showHadis(false); // Rastgele önceki hadis, soru sayısını artırma
+            // Daily task progress - hadis okuma (önceki butonunda da sayılabilir)
             updateTaskProgress('hadisOku', 1);
         };
 
         elements.nextHadisBtn.onclick = () => {
             stopCurrentAudio(); // Mevcut ses varsa durdur
-            showHadis(); // Rastgele sonraki hadis
+            showHadis(true); // Rastgele sonraki hadis, soru sayısını artır
             // Daily task progress - hadis okuma
             updateTaskProgress('hadisOku', 1);
         };

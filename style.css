@@ -2507,6 +2507,22 @@ body {
     color: #666;
 }
 
+/* Ayet, Dua, Hadis modları için soru sayısı gösterimi */
+.ayet-mode .duolingo-question-number,
+.dua-mode .duolingo-question-number,
+.hadis-mode .duolingo-question-number {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    z-index: 10;
+}
+
 .game-screen .question-icon {
     width: 80px;
     height: 80px;
@@ -2751,35 +2767,45 @@ body {
 
 /* Dinle Mode için Duolingo Tarzı Stiller */
 .dinle-mode .duolingo-header {
-    background: #fff;
-    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #f0f0f0;
+    color: white;
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 4px 20px rgba(102,126,234,0.3);
 }
 
 .dinle-mode .duolingo-back-btn {
-    background: transparent;
+    background: rgba(255,255,255,0.2);
     border: none;
-    font-size: 24px;
-    color: #666;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 20px;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
 }
 
 .dinle-mode .duolingo-back-btn:hover {
-    background: #f5f5f5;
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.dinle-mode .score-display {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
 }
 
 .dinle-mode .duolingo-progress-container {
@@ -2809,13 +2835,20 @@ body {
     text-align: center;
     background: #fff;
     flex: 1;
+    position: relative;
 }
 
 .dinle-mode .duolingo-question-number {
-    font-size: 14px;
-    color: #999;
-    margin-bottom: 12px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
     font-weight: 600;
+    color: #666;
+    margin-bottom: 0;
 }
 
 .dinle-mode .duolingo-question-hint {
@@ -3007,35 +3040,45 @@ body {
 
 /* Boşluk Mode için Duolingo Tarzı Stiller */
 .bosluk-mode .duolingo-header {
-    background: #fff;
-    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #f0f0f0;
+    color: white;
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 4px 20px rgba(102,126,234,0.3);
 }
 
 .bosluk-mode .duolingo-back-btn {
-    background: transparent;
+    background: rgba(255,255,255,0.2);
     border: none;
-    font-size: 24px;
-    color: #666;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 20px;
     cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.2s;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
 }
 
 .bosluk-mode .duolingo-back-btn:hover {
-    background: #f5f5f5;
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.bosluk-mode .score-display {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
 }
 
 .bosluk-mode .duolingo-progress-container {
@@ -3065,13 +3108,20 @@ body {
     text-align: center;
     background: #fff;
     flex: 1;
+    position: relative;
 }
 
 .bosluk-mode .duolingo-question-number {
-    font-size: 14px;
-    color: #999;
-    margin-bottom: 12px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
     font-weight: 600;
+    color: #666;
+    margin-bottom: 0;
 }
 
 .bosluk-mode .duolingo-question-hint {
