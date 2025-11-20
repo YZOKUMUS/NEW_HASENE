@@ -845,7 +845,7 @@
                     <span>🎯</span>
                     <span>Günlük Görevler</span>
                 </div>
-                <button class="daily-tasks-close-btn" onclick="event.stopPropagation(); closeDailyTasksModal();">×</button>
+                <button class="daily-tasks-close-btn modal-close-btn" onclick="event.stopPropagation(); closeDailyTasksModal();">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
@@ -905,7 +905,7 @@
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
-                <button onclick="event.stopPropagation(); closeStatsModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
+                <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
@@ -1306,7 +1306,7 @@
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">💰 Hasene Sistemi</h3>
-                <button onclick="event.stopPropagation(); closeXPInfoModal();" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='#f0f0f0'; this.style.color='#e74c3c';" onmouseout="this.style.background='transparent'; this.style.color='#999';">×</button>
+                <button id="closeXPInfoBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeXPInfoModal();">×</button>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
