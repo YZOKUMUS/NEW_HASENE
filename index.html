@@ -3767,6 +3767,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     const calendarStreakCountEl = document.getElementById('calendarStreakCount');
     if (calendarStreakCountEl) calendarStreakCountEl.textContent = '0';
 
+    // =========================================
+    // 🔥 YENİ BADGES PANEL TASARIMI GÜNCELLEMELERİ
+    // =========================================
+    // Achievement kartlarını güncelle (yeni tasarım için)
+    if (typeof updateAllAchievements === 'function') {
+        // Flag'i kaldır ki updateAllAchievements çalışsın
+        localStorage.removeItem('achievementsJustReset');
+        updateAllAchievements();
+    }
+
     showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");
 }
 
