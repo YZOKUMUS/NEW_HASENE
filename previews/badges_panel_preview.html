@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rozetler Paneli - Test Tasarımı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .badges-container {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .badges-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badges-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .badges-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1;
+            touch-action: manipulation;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .stats-summary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin: 20px;
+            padding: 20px;
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            box-shadow: 0 8px 20px rgba(245,87,108,0.3);
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            background: #f0f0f0;
+            color: #666;
+            touch-action: manipulation;
+            min-width: fit-content;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+            transform: scale(1.05);
+        }
+
+        .badges-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+            gap: 16px;
+        }
+
+        .badge-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            padding: 20px 16px;
+            text-align: center;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid transparent;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .badge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .badge-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .badge-card:hover::before {
+            opacity: 1;
+        }
+
+        .badge-card.unlocked {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%);
+            border-color: #ffd700;
+            box-shadow: 0 8px 25px rgba(255,215,0,0.3);
+        }
+
+        .badge-card.unlocked::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255,215,0,0.5);
+        }
+
+        .badge-icon {
+            font-size: 56px;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            transition: transform 0.3s;
+        }
+
+        .badge-card:hover .badge-icon {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .badge-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .badge-desc {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            min-height: 30px;
+        }
+
+        .badge-progress {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .badge-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .badge-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .badge-status {
+            font-size: 10px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-card.unlocked .badge-status {
+            color: #ff9800;
+        }
+
+        .badge-card.unlocked .badge-progress-fill {
+            background: linear-gradient(90deg, #ffd700 0%, #ffa500 100%);
+            width: 100% !important;
+        }
+
+        @media (max-width: 480px) {
+            .badges-container {
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .badges-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .badge-card {
+                padding: 16px 12px;
+            }
+
+            .badge-icon {
+                font-size: 48px;
+            }
+
+            .stats-summary {
+                margin: 16px;
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+        }
+
+        /* Scrollbar styling */
+        .badges-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .badges-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .badges-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .badges-content::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="badges-container">
+        <!-- Header -->
+        <div class="badges-header">
+            <h2>🏆 Başarılar</h2>
+            <button class="close-btn" onclick="alert('Kapat butonu çalışıyor!')">×</button>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Açılan</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">20</div>
+                <div class="stat-label">Toplam</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">60%</div>
+                <div class="stat-label">İlerleme</div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <button class="category-tab active" onclick="switchCategory('daily', this)">📅 Günlük</button>
+            <button class="category-tab" onclick="switchCategory('special', this)">⭐ Özel</button>
+            <button class="category-tab" onclick="switchCategory('streak', this)">🔥 Seri</button>
+            <button class="category-tab" onclick="switchCategory('level', this)">🏅 Mertebe</button>
+        </div>
+
+        <!-- Badges Content -->
+        <div class="badges-content">
+            <div id="badgesGrid" class="badges-grid">
+                <!-- Günlük Başarılar -->
+                <div class="badge-card unlocked" data-category="daily">
+                    <span class="badge-icon">🎯</span>
+                    <div class="badge-title">İlk Zafer</div>
+                    <div class="badge-desc">İlk sahih cevabın</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="badge-status">Tamamlandı</div>
+                </div>
+
+                <div class="badge-card unlocked" data-category="daily">
+                    <span class="badge-icon">⭐</span>
+                    <div class="badge-title">Günlük Kahraman</div>
+                    <div class="badge-desc">Günlük hedefini tamamla</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="badge-status">Tamamlandı</div>
+                </div>
+
+                <!-- Özel Başarılar -->
+                <div class="badge-card unlocked" data-category="special">
+                    <span class="badge-icon">🔥</span>
+                    <div class="badge-title">Combo Ustası</div>
+                    <div class="badge-desc">5x combo yap</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="badge-status">Tamamlandı</div>
+                </div>
+
+                <div class="badge-card" data-category="special">
+                    <span class="badge-icon">🌱</span>
+                    <div class="badge-title">İlk Adım</div>
+                    <div class="badge-desc">500 Hasene topla</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 75%;"></div>
+                    </div>
+                    <div class="badge-status">375/500</div>
+                </div>
+
+                <div class="badge-card unlocked" data-category="special">
+                    <span class="badge-icon">🥉</span>
+                    <div class="badge-title">Bronz Yolcu</div>
+                    <div class="badge-desc">2,000 Hasene</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="badge-status">Tamamlandı</div>
+                </div>
+
+                <div class="badge-card" data-category="special">
+                    <span class="badge-icon">🥈</span>
+                    <div class="badge-title">Gümüş Master</div>
+                    <div class="badge-desc">8,500 Hasene</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 45%;"></div>
+                    </div>
+                    <div class="badge-status">3,825/8,500</div>
+                </div>
+
+                <div class="badge-card" data-category="special">
+                    <span class="badge-icon">🥇</span>
+                    <div class="badge-title">Altın Master</div>
+                    <div class="badge-desc">25,500 Hasene</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 15%;"></div>
+                    </div>
+                    <div class="badge-status">3,825/25,500</div>
+                </div>
+
+                <div class="badge-card" data-category="special">
+                    <span class="badge-icon">💎</span>
+                    <div class="badge-title">Elmas Master</div>
+                    <div class="badge-desc">85,000 Hasene</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 4%;"></div>
+                    </div>
+                    <div class="badge-status">3,825/85,000</div>
+                </div>
+
+                <!-- Seri Başarılar -->
+                <div class="badge-card" data-category="streak">
+                    <span class="badge-icon">🔥</span>
+                    <div class="badge-title">7 Gün Seri</div>
+                    <div class="badge-desc">7 gün üst üste oyna</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 57%;"></div>
+                    </div>
+                    <div class="badge-status">4/7</div>
+                </div>
+
+                <div class="badge-card" data-category="streak">
+                    <span class="badge-icon">⚡</span>
+                    <div class="badge-title">30 Gün Seri</div>
+                    <div class="badge-desc">30 gün üst üste oyna</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 13%;"></div>
+                    </div>
+                    <div class="badge-status">4/30</div>
+                </div>
+
+                <!-- Mertebe Başarılar -->
+                <div class="badge-card unlocked" data-category="level">
+                    <span class="badge-icon">🏆</span>
+                    <div class="badge-title">Seviye 5</div>
+                    <div class="badge-desc">Seviye 5'e ulaş</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="badge-status">Tamamlandı</div>
+                </div>
+
+                <div class="badge-card" data-category="level">
+                    <span class="badge-icon">💎</span>
+                    <div class="badge-title">Seviye 10</div>
+                    <div class="badge-desc">Seviye 10'a ulaş</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 65%;"></div>
+                    </div>
+                    <div class="badge-status">Seviye 6.5/10</div>
+                </div>
+
+                <div class="badge-card" data-category="level">
+                    <span class="badge-icon">🌟</span>
+                    <div class="badge-title">Seviye 20</div>
+                    <div class="badge-desc">Seviye 20'ye ulaş</div>
+                    <div class="badge-progress">
+                        <div class="badge-progress-fill" style="width: 32%;"></div>
+                    </div>
+                    <div class="badge-status">Seviye 6.5/20</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchCategory(category, button) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            button.classList.add('active');
+            
+            // Hide all badges
+            document.querySelectorAll('.badge-card').forEach(card => {
+                card.style.display = 'none';
+            });
+            
+            // Show badges of selected category
+            document.querySelectorAll(`.badge-card[data-category="${category}"]`).forEach(card => {
+                card.style.display = 'block';
+            });
+            
+            // Animate cards
+            document.querySelectorAll(`.badge-card[data-category="${category}"]`).forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        }
+
+        // Initialize - show daily badges by default
+        document.addEventListener('DOMContentLoaded', () => {
+            switchCategory('daily', document.querySelector('.category-tab.active'));
+        });
+    </script>
+</body>
+</html>
+

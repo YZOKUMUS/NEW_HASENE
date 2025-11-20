@@ -52,10 +52,9 @@ async function loadKelimeData() {
     
     try {
         dataLoadStatus.kelimeBul.loading = true;
-        showLoadingWithProgress('Kelime verileri yükleniyor...', 0);
+        showLoading('Kelime verileri yükleniyor...');
         kelimeBulData = await fetchWithRetry('data/kelimebul.json');
         dataLoadStatus.kelimeBul.loaded = true;
-        showLoadingWithProgress('Kelime verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
         return kelimeBulData;
     } catch (error) {
@@ -83,10 +82,9 @@ async function loadAyetData() {
     
     try {
         dataLoadStatus.ayetOku.loading = true;
-        showLoadingWithProgress('Ayet verileri yükleniyor...', 0);
+        showLoading('Ayet verileri yükleniyor...');
         ayetOkuData = await fetchWithRetry('data/ayetoku.json');
         dataLoadStatus.ayetOku.loaded = true;
-        showLoadingWithProgress('Ayet verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
         return ayetOkuData;
     } catch (error) {
@@ -114,10 +112,9 @@ async function loadDuaData() {
     
     try {
         dataLoadStatus.dua.loading = true;
-        showLoadingWithProgress('Dua verileri yükleniyor...', 0);
+        showLoading('Dua verileri yükleniyor...');
         duaData = await fetchWithRetry('data/duaet.json');
         dataLoadStatus.dua.loaded = true;
-        showLoadingWithProgress('Dua verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
         return duaData;
     } catch (error) {
@@ -145,10 +142,9 @@ async function loadHadisData() {
     
     try {
         dataLoadStatus.hadis.loading = true;
-        showLoadingWithProgress('Hadis verileri yükleniyor...', 0);
+        showLoading('Hadis verileri yükleniyor...');
         hadisData = await fetchWithRetry('data/hadisoku.json');
         dataLoadStatus.hadis.loaded = true;
-        showLoadingWithProgress('Hadis verileri yüklendi!', 100);
         setTimeout(() => hideLoading(), 300);
         return hadisData;
     } catch (error) {

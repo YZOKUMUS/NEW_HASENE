@@ -134,7 +134,7 @@ function encryptData(data) {
     try {
         const jsonStr = JSON.stringify(data);
         return btoa(unescape(encodeURIComponent(jsonStr)));
-        } catch(e) {
+    } catch(e) {
         log.error('Encryption error:', e);
         return data;
     }
@@ -177,6 +177,14 @@ function showCustomAlert(message, type = 'info', title = null) {
     const messageEl = document.getElementById('customAlertMessage');
     const okBtn = document.getElementById('customAlertOKBtn');
     
+    // Null check - eğer elementler yüklenmemişse console'a uyarı ver ve çık
+    if (!modal || !iconEl || !titleEl || !messageEl || !okBtn) {
+        console.warn('⚠️ Custom alert modal elementi bulunamadı! Eski alert sistemine geri dönülüyor...');
+        // Fallback to standard alert
+        alert(title ? `${title}\n\n${message}` : message);
+        return;
+    }
+    
     // Type-based styling
     const types = {
         success: { icon: '🎉', title: 'Başarılı!', color: '#4caf50' },
@@ -191,10 +199,10 @@ function showCustomAlert(message, type = 'info', title = null) {
     titleEl.style.color = config.color;
     
     // HTML içeriği varsa innerHTML kullan, yoksa textContent
-    if (message.includes('<') && message.includes('>')) {
+    if (typeof message === 'string' && message.includes('<') && message.includes('>')) {
         safeSetHTML(messageEl, message, true);
     } else {
-    messageEl.textContent = message;
+        messageEl.textContent = message || '';
     }
     
     // Show modal
@@ -218,4 +226,15 @@ function showCustomAlert(message, type = 'info', title = null) {
     };
     document.addEventListener('keydown', handleEsc);
 }
+
+// Modal'ı kapat (global erişim için)
+function closeCustomAlert() {
+    const modal = document.getElementById('customAlertModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Global erişim için
+window.closeCustomAlert = closeCustomAlert;
 

@@ -58,42 +58,46 @@
     
 </head>
 <body>
-    <!-- Loading Sayfası - Yeni Tasarım -->
-    <div class="loading-screen-new" id="loadingScreen">
-        <!-- Logo -->
-        <div class="loading-logo-wrapper">
-            <img src="assets/images/icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img">
+    <!-- Loading Sayfası - Profesyonel Tasarım -->
+    <div class="loading-screen-new loading-screen-pro" id="loadingScreen">
+        <!-- Logo Container with Modern Glassmorphism Design -->
+        <div class="loading-logo-wrapper loading-logo-container-pro">
+            <div class="loading-logo-circle">
+                <img src="assets/images/icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img loading-logo-img-pro" onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;font-size:60px;font-weight:bold;\'>📖</div>';">
+            </div>
         </div>
         
-        <!-- Title -->
-        <h1 class="loading-app-title">HASENE</h1>
+        <!-- App Title -->
+        <h1 class="loading-app-title loading-app-title-pro">HASENE</h1>
 
-        <!-- Hadith Box -->
-        <div class="loading-hadith-container" id="hadisBox">
-            <div class="loading-hadith-arabic-text" id="hadisArabic">
+        <!-- Hadith Container - Modern Card Design -->
+        <div class="loading-hadith-container loading-hadith-container-pro" id="hadisBox">
+            <div class="loading-hadith-arabic-text loading-hadith-arabic-pro" id="hadisArabic">
                 مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
             </div>
-            <div class="loading-hadith-turkish-text" id="hadisTurkish">
+            <div class="loading-hadith-turkish-text loading-hadith-turkish-pro" id="hadisTurkish">
                 "Kim Allah'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."
             </div>
-            <div class="loading-hadith-source-text">(Tirmizi, Sevâbü'l-Kur'ân 16)</div>
+            <div class="loading-hadith-source-text loading-hadith-source-pro">(Tirmizi, Sevâbü'l-Kur'ân 16)</div>
         </div>
-        
-        <!-- Book Icon -->
-        <div class="loading-book-wrapper">
-            <img src="assets/images/OPENBOOK.png" alt="Book" class="loading-book-icon" id="bagIcon" onerror="this.onerror=null; this.src='assets/images/OPENBOOK.PNG'; this.onerror=function(){this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:#999;font-size:14px;\'>📖</div>';};">
+
+        <!-- Loading Dots Animation -->
+        <div class="loading-dots-pro">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
         </div>
 
         <!-- Progress Section -->
-        <div class="loading-progress-wrapper">
-            <div class="loading-progress-text" id="loadingProgressLabel">Kelime verileri yükleniyor...</div>
-            <div class="loading-progress-track">
-                <div class="loading-progress-fill" id="loadingProgressBar"></div>
+        <div class="loading-progress-wrapper loading-progress-container-pro">
+            <div class="loading-progress-text loading-progress-label-pro" id="loadingProgressLabel">Kelime verileri yükleniyor...</div>
+            <div class="loading-progress-track loading-progress-track-pro">
+                <div class="loading-progress-fill loading-progress-fill-pro" id="loadingProgressBar"></div>
             </div>
         </div>
         
         <!-- Copyright -->
-        <div class="loading-footer-text">© YZOKUMUS 2025</div>
+        <div class="loading-footer-text loading-footer-pro">© YZOKUMUS 2025</div>
     </div>
 
    
@@ -156,69 +160,73 @@
 
         <!-- Ana Menü -->
         <div class="main-menu" id="mainMenu">
-            <!-- Hero Section - Yeni Modern Tasarım -->
-            <div class="hero-section">
-                <div class="hero-content">
-                    <!-- Welcome Text -->
-                    <div class="welcome-text">
-                        <div class="welcome-title">Hoş Geldin! 👋</div>
-                        <div class="welcome-subtitle">Bugün hangi modu oynamak istersin?</div>
+            <!-- Hero Section - Minimal Kompakt Tasarım -->
+            <div class="hero-section hero-section-minimal">
+                <div class="hero-content hero-content-minimal">
+                    <!-- Compact Header -->
+                    <div class="hero-header-minimal">
+                        <div class="welcome-minimal">
+                            <div class="welcome-title-minimal">Hoş Geldin! 👋</div>
+                            <div class="welcome-subtitle-minimal">Bugün hangi modu oynamak istersin?</div>
+                        </div>
+                        <!-- TEST: Reset Butonu - Sağ Üst Köşe (Test Amaçlı) -->
+                        <button onclick="confirmResetStats()" class="reset-stats-btn" style="background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7; flex-shrink: 0; margin-left: 12px;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="Test: Tüm İstatistikleri Sıfırla">
+                            <span style="font-size: 16px;">🔄</span>
+                        </button>
                     </div>
 
-                    <!-- TEST: Reset Butonu - Sol Üst Köşe (Test Amaçlı) -->
-                    <button onclick="confirmResetStats()" class="reset-stats-btn" style="position: absolute; top: 12px; left: 12px; background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="Test: Tüm İstatistikleri Sıfırla">
-                        <span style="font-size: 16px;">🔄</span>
-                    </button>
-
-                    <!-- Stats Grid - Modern -->
-                    <div class="stats-grid">
-                        <!-- Hasene -->
-                        <div class="stat-card hasene">
-                            <div class="stat-value hasene" id="gamePoints">0</div>
-                            <div class="stat-label">HASENE</div>
+                    <!-- Compact Stats Row -->
+                    <div class="stats-row-minimal">
+                        <div class="stat-item-minimal">
+                            <div class="stat-value-minimal hasene" id="gamePoints">0</div>
+                            <div class="stat-label-minimal">Hasene</div>
                         </div>
-                        <!-- Yıldız -->
-                        <div class="stat-card star">
-                            <div class="stat-value star" id="starPoints">0</div>
-                            <div class="stat-label">⭐ YILDIZ</div>
+                        <div class="stat-item-minimal">
+                            <div class="stat-value-minimal star" id="starPoints">0</div>
+                            <div class="stat-label-minimal">⭐ Yıldız</div>
                         </div>
-                        <!-- Mertebe -->
-                        <div class="stat-card level">
-                            <div class="stat-value level" id="playerLevel">1. Mertebe</div>
-                            <div class="stat-label">MERTEBE</div>
+                        <div class="stat-item-minimal">
+                            <div class="stat-value-minimal level" id="playerLevel">1. Mertebe</div>
+                            <div class="stat-label-minimal">Seviye</div>
                         </div>
                     </div>
 
-                    <!-- Daily Goal Card - Modern -->
-                    <div class="daily-goal-card">
-                        <div class="goal-header">
-                            <div class="goal-title">Günlük Hedef</div>
-                            <button onclick="showDailyGoalSettings()" class="goal-settings-btn" id="goalButtonIcon">🎯</button>
+                    <!-- Compact Daily Goal -->
+                    <div class="daily-goal-minimal">
+                        <div class="goal-header-row">
+                            <div class="goal-title-minimal-wrapper" onclick="showDailyGoalSettings()" title="Günlük hedef ayarlarını aç">
+                                <span class="goal-title-minimal">🎯 Günlük Hedef</span>
+                                <span class="goal-settings-icon">⚙️</span>
+                            </div>
+                            <div class="goal-progress-minimal" id="dailyGoalProgressText">0 / 2,700</div>
                         </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" id="dailyGoalProgress" style="width: 0%;"></div>
+                        <div class="progress-bar-minimal">
+                            <div class="progress-fill-minimal" id="dailyGoalProgress" style="width: 0%;"></div>
                         </div>
-                        <div class="progress-text">
-                            <span id="dailyGoalText" style="font-weight: 700; color: white;">Günlük Vird: 2700 Hasene</span> • <span id="dailyGoalProgressText" style="color: white;">0 / 2700 Hasene</span>
+                        <div class="progress-text-minimal" style="display: none;">
+                            <span id="dailyGoalText" style="font-weight: 700; color: white;">Günlük Vird: 2700 Hasene</span>
                         </div>
+                    </div>
+
+                    <!-- Quick Info Buttons -->
+                    <div class="quick-info-minimal">
+                        <button id="xpInfoBtn" class="info-btn-minimal">
+                            <span>📿</span> Hasene Bilgi
+                        </button>
+                        <button onclick="showStatsModal()" class="info-btn-minimal">
+                            <span>📊</span> İstatistikler
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Hasene Bilgi Butonu - Modern -->
-            <button id="xpInfoBtn" class="info-button">
-                <span>📿</span>
-                <span>Hasene Nasıl Kazanılır?</span>
-                <span>ℹ️</span>
-            </button>
-
-            <!-- Zorluk Seçici - Modern -->
-            <div class="difficulty-section">
-                <div class="difficulty-title">Zorluk Seviyesi</div>
-                <div class="difficulty-buttons">
-                    <button class="diff-btn kolay" id="mainDiffKolay">🌱 Kolay</button>
-                    <button class="diff-btn orta active" id="mainDiffOrta">⚖️ Orta</button>
-                    <button class="diff-btn zor" id="mainDiffZor">🔥 Zor</button>
+            <!-- Zorluk Seçici - Kompakt -->
+            <div class="difficulty-section difficulty-minimal">
+                <div class="difficulty-title-minimal">Zorluk Seviyesi</div>
+                <div class="difficulty-buttons difficulty-buttons-minimal">
+                    <button class="diff-btn kolay diff-btn-minimal" id="mainDiffKolay">🌱 Kolay</button>
+                    <button class="diff-btn orta active diff-btn-minimal" id="mainDiffOrta">⚖️ Orta</button>
+                    <button class="diff-btn zor diff-btn-minimal" id="mainDiffZor">🔥 Zor</button>
                 </div>
             </div>
 
@@ -274,6 +282,26 @@
                 
                    
                 </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div id="bottomNavBar" class="bottom-nav" style="display: flex;">
+            <div class="nav-item" onclick="showStatsModal()" title="İstatistikler">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">İstatistikler</span>
+            </div>
+            <div class="nav-item" onclick="showBadgesModal()" title="Başarılar">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Başarılar</span>
+            </div>
+            <div class="nav-item" onclick="showCalendarModal()" title="Takvim">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Takvim</span>
+            </div>
+            <div class="nav-item" onclick="showDailyTasksModal()" title="Günlük Görevler">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Görevler</span>
             </div>
         </div>
 
@@ -523,193 +551,190 @@
         </div>
     </div>
 
-    <!-- Başarılar/Rozetler Modal - Duolingo Tarzı Yeni Tasarım -->
+    <!-- Başarılar/Rozetler Modal - Yeni Modern Tasarım -->
     <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)">
-        <div class="modal-content badges-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 20px; touch-action: pan-y;">
-            <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
-                <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🏆 Başarılar</h3>
+        <div class="modal-content badges-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y;">
+            <!-- Yeni Header -->
+            <div class="badges-header-new">
+                <h3>🏆 Başarılar</h3>
                 <button id="closeBadgesBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeBadgesModal();">×</button>
             </div>
             
             <!-- Scroll Edilebilir İçerik -->
-            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position;">
+            <div id="badgesScrollableContent" style="flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position;">
                 
-                <!-- İstatistikler Özeti -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;">
-                    <h3 style="font-size: 16px; margin-bottom: 16px; opacity: 0.9; font-weight: 600;">📊 İlerleme Özeti</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                        <div class="stat-item">
-                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesUnlockedCount">0</div>
-                            <div style="font-size: 12px; opacity: 0.9;">Açılan Rozet</div>
-                        </div>
-                        <div class="stat-item">
-                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesTotalCount">20</div>
-                            <div style="font-size: 12px; opacity: 0.9;">Toplam Rozet</div>
-                        </div>
-                        <div class="stat-item">
-                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 4px;" id="badgesProgressPercent">0%</div>
-                            <div style="font-size: 12px; opacity: 0.9;">Tamamlanma</div>
-                        </div>
+                <!-- Yeni İstatistikler Özeti -->
+                <div class="stats-summary-new">
+                    <div class="stat-item">
+                        <div class="stat-value" id="badgesUnlockedCount">0</div>
+                        <div class="stat-label">Açılan</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="badgesTotalCount">20</div>
+                        <div class="stat-label">Toplam</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="badgesProgressPercent">0%</div>
+                        <div class="stat-label">İlerleme</div>
                     </div>
                 </div>
 
                 <!-- Kategori Sekmeleri -->
-                <div class="category-tabs" style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; flex-wrap: wrap;">
-                    <button class="badge-tab active" onclick="showBadgeCategory('daily', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s;">📅 Günlük</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('special', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">⭐ Özel</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('streak', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">🔥 Seri</button>
-                    <button class="badge-tab" onclick="showBadgeCategory('level', this); event.stopPropagation();" style="flex: 1; min-width: 80px; padding: 10px 12px; background: transparent; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; color: #999; cursor: pointer; transition: all 0.3s;">🏅 Mertebe</button>
+                <div class="category-tabs">
+                    <button class="badge-tab active" onclick="showBadgeCategory('daily', this); event.stopPropagation();">📅 Günlük</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('special', this); event.stopPropagation();">⭐ Özel</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('streak', this); event.stopPropagation();">🔥 Seri</button>
+                    <button class="badge-tab" onclick="showBadgeCategory('level', this); event.stopPropagation();">🏅 Mertebe</button>
                 </div>
 
                 <!-- Günlük Başarılar -->
-                <div id="badgeCategoryDaily" class="badge-category-content" style="display: block;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div id="badgeCategoryDaily" class="badge-category-content" style="display: block; padding: 0 20px 20px;">
+                    <div>
                         <!-- İlk Zafer -->
-                        <div class="achievement-card" id="achievement-first_win" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🎯</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">İlk Zafer</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">İlk sahih cevabin</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-first_win" onclick="event.stopPropagation();">
+                            <div>🎯</div>
+                            <div>İlk Zafer</div>
+                            <div>İlk sahih cevabin</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">Kilitli</div>
+                            <div class="progress-text">Kilitli</div>
                         </div>
 
                         <!-- Günlük Kahraman -->
-                        <div class="achievement-card" id="achievement-daily_goal" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">⭐</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Günlük Kahraman</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Günlük hedefini tamamla</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-daily_goal" onclick="event.stopPropagation();">
+                            <div>⭐</div>
+                            <div>Günlük Kahraman</div>
+                            <div>Günlük hedefini tamamla</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">Kilitli</div>
+                            <div class="progress-text">Kilitli</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Özel Başarılar -->
-                <div id="badgeCategorySpecial" class="badge-category-content" style="display: none;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div id="badgeCategorySpecial" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
+                    <div>
                         <!-- Combo Ustası -->
-                        <div class="achievement-card" id="achievement-combo_master" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🔥</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Combo Ustası</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">5x combo yap</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-combo_master" onclick="event.stopPropagation();">
+                            <div>🔥</div>
+                            <div>Combo Ustası</div>
+                            <div>5x combo yap</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/5</div>
+                            <div class="progress-text">0/5</div>
                         </div>
 
                         <!-- İlk Adım -->
-                        <div class="achievement-card" id="achievement-xp_500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🌱</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">İlk Adım</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">500 Hasene topla</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-xp_500" onclick="event.stopPropagation();">
+                            <div>🌱</div>
+                            <div>İlk Adım</div>
+                            <div>500 Hasene topla</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/500</div>
+                            <div class="progress-text">0/500</div>
                         </div>
 
                         <!-- Bronz Yolcu -->
-                        <div class="achievement-card" id="achievement-xp_2000" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥉</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Bronz Yolcu</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">2,000 Hasene</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-xp_2000" onclick="event.stopPropagation();">
+                            <div>🥉</div>
+                            <div>Bronz Yolcu</div>
+                            <div>2,000 Hasene</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/2000</div>
+                            <div class="progress-text">0/2000</div>
                         </div>
 
                         <!-- Gümüş Master -->
-                        <div class="achievement-card" id="achievement-xp_8500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥈</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Gümüş Master</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">8,500 Hasene</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-xp_8500" onclick="event.stopPropagation();">
+                            <div>🥈</div>
+                            <div>Gümüş Master</div>
+                            <div>8,500 Hasene</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/8500</div>
+                            <div class="progress-text">0/8500</div>
                         </div>
 
                         <!-- Altın Master -->
-                        <div class="achievement-card" id="achievement-xp_25500" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🥇</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Altın Master</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">25,500 Hasene</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-xp_25500" onclick="event.stopPropagation();">
+                            <div>🥇</div>
+                            <div>Altın Master</div>
+                            <div>25,500 Hasene</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/25500</div>
+                            <div class="progress-text">0/25500</div>
                         </div>
 
                         <!-- Elmas Master -->
-                        <div class="achievement-card" id="achievement-xp_85000" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">💎</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Elmas Master</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">85,000 Hasene</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-xp_85000" onclick="event.stopPropagation();">
+                            <div>💎</div>
+                            <div>Elmas Master</div>
+                            <div>85,000 Hasene</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/85000</div>
+                            <div class="progress-text">0/85000</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Seri Başarılar -->
-                <div id="badgeCategoryStreak" class="badge-category-content" style="display: none;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div id="badgeCategoryStreak" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
+                    <div>
                         <!-- 7 Gün Streak -->
-                        <div class="achievement-card" id="achievement-streak_7" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🔥</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">7 Gün Seri</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">7 gün üst üste oyna</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-streak_7" onclick="event.stopPropagation();">
+                            <div>🔥</div>
+                            <div>7 Gün Seri</div>
+                            <div>7 gün üst üste oyna</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/7</div>
+                            <div class="progress-text">0/7</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Mertebe Başarılar -->
-                <div id="badgeCategoryLevel" class="badge-category-content" style="display: none;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div id="badgeCategoryLevel" class="badge-category-content" style="display: none; padding: 0 20px 20px;">
+                    <div>
                         <!-- Seviye 5 -->
-                        <div class="achievement-card" id="achievement-level_5" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🏆</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 5</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 5'e ulaş</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-level_5" onclick="event.stopPropagation();">
+                            <div>🏆</div>
+                            <div>Seviye 5</div>
+                            <div>Seviye 5'e ulaş</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/5</div>
+                            <div class="progress-text">0/5</div>
                         </div>
 
                         <!-- Seviye 10 -->
-                        <div class="achievement-card" id="achievement-level_10" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">💎</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 10</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 10'a ulaş</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-level_10" onclick="event.stopPropagation();">
+                            <div>💎</div>
+                            <div>Seviye 10</div>
+                            <div>Seviye 10'a ulaş</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/10</div>
+                            <div class="progress-text">0/10</div>
                         </div>
 
                         <!-- Seviye 20 -->
-                        <div class="achievement-card" id="achievement-level_20" style="background: #f8f9fa; border-radius: 16px; padding: 16px 12px; text-align: center; position: relative; transition: all 0.3s; border: 3px solid transparent; cursor: pointer;" onclick="event.stopPropagation();">
-                            <div style="font-size: 48px; margin-bottom: 8px; display: block;">🌟</div>
-                            <div style="font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px;">Seviye 20</div>
-                            <div style="font-size: 11px; color: #666; line-height: 1.4; margin-bottom: 8px;">Seviye 20'ye ulaş</div>
-                            <div class="achievement-progress" style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-top: 8px;">
-                                <div class="achievement-progress-fill" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 2px; width: 0%; transition: width 0.5s ease;"></div>
+                        <div class="achievement-card" id="achievement-level_20" onclick="event.stopPropagation();">
+                            <div>🌟</div>
+                            <div>Seviye 20</div>
+                            <div>Seviye 20'ye ulaş</div>
+                            <div class="achievement-progress">
+                                <div class="achievement-progress-fill" style="width: 0%;"></div>
                             </div>
-                            <div class="progress-text" style="font-size: 10px; color: #999; margin-top: 4px;">0/20</div>
+                            <div class="progress-text">0/20</div>
                         </div>
                     </div>
 
@@ -821,7 +846,7 @@
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
         <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 95vh; height: auto; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
             <!-- Scroll Edilebilir İçerik -->
-            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; touch-action: pan-y; -webkit-overflow-scrolling: touch;">
+            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position; padding-right: 4px; margin-bottom: 12px;">
                 <!-- Header -->
                 <div class="daily-tasks-header" style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid #f0f0f0;">
                     <div class="daily-tasks-title" style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05em; color: #1f2937;">
@@ -1685,7 +1710,8 @@
                 serious: { name: 'Ciddi', icon: '🔥' }
             };
             
-            const progressPercent = Math.min((dailyXP / goalXP) * 100, 100);
+            // Division by zero check
+            const progressPercent = goalXP > 0 ? Math.min((dailyXP / goalXP) * 100, 100) : 0;
             const isCompleted = dailyXP >= goalXP;
             
             // NULL KONTROL - Elementleri kontrol et
@@ -1700,16 +1726,23 @@
                 return;
             }
             
-            // Progress bar güncelle (yeni tasarım için)
+            // Progress bar güncelle (yeni minimal tasarım için)
             const progressBar = document.querySelector('.daily-goal-card .progress-bar');
+            const progressBarMinimal = document.querySelector('.progress-fill-minimal');
             if (progressBar) {
                 progressBar.style.width = progressPercent + '%';
+            }
+            if (progressBarMinimal) {
+                progressBarMinimal.style.width = progressPercent + '%';
             }
             if (progressEl) {
                 progressEl.style.width = progressPercent + '%';
             }
             if (progressTextEl) {
-                progressTextEl.textContent = dailyXP + ' / ' + goalXP + ' Hasene';
+                // Minimal tasarım için format: "945 / 2,700"
+                const formattedDailyXP = dailyXP.toLocaleString('tr-TR');
+                const formattedGoalXP = goalXP.toLocaleString('tr-TR');
+                progressTextEl.textContent = formattedDailyXP + ' / ' + formattedGoalXP;
             }
             if (goalTextEl) {
                 goalTextEl.textContent = 'Günlük Vird: ' + goalXP + ' Hasene';
@@ -2292,6 +2325,11 @@
             // Güvenlik kontrolü: totalWeight 0 veya negatif olamaz
             if (totalWeight <= 0 || wordsWithPriority.length === 0) {
                 log.warn('⚠️ Öncelik puanları hesaplanamadı, rastgele kelime seçiliyor');
+                // Array length check - prevent error if array is empty
+                if (!filteredData || filteredData.length === 0) {
+                    log.error('❌ Filtrelenmiş veri bulunamadı!');
+                    return null;
+                }
                 return filteredData[Math.floor(Math.random() * filteredData.length)];
             }
             
@@ -2966,12 +3004,14 @@ window.hideAllGameScreens = hideAllGameScreens;
 
 // Tüm modalları kapat
 function closeAllModals() {
-    const modals = ['statsModal', 'badgesModal', 'calendarModal', 'dailyTasksModal', 'onboardingModal', 'dailyGoalModal', 'xpInfoModal'];
+    const modals = ['statsModal', 'badgesModal', 'calendarModal', 'dailyTasksModal', 'onboardingModal', 'dailyGoalModal', 'xpInfoModal', 'customAlertModal', 'customConfirm'];
     modals.forEach(modalId => {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'none';
             modal.style.zIndex = '';
+            // Force reflow to ensure modal is hidden before next operation
+            modal.offsetHeight;
         }
     });
     // Body scroll'u tekrar aktif et
@@ -3787,7 +3827,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             const currentLevelPoints = totalPoints - currentLevelStart;
             const levelRequiredPoints = nextLevelStart - currentLevelStart;
-            const progressPercentage = Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100));
+            // Division by zero check
+            const progressPercentage = levelRequiredPoints > 0 ? Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100)) : 100;
             
             const levelProgressElement = document.getElementById('levelProgress');
             if (levelProgressElement) {
@@ -4001,39 +4042,47 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hideAllModes();
             }
             
-            // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-            if (typeof hideBottomNavBar === 'function') {
-                hideBottomNavBar();
-            }
-            
-            // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-            initBadgesModalTouchEvents();
-            
-            // Body scroll'u engelle
-            document.body.style.overflow = 'hidden';
-            
-            // Tüm rozet sayılarını güncelle
-            const diamondEl = document.getElementById('diamondBadgeCount');
-            const goldEl = document.getElementById('goldBadgeCount');
-            const silverEl = document.getElementById('silverBadgeCount');
-            const bronzeEl = document.getElementById('bronzeBadgeCount');
-            
-            if (diamondEl) diamondEl.textContent = badges.diamond;
-            if (goldEl) goldEl.textContent = badges.gold;
-            if (silverEl) silverEl.textContent = badges.silver;
-            if (bronzeEl) bronzeEl.textContent = badges.bronze;
-            
-            // Yeni tasarım için istatistikleri güncelle
-            updateBadgesModalStats();
-            
-            // Tüm achievement'ları güncelle
-            updateAllAchievements();
-            
-            // İlk kategoriyi göster
-            showBadgeCategory('daily');
-            
-            // Modal'ı göster
-            document.getElementById('badgesModal').style.display = 'flex';
+            // Synchronization: Wait for DOM updates before opening new modal
+            requestAnimationFrame(() => {
+                // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+                if (typeof hideBottomNavBar === 'function') {
+                    hideBottomNavBar();
+                }
+                
+                // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+                initBadgesModalTouchEvents();
+                
+                // Body scroll'u engelle
+                document.body.style.overflow = 'hidden';
+                
+                // Tüm rozet sayılarını güncelle
+                const diamondEl = document.getElementById('diamondBadgeCount');
+                const goldEl = document.getElementById('goldBadgeCount');
+                const silverEl = document.getElementById('silverBadgeCount');
+                const bronzeEl = document.getElementById('bronzeBadgeCount');
+                
+                if (diamondEl) diamondEl.textContent = badges.diamond;
+                if (goldEl) goldEl.textContent = badges.gold;
+                if (silverEl) silverEl.textContent = badges.silver;
+                if (bronzeEl) bronzeEl.textContent = badges.bronze;
+                
+                // Yeni tasarım için istatistikleri güncelle
+                updateBadgesModalStats();
+                
+                // Tüm achievement'ları güncelle
+                updateAllAchievements();
+                
+                // İlk kategoriyi göster
+                showBadgeCategory('daily');
+                
+                // Modal'ı göster
+                const badgesModal = document.getElementById('badgesModal');
+                if (badgesModal) {
+                    badgesModal.style.display = 'flex';
+                    // Force reflow to ensure modal is visible
+                    badgesModal.offsetHeight;
+                }
+            });
         }
 
         // Kategori değiştirme fonksiyonu
@@ -4099,7 +4148,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }, progress: () => {
                     const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
                     const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
-                    return Math.min((dailyHasene / goalHasene) * 100, 100);
+                    // Division by zero check
+                    return goalHasene > 0 ? Math.min((dailyHasene / goalHasene) * 100, 100) : 0;
                 }},
                 { id: 'streak_7', name: '7 Gün Seri', desc: '7 gün üst üste oyna', icon: '🔥', condition: () => streakData.currentStreak >= 7, progress: () => Math.min((streakData.currentStreak || 0) / 7 * 100, 100) },
                 { id: 'level_5', name: 'Seviye 5', desc: 'Seviye 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => {
@@ -4135,20 +4185,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (isUnlocked) {
                     card.classList.add('unlocked');
                     card.classList.remove('locked');
-                    card.style.background = 'linear-gradient(135deg, #fff 0%, #f0f7ff 100%)';
-                    card.style.borderColor = '#667eea';
-                    card.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
-                    if (progressFill) progressFill.style.width = '100%';
-                    if (progressText) progressText.textContent = '✓ Tamamlandı';
-                    if (progressText) progressText.style.color = '#667eea';
-                    if (progressText) progressText.style.fontWeight = '600';
+                    // Inline style'ları temizle - CSS class'ları kullanılacak
+                    card.style.background = '';
+                    card.style.borderColor = '';
+                    card.style.boxShadow = '';
+                    card.style.opacity = '';
+                    card.style.filter = '';
+                    if (progressFill) {
+                        progressFill.style.width = '100%';
+                        progressFill.style.background = '';
+                    }
+                    if (progressText) {
+                        progressText.textContent = 'Tamamlandı';
+                        progressText.style.color = '';
+                        progressText.style.fontWeight = '';
+                    }
                 } else {
-                    card.classList.add('locked');
                     card.classList.remove('unlocked');
-                    card.style.background = '#f8f9fa';
-                    card.style.borderColor = 'transparent';
-                    card.style.opacity = '0.6';
-                    card.style.filter = 'grayscale(50%)';
+                    card.classList.add('locked');
+                    // Inline style'ları temizle - CSS class'ları kullanılacak
+                    card.style.background = '';
+                    card.style.borderColor = '';
+                    card.style.opacity = '';
+                    card.style.filter = '';
                     
                     // İlerleme göster
                     if (ach.progress && progressFill) {
@@ -4159,7 +4218,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             finalProgress = 0;
                         }
                         progressFill.style.width = finalProgress + '%';
-                        progressFill.style.background = finalProgress > 0 ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)' : '#ccc';
+                        progressFill.style.background = '';
                     }
                     
                     // İlerleme metni
@@ -4477,17 +4536,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hideAllModes();
             }
             
-            // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-            if (typeof hideBottomNavBar === 'function') {
-                hideBottomNavBar();
-            }
-            
-            // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-            initStatsModalTouchEvents();
-            
-            // Body scroll'u engelle
-            document.body.style.overflow = 'hidden';
-            // Genel istatistikleri güncelle (null check ile)
+            // Synchronization: Wait for DOM updates before opening new modal
+            requestAnimationFrame(() => {
+                // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+                if (typeof hideBottomNavBar === 'function') {
+                    hideBottomNavBar();
+                }
+                
+                // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+                initStatsModalTouchEvents();
+                
+                // Body scroll'u engelle
+                document.body.style.overflow = 'hidden';
+                
+                // Genel istatistikleri güncelle (null check ile)
             const statsLevelEl = document.getElementById('statsLevel');
             const statsPointsEl = document.getElementById('statsPoints');
             const statsStarsEl = document.getElementById('statsStars');
@@ -4514,7 +4576,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             const currentLevelPoints = totalPoints - currentLevelStart;
             const levelRequiredPoints = nextLevelStart - currentLevelStart;
-            const progressPercentage = Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100));
+            // Division by zero check
+            const progressPercentage = levelRequiredPoints > 0 ? Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100)) : 100;
             const pointsNeeded = Math.max(0, nextLevelStart - totalPoints);
             
             // Seviye bilgilerini güncelle (null check ile)
@@ -4633,22 +4696,27 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             }
             
-            // Modal'ı göster (null check ile)
-            const statsModal = document.getElementById('statsModal');
-            if (statsModal) statsModal.style.display = 'flex';
-            
-            // Kelime istatistiklerini güncelle (artık tek sayfa olduğu için her zaman göster)
-            if (typeof updateWordStatistics === 'function') {
-                updateWordStatistics();
-            }
-            
-            // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
-            updateAnalyticsData();
-            
-            // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
-            updateLeaderboard();
-            
-            log.debug('📊 İstatistikler modalı açıldı');
+                // Modal'ı göster (null check ile)
+                const statsModal = document.getElementById('statsModal');
+                if (statsModal) {
+                    statsModal.style.display = 'flex';
+                    // Force reflow to ensure modal is visible
+                    statsModal.offsetHeight;
+                }
+                
+                // Kelime istatistiklerini güncelle (artık tek sayfa olduğu için her zaman göster)
+                if (typeof updateWordStatistics === 'function') {
+                    updateWordStatistics();
+                }
+                
+                // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
+                updateAnalyticsData();
+                
+                // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
+                updateLeaderboard();
+                
+                log.debug('📊 İstatistikler modalı açıldı');
+            });
         }
         
         // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
@@ -5159,7 +5227,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const skipBtn = document.getElementById('onboardingSkipBtn');
             
             if (progressBar) {
-                const progress = (currentOnboardingSlide / totalOnboardingSlides) * 100;
+                // Division by zero check (defensive programming)
+                const progress = totalOnboardingSlides > 0 ? (currentOnboardingSlide / totalOnboardingSlides) * 100 : 0;
                 progressBar.style.width = progress + '%';
             }
             
@@ -5370,16 +5439,30 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 hideAllModes();
             }
             
-            // Body scroll'u engelle
-            document.body.style.overflow = 'hidden';
-            // Haftalık streak gösterimini oluştur
-            generateWeeklyStreakDisplay();
-            
-            // Aylık takvimi oluştur
-            generateMonthlyCalendar();
-            
-            // Modal'ı göster
-            document.getElementById('calendarModal').style.display = 'flex';
+            // Synchronization: Wait for DOM updates before opening new modal
+            requestAnimationFrame(() => {
+                // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+                if (typeof hideBottomNavBar === 'function') {
+                    hideBottomNavBar();
+                }
+                
+                // Body scroll'u engelle
+                document.body.style.overflow = 'hidden';
+                
+                // Haftalık streak gösterimini oluştur
+                generateWeeklyStreakDisplay();
+                
+                // Aylık takvimi oluştur
+                generateMonthlyCalendar();
+                
+                // Modal'ı göster
+                const calendarModal = document.getElementById('calendarModal');
+                if (calendarModal) {
+                    calendarModal.style.display = 'flex';
+                    // Force reflow to ensure modal is visible
+                    calendarModal.offsetHeight;
+                }
+            });
         }
 
         function closeCalendarModal() {
@@ -5418,6 +5501,98 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // Touch event tracking for calendar modal scroll detection
         let calendarModalTouchStart = { x: 0, y: 0, time: 0 };
         let calendarModalIsScrolling = false;
+        
+        // Touch event tracking for daily tasks modal scroll detection
+        let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+        let dailyTasksModalIsScrolling = false;
+        
+        // Daily tasks modal için touch event'leri
+        function initDailyTasksModalTouchEvents() {
+            const dailyTasksModal = document.getElementById('dailyTasksModal');
+            const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
+            if (!dailyTasksModal) return;
+            
+            // Eğer zaten eklenmişse, tekrar ekleme
+            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
+            dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
+            
+            // Scroll edilebilir içerik alanında scroll algılama
+            if (dailyTasksScrollableContent) {
+                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
+                    dailyTasksModalIsScrolling = false;
+                }, { passive: true });
+                
+                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
+                    // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                    dailyTasksModalIsScrolling = true;
+                }, { passive: true });
+            }
+            
+            // Modal overlay için touch event'leri
+            dailyTasksModal.addEventListener('touchstart', function(e) {
+                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    return;
+                }
+                
+                const touch = e.touches[0];
+                dailyTasksModalTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    time: Date.now()
+                };
+                dailyTasksModalIsScrolling = false;
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchmove', function(e) {
+                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
+                if (e.target && (e.target.id === 'dailyTasksScrollableContent' || e.target.closest('#dailyTasksScrollableContent'))) {
+                    dailyTasksModalIsScrolling = true;
+                    return;
+                }
+                
+                if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
+                    const touch = e.touches[0];
+                    const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
+                    const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
+                    // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
+                    if (deltaX > 10 || deltaY > 10) {
+                        dailyTasksModalIsScrolling = true;
+                    }
+                }
+            }, { passive: true });
+            
+            dailyTasksModal.addEventListener('touchend', function(e) {
+                // Touch end'de scroll kontrolü yap
+                if (dailyTasksModalIsScrolling) {
+                    // Scroll oldu, kapatma
+                    dailyTasksModalIsScrolling = false;
+                    dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
+                // Scroll değilse, normal click gibi davran
+                const touch = e.changedTouches[0];
+                const deltaTime = Date.now() - dailyTasksModalTouchStart.time;
+                const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
+                const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
+                
+                // Kısa süre (300ms) ve küçük hareket (10px) = tap
+                if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
+                    // X butonuna veya claim butonuna tıklanmışsa ignore et
+                    const target = e.target;
+                    if (target && (target.id === 'closeDailyTasksBtn' || target.closest('#closeDailyTasksBtn') || target.closest('button[onclick="closeDailyTasksModal()"]') || target.id === 'claimRewardsBtn' || target.closest('#claimRewardsBtn'))) {
+                        dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+                        return;
+                    }
+                    
+                    // Panel üzerine veya dış arka plana tap yapıldı, kapat
+                    closeDailyTasksModal();
+                }
+                
+                dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
+            }, { passive: true });
+        }
         
         // Calendar modal için touch event'leri
         function initCalendarModalTouchEvents() {
@@ -5967,9 +6142,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Modal'ı göster (null check ile)
             const modal = document.getElementById('dailyTasksModal');
             if (modal) {
-                modal.style.display = 'flex';
-                // Body scroll'u engelle
-                document.body.style.overflow = 'hidden';
+                // Force reflow to ensure modal is visible before showing
+                requestAnimationFrame(() => {
+                    modal.style.display = 'flex';
+                    modal.offsetHeight; // Force reflow
+                    // Body scroll'u engelle
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Touch event'leri başlat (smooth scrolling için)
+                    initDailyTasksModalTouchEvents();
+                });
             } else {
                 log.error('❌ dailyTasksModal elementi bulunamadı!');
             }
@@ -6687,10 +6869,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.duaMode) {
                 elements.duaMode.style.display = 'block';
                 elements.duaMode.style.zIndex = '';
+                
+                // Navigasyon bar'ı gizle (okuma modu başladığında)
+                hideBottomNavBar();
             }
             // Soru sayısını başlat (ilk gösterim 1. soru)
             duaQuestionCount = 1;
-            // Rastgele dua ile başla
+            // Rastgele dua ile başla - array length check
+            if (!duaData || duaData.length === 0) {
+                showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
             currentDuaIndex = Math.floor(Math.random() * duaData.length);
             showDua(false); // İlk gösterimde soru sayısını artırma
         };
@@ -6718,10 +6907,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.ayetMode) {
                 elements.ayetMode.style.display = 'block';
                 elements.ayetMode.style.zIndex = '';
+                
+                // Navigasyon bar'ı gizle (okuma modu başladığında)
+                hideBottomNavBar();
             }
             // Soru sayısını başlat (ilk gösterim 1. soru)
             ayetQuestionCount = 1;
-            // Rastgele ayet ile başla
+            // Rastgele ayet ile başla - array length check
+            if (!ayetOkuData || ayetOkuData.length === 0) {
+                showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
             currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
             showAyet(false); // İlk gösterimde soru sayısını artırma
         };
@@ -6749,10 +6945,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (elements.hadisMode) {
                 elements.hadisMode.style.display = 'block';
                 elements.hadisMode.style.zIndex = '';
+                
+                // Navigasyon bar'ı gizle (okuma modu başladığında)
+                hideBottomNavBar();
             }
             // Soru sayısını başlat (ilk gösterim 1. soru)
             hadisQuestionCount = 1;
-            // Rastgele hadis ile başla
+            // Rastgele hadis ile başla - array length check
+            if (!hadisData || hadisData.length === 0) {
+                showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
             currentHadisIndex = Math.floor(Math.random() * hadisData.length);
             showHadis(false); // İlk gösterimde soru sayısını artırma
         };
@@ -6851,6 +7054,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     elements.mainMenu.style.display = 'block';
                 }
                 if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
+                
+                // Navigasyon bar'ı göster (ana ekrana dönünce)
+                showBottomNavBar();
             };
         }
 
@@ -7924,6 +8130,51 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // ============ SES TANIMA SİSTEMİ ============
         let recognition = null;
         let isListening = false;
+        let microphoneStream = null;
+        let recognitionInitialized = false;
+        
+        // Ses tanımayı durdur (global erişim için)
+        window.stopSpeechRecognition = function() {
+            try {
+                if (recognition && isListening) {
+                    recognition.stop();
+                    isListening = false;
+                }
+            } catch (e) {
+                log.debug('Ses tanıma durdurulurken hata:', e);
+            }
+            
+            // Mikrofon stream'ini temizle
+            if (microphoneStream) {
+                try {
+                    microphoneStream.getTracks().forEach(track => {
+                        track.stop();
+                        track.enabled = false;
+                    });
+                    microphoneStream = null;
+                } catch (e) {
+                    log.debug('Mikrofon stream temizlenirken hata:', e);
+                }
+            }
+            
+            // UI'ı sıfırla
+            const micBtn = document.getElementById('dinleMicBtn');
+            const statusEl = document.getElementById('speechStatus');
+            
+            if (micBtn) {
+                micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                micBtn.style.transform = 'scale(1)';
+                micBtn.style.boxShadow = '';
+                micBtn.style.animation = '';
+            }
+            
+            if (statusEl && !statusEl.textContent.includes('❌')) {
+                statusEl.textContent = '';
+                statusEl.style.color = '#666';
+            }
+            
+            log.debug('🛑 Ses tanıma durduruldu ve temizlendi');
+        };
         
         // Mikrofon iznini kontrol et
         async function checkMicrophonePermission() {
@@ -8019,54 +8270,97 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return false;
             }
             
+            // Yeni SpeechRecognition nesnesi oluştur
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (recognition) {
+                // Eski recognition nesnesini temizle
+                try {
+                    recognition.onstart = null;
+                    recognition.onresult = null;
+                    recognition.onerror = null;
+                    recognition.onend = null;
+                    if (isListening) {
+                        recognition.stop();
+                    }
+                } catch (e) {
+                    log.debug('Eski recognition temizlenirken hata:', e);
+                }
+            }
+            
             recognition = new SpeechRecognition();
             
             // Dinle ve Bul modu Arapça telaffuz beklediğinden varsayılan dil Arapça (Suudi Arabistan)
-            // Web Speech API tek dil kabul ettiği için önceden verilen "tr-TR,ar-SA" değeri tarayıcının İngilizceye dönmesine neden olabiliyordu.
-            // İleride kullanıcı dil seçimi eklenene kadar lokalStorage üzerinden override imkanı bırakıyoruz.
             const speechLang = localStorage.getItem('speechRecognitionLang') || 'ar-SA';
             recognition.lang = speechLang;
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 3;
+            recognition.continuous = false;  // Tek seferlik tanıma
+            recognition.interimResults = false;  // Ara sonuçları gösterme
+            recognition.maxAlternatives = 3;  // En fazla 3 alternatif sonuç
+            recognition.serviceURI = '';  // Varsayılan servisi kullan
             
             recognition.onstart = () => {
                 isListening = true;
                 const statusEl = document.getElementById('speechStatus');
                 const micBtn = document.getElementById('dinleMicBtn');
+                
                 if (statusEl) {
                     statusEl.textContent = '🎤 Dinleniyor...';
                     statusEl.style.color = '#667eea';
+                    // HTML içeriğini temizle (eğer varsa)
+                    statusEl.innerHTML = '🎤 Dinleniyor...';
                 }
+                
                 if (micBtn) {
                     // Duolingo tarzı: Mikrofon butonu animasyonu (pulse efekti)
                     micBtn.style.background = 'linear-gradient(135deg, #f44336 0%, #e91e63 100%)';
                     micBtn.style.transform = 'scale(1.15)';
                     micBtn.style.boxShadow = '0 0 20px rgba(244, 67, 54, 0.6)';
                     micBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
+                    micBtn.disabled = false; // Butonu aktif tut
                 }
-                triggerHaptic('light');
-                log.debug('✅ Ses tanıma başlatıldı');
+                
+                // Haptic feedback
+                if (typeof triggerHaptic === 'function') {
+                    triggerHaptic('light');
+                }
+                
+                log.debug('✅ Ses tanıma başlatıldı - dinleniyor...');
             };
             
             recognition.onresult = (event) => {
                 const results = event.results;
                 let recognizedText = '';
+                let bestConfidence = 0;
                 
-                // En iyi sonucu al (Duolingo gibi - en yüksek güvenilirlik skoruna sahip sonucu)
+                // En iyi sonucu al (en yüksek güvenilirlik skoruna sahip sonucu)
                 for (let i = 0; i < results.length; i++) {
-                    const result = results[i][0];
-                    recognizedText = result.transcript.trim();
-                    const confidence = result.confidence || 0;
-                    log.debug('Ses tanıma sonucu:', recognizedText, 'Güvenilirlik:', confidence);
+                    if (results[i].length > 0) {
+                        const result = results[i][0];
+                        const confidence = result.confidence || 0;
+                        // En yüksek güvenilirliğe sahip sonucu seç
+                        if (confidence > bestConfidence || recognizedText === '') {
+                            recognizedText = result.transcript.trim();
+                            bestConfidence = confidence;
+                            log.debug('📝 Ses tanıma sonucu:', recognizedText, 'Güvenilirlik:', confidence.toFixed(2));
+                        }
+                    }
                 }
                 
-                // Kelimeyi bul ve eşleştir (Duolingo gibi anında)
+                // Sonucu işle
                 if (recognizedText && currentDinleQuestion) {
-                    // Duolingo tarzı: Hemen eşleştir, gecikme yok
+                    // Duolingo tarzı: Hemen eşleştir
                     matchSpeechToAnswer(recognizedText);
+                } else if (!recognizedText) {
+                    // Sonuç alınamadı
+                    const statusEl = document.getElementById('speechStatus');
+                    if (statusEl) {
+                        statusEl.textContent = '⚠️ Konuşma algılanamadı. Lütfen tekrar deneyin.';
+                        statusEl.style.color = '#f39c12';
+                    }
+                    log.debug('⚠️ Ses tanıma sonucu boş');
                 }
+                
+                // Recognition otomatik olarak durur (continuous: false), ama manuel durdurma da yap
+                isListening = false;
             };
             
             recognition.onerror = (event) => {
@@ -8074,39 +8368,70 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const statusEl = document.getElementById('speechStatus');
                 const micBtn = document.getElementById('dinleMicBtn');
                 
-                let errorMsg = 'Ses tanıma hatası';
-                let helpText = '';
-                
-                if (event.error === 'no-speech') {
-                    errorMsg = 'Konuşma algılanamadı';
-                    helpText = 'Daha yüksek sesle konuşmayı deneyin';
-                } else if (event.error === 'audio-capture') {
-                    errorMsg = 'Mikrofon bulunamadı';
-                    helpText = 'Mikrofonun bağlı olduğundan emin olun. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.';
-                } else if (event.error === 'not-allowed') {
-                    errorMsg = 'Mikrofon izni verilmedi';
-                    helpText = 'Tarayıcı ayarlarından mikrofon izni verin';
-                } else if (event.error === 'aborted') {
-                    errorMsg = 'Ses tanıma durduruldu';
-                    helpText = '';
-                } else if (event.error === 'network') {
-                    errorMsg = 'Bağlantı hatası';
-                    helpText = 'Ses tanıma servisine bağlanılamıyor. İnternet bağlantınızı kontrol edin veya birkaç saniye sonra tekrar deneyin.';
-                } else {
-                    // Bilinmeyen hata
-                    errorMsg = 'Ses tanıma hatası';
-                    helpText = `Hata kodu: ${event.error}. Lütfen sayfayı yenileyip tekrar deneyin.`;
+                // Stream'i temizle (hata durumunda)
+                if (microphoneStream) {
+                    try {
+                        microphoneStream.getTracks().forEach(track => {
+                            if (track.readyState === 'live') {
+                                track.stop();
+                            }
+                        });
+                        microphoneStream = null;
+                    } catch (e) {
+                        log.debug('Stream temizlenirken hata (onerror):', e);
+                    }
                 }
                 
-                if (statusEl) {
+                let errorMsg = 'Ses tanıma hatası';
+                let helpText = '';
+                let showHelpModal = false;
+                
+                // Hata kodlarına göre mesajları belirle
+                switch (event.error) {
+                    case 'no-speech':
+                        errorMsg = 'Konuşma algılanamadı';
+                        helpText = 'Daha yüksek sesle ve net konuşmayı deneyin. Mikrofonunuzun açık olduğundan emin olun.';
+                        break;
+                    case 'audio-capture':
+                        errorMsg = 'Mikrofon bulunamadı veya erişilemedi';
+                        helpText = 'Mikrofonun bağlı olduğundan emin olun. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.';
+                        showHelpModal = true;
+                        break;
+                    case 'not-allowed':
+                        errorMsg = 'Mikrofon izni verilmedi';
+                        helpText = 'Tarayıcı ayarlarından mikrofon izni verin ve sayfayı yenileyin.';
+                        showHelpModal = true;
+                        break;
+                    case 'aborted':
+                        // Kullanıcı manuel durdurmuş, mesaj gösterme
+                        errorMsg = '';
+                        helpText = '';
+                        break;
+                    case 'network':
+                        errorMsg = 'Bağlantı hatası';
+                        helpText = 'Ses tanıma servisine bağlanılamıyor. İnternet bağlantınızı kontrol edin veya birkaç saniye sonra tekrar deneyin.';
+                        showHelpModal = true;
+                        break;
+                    default:
+                        errorMsg = `Ses tanıma hatası (${event.error || 'Bilinmeyen'})`;
+                        helpText = 'Lütfen sayfayı yenileyip tekrar deneyin.';
+                        break;
+                }
+                
+                // UI'ı güncelle
+                if (statusEl && errorMsg) {
                     statusEl.innerHTML = '❌ ' + errorMsg + (helpText ? '<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">' + helpText + '</small>' : '');
                     statusEl.style.color = '#f44336';
                     
-                    // Network hatası için yardım butonu ekle
-                    if (event.error === 'network') {
+                    // Network veya audio-capture hatası için tekrar dene butonu ekle
+                    if (event.error === 'network' || event.error === 'audio-capture' || event.error === 'no-speech') {
+                        // Önceki butonları kaldır
+                        const oldBtns = statusEl.querySelectorAll('button');
+                        oldBtns.forEach(btn => btn.remove());
+                        
                         const retryBtn = document.createElement('button');
                         retryBtn.textContent = '🔄 Tekrar Dene';
-                        retryBtn.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 600;';
+                        retryBtn.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 600; touch-action: manipulation;';
                         retryBtn.onclick = () => {
                             statusEl.innerHTML = '🔄 Tekrar deneniyor...';
                             statusEl.style.color = '#f39c12';
@@ -8116,34 +8441,36 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                                 }
                             }, 500);
                         };
-                        // Önceki butonu kaldır
-                        const oldBtn = statusEl.querySelector('button');
-                        if (oldBtn) oldBtn.remove();
                         statusEl.appendChild(retryBtn);
                     }
                 }
+                
+                // Butonu sıfırla
                 if (micBtn) {
                     micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                     micBtn.style.transform = 'scale(1)';
+                    micBtn.style.boxShadow = '';
+                    micBtn.style.animation = '';
+                    micBtn.disabled = false;
                 }
                 
-                log.error('Ses tanıma hatası:', event.error, event);
-                triggerHaptic('error');
+                log.error('❌ Ses tanıma hatası:', event.error, event);
                 
-                // İzin hatası ise kullanıcıya yardım göster
-                if (event.error === 'not-allowed') {
+                // Haptic feedback
+                if (typeof triggerHaptic === 'function' && event.error !== 'aborted') {
+                    triggerHaptic('error');
+                }
+                
+                // Yardım modallarını göster (gerekirse)
+                if (showHelpModal) {
                     setTimeout(() => {
-                        showMicrophonePermissionHelp();
-                    }, 1000);
-                } else if (event.error === 'audio-capture') {
-                    // Mikrofon bulunamadı hatası için Bluetooth yardımı göster
-                    setTimeout(() => {
-                        showBluetoothMicrophoneHelp();
-                    }, 1500);
-                } else if (event.error === 'network') {
-                    // Network hatası için de yardım göster
-                    setTimeout(() => {
-                        showNetworkErrorHelp();
+                        if (event.error === 'not-allowed') {
+                            showMicrophonePermissionHelp();
+                        } else if (event.error === 'audio-capture') {
+                            showBluetoothMicrophoneHelp();
+                        } else if (event.error === 'network') {
+                            showNetworkErrorHelp();
+                        }
                     }, 1500);
                 }
             };
@@ -8152,24 +8479,47 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 isListening = false;
                 const micBtn = document.getElementById('dinleMicBtn');
                 const statusEl = document.getElementById('speechStatus');
+                
+                // UI'ı sıfırla
                 if (micBtn) {
-                    // Duolingo tarzı: Mikrofon butonu normal haline dön
                     micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                     micBtn.style.transform = 'scale(1)';
                     micBtn.style.boxShadow = '';
                     micBtn.style.animation = '';
                 }
+                
                 // Status mesajını sadece hata durumunda değiştir, normal bitişte temizle
-                if (statusEl && !statusEl.textContent.includes('❌') && !statusEl.textContent.includes('⚠️') && !statusEl.textContent.includes('✅')) {
-                    statusEl.textContent = '';
+                if (statusEl) {
+                    const currentText = statusEl.textContent || '';
+                    if (!currentText.includes('❌') && !currentText.includes('⚠️') && !currentText.includes('Eşleşmedi')) {
+                        // Başarılı veya normal bitişte temizle
+                        if (!currentText.includes('✅')) {
+                            statusEl.textContent = '';
+                        }
+                    }
                 }
-                // Stream'i temizle (Bluetooth mikrofon için)
-                if (microphoneStream) {
-                    microphoneStream.getTracks().forEach(track => track.stop());
-                    microphoneStream = null;
+                
+                // Stream'i temizle (Bluetooth mikrofon için) - sadece masaüstünde
+                // Mobilde stream kullanılmıyor, bu yüzden temizleme gerekmez
+                const isMobile = isMobileDevice();
+                if (!isMobile && microphoneStream) {
+                    try {
+                        microphoneStream.getTracks().forEach(track => {
+                            if (track.readyState === 'live') {
+                                track.stop();
+                            }
+                        });
+                        microphoneStream = null;
+                    } catch (e) {
+                        log.debug('Stream temizlenirken hata (onuend):', e);
+                    }
                 }
-                log.debug('🛑 Ses tanıma durduruldu');
+                
+                log.debug('🛑 Ses tanıma durduruldu (onend)');
             };
+            
+            // Recognition başarıyla başlatıldı işaretini set et
+            recognitionInitialized = true;
             
             // Başarılı başlatma - status mesajını temizle (kullanıcı butona basana kadar mesaj gösterme)
             const statusEl = document.getElementById('speechStatus');
@@ -8178,7 +8528,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 statusEl.style.color = '#666';
             }
             
-            log.debug('✅ Ses tanıma sistemi hazır');
+            log.debug('✅ Ses tanıma sistemi hazır ve yapılandırıldı');
             return true;
         }
         
@@ -8267,11 +8617,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             showCustomAlert(helpMsg, 'info', '🎤 Mikrofon İzni Gerekli');
         }
         
-        // Mikrofon stream'i (Bluetooth mikrofon desteği için)
-        let microphoneStream = null;
-        
         // Ses tanımayı başlat (global erişim için)
         window.startSpeechRecognition = async function() {
+            // Önce mevcut ses tanımayı durdur (eğer aktifse)
+            if (isListening || recognition) {
+                window.stopSpeechRecognition();
+                // Kısa bir bekleme - durma işleminin tamamlanması için
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            // Validation checks
             if (!currentDinleQuestion) {
                 const statusEl = document.getElementById('speechStatus');
                 if (statusEl) {
@@ -8283,7 +8638,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // Seçeneklerin yüklenip yüklenmediğini kontrol et
-            const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
+            const allBtns = elements.dinleOptions?.querySelectorAll('.duolingo-option, .option');
             if (!allBtns || allBtns.length === 0) {
                 const statusEl = document.getElementById('speechStatus');
                 if (statusEl) {
@@ -8294,54 +8649,54 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
-            if (isListening) {
-                // Eğer zaten dinleniyorsa durdur
-                if (recognition) {
-                    recognition.stop();
+            // Recognition nesnesini kontrol et ve başlat
+            if (!recognition || !recognitionInitialized) {
+                if (!initSpeechRecognition()) {
+                    const statusEl = document.getElementById('speechStatus');
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Ses tanıma başlatılamadı';
+                        statusEl.style.color = '#f44336';
+                    }
+                    showCustomAlert('Ses tanıma özelliği bu tarayıcıda desteklenmiyor.', 'error');
+                    return;
                 }
-                if (microphoneStream) {
-                    microphoneStream.getTracks().forEach(track => track.stop());
-                    microphoneStream = null;
-                }
-                return;
             }
             
-            // İzin kontrolü
+            // İzin kontrolü ve mikrofon hazırlama
             const statusEl = document.getElementById('speechStatus');
+            const isMobile = isMobileDevice();
+            
             if (statusEl) {
                 statusEl.textContent = '🔍 Mikrofon hazırlanıyor...';
                 statusEl.style.color = '#f39c12';
             }
             
-            const permission = await checkMicrophonePermission();
-            if (permission === 'denied') {
-                if (statusEl) {
-                    statusEl.textContent = '❌ Mikrofon izni reddedildi';
-                    statusEl.style.color = '#f44336';
+            // İzin kontrolü (mobilde daha az önemli, direkt deneme yapabiliriz)
+            if (!isMobile) {
+                try {
+                    const permission = await checkMicrophonePermission();
+                    if (permission === 'denied') {
+                        if (statusEl) {
+                            statusEl.textContent = '❌ Mikrofon izni reddedildi';
+                            statusEl.style.color = '#f44336';
+                        }
+                        showMicrophonePermissionHelp();
+                        return;
+                    } else if (permission === 'not-found') {
+                        if (statusEl) {
+                            statusEl.textContent = '❌ Mikrofon bulunamadı';
+                            statusEl.style.color = '#f44336';
+                        }
+                        showBluetoothMicrophoneHelp();
+                        return;
+                    }
+                } catch (permError) {
+                    log.warn('İzin kontrolü hatası, devam ediliyor:', permError);
                 }
-                showMicrophonePermissionHelp();
-                return;
-            } else if (permission === 'not-found') {
-                if (statusEl) {
-                    statusEl.textContent = '❌ Mikrofon bulunamadı';
-                    statusEl.style.color = '#f44336';
-                }
-                showCustomAlert('Mikrofon cihazı bulunamadı. Lütfen mikrofonun bağlı olduğundan emin olun.', 'error');
-                return;
-            } else if (permission === 'unknown') {
-                // Bilinmeyen durum - yine de denemeye devam et
-                log.warn('Mikrofon izin durumu bilinmiyor, denemeye devam ediliyor');
             }
             
-            // Mobil cihaz tespiti
-            const isMobile = isMobileDevice();
-            
-            // Mobil cihazlarda getUserMedia'ya gerek olmayabilir (direkt Speech Recognition çalışabilir)
-            // Ancak masaüstünde Bluetooth mikrofon için getUserMedia gerekli
-            const needsGetUserMedia = !isMobile; // Masaüstünde getUserMedia kullan
-            
-            if (needsGetUserMedia && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                // Bluetooth mikrofon desteği: getUserMedia ile mikrofonu aktif hale getir (sadece masaüstü)
+            // Masaüstünde getUserMedia ile mikrofonu aktif hale getir (Bluetooth desteği için)
+            if (!isMobile && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 try {
                     if (statusEl) {
                         statusEl.textContent = '🎤 Mikrofon bağlanıyor...';
@@ -8350,7 +8705,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     
                     // Önceki stream varsa kapat
                     if (microphoneStream) {
-                        microphoneStream.getTracks().forEach(track => track.stop());
+                        try {
+                            microphoneStream.getTracks().forEach(track => {
+                                if (track.readyState === 'live') {
+                                    track.stop();
+                                }
+                            });
+                        } catch (e) {
+                            log.debug('Eski stream temizlenirken hata:', e);
+                        }
+                        microphoneStream = null;
                     }
                     
                     // Mikrofonu aktif hale getir (Bluetooth dahil tüm mikrofonlar için)
@@ -8359,41 +8723,41 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             echoCancellation: true,
                             noiseSuppression: true,
                             autoGainControl: true,
-                            // Tüm mikrofonları kabul et (Bluetooth dahil)
                             sampleRate: 44100
                         } 
                     });
                     
                     const audioTracks = microphoneStream.getAudioTracks();
-                    const trackInfo = audioTracks.map(t => ({
-                        label: t.label,
-                        kind: t.kind,
-                        enabled: t.enabled,
-                        readyState: t.readyState
-                    }));
-                    
-                    log.debug('Mikrofon stream aktif:', trackInfo);
-                    
-                    // Kullanıcıya hangi mikrofonun kullanıldığını göster
-                    const micLabel = audioTracks[0]?.label || 'Bilinmeyen mikrofon';
-                    const isBluetooth = micLabel.toLowerCase().includes('bluetooth') || 
-                                       micLabel.toLowerCase().includes('bt') ||
-                                       micLabel.toLowerCase().includes('wireless');
-                    
-                    if (statusEl) {
-                        if (isBluetooth) {
-                            statusEl.innerHTML = `✅ Bluetooth mikrofon hazır: <small style="font-size: 0.75em; color: #666;">${micLabel}</small>`;
-                        } else {
-                            statusEl.innerHTML = `✅ Mikrofon hazır: <small style="font-size: 0.75em; color: #666;">${micLabel}</small>`;
+                    if (audioTracks.length > 0) {
+                        const trackInfo = audioTracks.map(t => ({
+                            label: t.label || 'Bilinmeyen',
+                            enabled: t.enabled,
+                            readyState: t.readyState
+                        }));
+                        
+                        log.debug('✅ Mikrofon stream aktif:', trackInfo);
+                        
+                        // Kullanıcıya hangi mikrofonun kullanıldığını göster
+                        const micLabel = audioTracks[0]?.label || 'Bilinmeyen mikrofon';
+                        const isBluetooth = micLabel.toLowerCase().includes('bluetooth') || 
+                                           micLabel.toLowerCase().includes('bt') ||
+                                           micLabel.toLowerCase().includes('wireless');
+                        
+                        if (statusEl) {
+                            const micDisplayName = micLabel.length > 30 ? micLabel.substring(0, 30) + '...' : micLabel;
+                            if (isBluetooth) {
+                                statusEl.innerHTML = `✅ Bluetooth mikrofon hazır<br><small style="font-size: 0.75em; color: #666;">${micDisplayName}</small>`;
+                            } else {
+                                statusEl.innerHTML = `✅ Mikrofon hazır<br><small style="font-size: 0.75em; color: #666;">${micDisplayName}</small>`;
+                            }
+                            statusEl.style.color = '#4caf50';
                         }
-                        statusEl.style.color = '#4caf50';
+                        
+                        // Mikrofonun tam olarak hazır olması için kısa bir gecikme
+                        await new Promise(resolve => setTimeout(resolve, 300));
                     }
-                    
-                    // Kısa bir gecikme ile Speech Recognition'ı başlat
-                    // (Mikrofonun tam olarak hazır olması için)
-                    await new Promise(resolve => setTimeout(resolve, 300));
                 } catch (mediaError) {
-                    log.error('Mikrofon erişim hatası:', mediaError);
+                    log.error('❌ Mikrofon erişim hatası:', mediaError);
                     if (statusEl) {
                         statusEl.textContent = '❌ Mikrofon erişilemedi';
                         statusEl.style.color = '#f44336';
@@ -8404,59 +8768,63 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     } else if (mediaError.name === 'NotFoundError' || mediaError.name === 'DevicesNotFoundError') {
                         showBluetoothMicrophoneHelp();
                     } else {
-                        showCustomAlert('Mikrofon erişilemedi. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.', 'error');
+                        showCustomAlert(`Mikrofon erişilemedi: ${mediaError.message || mediaError.name}. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.`, 'error');
                     }
                     return;
                 }
-            } else if (isMobile) {
-                // Mobil cihazlarda direkt Speech Recognition başlat (getUserMedia'ya gerek yok)
-                if (statusEl) {
-                    statusEl.textContent = '🎤 Hazırlanıyor...';
-                    statusEl.style.color = '#f39c12';
-                }
-                // Kısa bir gecikme (mobil cihazlarda daha hızlı)
-                await new Promise(resolve => setTimeout(resolve, 100));
             }
             
-            if (!recognition) {
-                if (!initSpeechRecognition()) {
-                    showCustomAlert('Ses tanıma özelliği bu tarayıcıda desteklenmiyor.', 'error');
-                    return;
-                }
-            }
-            
+            // Speech Recognition'ı başlat
             try {
                 if (statusEl) {
-                    if (isMobile) {
-                        statusEl.textContent = '🎤 Dinleniyor... (Mobil)';
-                    } else {
-                        statusEl.textContent = '🎤 Dinleniyor...';
-                    }
+                    statusEl.textContent = '🎤 Dinleniyor...';
                     statusEl.style.color = '#667eea';
                 }
+                
+                // Recognition zaten başlatılmışsa önce durdur
+                if (isListening) {
+                    try {
+                        recognition.stop();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (e) {
+                        log.debug('Recognition durdurulurken hata:', e);
+                    }
+                }
+                
+                // Yeni başlat
                 recognition.start();
+                log.debug('✅ Speech Recognition başlatıldı');
             } catch (error) {
-                log.error('Ses tanıma başlatma hatası:', error);
+                log.error('❌ Ses tanıma başlatma hatası:', error);
                 
                 // Stream'i temizle
                 if (microphoneStream) {
-                    microphoneStream.getTracks().forEach(track => track.stop());
-                    microphoneStream = null;
+                    try {
+                        microphoneStream.getTracks().forEach(track => {
+                            if (track.readyState === 'live') {
+                                track.stop();
+                            }
+                        });
+                        microphoneStream = null;
+                    } catch (e) {
+                        log.debug('Stream temizlenirken hata:', e);
+                    }
                 }
                 
-                if (error.name === 'NotAllowedError' || error.message.includes('not allowed')) {
+                // Hata mesajlarını göster
+                if (error.name === 'NotAllowedError' || error.message?.includes('not allowed')) {
                     if (statusEl) {
                         statusEl.textContent = '❌ Mikrofon izni verilmedi';
                         statusEl.style.color = '#f44336';
                     }
                     showMicrophonePermissionHelp();
-                } else if (error.name === 'NotFoundError' || error.message.includes('not found')) {
+                } else if (error.name === 'NotFoundError' || error.message?.includes('not found')) {
                     if (statusEl) {
                         statusEl.textContent = '❌ Mikrofon bulunamadı';
                         statusEl.style.color = '#f44336';
                     }
                     showBluetoothMicrophoneHelp();
-                } else if (error.name === 'NetworkError' || error.message.includes('network')) {
+                } else if (error.name === 'NetworkError' || error.message?.includes('network')) {
                     if (statusEl) {
                         statusEl.textContent = '❌ Bağlantı hatası';
                         statusEl.style.color = '#f44336';
@@ -8464,14 +8832,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     showNetworkErrorHelp();
                 } else {
                     if (statusEl) {
-                        statusEl.textContent = '❌ Ses tanıma başlatılamadı: ' + (error.message || error.name || 'Bilinmeyen hata');
+                        statusEl.textContent = `❌ Hata: ${error.message || error.name || 'Bilinmeyen hata'}`;
                         statusEl.style.color = '#f44336';
                     }
-                    if (isMobile) {
-                        showCustomAlert('Ses tanıma başlatılamadı. Mobil cihazlarda genellikle daha iyi çalışır. Lütfen tekrar deneyin veya tarayıcı ayarlarından mikrofon iznini kontrol edin.', 'error');
-                    } else {
-                        showCustomAlert('Ses tanıma başlatılamadı: ' + (error.message || error.name || 'Bilinmeyen hata') + '. Lütfen tekrar deneyin.', 'error');
-                    }
+                    showCustomAlert(`Ses tanıma başlatılamadı: ${error.message || error.name || 'Bilinmeyen hata'}. Lütfen tekrar deneyin.`, 'error');
                 }
             }
         };
@@ -8556,7 +8920,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Benzerlik skoru hesapla (Duolingo tarzı)
                     const longer = Math.max(btnTextNormalized.length, normalizedSpoken.length);
                     const shorter = Math.min(btnTextNormalized.length, normalizedSpoken.length);
-                    const similarity = (shorter / longer) * 100;
+                    // Division by zero check (if both strings are empty)
+                    const similarity = longer > 0 ? (shorter / longer) * 100 : 0;
                     
                     if (similarity > bestScore) {
                         bestScore = similarity;
@@ -8596,6 +8961,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (statusEl) {
                     statusEl.textContent = '✅ "' + spokenText + '" eşleşti!';
                     statusEl.style.color = '#4caf50';
+                }
+                
+                // Ses tanımayı durdur (eşleşme bulunduğunda)
+                if (isListening && recognition) {
+                    try {
+                        isListening = false;
+                        recognition.stop();
+                    } catch (e) {
+                        log.debug('Recognition durdurulurken hata (match):', e);
+                    }
                 }
                 
                 // Duolingo gibi: Doğrudan checkDinleAnswer fonksiyonunu çağır (click() yerine)
@@ -8665,14 +9040,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 statusEl.style.color = '#666';
             }
             
-            // Ses tanımayı durdur (eğer aktifse)
-            if (isListening && recognition) {
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    log.debug('Ses tanıma zaten durdurulmuş');
-                }
-            }
+            // Ses tanımayı durdur ve temizle (eğer aktifse)
+            window.stopSpeechRecognition();
             
             log.debug(`🎪 === SORU YÜKLENİYOR ===`);
             log.debug(`📊 Mevcut soru sayısı: ${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
@@ -8750,6 +9119,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
             log.debug(`🔀 Seçenekler oluşturuluyor... (4 Arapça kelime)`);
             // Seçenekler oluştur (4 Arapça kelime) - aynı zorluktan
+            // Array length check - prevent error if array is empty
+            if (!filteredData || filteredData.length === 0) {
+                log.error('❌ Filtrelenmiş veri bulunamadı!');
+                showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                return;
+            }
             const wrongAnswers = [];
             let attempts = 0;
             while (wrongAnswers.length < 3 && attempts < 50) {
@@ -10327,7 +10702,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const randomHadis = hadisler[Math.floor(Math.random() * hadisler.length)];
             if (hadisArabic && hadisTurkish) {
                 hadisArabic.textContent = randomHadis.arabic;
-                const hadisSource = document.querySelector('.loading-hadith-source-text');
+                const hadisSource = document.querySelector('.loading-hadith-source-text, .loading-hadith-source-pro');
                 if (hadisSource) {
                     hadisTurkish.textContent = randomHadis.turkish;
                     hadisSource.textContent = randomHadis.source;
@@ -11279,6 +11654,7 @@ function showMainMenu() {
 
 </body>
 </html>
+
 
 
 

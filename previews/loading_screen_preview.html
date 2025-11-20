@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hasene - Professional Loading Screen Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Professional Loading Screen */
+        .loading-screen-pro {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Animated Background Pattern */
+        .loading-screen-pro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+            animation: backgroundMove 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundMove {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(180deg);
+            }
+        }
+
+        /* Logo Container with Pulse Animation */
+        .loading-logo-container-pro {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 30px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.05);
+            }
+        }
+
+        .loading-logo-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 2px 10px rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.3),
+                    inset 0 2px 10px rgba(255, 255, 255, 0.2),
+                    0 0 0 0 rgba(255, 255, 255, 0.4);
+            }
+            50% {
+                box-shadow: 
+                    0 20px 60px rgba(0, 0, 0, 0.3),
+                    inset 0 2px 10px rgba(255, 255, 255, 0.2),
+                    0 0 30px 10px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .loading-logo-circle::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: rgba(255, 255, 255, 0.6);
+            border-right-color: rgba(255, 255, 255, 0.3);
+            animation: logoRotate 2s linear infinite;
+        }
+
+        @keyframes logoRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-logo-img-pro {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+        }
+
+        /* App Title */
+        .loading-app-title-pro {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            animation: titleFade 2s ease-in-out infinite;
+        }
+
+        @keyframes titleFade {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Hadith Container - Modern Card Design */
+        .loading-hadith-container-pro {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.2),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+            animation: cardFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Arabic Text - Professional Typography */
+        .loading-hadith-arabic-pro {
+            font-family: 'Uthmani', 'Arabic Typesetting', 'Traditional Arabic', serif;
+            font-size: 1.4em;
+            line-height: 2;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            direction: rtl;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Turkish Text */
+        .loading-hadith-turkish-pro {
+            font-size: 1em;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+            font-style: italic;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Source Text */
+        .loading-hadith-source-pro {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            font-weight: 400;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Progress Section - Modern Design */
+        .loading-progress-container-pro {
+            position: relative;
+            z-index: 2;
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .loading-progress-label-pro {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        /* Progress Bar - Modern Gradient */
+        .loading-progress-track-pro {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .loading-progress-fill-pro {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.9) 0%, 
+                rgba(255, 255, 255, 0.7) 50%,
+                rgba(255, 255, 255, 0.9) 100%);
+            border-radius: 10px;
+            width: 0%;
+            position: relative;
+            overflow: hidden;
+            transition: width 0.3s ease;
+            animation: progressShine 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .loading-progress-fill-pro::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.6), 
+                transparent);
+            animation: progressSweep 2s ease-in-out infinite;
+        }
+
+        @keyframes progressSweep {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes progressShine {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        /* Loading Dots Animation */
+        .loading-dots-pro {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotBounce {
+            0%, 80%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            40% {
+                transform: translateY(-15px) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        .loading-footer-pro {
+            position: relative;
+            z-index: 2;
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-weight: 400;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .loading-logo-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .loading-logo-img-pro {
+                width: 85px;
+                height: 85px;
+            }
+
+            .loading-app-title-pro {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+
+            .loading-hadith-container-pro {
+                padding: 25px 20px;
+                margin-bottom: 30px;
+            }
+
+            .loading-hadith-arabic-pro {
+                font-size: 1.2em;
+                line-height: 1.8;
+            }
+
+            .loading-hadith-turkish-pro {
+                font-size: 0.9em;
+            }
+
+            .loading-progress-container-pro {
+                max-width: 300px;
+            }
+        }
+
+        /* Fade Out Animation */
+        .loading-screen-pro.fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* Performance Optimizations */
+        .loading-screen-pro * {
+            will-change: transform, opacity;
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional Loading Screen -->
+    <div class="loading-screen-pro" id="loadingScreen">
+        <!-- Logo with Modern Design -->
+        <div class="loading-logo-container-pro">
+            <div class="loading-logo-circle">
+                <img src="../assets/images/icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img-pro" 
+                     onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;font-size:60px;font-weight:bold;\'>📖</div>';">
+            </div>
+        </div>
+        
+        <!-- App Title -->
+        <h1 class="loading-app-title-pro">HASENE</h1>
+
+        <!-- Hadith Container - Modern Card -->
+        <div class="loading-hadith-container-pro" id="hadisBox">
+            <div class="loading-hadith-arabic-pro" id="hadisArabic">
+                مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
+            </div>
+            <div class="loading-hadith-turkish-pro" id="hadisTurkish">
+                "Kim Allah'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."
+            </div>
+            <div class="loading-hadith-source-pro">(Tirmizi, Sevâbü'l-Kur'ân 16)</div>
+        </div>
+
+        <!-- Loading Dots Animation -->
+        <div class="loading-dots-pro">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="loading-progress-container-pro">
+            <div class="loading-progress-label-pro" id="loadingProgressLabel">
+                Kelime verileri yükleniyor...
+            </div>
+            <div class="loading-progress-track-pro">
+                <div class="loading-progress-fill-pro" id="loadingProgressBar" style="width: 45%;"></div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="loading-footer-pro">© YZOKUMUS 2025</div>
+    </div>
+
+    <script>
+        // Simulate loading progress
+        let progress = 0;
+        const progressBar = document.getElementById('loadingProgressBar');
+        const progressLabel = document.getElementById('loadingProgressLabel');
+        
+        const progressSteps = [
+            { label: 'Kelime verileri yükleniyor...', progress: 20 },
+            { label: 'Ayet verileri yükleniyor...', progress: 40 },
+            { label: 'Hadis verileri yükleniyor...', progress: 60 },
+            { label: 'Dua verileri yükleniyor...', progress: 80 },
+            { label: 'Tamamlanıyor...', progress: 100 }
+        ];
+        
+        let currentStep = 0;
+        
+        function updateProgress() {
+            if (currentStep < progressSteps.length) {
+                const step = progressSteps[currentStep];
+                progressLabel.textContent = step.label;
+                progressBar.style.width = step.progress + '%';
+                currentStep++;
+                
+                if (currentStep < progressSteps.length) {
+                    setTimeout(updateProgress, 1000);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').classList.add('fade-out');
+                        setTimeout(() => {
+                            document.getElementById('loadingScreen').style.display = 'none';
+                            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;font-size:1.2em;">Loading screen test completed! ✅</div>';
+                        }, 500);
+                    }, 500);
+                }
+            }
+        }
+        
+        // Start progress animation after 500ms
+        setTimeout(updateProgress, 500);
+        
+        // Add some interactivity - click to restart
+        document.addEventListener('click', () => {
+            if (document.getElementById('loadingScreen').style.display !== 'none') {
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
+
