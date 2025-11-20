@@ -6018,13 +6018,27 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             });
             
             // Genel ilerleme
-            document.getElementById('completedTasks').textContent = completedCount;
-            document.getElementById('totalTasks').textContent = totalCount;
-            
-            const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+            const completedTasksEl = document.getElementById('completedTasks');
+            const totalTasksEl = document.getElementById('totalTasks');
             const taskProgressBar = document.getElementById('taskProgress');
+            
+            if (completedTasksEl) {
+                completedTasksEl.textContent = completedCount;
+            } else {
+                log.error('❌ completedTasks elementi bulunamadı!');
+            }
+            
+            if (totalTasksEl) {
+                totalTasksEl.textContent = totalCount;
+            } else {
+                log.error('❌ totalTasks elementi bulunamadı!');
+            }
+            
+            const progressPercent = totalCount > 0 ? Math.min((completedCount / totalCount) * 100, 100) : 0;
             if (taskProgressBar) {
                 taskProgressBar.style.width = progressPercent + '%';
+            } else {
+                log.error('❌ taskProgress elementi bulunamadı!');
             }
             
             // Badge güncelle (tamamlanmamış görev varsa göster)
@@ -6082,9 +6096,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const updatedTotalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
             
             // Genel ilerleme güncelle
-            document.getElementById('completedTasks').textContent = updatedCompletedCount;
-            document.getElementById('totalTasks').textContent = updatedTotalCount;
-            const updatedProgressPercent = updatedTotalCount > 0 ? (updatedCompletedCount / updatedTotalCount) * 100 : 0;
+            if (completedTasksEl) {
+                completedTasksEl.textContent = updatedCompletedCount;
+            }
+            if (totalTasksEl) {
+                totalTasksEl.textContent = updatedTotalCount;
+            }
+            const updatedProgressPercent = updatedTotalCount > 0 ? Math.min((updatedCompletedCount / updatedTotalCount) * 100, 100) : 0;
             // taskProgressBar zaten yukarıda tanımlı, tekrar tanımlamaya gerek yok
             if (taskProgressBar) {
                 taskProgressBar.style.width = updatedProgressPercent + '%';
@@ -6092,34 +6110,49 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
             // Temel görevleri göster
             const dailyList = document.getElementById('dailyTasksList');
-            dailyList.innerHTML = '';
-            
-            dailyTasks.tasks.forEach(task => {
-                const taskElement = createTaskElement(task);
-                dailyList.appendChild(taskElement);
-            });
+            if (dailyList) {
+                dailyList.innerHTML = '';
+                
+                if (dailyTasks.tasks && dailyTasks.tasks.length > 0) {
+                    dailyTasks.tasks.forEach(task => {
+                        const taskElement = createTaskElement(task);
+                        dailyList.appendChild(taskElement);
+                    });
+                }
+            } else {
+                log.error('❌ dailyTasksList elementi bulunamadı!');
+            }
 
             // Bonus görevleri göster
             const bonusList = document.getElementById('bonusTasksList');
-            bonusList.innerHTML = '';
-            
-            dailyTasks.bonusTasks.forEach(task => {
-                const taskElement = createTaskElement(task);
-                bonusList.appendChild(taskElement);
-            });
+            if (bonusList) {
+                bonusList.innerHTML = '';
+                
+                if (dailyTasks.bonusTasks && dailyTasks.bonusTasks.length > 0) {
+                    dailyTasks.bonusTasks.forEach(task => {
+                        const taskElement = createTaskElement(task);
+                        bonusList.appendChild(taskElement);
+                    });
+                }
+            } else {
+                log.error('❌ bonusTasksList elementi bulunamadı!');
+            }
 
             // Ödül bölümü
             const rewardsSection = document.getElementById('rewardsSection');
-            if (completedCount === totalCount && !dailyTasks.rewardsClaimed) {
-                rewardsSection.style.display = 'block';
-            } else {
-                rewardsSection.style.display = 'none';
+            if (rewardsSection) {
+                if (completedCount === totalCount && totalCount > 0 && !dailyTasks.rewardsClaimed) {
+                    rewardsSection.style.display = 'block';
+                } else {
+                    rewardsSection.style.display = 'none';
+                }
             }
         }
 
         function createTaskElement(task) {
             const isCompleted = dailyTasks.completedTasks.includes(task.id);
-            const progressPercent = (task.current / task.target) * 100;
+            // Sıfıra bölünme kontrolü
+            const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
             
             // Task icon mapping
             const taskIcons = {
