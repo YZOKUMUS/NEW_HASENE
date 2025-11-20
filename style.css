@@ -863,11 +863,11 @@ body {
 }
 
 .audio-btn {
-    background-image: url('hoparlor.png');
+    background-image: url('assets/images/hoparlor.png');
 }
 
 .hint-btn {
-    background-image: url('clue.png');
+    background-image: url('assets/images/clue.png');
 }
 
 /* ----- GAME BOX ----- */
@@ -2248,6 +2248,7 @@ body {
     width: 24px;
     height: 24px;
     margin: 10px auto;
+    background-image: url('assets/images/hoparlor.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
