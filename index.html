@@ -8409,8 +8409,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         showHelpModal = true;
                         break;
                     case 'not-allowed':
-                        errorMsg = 'Mikrofon izni verilmedi';
-                        helpText = 'Tarayıcı ayarlarından mikrofon izni verin ve sayfayı yenileyin.';
+                        errorMsg = 'Mikrofon izni reddedildi';
+                        helpText = 'Tarayıcı ayarlarından mikrofon izni verin. Adres çubuğundaki 🔒 simgesine tıklayın ve mikrofon iznini "İzin ver" yapın.';
                         showHelpModal = true;
                         break;
                     case 'aborted':
@@ -8434,8 +8434,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     statusEl.innerHTML = '❌ ' + errorMsg + (helpText ? '<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">' + helpText + '</small>' : '');
                     statusEl.style.color = '#f44336';
                     
-                    // Network veya audio-capture hatası için tekrar dene butonu ekle
-                    if (event.error === 'network' || event.error === 'audio-capture' || event.error === 'no-speech') {
+                    // Network, audio-capture, no-speech veya not-allowed hatası için tekrar dene butonu ekle
+                    if (event.error === 'network' || event.error === 'audio-capture' || event.error === 'no-speech' || event.error === 'not-allowed') {
                         // Önceki butonları kaldır
                         const oldBtns = statusEl.querySelectorAll('button');
                         oldBtns.forEach(btn => btn.remove());
@@ -8443,7 +8443,26 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         const retryBtn = document.createElement('button');
                         retryBtn.textContent = '🔄 Tekrar Dene';
                         retryBtn.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 600; touch-action: manipulation;';
-                        retryBtn.onclick = () => {
+                        retryBtn.onclick = async () => {
+                            // not-allowed hatası için önce izin kontrolü yap
+                            if (event.error === 'not-allowed') {
+                                statusEl.innerHTML = '🔍 Mikrofon izni kontrol ediliyor...';
+                                statusEl.style.color = '#f39c12';
+                                
+                                // İzin kontrolü yap
+                                try {
+                                    const permission = await checkMicrophonePermission();
+                                    if (permission === 'denied') {
+                                        statusEl.innerHTML = '❌ Mikrofon izni hala reddedildi<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">Lütfen tarayıcı ayarlarından mikrofon iznini verin.</small>';
+                                        statusEl.style.color = '#f44336';
+                                        showMicrophonePermissionHelp();
+                                        return;
+                                    }
+                                } catch (permError) {
+                                    log.debug('İzin kontrolü hatası:', permError);
+                                }
+                            }
+                            
                             statusEl.innerHTML = '🔄 Tekrar deneniyor...';
                             statusEl.style.color = '#f39c12';
                             setTimeout(() => {
@@ -8465,7 +8484,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     micBtn.disabled = false;
                 }
                 
-                log.error('❌ Ses tanıma hatası:', event.error, event);
+                // Sadece aborted hatası dışındaki hataları logla (aborted normal bir durum)
+                if (event.error !== 'aborted') {
+                    log.error('❌ Ses tanıma hatası:', event.error, event);
+                } else {
+                    log.debug('🛑 Ses tanıma kullanıcı tarafından durduruldu (aborted)');
+                }
                 
                 // Haptic feedback
                 if (typeof triggerHaptic === 'function' && event.error !== 'aborted') {

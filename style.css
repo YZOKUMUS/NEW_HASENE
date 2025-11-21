@@ -7170,37 +7170,99 @@ body {
 /* Mobile Responsive - Preview Tasarım */
 @media (max-width: 480px) {
     #badgesModal .badges-container {
+        max-width: 100% !important;
         max-height: 100vh !important;
         border-radius: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
     }
 
     #badgesModal .badges-header {
-        padding: 20px 16px !important;
+        padding: 16px 12px !important;
     }
 
     #badgesModal .badges-header h2 {
-        font-size: 20px !important;
+        font-size: 18px !important;
+    }
+
+    #badgesModal .close-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        font-size: 22px !important;
     }
 
     #badgesModal .stats-summary {
-        margin: 16px !important;
-        padding: 16px !important;
+        margin: 12px !important;
+        padding: 12px !important;
+        gap: 12px !important;
     }
 
     #badgesModal .stats-summary .stat-value {
-        font-size: 28px !important;
+        font-size: 24px !important;
+    }
+
+    #badgesModal .stats-summary .stat-label {
+        font-size: 11px !important;
+    }
+
+    /* Category tabs - mobilde scroll edilebilir */
+    #badgesModal .category-tabs {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        padding: 0 12px !important;
+        margin: 0 0 12px 0 !important;
+    }
+
+    #badgesModal .category-tabs::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    #badgesModal .category-tab {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        min-height: 40px !important;
+        white-space: nowrap !important;
+    }
+
+    #badgesModal .badges-content {
+        padding: 0 12px 16px !important;
     }
 
     #badgesModal .badges-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
 
     #badgesModal .badge-card {
-        padding: 16px 12px !important;
+        padding: 12px 8px !important;
+        border-radius: 16px !important;
     }
 
     #badgesModal .badge-icon {
-        font-size: 48px !important;
+        font-size: 40px !important;
+        margin-bottom: 8px !important;
+    }
+
+    #badgesModal .badge-title {
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
+    }
+
+    #badgesModal .badge-desc {
+        font-size: 11px !important;
+        margin-bottom: 8px !important;
+    }
+
+    #badgesModal .badge-progress {
+        height: 4px !important;
+        margin-bottom: 6px !important;
+    }
+
+    #badgesModal .badge-status {
+        font-size: 10px !important;
     }
 }
