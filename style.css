@@ -1979,6 +1979,11 @@ body {
     pointer-events: auto !important;
 }
 
+/* Scrollable content içindeki tüm elementlerin scroll yapılabilmesi için */
+#dailyTasksScrollableContent * {
+    touch-action: pan-y !important;
+}
+
 #dailyTasksScrollableContent::-webkit-scrollbar {
     width: 6px;
 }
