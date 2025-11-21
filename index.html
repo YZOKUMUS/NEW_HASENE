@@ -768,7 +768,7 @@
     <div class="modal" id="dailyTasksModal" onclick="handleDailyTasksModalClick(event)">
         <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 95vh; height: auto; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
             <!-- Scroll Edilebilir İçerik -->
-            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; will-change: scroll-position; padding-right: 4px; margin-bottom: 12px;">
+            <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
                 <!-- Header -->
                 <div class="daily-tasks-header" style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid #f0f0f0;">
                     <div class="daily-tasks-title" style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05em; color: #1f2937;">
@@ -6426,11 +6426,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 e.stopPropagation();
                 e.preventDefault();
             };
-            // Touch event'leri passive olarak ekle (scroll performansı için)
+            // Touch event'leri - scroll'u engellemeden sadece click'i engelle
             div.addEventListener('touchstart', function(e) {
                 e.stopPropagation();
-                e.preventDefault();
-            }, { passive: false }); // preventDefault kullanıldığı için passive: false
+                // preventDefault kaldırıldı - scroll'u engellemesin
+            }, { passive: true }); // Scroll performansı için passive: true
             
             // Hover efekti
             div.onmouseover = function() {
