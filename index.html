@@ -6742,6 +6742,35 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 elements.dinleNextBtn.onclick = () => {
                     log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
                     log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
+                    
+                    // 10 soru kontrolü - butona tıklamadan önce kontrol et
+                    if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
+                        log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
+                        log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
+                        
+                        // Günlük görev ilerlemesini güncelle
+                        updateTaskProgress('dinleBul', sessionCorrect);
+                        
+                        // Session puanlarını global'e aktar
+                        addToGlobalPoints(sessionScore, sessionCorrect);
+                        
+                        // Direkt ana menüye dön
+                        elements.dinleMode.style.display = 'none';
+                        elements.mainMenu.style.display = 'block';
+                        
+                        // Navigasyon bar'ı göster
+                        showBottomNavBar();
+                        
+                        // Oyun değişkenlerini temizle
+                        dinleScore = 0;
+                        dinleCorrect = 0;
+                        dinleWrong = 0;
+                        dinleQuestionCount = 0;
+                        updateDinleUI();
+                        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                        return;
+                    }
+                    
                     log.debug(`🎯 Bir sonraki soru yükleniyor...`);
                     // Butonu hemen gizle
                     if (elements.dinleNextBtn) {
@@ -6756,6 +6785,35 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     e.stopPropagation();
                     log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
                     log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
+                    
+                    // 10 soru kontrolü - butona tıklamadan önce kontrol et
+                    if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
+                        log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
+                        log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
+                        
+                        // Günlük görev ilerlemesini güncelle
+                        updateTaskProgress('dinleBul', sessionCorrect);
+                        
+                        // Session puanlarını global'e aktar
+                        addToGlobalPoints(sessionScore, sessionCorrect);
+                        
+                        // Direkt ana menüye dön
+                        elements.dinleMode.style.display = 'none';
+                        elements.mainMenu.style.display = 'block';
+                        
+                        // Navigasyon bar'ı göster
+                        showBottomNavBar();
+                        
+                        // Oyun değişkenlerini temizle
+                        dinleScore = 0;
+                        dinleCorrect = 0;
+                        dinleWrong = 0;
+                        dinleQuestionCount = 0;
+                        updateDinleUI();
+                        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                        return;
+                    }
+                    
                     log.debug(`🎯 Bir sonraki soru yükleniyor...`);
                     // Butonu hemen gizle
                     if (elements.dinleNextBtn) {
