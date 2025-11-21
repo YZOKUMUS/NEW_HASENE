@@ -4219,8 +4219,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                                 return;
                             }
                             
-                            // Scroll edilebilir içerik alanına tıklanmışsa ignore et
-                            if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
+                            // Scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa ignore et
+                            if (target && badgesScrollableContent && (
+                                target === badgesScrollableContent || 
+                                target.id === 'badgesScrollableContent' || 
+                                badgesScrollableContent.contains(target)
+                            )) {
                                 return;
                             }
                             

@@ -2148,10 +2148,19 @@ body {
     height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    /* Touch action - scroll için - TÜM ALANDA ÇALIŞSIN */
+    touch-action: pan-y !important;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    /* Scroll için pointer events */
+    pointer-events: auto !important;
+}
+
+/* Scrollable content içindeki tüm elementlerin scroll yapılabilmesi için */
+#badgesScrollableContent * {
+    touch-action: pan-y !important;
 }
 
 #badgesScrollableContent::-webkit-scrollbar {
