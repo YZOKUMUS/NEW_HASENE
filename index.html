@@ -6705,16 +6705,35 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Mikrofon butonu event listener
             const dinleMicBtn = document.getElementById('dinleMicBtn');
             if (dinleMicBtn) {
-                // Masaüstü için onclick
-                dinleMicBtn.onclick = () => {
-                    startSpeechRecognition();
+                const isMobile = isMobileDevice();
+                let micButtonClicked = false; // Çift tıklamayı önlemek için
+                
+                const handleMicClick = async (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    
+                    // Çift tıklamayı önle
+                    if (micButtonClicked) {
+                        log.debug('⏭️ Mikrofon butonu zaten tıklandı, atlanıyor');
+                        return;
+                    }
+                    
+                    micButtonClicked = true;
+                    setTimeout(() => {
+                        micButtonClicked = false;
+                    }, 1000); // 1 saniye içinde tekrar tıklamayı engelle
+                    
+                    await startSpeechRecognition();
                 };
-                // Mobil için touchend
-                dinleMicBtn.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    startSpeechRecognition();
-                }, { passive: false });
+                
+                // Mobilde sadece touchend, masaüstünde sadece onclick
+                if (isMobile) {
+                    dinleMicBtn.addEventListener('touchend', handleMicClick, { passive: false });
+                } else {
+                    dinleMicBtn.onclick = handleMicClick;
+                }
             }
             
             // Next butonu event handler'ını buraya taşıdık
@@ -8096,30 +8115,88 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         let isListening = false;
         let microphoneStream = null;
         let recognitionInitialized = false;
+        let isStopping = false; // Durdurma işlemi devam ediyor mu?
         
-        // Ses tanımayı durdur (global erişim için)
-        window.stopSpeechRecognition = function() {
-            try {
-                if (recognition && isListening) {
-                    recognition.stop();
-                    isListening = false;
-                }
-            } catch (e) {
-                log.debug('Ses tanıma durdurulurken hata:', e);
-            }
-            
-            // Mikrofon stream'ini temizle
+        // Mikrofon stream'ini güvenli şekilde temizle
+        function cleanupMicrophoneStream() {
             if (microphoneStream) {
                 try {
                     microphoneStream.getTracks().forEach(track => {
-                        track.stop();
-                        track.enabled = false;
+                        if (track.readyState === 'live' || track.readyState === 'ended') {
+                            track.stop();
+                            track.enabled = false;
+                        }
                     });
                     microphoneStream = null;
+                    log.debug('✅ Mikrofon stream temizlendi');
                 } catch (e) {
-                    log.debug('Mikrofon stream temizlenirken hata:', e);
+                    log.debug('Stream temizlenirken hata:', e);
+                    microphoneStream = null; // Hata olsa bile null yap
                 }
             }
+        }
+        
+        // Recognition'ı güvenli şekilde durdur
+        async function stopRecognitionSafely() {
+            if (recognition && isListening && !isStopping) {
+                isStopping = true;
+                try {
+                    recognition.stop();
+                    isListening = false;
+                    // Recognition'ın tamamen durması için bekle
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    log.debug('✅ Recognition güvenli şekilde durduruldu');
+                } catch (e) {
+                    log.debug('Recognition durdurulurken hata:', e);
+                    isListening = false;
+                } finally {
+                    isStopping = false;
+                }
+            } else if (recognition && !isListening) {
+                // Zaten durmuş, sadece flag'i kontrol et
+                isListening = false;
+            }
+        }
+        
+        // Recognition nesnesini tamamen temizle
+        function cleanupRecognition() {
+            if (recognition) {
+                try {
+                    // Tüm event listener'ları kaldır
+                    recognition.onstart = null;
+                    recognition.onresult = null;
+                    recognition.onerror = null;
+                    recognition.onend = null;
+                    
+                    // Eğer aktifse durdur
+                    if (isListening) {
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            // Zaten durmuş olabilir
+                        }
+                    }
+                    
+                    recognition = null;
+                    recognitionInitialized = false;
+                    isListening = false;
+                    log.debug('✅ Recognition nesnesi temizlendi');
+                } catch (e) {
+                    log.debug('Recognition temizlenirken hata:', e);
+                    recognition = null;
+                    recognitionInitialized = false;
+                    isListening = false;
+                }
+            }
+        }
+        
+        // Ses tanımayı durdur (global erişim için)
+        window.stopSpeechRecognition = async function() {
+            // Önce recognition'ı durdur
+            await stopRecognitionSafely();
+            
+            // Mikrofon stream'ini temizle
+            cleanupMicrophoneStream();
             
             // UI'ı sıfırla
             const micBtn = document.getElementById('dinleMicBtn');
@@ -8130,6 +8207,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 micBtn.style.transform = 'scale(1)';
                 micBtn.style.boxShadow = '';
                 micBtn.style.animation = '';
+                micBtn.disabled = false;
             }
             
             if (statusEl && !statusEl.textContent.includes('❌')) {
@@ -8140,7 +8218,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.debug('🛑 Ses tanıma durduruldu ve temizlendi');
         };
         
-        // Mikrofon iznini kontrol et
+        // Mikrofon iznini kontrol et (stream açmadan)
         async function checkMicrophonePermission() {
             try {
                 // Permissions API desteği var mı? (Chrome/Edge için)
@@ -8151,30 +8229,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         log.debug('Mikrofon izin durumu (Permissions API):', permission.state);
                         return permission.state;
                     } catch (permError) {
-                        // Permissions API'de 'microphone' desteklenmiyorsa getUserMedia ile test et
-                        log.debug('Permissions API mikrofon desteği yok, getUserMedia ile test ediliyor');
-                    }
-                }
-                
-                // Permissions API yoksa veya desteklenmiyorsa, getUserMedia ile test et
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        stream.getTracks().forEach(track => track.stop()); // Stream'i hemen kapat
-                        log.debug('Mikrofon izin durumu (getUserMedia): granted');
-                        return 'granted';
-                    } catch (error) {
-                        log.debug('Mikrofon izin hatası:', error.name, error.message);
-                        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                            return 'denied';
-                        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-                            return 'not-found';
-                        }
+                        // Permissions API'de 'microphone' desteklenmiyorsa veya hata varsa
+                        log.debug('Permissions API mikrofon desteği yok veya hata:', permError);
+                        // Stream açmadan 'prompt' döndür (kullanıcı izin vermemiş olabilir)
                         return 'prompt';
                     }
                 }
                 
-                return 'unknown';
+                // Permissions API yoksa, stream açmadan 'prompt' döndür
+                // getUserMedia ile test etmek yerine direkt 'prompt' döndür
+                // Çünkü stream açmak gereksiz yere izin isteyebilir
+                log.debug('Permissions API yok, varsayılan olarak prompt döndürülüyor');
+                return 'prompt';
             } catch (error) {
                 log.error('Mikrofon izin kontrolü hatası:', error);
                 return 'unknown';
@@ -8236,21 +8302,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Yeni SpeechRecognition nesnesi oluştur
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            // Eski recognition nesnesini tamamen temizle
             if (recognition) {
-                // Eski recognition nesnesini temizle
-                try {
-                    recognition.onstart = null;
-                    recognition.onresult = null;
-                    recognition.onerror = null;
-                    recognition.onend = null;
-                    if (isListening) {
-                        recognition.stop();
-                    }
-                } catch (e) {
-                    log.debug('Eski recognition temizlenirken hata:', e);
-                }
+                cleanupRecognition();
             }
             
+            // Yeni recognition nesnesi oluştur
             recognition = new SpeechRecognition();
             
             // Dinle ve Bul modu Arapça telaffuz beklediğinden varsayılan dil Arapça (Suudi Arabistan)
@@ -8333,18 +8391,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const micBtn = document.getElementById('dinleMicBtn');
                 
                 // Stream'i temizle (hata durumunda)
-                if (microphoneStream) {
-                    try {
-                        microphoneStream.getTracks().forEach(track => {
-                            if (track.readyState === 'live') {
-                                track.stop();
-                            }
-                        });
-                        microphoneStream = null;
-                    } catch (e) {
-                        log.debug('Stream temizlenirken hata (onerror):', e);
-                    }
-                }
+                cleanupMicrophoneStream();
                 
                 let errorMsg = 'Ses tanıma hatası';
                 let helpText = '';
@@ -8466,17 +8513,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Stream'i temizle (Bluetooth mikrofon için) - sadece masaüstünde
                 // Mobilde stream kullanılmıyor, bu yüzden temizleme gerekmez
                 const isMobile = isMobileDevice();
-                if (!isMobile && microphoneStream) {
-                    try {
-                        microphoneStream.getTracks().forEach(track => {
-                            if (track.readyState === 'live') {
-                                track.stop();
-                            }
-                        });
-                        microphoneStream = null;
-                    } catch (e) {
-                        log.debug('Stream temizlenirken hata (onuend):', e);
-                    }
+                if (!isMobile) {
+                    cleanupMicrophoneStream();
                 }
                 
                 log.debug('🛑 Ses tanıma durduruldu (onend)');
@@ -8583,11 +8621,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         
         // Ses tanımayı başlat (global erişim için)
         window.startSpeechRecognition = async function() {
+            // Eğer zaten durduruluyorsa bekle
+            if (isStopping) {
+                log.debug('⏳ Recognition durduruluyor, bekleniyor...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
             // Önce mevcut ses tanımayı durdur (eğer aktifse)
             if (isListening || recognition) {
-                window.stopSpeechRecognition();
-                // Kısa bir bekleme - durma işleminin tamamlanması için
-                await new Promise(resolve => setTimeout(resolve, 200));
+                await window.stopSpeechRecognition();
+                // Durdurma işleminin tamamlanması için yeterli bekleme
+                await new Promise(resolve => setTimeout(resolve, 400));
             }
             
             // Validation checks
@@ -8668,18 +8712,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     }
                     
                     // Önceki stream varsa kapat
-                    if (microphoneStream) {
-                        try {
-                            microphoneStream.getTracks().forEach(track => {
-                                if (track.readyState === 'live') {
-                                    track.stop();
-                                }
-                            });
-                        } catch (e) {
-                            log.debug('Eski stream temizlenirken hata:', e);
-                        }
-                        microphoneStream = null;
-                    }
+                    cleanupMicrophoneStream();
                     
                     // Mikrofonu aktif hale getir (Bluetooth dahil tüm mikrofonlar için)
                     microphoneStream = await navigator.mediaDevices.getUserMedia({ 
@@ -8717,8 +8750,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             statusEl.style.color = '#4caf50';
                         }
                         
-                        // Mikrofonun tam olarak hazır olması için kısa bir gecikme
-                        await new Promise(resolve => setTimeout(resolve, 300));
+                        // Mikrofonun tam olarak hazır olması için yeterli gecikme
+                        // Bluetooth mikrofonlar için daha uzun süre gerekebilir
+                        await new Promise(resolve => setTimeout(resolve, 500));
                     }
                 } catch (mediaError) {
                     log.error('❌ Mikrofon erişim hatası:', mediaError);
@@ -8747,33 +8781,31 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 // Recognition zaten başlatılmışsa önce durdur
                 if (isListening) {
-                    try {
-                        recognition.stop();
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    } catch (e) {
-                        log.debug('Recognition durdurulurken hata:', e);
-                    }
+                    await stopRecognitionSafely();
                 }
                 
-                // Yeni başlat
-                recognition.start();
-                log.debug('✅ Speech Recognition başlatıldı');
+                // Yeni başlat (eğer hala durmuşsa)
+                if (!isListening && !isStopping) {
+                    try {
+                        recognition.start();
+                        log.debug('✅ Speech Recognition başlatıldı');
+                    } catch (startError) {
+                        // Eğer "already started" hatası alırsak, zaten başlamış demektir
+                        if (startError.message && startError.message.includes('already started')) {
+                            log.debug('⚠️ Recognition zaten başlatılmış');
+                            isListening = true;
+                        } else {
+                            throw startError; // Diğer hataları yukarı fırlat
+                        }
+                    }
+                } else {
+                    log.debug('⚠️ Recognition başlatılamadı: isListening=' + isListening + ', isStopping=' + isStopping);
+                }
             } catch (error) {
                 log.error('❌ Ses tanıma başlatma hatası:', error);
                 
                 // Stream'i temizle
-                if (microphoneStream) {
-                    try {
-                        microphoneStream.getTracks().forEach(track => {
-                            if (track.readyState === 'live') {
-                                track.stop();
-                            }
-                        });
-                        microphoneStream = null;
-                    } catch (e) {
-                        log.debug('Stream temizlenirken hata:', e);
-                    }
-                }
+                cleanupMicrophoneStream();
                 
                 // Hata mesajlarını göster
                 if (error.name === 'NotAllowedError' || error.message?.includes('not allowed')) {
