@@ -8855,6 +8855,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             return (matches / longer.length) * 100;
         }
         
+        // Arapça metin normalizasyonu (boşlukları, özel karakterleri temizle)
+        function normalizeArabicText(text) {
+            if (!text) return '';
+            // Unicode normalizasyonu (Arapça karakterler için)
+            let normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            // Tüm boşlukları temizle (normal boşluk, non-breaking space, vb.)
+            normalized = normalized.replace(/\s+/g, '').trim();
+            // Arapça için toLowerCase gerekmez, ama yine de yapalım (güvenlik için)
+            // Arapça karakterler zaten küçük/büyük harf ayrımı yapmaz
+            return normalized;
+        }
+        
         // Konuşulan metni cevaplarla eşleştir
         function matchSpeechToAnswer(spokenText) {
             const statusEl = document.getElementById('speechStatus');
@@ -8875,8 +8887,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             speechAttemptCount++;
             const maxAttempts = 2;
             
-            // Konuşulan metni normalize et (küçük harf, boşlukları temizle)
-            const normalizedSpoken = spokenText.toLowerCase().trim();
+            // DEBUG: Orijinal konuşulan metni logla
+            log.debug('🎤 Orijinal konuşulan metin:', spokenText);
+            log.debug('🎤 Konuşulan metin uzunluğu:', spokenText.length);
+            log.debug('🎤 Konuşulan metin karakterleri:', Array.from(spokenText).map(c => c.charCodeAt(0)));
+            
+            // Konuşulan metni normalize et (Arapça için özel normalizasyon)
+            const normalizedSpoken = normalizeArabicText(spokenText);
+            log.debug('🔍 Normalize edilmiş konuşulan metin:', normalizedSpoken);
             
             if (statusEl) {
                 statusEl.textContent = '🔍 "' + spokenText + '" aranıyor...';
@@ -8885,14 +8903,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Doğru cevabı bul (sadece kontrol için, göstermeyeceğiz)
             const correctWord = currentDinleQuestion.kelime;
-            const correctWordNormalized = correctWord.toLowerCase().trim();
+            const correctWordNormalized = normalizeArabicText(correctWord);
+            log.debug('✅ Doğru cevap (orijinal):', correctWord);
+            log.debug('✅ Doğru cevap (normalize):', correctWordNormalized);
             
             // Duolingo tarzı akıllı eşleştirme algoritması
             let matchedButton = null;
             let bestMatch = null;
             let bestScore = 0;
             
-            allBtns.forEach(btn => {
+            // DEBUG: Tüm buton metinlerini logla
+            log.debug('📋 Toplam buton sayısı:', allBtns.length);
+            
+            allBtns.forEach((btn, index) => {
                 // Buton metnini al (HTML içeriğinden temizle)
                 let btnText = btn.textContent.trim();
                 // Eğer HTML içeriği varsa (Arapça için), sadece metni al
@@ -8902,22 +8925,62 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     btnText = tempDiv.textContent.trim();
                 }
                 
-                const btnTextNormalized = btnText.toLowerCase().trim();
+                // DEBUG: Her buton için log
+                log.debug(`📋 Buton ${index + 1} (orijinal):`, btnText);
+                log.debug(`📋 Buton ${index + 1} uzunluğu:`, btnText.length);
+                
+                // Arapça için özel normalizasyon
+                const btnTextNormalized = normalizeArabicText(btnText);
+                log.debug(`📋 Buton ${index + 1} (normalize):`, btnTextNormalized);
+                
+                // DEBUG: Eşleştirme denemeleri
+                const exactMatch = btnTextNormalized === normalizedSpoken;
+                log.debug(`📋 Buton ${index + 1} tam eşleşme:`, exactMatch);
                 
                 // 1. Tam eşleşme (en yüksek öncelik)
-                if (btnTextNormalized === normalizedSpoken) {
+                if (exactMatch) {
+                    log.debug(`✅ TAM EŞLEŞME BULUNDU! Buton ${index + 1}: "${btnText}"`);
                     bestScore = 100;
                     bestMatch = btn;
                     return; // En iyi eşleşme bulundu, devam etme
                 }
                 
-                // 2. Kısmi eşleşme (içeriyor mu?)
-                if (normalizedSpoken.includes(btnTextNormalized) || btnTextNormalized.includes(normalizedSpoken)) {
+                // 2. Baş harf eşleşmesi (Arapça için çok önemli - ilk 1-2 karakter)
+                if (normalizedSpoken.length >= 1 && btnTextNormalized.length >= 1) {
+                    // İlk karakter eşleşiyorsa
+                    const firstCharMatch = normalizedSpoken[0] === btnTextNormalized[0];
+                    // İlk 2 karakter eşleşiyorsa (eğer varsa)
+                    const firstTwoCharsMatch = normalizedSpoken.length >= 2 && btnTextNormalized.length >= 2 &&
+                                             normalizedSpoken.substring(0, 2) === btnTextNormalized.substring(0, 2);
+                    
+                    if (firstTwoCharsMatch) {
+                        // İlk 2 karakter eşleşiyorsa yüksek skor ver
+                        const similarity = 85; // İlk 2 karakter eşleşmesi için %85 skor
+                        log.debug(`✅ İLK 2 KARAKTER EŞLEŞTİ! Buton ${index + 1}: "${btnText}" (${similarity}%)`);
+                        if (similarity > bestScore) {
+                            bestScore = similarity;
+                            bestMatch = btn;
+                        }
+                    } else if (firstCharMatch) {
+                        // Sadece ilk karakter eşleşiyorsa orta skor ver
+                        const similarity = 60; // İlk karakter eşleşmesi için %60 skor
+                        log.debug(`✅ İLK KARAKTER EŞLEŞTİ! Buton ${index + 1}: "${btnText}" (${similarity}%)`);
+                        if (similarity > bestScore) {
+                            bestScore = similarity;
+                            bestMatch = btn;
+                        }
+                    }
+                }
+                
+                // 3. Kısmi eşleşme (içeriyor mu?)
+                const containsMatch = normalizedSpoken.includes(btnTextNormalized) || btnTextNormalized.includes(normalizedSpoken);
+                if (containsMatch) {
                     // Benzerlik skoru hesapla (Duolingo tarzı)
                     const longer = Math.max(btnTextNormalized.length, normalizedSpoken.length);
                     const shorter = Math.min(btnTextNormalized.length, normalizedSpoken.length);
                     // Division by zero check (if both strings are empty)
                     const similarity = longer > 0 ? (shorter / longer) * 100 : 0;
+                    log.debug(`📋 Buton ${index + 1} kısmi eşleşme skoru:`, similarity.toFixed(2) + '%');
                     
                     if (similarity > bestScore) {
                         bestScore = similarity;
@@ -8925,15 +8988,39 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     }
                 }
                 
-                // 3. Levenshtein benzeri basit karşılaştırma (Arapça karakterler için)
+                // 4. Levenshtein benzeri basit karşılaştırma (Arapça karakterler için)
                 const charSimilarity = calculateSimilarity(btnTextNormalized, normalizedSpoken);
-                if (charSimilarity > bestScore && charSimilarity > 70) { // %70'den fazla benzerlik
+                log.debug(`📋 Buton ${index + 1} karakter benzerliği:`, charSimilarity.toFixed(2) + '%');
+                // Eşik değerini %40'a düşürdük (baş harf kontrolü zaten var)
+                if (charSimilarity > bestScore && charSimilarity > 40) { // %40'den fazla benzerlik
+                    log.debug(`✅ YÜKSEK BENZERLİK BULUNDU! Buton ${index + 1}: "${btnText}" (${charSimilarity.toFixed(2)}%)`);
                     bestScore = charSimilarity;
                     bestMatch = btn;
                 }
             });
             
+            log.debug('🏆 En iyi eşleşme skoru:', bestScore.toFixed(2) + '%');
+            log.debug('🏆 En iyi eşleşme butonu:', bestMatch ? bestMatch.textContent.trim() : 'YOK');
+            
             matchedButton = bestMatch;
+            
+            // DEBUG: Eşleşme sonucu
+            if (matchedButton) {
+                log.debug('✅ EŞLEŞME BULUNDU! Buton:', matchedButton.textContent.trim());
+                log.debug('✅ Eşleşme skoru:', bestScore.toFixed(2) + '%');
+            } else {
+                log.warn('❌ HİÇBİR EŞLEŞME BULUNAMADI!');
+                log.warn('❌ Konuşulan metin:', normalizedSpoken);
+                log.warn('❌ Tüm buton metinleri:', Array.from(allBtns).map(btn => {
+                    let text = btn.textContent.trim();
+                    if (btn.innerHTML && btn.innerHTML.includes('<span')) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = btn.innerHTML;
+                        text = tempDiv.textContent.trim();
+                    }
+                    return normalizeArabicText(text);
+                }));
+            }
             
             if (matchedButton) {
                 // Duolingo tarzı: Butonu vurgula (görsel geri bildirim)
