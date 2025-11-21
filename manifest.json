@@ -1,7 +1,7 @@
 {
-  "name": "Hasene Arapça Oyunu",
+  "name": "Hasene Arapça Dersi",
   "short_name": "Hasene",
-  "description": "İslami Arapça öğrenme platformu: kelime çeviri, ayet okuma, dua ezberleme, hadis öğrenme ve gamifikasyon destekli eğitim.",
+  "description": "İslami Arapça öğrenme platformu: kelime çeviri, ayet okuma, dua ezberleme, hadis öğrenme ve talebe destekli eğitim.",
 
   "start_url": "index.html",
   "scope": "./",
@@ -53,9 +53,9 @@
       ]
     },
     {
-      "name": "Görevler",
-      "short_name": "Görevler",
-      "description": "Günlük görevlerini kontrol et",
+      "name": "Vazifeler",
+      "short_name": "Vazifeler",
+      "description": "Günlük vazifelerini kontrol et",
       "url": "index.html?mode=tasks",
       "icons": [
         {
