@@ -4994,8 +4994,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Modal overlay için touch event'leri
             statsModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'statsScrollableContent' || e.target.closest('#statsScrollableContent'))) {
+                // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
+                const target = e.target;
+                if (target && statsScrollableContent && (
+                    target === statsScrollableContent || 
+                    target.id === 'statsScrollableContent' || 
+                    statsScrollableContent.contains(target)
+                )) {
                     return;
                 }
                 
@@ -5009,8 +5014,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
             
             statsModal.addEventListener('touchmove', function(e) {
-                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (e.target && (e.target.id === 'statsScrollableContent' || e.target.closest('#statsScrollableContent'))) {
+                // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
+                const target = e.target;
+                if (target && statsScrollableContent && (
+                    target === statsScrollableContent || 
+                    target.id === 'statsScrollableContent' || 
+                    statsScrollableContent.contains(target)
+                )) {
                     statsModalIsScrolling = true;
                     return;
                 }
@@ -5027,6 +5037,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
             
             statsModal.addEventListener('touchend', function(e) {
+                // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
+                const target = e.target;
+                if (target && statsScrollableContent && (
+                    target === statsScrollableContent || 
+                    target.id === 'statsScrollableContent' || 
+                    statsScrollableContent.contains(target)
+                )) {
+                    statsModalIsScrolling = false;
+                    statsModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
                 // Touch end'de scroll kontrolü yap
                 if (statsModalIsScrolling) {
                     // Scroll oldu, kapatma
@@ -5044,7 +5066,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Kısa süre (300ms) ve küçük hareket (10px) = tap
                 if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
                     // X butonuna tıklanmışsa ignore et
-                    const target = e.target;
                     if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
                         statsModalTouchStart = { x: 0, y: 0, time: 0 };
                         return;
@@ -5601,8 +5622,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Modal overlay için touch event'leri
             calendarModal.addEventListener('touchstart', function(e) {
-                // Eğer scroll edilebilir içerik alanına tıklanmışsa, ignore et
-                if (e.target && (e.target.id === 'calendarScrollableContent' || e.target.closest('#calendarScrollableContent'))) {
+                // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
+                const target = e.target;
+                if (target && calendarScrollableContent && (
+                    target === calendarScrollableContent || 
+                    target.id === 'calendarScrollableContent' || 
+                    calendarScrollableContent.contains(target)
+                )) {
                     return;
                 }
                 
@@ -5616,8 +5642,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
             
             calendarModal.addEventListener('touchmove', function(e) {
-                // Eğer scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-                if (e.target && (e.target.id === 'calendarScrollableContent' || e.target.closest('#calendarScrollableContent'))) {
+                // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
+                const target = e.target;
+                if (target && calendarScrollableContent && (
+                    target === calendarScrollableContent || 
+                    target.id === 'calendarScrollableContent' || 
+                    calendarScrollableContent.contains(target)
+                )) {
                     calendarModalIsScrolling = true;
                     return;
                 }
@@ -5634,6 +5665,18 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }, { passive: true });
             
             calendarModal.addEventListener('touchend', function(e) {
+                // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
+                const target = e.target;
+                if (target && calendarScrollableContent && (
+                    target === calendarScrollableContent || 
+                    target.id === 'calendarScrollableContent' || 
+                    calendarScrollableContent.contains(target)
+                )) {
+                    calendarModalIsScrolling = false;
+                    calendarModalTouchStart = { x: 0, y: 0, time: 0 };
+                    return;
+                }
+                
                 // Touch end'de scroll kontrolü yap
                 if (calendarModalIsScrolling) {
                     // Scroll oldu, kapatma
@@ -5651,7 +5694,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Kısa süre (300ms) ve küçük hareket (10px) = tap
                 if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
                     // X butonuna tıklanmışsa ignore et
-                    const target = e.target;
                     if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
                         calendarModalTouchStart = { x: 0, y: 0, time: 0 };
                         return;
