@@ -42,7 +42,7 @@
     {
       "name": "Kelime Çevir",
       "short_name": "Kelime",
-      "description": "Arapça kelimeleri Türkçeye çevir",
+      "description": "Arapça kelimelerin Türkçe Meâl karşılığını Bul",
       "url": "index.html?mode=kelime",
       "icons": [
         {

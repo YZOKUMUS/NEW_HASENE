@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combo Pop-up Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Animasyonlar */
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔥 Combo Pop-up Test</h1>
+        <p style="color: #666; margin-bottom: 20px;">
+            Aşağıdaki butonlara tıklayarak pop-up'ların nasıl göründüğünü test edebilirsiniz.
+        </p>
+
+        <div class="test-buttons">
+            <button onclick="testCombo(3)">🔥 3x Combo Test</button>
+            <button onclick="testCombo(6)">🔥 6x Combo Test</button>
+            <button onclick="testCombo(9)">🔥 9x Combo Test</button>
+            <button onclick="testCombo(12)">🔥 12x Combo Test</button>
+            <button onclick="testDailyGoal()">🎯 Günlük Hedef Mesajı</button>
+            <button onclick="testFavorite()">⭐ Favori Eklendi</button>
+            <button onclick="testAllTasks()">🎉 Tüm Görevler Tamamlandı</button>
+        </div>
+
+        <div class="info">
+            <strong>📌 Not:</strong><br>
+            Pop-up'lar ekranın <strong>altında</strong> (20px yukarıda) görünecek.<br>
+            Her pop-up 3 saniye sonra otomatik olarak kaybolacak.
+        </div>
+    </div>
+
+    <script>
+        function showSuccessMessage(message) {
+            const msg = document.createElement('div');
+            msg.textContent = message;
+            // comboIndicator ile aynı boyutlar: padding: 10px 16px, font-size: 14px, border-radius: 10px
+            msg.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 10000; box-shadow: 0 4px 15px rgba(74,222,128,0.4); animation: slideUp 0.3s ease; max-width: 90%; box-sizing: border-box; text-align: center; line-height: 1.3; margin: 0;';
+            document.body.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => msg.remove(), 300);
+            }, 3000);
+        }
+
+        function testCombo(count) {
+            const bonusXP = Math.floor(count / 3) * 5;
+            showSuccessMessage(`🔥 Maşallah! x${count}! +${bonusXP} Bonus XP!`);
+        }
+
+        function testDailyGoal() {
+            showSuccessMessage('🎯 Günlük hedefin 100 Hasene olarak ayarlandı!');
+        }
+
+        function testFavorite() {
+            showSuccessMessage('⭐ Favorilere eklendi!');
+        }
+
+        function testAllTasks() {
+            showSuccessMessage('🎉 Tüm günlük görevleri tamamladın! +2,500 XP bonus!');
+        }
+    </script>
+</body>
+</html>
