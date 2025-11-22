@@ -31,3 +31,8 @@ Thumbs.db
 test-results/
 playwright-report/
 coverage/
+
+# Gradle
+.gradle/
+gradle.properties
+local.properties
