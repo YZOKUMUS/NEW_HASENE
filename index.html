@@ -11577,9 +11577,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
     <!-- Özel Onay Pop-up -->
         <script>
-        // Arapça hareke renklendirme fonksiyonu artık boş
-        // updateArabicTextColoring fonksiyonu kaldırıldı - kullanılmıyor
-            
+        // Arapça hareke renklendirme fonksiyonu (boş - kullanılmıyor ama çağrılıyor)
+        function updateArabicTextColoring() {
+            // Fonksiyon kaldırıldı ama hala çağrılıyor, boş fonksiyon olarak tanımlı
+            // Hata önleme için
+        }
+        
+        // Global erişim için
+        window.updateArabicTextColoring = updateArabicTextColoring;
         
         </script>
 

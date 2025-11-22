@@ -91,12 +91,13 @@ body.dark-mode .game-card {
 }
 
 body.dark-mode .game-title {
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
 }
 
 body.dark-mode .game-desc {
-    color: var(--text-secondary) !important;
-    opacity: 0.9 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    opacity: 1 !important;
 }
 
 body.dark-mode .game-icon {
