@@ -16,7 +16,11 @@
     "lint": "eslint js/**/*.js",
     "lint:fix": "eslint js/**/*.js --fix",
     "format": "prettier --write \"**/*.{js,json,css,html,md}\"",
-    "format:check": "prettier --check \"**/*.{js,json,css,html,md}\""
+    "format:check": "prettier --check \"**/*.{js,json,css,html,md}\"",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:build:android": "npm run build && npx cap sync android"
   },
   "repository": {
     "type": "git",
@@ -39,9 +43,19 @@
     "url": "https://github.com/yzokumus/NEW_HASENE/issues"
   },
   "homepage": "https://github.com/yzokumus/NEW_HASENE#readme",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
+    "@capacitor/cli": "^6.0.0",
     "@playwright/test": "^1.41.0",
     "@testing-library/jest-dom": "^6.1.5",
     "babel-jest": "^29.7.0",

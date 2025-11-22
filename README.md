@@ -29,6 +29,7 @@
 ### ⚙️ Teknik Özellikler
 - **📱 Responsive Tasarım**: Mobil ve masaüstü uyumlu
 - **🔄 PWA Desteği**: Progressive Web App olarak yüklenebilir
+- **📱 Native Android**: Capacitor ile Android uygulaması desteği
 - **💾 Offline Çalışma**: İnternet bağlantısı olmadan kullanılabilir
 - **🔒 Çoklu Veri Koruma**: IndexedDB + localStorage + URL yedekleme
 - **🎵 Ses Sistemi**: Sesli telaffuz ve oyun sesleri
@@ -72,6 +73,53 @@ npm run lint
 npm run format
 ```
 
+### 📱 Android Uygulaması Oluşturma
+
+Projeyi Android uygulamasına dönüştürmek için:
+
+#### Hızlı Kurulum (Windows)
+```bash
+scripts\setup-android.bat
+```
+
+#### Hızlı Kurulum (Linux/Mac)
+```bash
+chmod +x scripts/setup-android.sh
+./scripts/setup-android.sh
+```
+
+#### Manuel Kurulum
+```bash
+# 1. Bağımlılıkları yükle
+npm install
+
+# 2. Projeyi build et
+npm run build
+
+# 3. Android platformunu ekle
+npm run cap:add:android
+
+# 4. Capacitor sync
+npm run cap:sync
+
+# 5. Android Studio'da aç
+npm run cap:open:android
+```
+
+**Detaylı rehber için:** [Android Yayınlama Rehberi](docs/ANDROID_YAYINLAMA_REHBERI.md)
+
+#### Android Build Komutları
+```bash
+# Build ve sync
+npm run cap:build:android
+
+# Sadece sync
+npm run cap:sync
+
+# Android Studio'da aç
+npm run cap:open:android
+```
+
 ## 🎮 Nasıl Oynanır?
 
 1. **🏠 Ana Menü**: Oyun modunu seçin
@@ -96,6 +144,7 @@ npm run format
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Build Tool**: Vite
+- **Mobile Framework**: Capacitor (Android)
 - **Veri Depolama**: IndexedDB, LocalStorage
 - **PWA**: Service Worker, Web App Manifest
 - **Ses**: Web Audio API
@@ -105,9 +154,10 @@ npm run format
 
 ## 🎯 Gelecek Güncellemeler
 
+- [x] 📱 Android uygulama versiyonu (Capacitor ile)
 - [ ] 🌐 Çoklu dil desteği
 - [ ] 👥 Multiplayer modu  
-- [ ] 📱 Mobil uygulama versiyonu
+- [ ] 🍎 iOS uygulama versiyonu
 - [ ] 🤖 AI destekli kişiselleştirme
 - [ ] 📊 Detaylı analitik
 

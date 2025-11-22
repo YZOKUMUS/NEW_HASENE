@@ -11,6 +11,8 @@ export default defineConfig({
     build: {
         outDir: "dist",
         assetsDir: "assets",
+        // Capacitor için public path ayarı
+        base: "./",
         // Mevcut yapıyı koru - sadece optimize et
         rollupOptions: {
             input: {

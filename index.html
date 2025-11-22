@@ -78,6 +78,14 @@
     <script src="js/event-handler.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="js/favorites.js"></script>
+    <script src="js/feedback-animations.js"></script>
+    <script src="js/sound-effects.js"></script>
+    <script src="js/badge-visualization.js"></script>
+    <script src="js/game-tutorial.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/social-share.js"></script>
+    <script src="js/detailed-stats.js"></script>
     
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
@@ -285,6 +293,9 @@
                         </button>
                         <button onclick="showStatsModal()" class="info-btn-minimal" aria-label="İstatistikler modalını aç" role="button">
                             <span aria-hidden="true">📊</span> İstatistikler
+                        </button>
+                        <button onclick="showLeaderboard('weekly')" class="info-btn-minimal" aria-label="Liderlik tablosunu aç" role="button">
+                            <span aria-hidden="true">🏆</span> Liderlik
                         </button>
                     </div>
                 </div>
@@ -901,7 +912,12 @@
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
-                <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button onclick="event.stopPropagation(); if(typeof showDetailedStats === 'function') showDetailedStats();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Detaylı İstatistikler">
+                        📈 Detaylı
+                    </button>
+                    <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
+                </div>
             </div>
 
             <!-- Scroll Edilebilir İçerik -->
@@ -2396,6 +2412,11 @@
             }
             updateDailyGoalDisplay();
             
+            // Bildirimleri başlat
+            if (typeof initNotifications === 'function') {
+                initNotifications();
+            }
+            
             // Modal butonlarına event listener ekle
             const dailyTasksBtn = document.getElementById('dailyTasksBtn');
             const statsBtn = document.getElementById('statsBtn');
@@ -3474,7 +3495,12 @@ window.closeAllModals = closeAllModals;
                     saveToURL();
                 } catch(e) { log.error('URL save failed:', e); }
                 
-                // 4. Hedef tamamlama bildirimi kontrolü
+                // 4. Liderlik tablosu güncelle
+                if (typeof updateLeaderboardScores === 'function' && sessionScore > 0) {
+                    updateLeaderboardScores(sessionScore);
+                }
+                
+                // 5. Hedef tamamlama bildirimi kontrolü
                 if (typeof checkGoalCompletion === 'function') {
                     checkGoalCompletion();
                 }
@@ -6748,44 +6774,49 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // ============ ANA MENÜ NAVİGASYONU ============
         // Kelime Çevir modu - oyun modları seçici ile başlar
         elements.kelimeCevirBtn.onclick = async () => {
-            log.game('📚 === KELİME ÇEVİR OYUNU BAŞLATILIYOR ===');
-            log.game('📋 1. Veri kontrol ediliyor...');
-            
-            // Lazy loading: Kelime verilerini yükle
-            try {
-                await loadKelimeData();
-            } catch (error) {
-                log.warn('❌ Kelime verileri yüklenemedi!');
-                showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-                return;
-            }
-            
-            if (!kelimeBulData || kelimeBulData.length === 0) {
-                log.warn('❌ Kelime verileri yüklenemedi!');
-                showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-                return;
-            }
-            log.game(`✅ Kelime verileri OK: ${kelimeBulData.length} kelime mevcut`);
-            log.game(`🎯 Mevcut zorluk: ${currentDifficulty}`);
-            
-            // Önce tüm modalları kapat
-            closeAllModals();
-            
-            log.game('📋 2. Mode Selector açılıyor...');
-            hideAllModes();
-            // Main menu'yu gizle
-            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-            if (elements.modeSelector) elements.modeSelector.style.display = 'block';
-            if (elements.settingsBtn) elements.settingsBtn.style.display = 'block';
-            log.game('✅ Mode Selector açıldı!');
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('kelime-cevir', async () => {
+                log.game('📚 === KELİME ÇEVİR OYUNU BAŞLATILIYOR ===');
+                log.game('📋 1. Veri kontrol ediliyor...');
+                
+                // Lazy loading: Kelime verilerini yükle
+                try {
+                    await loadKelimeData();
+                } catch (error) {
+                    log.warn('❌ Kelime verileri yüklenemedi!');
+                    showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                    return;
+                }
+                
+                if (!kelimeBulData || kelimeBulData.length === 0) {
+                    log.warn('❌ Kelime verileri yüklenemedi!');
+                    showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
+                    return;
+                }
+                log.game(`✅ Kelime verileri OK: ${kelimeBulData.length} kelime mevcut`);
+                log.game(`🎯 Mevcut zorluk: ${currentDifficulty}`);
+                
+                // Önce tüm modalları kapat
+                closeAllModals();
+                
+                log.game('📋 2. Mode Selector açılıyor...');
+                hideAllModes();
+                // Main menu'yu gizle
+                if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+                if (elements.modeSelector) elements.modeSelector.style.display = 'block';
+                if (elements.settingsBtn) elements.settingsBtn.style.display = 'block';
+                log.game('✅ Mode Selector açıldı!');
+            });
         };
 
         // Dinle ve Bul modu - Doğrudan başlat
         elements.dinleBulBtn.onclick = async () => {
-            // Önce tüm modalları kapat
-            closeAllModals();
-            
-            log.game('🔥 === DINLE VE BUL OYUNU BAŞLATILIYOR ===');
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('dinle-bul', async () => {
+                // Önce tüm modalları kapat
+                closeAllModals();
+                
+                log.game('🔥 === DINLE VE BUL OYUNU BAŞLATILIYOR ===');
             log.game('📋 1. Veri kontrol ediliyor...');
             
             // Lazy loading: Kelime verilerini yükle
@@ -6981,16 +7012,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }, { passive: false });
             }
             
-            updateDinleUI();
-            loadDinleQuestion();
+                updateDinleUI();
+                loadDinleQuestion();
+            });
         };
 
         // Boşluk Doldur modu
         elements.boslukDoldurBtn.onclick = async () => {
-            // Önce tüm modalları kapat
-            closeAllModals();
-            
-            log.debug('📋 === BOŞLUK DOLDUR OYUNU BAŞLATILIYOR ===');
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('bosluk-doldur', async () => {
+                // Önce tüm modalları kapat
+                closeAllModals();
+                
+                log.debug('📋 === BOŞLUK DOLDUR OYUNU BAŞLATILIYOR ===');
             log.debug('📋 1. Veri kontrol ediliyor...');
 
             // Lazy loading: Ayet verilerini yükle
@@ -7040,14 +7074,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             log.debug(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
             
-            updateBoslukUI();
-            loadBoslukQuestion();
+                updateBoslukUI();
+                loadBoslukQuestion();
+            });
         };
 
         // Dua Et modu
         elements.duaEtBtn.onclick = async () => {
-            // Önce tüm modalları kapat
-            closeAllModals();
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('dua-ogren', async () => {
+                // Önce tüm modalları kapat
+                closeAllModals();
             
             // Lazy loading: Dua verilerini yükle
             try {
@@ -7078,14 +7115,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            currentDuaIndex = Math.floor(Math.random() * duaData.length);
-            showDua(false); // İlk gösterimde soru sayısını artırma
+                currentDuaIndex = Math.floor(Math.random() * duaData.length);
+                showDua(false); // İlk gösterimde soru sayısını artırma
+            });
         };
 
         // Ayet Oku modu
         elements.ayetOkuBtn.onclick = async () => {
-            // Önce tüm modalları kapat
-            closeAllModals();
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('ayet-oku', async () => {
+                // Önce tüm modalları kapat
+                closeAllModals();
             
             // Lazy loading: Ayet verilerini yükle
             try {
@@ -7116,14 +7156,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
-            showAyet(false); // İlk gösterimde soru sayısını artırma
+                currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
+                showAyet(false); // İlk gösterimde soru sayısını artırma
+            });
         };
 
         // Hadis Oku modu
         elements.hadisOkuBtn.onclick = async () => {
-            // Önce tüm modalları kapat
-            closeAllModals();
+            // Tutorial göster (ilk kez oynanıyorsa)
+            showGameTutorial('hadis-oku', async () => {
+                // Önce tüm modalları kapat
+                closeAllModals();
             
             // Lazy loading: Hadis verilerini yükle
             try {
@@ -7154,8 +7197,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
                 return;
             }
-            currentHadisIndex = Math.floor(Math.random() * hadisData.length);
-            showHadis(false); // İlk gösterimde soru sayısını artırma
+                currentHadisIndex = Math.floor(Math.random() * hadisData.length);
+                showHadis(false); // İlk gösterimde soru sayısını artırma
+            });
         };
 
         // Geri butonları
