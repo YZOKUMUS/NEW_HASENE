@@ -1447,7 +1447,7 @@ body.dark-mode .section-title {
 }
 
 .audio-btn {
-    background-image: url('assets/images/hoparlor.png');
+    background-image: url('assets/images/hoparlor.webp');
 }
 
 .hint-btn {
@@ -2960,7 +2960,7 @@ body.dark-mode .section-title {
     width: 24px;
     height: 24px;
     margin: 10px auto;
-    background-image: url('assets/images/hoparlor.png');
+    background-image: url('assets/images/hoparlor.webp');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

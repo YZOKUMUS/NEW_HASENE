@@ -14,14 +14,74 @@ const dataLoadStatus = {
     hadis: { loaded: false, loading: false }
 };
 
+// ============ JSON PARSER WEB WORKER ============
+// Büyük JSON dosyalarını background'da parse eder (UI donmasını önler)
+let jsonWorker = null;
+
+function getJSONWorker() {
+    if (!jsonWorker && typeof Worker !== 'undefined') {
+        try {
+            jsonWorker = new Worker('js/json-parser-worker.js');
+        } catch (e) {
+            console.warn('Web Worker desteklenmiyor, normal parse kullanılacak:', e);
+            return null;
+        }
+    }
+    return jsonWorker;
+}
+
+async function parseJSONInWorker(jsonString) {
+    const worker = getJSONWorker();
+    
+    // Worker desteklenmiyorsa normal parse kullan
+    if (!worker) {
+        return JSON.parse(jsonString);
+    }
+    
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            worker.terminate();
+            jsonWorker = null;
+            reject(new Error('JSON parse timeout'));
+        }, 30000); // 30 saniye timeout
+        
+        worker.onmessage = (e) => {
+            clearTimeout(timeout);
+            if (e.data.success) {
+                resolve(e.data.data);
+            } else {
+                reject(new Error(e.data.error || 'JSON parse hatası'));
+            }
+        };
+        
+        worker.onerror = (e) => {
+            clearTimeout(timeout);
+            reject(new Error('Worker hatası: ' + e.message));
+        };
+        
+        worker.postMessage({ type: 'parse', data: jsonString });
+    });
+}
+
 // ============ NETWORK - FETCH WITH RETRY ============
-async function fetchWithRetry(url, retries = 3, delay = 1000) {
+async function fetchWithRetry(url, retries = 3, delay = 1000, useWorker = false) {
     // JSON yükleme hatalarında otomatik retry
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
+            
+            // Büyük dosyalar için Web Worker kullan (hadisoku.json > 3MB)
+            const text = await response.text();
+            const fileSize = new Blob([text]).size;
+            const shouldUseWorker = useWorker || fileSize > 2 * 1024 * 1024; // 2MB üzeri
+            
+            if (shouldUseWorker && typeof Worker !== 'undefined') {
+                log.debug(`📡 Büyük dosya tespit edildi (${(fileSize / 1024 / 1024).toFixed(2)} MB), Web Worker kullanılıyor...`);
+                return await parseJSONInWorker(text);
+            } else {
+                return JSON.parse(text);
+            }
         } catch (error) {
             log.debug(`📡 Fetch attempt ${i + 1}/${retries} failed for ${url}`);
             if (i === retries - 1) {
@@ -143,7 +203,8 @@ async function loadHadisData() {
     try {
         dataLoadStatus.hadis.loading = true;
         showLoading('Hadis verileri yükleniyor...');
-        hadisData = await fetchWithRetry('data/hadisoku.json');
+        // hadisoku.json çok büyük (3.97 MB), Web Worker kullan
+        hadisData = await fetchWithRetry('data/hadisoku.json', 3, 1000, true);
         dataLoadStatus.hadis.loaded = true;
         setTimeout(() => hideLoading(), 300);
         return hadisData;
