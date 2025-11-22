@@ -80,7 +80,16 @@ function getFavoriteWords() {
 // Tekrar listesini yükle
 function loadReviewWords() {
     try {
-        const wordStats = loadWordStats();
+        // loadWordStats fonksiyonunu kontrol et (index.html'de tanımlı)
+        const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
+        
+        if (!loadWordStatsFn) {
+            // Fonksiyon henüz yüklenmemiş, boş liste döndür
+            reviewWords = [];
+            return;
+        }
+        
+        const wordStats = loadWordStatsFn();
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
         
@@ -251,7 +260,12 @@ function addFavoriteButtonToWordCard(cardElement, wordId) {
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
         loadFavorites();
-        loadReviewWords();
+        // loadReviewWords'ü biraz gecikmeyle çağır (loadWordStats yüklenene kadar bekle)
+        setTimeout(() => {
+            if (typeof loadWordStats === 'function' || (typeof window !== 'undefined' && typeof window.loadWordStats === 'function')) {
+                loadReviewWords();
+            }
+        }, 100);
     });
 }
 
