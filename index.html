@@ -2430,8 +2430,13 @@
         const activeTimeouts = new Set();
         
         // Debounce değişkenleri (erken tanımlama - beforeunload için)
-        let saveStatsTimeout = null;
-        let pendingSave = false;
+        // Global scope'a ekle (beforeunload event listener'ı için)
+        if (typeof window.saveStatsTimeout === 'undefined') {
+            window.saveStatsTimeout = null;
+        }
+        if (typeof window.pendingSave === 'undefined') {
+            window.pendingSave = false;
+        }
         
         // setInterval wrapper - otomatik takip
         const originalSetInterval = window.setInterval;
@@ -2491,7 +2496,7 @@
             }
             
             // Acil kaydetme (sayfa kapanırken)
-            if (typeof saveStatsImmediate === 'function' && pendingSave) {
+            if (typeof saveStatsImmediate === 'function' && window.pendingSave) {
                 saveStatsImmediate().catch(() => {});
             }
         });
@@ -3598,27 +3603,27 @@ window.closeAllModals = closeAllModals;
         
         // Debounced saveStats - 500ms bekle, sonra kaydet
         function debouncedSaveStats() {
-            pendingSave = true;
-            if (saveStatsTimeout) {
-                clearTimeout(saveStatsTimeout);
+            window.pendingSave = true;
+            if (window.saveStatsTimeout) {
+                clearTimeout(window.saveStatsTimeout);
             }
-            saveStatsTimeout = setTimeout(() => {
-                if (pendingSave) {
+            window.saveStatsTimeout = setTimeout(() => {
+                if (window.pendingSave) {
                     saveStats().catch(err => {
                         log.error('❌ saveStats hatası:', err);
                     });
-                    pendingSave = false;
+                    window.pendingSave = false;
                 }
             }, 500);
         }
         
         // Acil kaydetme (oyun bitişi gibi kritik durumlar için)
         async function saveStatsImmediate() {
-            if (saveStatsTimeout) {
-                clearTimeout(saveStatsTimeout);
-                saveStatsTimeout = null;
+            if (window.saveStatsTimeout) {
+                clearTimeout(window.saveStatsTimeout);
+                window.saveStatsTimeout = null;
             }
-            pendingSave = false;
+            window.pendingSave = false;
             return await saveStats();
         }
         
