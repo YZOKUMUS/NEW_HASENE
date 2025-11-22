@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yzokumus.github.io/NEW_HASENE/sitemap.xml
+

@@ -32,6 +32,11 @@
 - **💾 Offline Çalışma**: İnternet bağlantısı olmadan kullanılabilir
 - **🔒 Çoklu Veri Koruma**: IndexedDB + localStorage + URL yedekleme
 - **🎵 Ses Sistemi**: Sesli telaffuz ve oyun sesleri
+- **🌙 Dark Mode**: Karanlık tema desteği
+- **♿ Erişilebilirlik**: ARIA labels ve keyboard navigation
+- **🔍 SEO Optimizasyonu**: Meta tags ve structured data
+- **⚡ Modern Build**: Vite ile hızlı development
+- **🧪 Test Altyapısı**: Jest ve Playwright desteği
 
 ## 🚀 Kurulum
 
@@ -42,12 +47,29 @@
 
 ### Geliştirici Kurulumu
 ```bash
-git clone https://github.com/yzokumus/HASENE-ARABIC-GAME-MAIN.git
-cd HASENE-ARABIC-GAME-MAIN
-# HTTP sunucu başlatın (isteğe bağlı)
-python -m http.server 8000
-# veya
-node server.js
+git clone https://github.com/yzokumus/NEW_HASENE.git
+cd NEW_HASENE
+
+# Bağımlılıkları yükle
+npm install
+
+# Development server başlat (Vite)
+npm run dev
+
+# Production build
+npm run build
+
+# Testleri çalıştır
+npm test
+
+# E2E testler
+npm run test:e2e
+
+# Kod kontrolü
+npm run lint
+
+# Kod formatlama
+npm run format
 ```
 
 ## 🎮 Nasıl Oynanır?
@@ -73,10 +95,13 @@ node server.js
 ## 🛠️ Teknolojiler
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Build Tool**: Vite
 - **Veri Depolama**: IndexedDB, LocalStorage
 - **PWA**: Service Worker, Web App Manifest
 - **Ses**: Web Audio API
 - **Responsive**: CSS Grid, Flexbox
+- **Testing**: Jest, Playwright
+- **Code Quality**: ESLint, Prettier
 
 ## 🎯 Gelecek Güncellemeler
 

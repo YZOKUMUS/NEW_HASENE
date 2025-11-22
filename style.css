@@ -11,6 +11,125 @@
     font-display: swap;
 }
 
+/* ----- CSS VARIABLES ----- */
+:root {
+    --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-secondary: #fff;
+    --text-primary: #222;
+    --text-secondary: #666;
+    --border-color: #eee;
+    --shadow: rgba(0,0,0,0.08);
+    --card-bg: rgba(255,255,255,0.95);
+}
+
+/* Dark Mode Variables */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        --bg-secondary: #1e1e1e;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --border-color: #333;
+        --shadow: rgba(0,0,0,0.3);
+        --card-bg: rgba(30,30,30,0.95);
+    }
+}
+
+/* Dark Mode Class (for manual toggle) */
+body.dark-mode {
+    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --bg-secondary: #1e1e1e;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333;
+    --shadow: rgba(0,0,0,0.3);
+    --card-bg: rgba(30,30,30,0.95);
+}
+
+/* Dark Mode - Tüm elementler için override */
+body.dark-mode .hero-section-minimal,
+body.dark-mode .hero-section {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .welcome-title-minimal,
+body.dark-mode .welcome-subtitle-minimal {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .stat-item-minimal,
+body.dark-mode .stat-value-minimal,
+body.dark-mode .stat-label-minimal {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .daily-goal-minimal,
+body.dark-mode .goal-title-minimal {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .difficulty-minimal {
+    background: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .difficulty-title-minimal {
+    color: var(--text-secondary) !important;
+}
+
+.difficulty-minimal {
+    background: white;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode .game-card {
+    background: var(--card-bg) !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .game-title {
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .game-desc {
+    color: var(--text-secondary) !important;
+    opacity: 0.9 !important;
+}
+
+body.dark-mode .game-icon {
+    opacity: 1 !important;
+}
+
+body.dark-mode .info-btn-minimal {
+    background: rgba(255,255,255,0.1) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .info-btn-minimal:hover {
+    background: rgba(255,255,255,0.15) !important;
+}
+
+body.dark-mode .bottom-nav {
+    background: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+body.dark-mode .nav-item {
+    color: var(--text-secondary) !important;
+}
+
+body.dark-mode .nav-item.active {
+    color: #667eea !important;
+}
+
+body.dark-mode .main-menu {
+    background: transparent !important;
+}
+
 /* ----- GLOBAL RESET ----- */
 * {
     margin: 0;
@@ -21,22 +140,24 @@
 
 body {
     font-family: 'Roboto', Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-primary);
     min-height: 100vh;
     overflow-x: hidden; /* Prevent horizontal scrolling */
-    color: #222;
+    color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ----- CONTAINER ----- */
 .container {
     max-width: 600px;
     margin: 75px auto 90px auto;
-    background: #fff;
+    background: var(--bg-secondary);
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 35px var(--shadow);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* ----- HEADER ----- */
@@ -47,11 +168,12 @@ body {
     transform: translateX(-50%);
     width: 100%;
     max-width: 600px;
-    background: #fff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 20px var(--shadow);
     padding: 15px;
     text-align: center;
     z-index: 1000;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .header h1 {
@@ -86,12 +208,13 @@ body {
 
 /* Hero Section - Üst Kısım */
 .hero-section {
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+    background: var(--card-bg);
     border-radius: 24px;
     padding: 30px 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 40px var(--shadow);
     position: relative;
     overflow: hidden;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Minimal Kompakt Hero Section */
@@ -102,6 +225,7 @@ body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hero-content-minimal {
@@ -126,12 +250,14 @@ body {
     font-weight: 700;
     color: #333;
     margin-bottom: 2px;
+    transition: color 0.3s ease;
 }
 
 .welcome-subtitle-minimal {
     font-size: 12px;
     color: #666;
     font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 /* Compact Stats Row */
@@ -149,6 +275,11 @@ body {
     text-align: center;
     border: 1px solid rgba(0,0,0,0.05);
     transition: all 0.2s;
+}
+
+body.dark-mode .stat-item-minimal {
+    background: linear-gradient(135deg, rgba(30,30,30,0.8) 0%, rgba(26,26,26,0.9) 100%) !important;
+    border-color: var(--border-color) !important;
 }
 
 .stat-item-minimal:hover {
@@ -313,8 +444,10 @@ body {
 
 /* Quick Info Buttons - Minimal */
 .quick-info-minimal {
-    display: flex;
+    display: flex !important;
     gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
 }
 
 .info-btn-minimal {
@@ -333,8 +466,50 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+    gap: 4px;
+}
+
+/* Dark Mode Toggle Button - Özel Stil (Sağ Üst Köşe) */
+#darkModeToggle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: 2px solid rgba(255,255,255,0.3) !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.3) !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    z-index: 10 !important;
+    flex-shrink: 0 !important;
+}
+
+#darkModeToggle:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.5) !important;
+}
+
+body.dark-mode #darkModeToggle {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    border: 2px solid rgba(255,255,255,0.3) !important;
+    box-shadow: 0 2px 8px rgba(251,191,36,0.3) !important;
+}
+
+body.dark-mode #darkModeToggle:hover {
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
+    box-shadow: 0 4px 12px rgba(251,191,36,0.5) !important;
+}
+
+#darkModeToggle span {
+    display: inline-block !important;
+    line-height: 1 !important;
 }
 
 .info-btn-minimal:hover {
@@ -646,6 +821,12 @@ body {
     padding: 20px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.15);
     margin-top: 4px; /* Reduce gap to bring games closer to hero section */
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.dark-mode .games-section {
+    background: var(--card-bg) !important;
+    box-shadow: 0 8px 30px var(--shadow) !important;
 }
 
 .section-title {
@@ -654,6 +835,11 @@ body {
     color: #333;
     margin-bottom: 16px;
     text-align: center;
+    transition: color 0.3s ease;
+}
+
+body.dark-mode .section-title {
+    color: var(--text-primary) !important;
 }
 
 .games-grid {
@@ -718,12 +904,14 @@ body {
     font-weight: 700;
     color: #333;
     margin-bottom: 6px;
+    transition: color 0.3s ease;
 }
 
 .game-desc {
     font-size: 12px;
     color: #666;
     line-height: 1.4;
+    transition: color 0.3s ease;
 }
 
 /* Info Button */

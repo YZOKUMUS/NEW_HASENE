@@ -5,13 +5,34 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "node server.js"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "start": "node server.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint js/**/*.js",
+    "lint:fix": "eslint js/**/*.js --fix",
+    "format": "prettier --write \"**/*.{js,json,css,html,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,css,html,md}\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yzokumus/NEW_HASENE.git"
   },
-  "keywords": [],
+  "keywords": [
+    "arapça",
+    "kuran",
+    "islami",
+    "eğitim",
+    "oyun",
+    "pwa",
+    "progressive-web-app",
+    "arapça-öğrenme",
+    "kuran-kelimeleri"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -21,6 +42,12 @@
   "devDependencies": {
     "jest": "^30.2.0",
     "supertest": "^7.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "vite": "^5.1.0",
+    "@playwright/test": "^1.41.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }
