@@ -2,16 +2,13 @@
   "name": "Hasene Arapça Dersi",
   "short_name": "Hasene",
   "description": "İslami Arapça öğrenme platformu: kelime çeviri, ayet okuma, dua ezberleme, hadis öğrenme ve talebe destekli eğitim.",
-
   "start_url": "/NEW_HASENE/index.html",
   "scope": "/NEW_HASENE/",
   "display": "standalone",
   "orientation": "portrait-primary",
-
   "background_color": "#667eea",
   "theme_color": "#764ba2",
   "lang": "tr",
-
   "icons": [
     {
       "src": "assets/images/icon-192-v4-RED-MUSHAF.png",
@@ -26,9 +23,7 @@
       "purpose": "any maskable"
     }
   ],
-
   "categories": ["education", "games"],
-
   "screenshots": [
     {
       "src": "assets/images/icon-512-v4-RED-MUSHAF.png",
@@ -37,7 +32,6 @@
       "label": "Ana ekran"
     }
   ],
-
   "shortcuts": [
     {
       "name": "Kelime Çevir",
@@ -66,6 +60,5 @@
       ]
     }
   ],
-
   "prefer_related_applications": false
 }
