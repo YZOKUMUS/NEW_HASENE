@@ -4169,15 +4169,23 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Her 3 doğru cevapda combo bonusu
             if (comboCount > 0 && comboCount % 3 === 0) {
                 const comboBonus = 5;
+                sessionScore += comboBonus; // Session skoruna da ekle (oyun sonunda gösterilecek)
                 totalPoints += comboBonus;
                 dailyTasks.todayStats.toplamPuan += comboBonus; // Bugünkü puana da ekle!
                 
                 // COMBO BONUSUNU DAILY XP'YE DE EKLE
                 addDailyXP(comboBonus);
                 
+                // COMBO BONUSUNU LİDERLİK TABLOSUNA DA EKLE
+                if (typeof updateLeaderboardScores === 'function' && comboBonus > 0) {
+                    updateLeaderboardScores(comboBonus);
+                    log.game(`📊 Liderlik tablosu güncellendi (combo bonusu): +${comboBonus} Hasene`);
+                }
+                
                 log.game(`🔥 Combo bonusu: +${comboBonus} XP`);
                 
                 // COMBO BONUS SONRASI HEMEN UI GÜNCELLE
+                updateUI(); // Oyun içi barı güncelle
                 updateStatsBar(); // Üst barı hemen güncelle
             }
             
