@@ -1741,7 +1741,18 @@
                 setTimeout(() => {
                     showSuccessMessage('🎉 Günlük virdi tamamladın! +1000 ihsan Hasene!');
                     // Bonus Hasene ekle (puan sistemine direkt ekle)
-                    totalPoints += 1000;
+                    const dailyGoalBonus = 1000;
+                    totalPoints += dailyGoalBonus;
+                    
+                    // Bugünkü toplam puana da ekle (istatistikler için)
+                    dailyTasks.todayStats.toplamPuan += dailyGoalBonus;
+                    
+                    // Günlük vird bonusunu liderlik tablosuna da ekle
+                    if (typeof updateLeaderboardScores === 'function' && dailyGoalBonus > 0) {
+                        updateLeaderboardScores(dailyGoalBonus);
+                        log.game(`📊 Liderlik tablosu güncellendi (günlük vird bonusu): +${dailyGoalBonus} Hasene`);
+                    }
+                    
                     updateStatsBar();
                     debouncedSaveStats(); // Debounced kaydetme
                     checkAchievements();
@@ -6897,6 +6908,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 // Daily XP'ye de ekle
                 addDailyXP(bonusXP);
+                
+                // Günlük görev ödülünü liderlik tablosuna da ekle
+                if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
+                    updateLeaderboardScores(bonusXP);
+                    log.game(`📊 Liderlik tablosu güncellendi (günlük görev ödülü): +${bonusXP} Hasene`);
+                }
                 
                 dailyTasks.rewardsClaimed = true;
                 debouncedSaveStats(); // Debounced kaydetme
