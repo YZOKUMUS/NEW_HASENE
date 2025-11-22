@@ -23,7 +23,8 @@ const APP_SHELL = [
 // INSTALL
 // ===============================
 self.addEventListener("install", (event) => {
-  console.log("📦 SAFE SW INSTALL…");
+  // Log'ları azalt - sadece gerçekten gerekliyse göster
+  // console.log("📦 SAFE SW INSTALL…");
 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -40,7 +41,8 @@ self.addEventListener("install", (event) => {
 // ACTIVATE
 // ===============================
 self.addEventListener("activate", (event) => {
-  console.log("🚀 SAFE SW ACTIVATE - Tüm eski cache'ler temizleniyor…");
+  // Log'ları azalt - sadece gerçekten gerekliyse göster
+  // console.log("🚀 SAFE SW ACTIVATE - Tüm eski cache'ler temizleniyor…");
 
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -48,7 +50,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         keys.map((key) => {
           if (!key.includes(CACHE_VERSION)) {
-            console.log("🗑️ Eski cache siliniyor:", key);
+            // console.log("🗑️ Eski cache siliniyor:", key);
             return caches.delete(key);
           }
         })
@@ -119,7 +121,7 @@ self.addEventListener("fetch", (event) => {
 // PUSH NOTIFICATIONS
 // ===============================
 self.addEventListener("push", (event) => {
-  console.log("📬 Push event alındı:", event);
+  // console.log("📬 Push event alındı:", event);
   
   let notificationData = {
     title: "Hasene Arapça",
@@ -156,7 +158,7 @@ self.addEventListener("push", (event) => {
 // NOTIFICATION CLICK
 // ===============================
 self.addEventListener("notificationclick", (event) => {
-  console.log("🔔 Bildirim tıklandı:", event);
+  // console.log("🔔 Bildirim tıklandı:", event);
   
   event.notification.close();
 
@@ -182,5 +184,5 @@ self.addEventListener("notificationclick", (event) => {
 // NOTIFICATION CLOSE
 // ===============================
 self.addEventListener("notificationclose", (event) => {
-  console.log("❌ Bildirim kapatıldı:", event);
+  // console.log("❌ Bildirim kapatıldı:", event);
 });

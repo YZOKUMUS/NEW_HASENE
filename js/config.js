@@ -6,6 +6,7 @@ const CONFIG = {
     debugAudio: false,          // Ses sistemi debug'ları
     debugGameFlow: false,       // Oyun akışı debug'ları
     showCriticalErrors: true,   // Kritik hataları her zaman göster
+    showWarnings: false,        // Uyarıları göster (false = sadece kritik hatalar)
     hapticEnabled: true,        // Haptic feedback (titreme) aktif mi
     swipeGesturesEnabled: true  // Swipe jestleri aktif mi
 };
@@ -22,7 +23,7 @@ const log = {
     audio: (...args) => { if (CONFIG.debugAudio) __orig_console_log(...args); },
     game: (...args) => { if (CONFIG.debugGameFlow) __orig_console_log(...args); },
     error: (...args) => { if (CONFIG.showCriticalErrors) console.error(...args); },
-    warn: (...args) => { if (CONFIG.showCriticalErrors) console.warn(...args); }
+    warn: (...args) => { if (CONFIG.showWarnings) console.warn(...args); }  // Uyarılar artık varsayılan olarak kapalı
 };
 
 // Gate any remaining raw console.log calls via CONFIG.debug (global toggle).

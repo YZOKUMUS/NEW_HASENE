@@ -182,7 +182,10 @@ function validateCriticalData() {
     }
     
     if (issues.length > 0) {
-        log.warn('⚠️ Veri doğrulama sorunları tespit edildi:', issues);
+        // Sadece gerçekten kritikse göster (log.warn artık CONFIG.showWarnings ile kontrol ediliyor)
+        if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+            log.warn('⚠️ Veri doğrulama sorunları tespit edildi:', issues);
+        }
         // Verileri kaydet (debouncedSaveStats veya saveStatsImmediate kullan)
         if (typeof debouncedSaveStats === 'function') {
             debouncedSaveStats();
@@ -218,6 +221,11 @@ function validateCriticalFunctions() {
     
     if (missing.length > 0) {
         // Sadece gerçekten eksikse hata ver (fonksiyonlar henüz yüklenmemiş olabilir)
+        // İlk yüklemede fonksiyonlar henüz yüklenmemiş olabilir, bu normal
+        // Sadece showWarnings aktifse göster
+        if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+            log.warn('❌ Kritik fonksiyonlar eksik!', missing);
+        }
         // 3 saniye sonra tekrar kontrol et
         if (typeof window.healthCheckRetryCount === 'undefined') {
             window.healthCheckRetryCount = 0;
@@ -240,7 +248,10 @@ function validateCriticalFunctions() {
             return false;
         } else {
             // 3 deneme sonrası hala eksikse gerçekten eksik demektir
-            log.error('❌ Kritik fonksiyonlar eksik (3 deneme sonrası):', missing);
+            // Sadece showWarnings aktifse göster
+            if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+                log.error('❌ Kritik fonksiyonlar eksik (3 deneme sonrası):', missing);
+            }
             return false;
         }
     }
@@ -258,18 +269,27 @@ function healthCheck() {
     
     // 1. Kritik fonksiyonlar
     if (!validateCriticalFunctions()) {
-        log.error('❌ Kritik fonksiyonlar eksik!');
+        // Sadece showWarnings aktifse göster
+        if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+            log.error('❌ Kritik fonksiyonlar eksik!');
+        }
         return false;
     }
     
     // 2. Kritik veriler
     if (!validateCriticalData()) {
-        log.warn('⚠️ Veri doğrulama sorunları var ama devam ediliyor...');
+        // Sadece showWarnings aktifse göster
+        if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+            log.warn('⚠️ Veri doğrulama sorunları var ama devam ediliyor...');
+        }
     }
     
     // 3. DOM hazır mı?
     if (document.readyState === 'loading') {
-        log.warn('⚠️ DOM henüz yüklenmedi');
+        // Sadece showWarnings aktifse göster
+        if (typeof CONFIG !== 'undefined' && CONFIG.showWarnings) {
+            log.warn('⚠️ DOM henüz yüklenmedi');
+        }
     }
     
     // 4. localStorage erişilebilir mi?
