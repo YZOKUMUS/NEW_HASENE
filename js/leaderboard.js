@@ -303,12 +303,41 @@ function formatPeriod(key, type) {
 
 // Skor güncelle (oyun sonunda çağrılır)
 function updateLeaderboardScores(score) {
-    saveWeeklyScore(score);
-    saveMonthlyScore(score);
+    // Sadece geçerli pozitif skorları ekle
+    if (typeof score === 'number' && score > 0 && !isNaN(score)) {
+        saveWeeklyScore(score);
+        saveMonthlyScore(score);
+    }
+}
+
+// Hatalı skorları düzelt (sadece bir kez çalıştırılmalı)
+function fixDuplicateLeaderboardScores() {
+    try {
+        const weeklyScores = getWeeklyScores();
+        const currentKey = getWeekKey(new Date());
+        const currentScore = weeklyScores[currentKey];
+        
+        if (currentScore && currentScore.score > 0) {
+            // Eğer skor çok büyükse (muhtemelen çift eklenmiş), düzelt
+            // Normal bir oyun seansında maksimum ~200-300 hasene kazanılabilir
+            if (currentScore.score > 500) {
+                console.warn('⚠️ Haftalık skor çok büyük, düzeltiliyor:', currentScore.score);
+                // Skoru yeniden hesapla - sadece bugünkü totalPoints'i kullan
+                const totalPoints = parseInt(localStorage.getItem('hasene_totalPoints')) || 0;
+                // Bugünkü skor = totalPoints'in bugünkü artışı (yaklaşık hesaplama)
+                // Bu basit bir çözüm, daha iyi bir çözüm için günlük skor takibi gerekir
+                weeklyScores[currentKey].score = Math.min(currentScore.score, totalPoints);
+                localStorage.setItem('hasene_weeklyScores', JSON.stringify(weeklyScores));
+            }
+        }
+    } catch(e) {
+        console.error('Skor düzeltme hatası:', e);
+    }
 }
 
 // Global fonksiyonlar
 window.showLeaderboard = showLeaderboard;
 window.closeLeaderboard = closeLeaderboard;
 window.updateLeaderboardScores = updateLeaderboardScores;
+window.fixDuplicateLeaderboardScores = fixDuplicateLeaderboardScores;
 

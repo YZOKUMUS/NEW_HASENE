@@ -3496,10 +3496,9 @@ window.closeAllModals = closeAllModals;
                     saveToURL();
                 } catch(e) { log.error('URL save failed:', e); }
                 
-                // 4. Liderlik tablosu güncelle
-                if (typeof updateLeaderboardScores === 'function' && sessionScore > 0) {
-                    updateLeaderboardScores(sessionScore);
-                }
+                // 4. Liderlik tablosu güncelleme - KALDIRILDI
+                // NOT: updateLeaderboardScores sadece oyun bitiminde addToGlobalPoints içinde çağrılmalı
+                // Burada çağrılırsa her saveAllGameData çağrısında aynı sessionScore tekrar eklenir!
                 
                 // 5. Hedef tamamlama bildirimi kontrolü
                 if (typeof checkGoalCompletion === 'function') {
@@ -6825,6 +6824,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Günlük görevleri güncelle
                 updateTaskProgress('toplamDogru', correctAnswers);
                 // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
+            }
+            
+            // Liderlik tablosu güncelle - Sadece oyun bitiminde bir kez çağrılır
+            if (typeof updateLeaderboardScores === 'function' && points > 0) {
+                updateLeaderboardScores(points);
             }
             
             updateStatsBar(); // Global barı güncelle
