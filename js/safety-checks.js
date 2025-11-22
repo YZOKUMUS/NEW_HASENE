@@ -183,8 +183,12 @@ function validateCriticalData() {
     
     if (issues.length > 0) {
         log.warn('⚠️ Veri doğrulama sorunları tespit edildi:', issues);
-        // Verileri kaydet
-        saveStats();
+        // Verileri kaydet (debouncedSaveStats veya saveStatsImmediate kullan)
+        if (typeof debouncedSaveStats === 'function') {
+            debouncedSaveStats();
+        } else if (typeof saveStatsImmediate === 'function') {
+            saveStatsImmediate().catch(() => {});
+        }
         return false;
     }
     
@@ -206,13 +210,9 @@ function validateCriticalFunctions() {
     
     const missing = [];
     criticalFunctions.forEach(fnName => {
-        // Önce window'da kontrol et, yoksa global scope'ta kontrol et
-        const func = window[fnName] || (typeof eval !== 'undefined' ? eval(`typeof ${fnName} !== 'undefined' ? ${fnName} : null`) : null);
-        if (typeof func !== 'function') {
-            // Eval kullanmadan kontrol et - sadece window'da yoksa eksik say
-            if (typeof window[fnName] !== 'function') {
-                missing.push(fnName);
-            }
+        // CSP uyumlu: Sadece window'da kontrol et (eval kullanmadan)
+        if (typeof window[fnName] !== 'function') {
+            missing.push(fnName);
         }
     });
     
@@ -295,8 +295,14 @@ function recoverFromError(error, context = 'unknown') {
         // 1. Verileri doğrula ve düzelt
         validateCriticalData();
         
-        // 2. Verileri kaydet
-        saveStats();
+        // 2. Verileri kaydet (debouncedSaveStats veya saveStatsImmediate kullan)
+        if (typeof debouncedSaveStats === 'function') {
+            debouncedSaveStats();
+        } else if (typeof saveStatsImmediate === 'function') {
+            saveStatsImmediate().catch(() => {});
+        } else if (typeof saveStats === 'function') {
+            saveStats();
+        }
         
         // 3. UI'ı sıfırla
         if (typeof hideAllModes === 'function') {

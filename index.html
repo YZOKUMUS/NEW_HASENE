@@ -2203,6 +2203,10 @@
                 log.error('📊 Kelime istatistikleri kaydedilirken hata:', error);
             }
         }
+        
+        // Global erişim için window'a ekle
+        window.loadWordStats = loadWordStats;
+        window.saveWordStats = saveWordStats;
 
         function updateWordStats(wordId, isCorrect) {
             // NULL KONTROL - wordId geçerli mi?
@@ -11085,7 +11089,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             window.closeBadgesModal = closeBadgesModal;
             
             // Kritik fonksiyonları global hale getir (safety-checks için)
-            window.saveStats = saveStats;
+            // saveStats artık debouncedSaveStats kullanıyor, geriye uyumluluk için alias ekle
+            window.saveStats = debouncedSaveStats;
+            window.debouncedSaveStats = debouncedSaveStats;
+            window.saveStatsImmediate = saveStatsImmediate;
             window.loadStats = loadStats;
             window.updateUI = updateUI;
             window.updateStatsBar = updateStatsBar;
