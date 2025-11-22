@@ -1897,6 +1897,14 @@
             try {
                 log.stats('🔍 filterWordStats BAŞLADI, filterType:', filterType);
                 
+                // Favoriler ve tekrar listesini güncelle (filtreleme öncesi)
+                if (typeof loadFavorites === 'function') {
+                    loadFavorites();
+                }
+                if (typeof loadReviewWords === 'function') {
+                    loadReviewWords();
+                }
+                
                 const wordStats = loadWordStats();
                 const listContainer = document.getElementById('wordStatsList');
                 log.stats('🔍 filterWordStats çağrıldı, filterType:', filterType, 'wordStats:', wordStats, 'toplam kelime:', Object.keys(wordStats).length);
@@ -1921,6 +1929,18 @@
                 Object.entries(wordStats).forEach(([wordId, stat]) => {
                     log.stats('🔄 İşleniyor:', wordId, stat);
                     
+                    // Eski veriler için eksik alanları hesapla
+                    if (typeof stat.successRate === 'undefined') {
+                        const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
+                        stat.successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
+                    }
+                    if (typeof stat.masteryLevel === 'undefined') {
+                        stat.masteryLevel = 0;
+                    }
+                    if (typeof stat.lastSeen === 'undefined') {
+                        stat.lastSeen = Date.now();
+                    }
+                    
                     // Kelime verisini bul
                     let wordData = null;
                     
@@ -1944,11 +1964,12 @@
                         log.stats('⚠️ Kelime verisi bulunamadı, geçici veri oluşturuldu:', wordData);
                     }
                     
-                    // Favoriler kontrolü
+                    // Favoriler kontrolü (güncel liste ile)
                     const isFav = typeof isFavorite !== 'undefined' && isFavorite(wordId);
                     
-                    // Tekrar listesi kontrolü
-                    const needsReview = typeof reviewWords !== 'undefined' && reviewWords.includes(wordId);
+                    // Tekrar listesi kontrolü (güncel liste ile)
+                    const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(wordId)) ||
+                                       (typeof reviewWords !== 'undefined' && Array.isArray(reviewWords) && reviewWords.includes(wordId));
                     
                     const shouldShow = 
                         filterType === 'all' ||
