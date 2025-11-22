@@ -2686,7 +2686,7 @@
         
         // GLOBAL (KALICI) PUANLAR
         let totalPoints = 0;  // Toplam oyun puanı (kalıcı)
-        let starPoints = 0;   // Yıldız puanı (her 500 puan = 1 yıldız)
+        let starPoints = 0;   // Yıldız puanı (her 100 Hasene = 1 yıldız)
         let level = 1;        // Global seviye
 
         // ROZET SİSTEMİ
@@ -3359,7 +3359,7 @@ window.closeAllModals = closeAllModals;
             
             // Level 10'dan sonra her seviye için 15000 puan artış
             const afterLevel10 = points - 58000;
-            return 10 + Math.floor(afterLevel10 / 15000) + 1;
+            return 10 + Math.floor(afterLevel10 / 15000);
         }
 
         // Bir sonraki seviye için gereken puan
@@ -7324,7 +7324,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     timeLeft = 0;
                     
                     updateUI();
-                    updateProgress();
+                    updateLoadingProgress();
                     
                     forceLog('[9] Ekranlar gizleniyor...');
             if (elements.gameScreen) elements.gameScreen.style.display = 'none';
@@ -11305,7 +11305,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 { percent: 100, label: 'Haydi Bismillah...', duration: 1500 }
             ];
             
-            function updateProgress() {
+            function updateLoadingProgress() {
                 if (progressSteps.length === 0) return;
                 
                 const step = progressSteps.shift();
@@ -11319,7 +11319,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         clearInterval(interval);
                         
                         if (progressSteps.length > 0) {
-                            setTimeout(updateProgress, 500);
+                            setTimeout(updateLoadingProgress, 500);
                         } else {
             setTimeout(() => {
                                 // Loading screen kapanırken tüm harfleri temizle
@@ -11365,7 +11365,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             setTimeout(() => {
-                updateProgress();
+                updateLoadingProgress();
             }, 500);
         });
 
@@ -11376,7 +11376,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     <!-- Özel Onay Pop-up -->
         <script>
         // Arapça hareke renklendirme fonksiyonu artık boş
-        function updateArabicTextColoring() {}
+        // updateArabicTextColoring fonksiyonu kaldırıldı - kullanılmıyor
             
         
         </script>

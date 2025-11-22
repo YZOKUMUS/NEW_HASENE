@@ -3,7 +3,7 @@
 // ===============================
 
 // === DİNAMİK BASE PATH ===
-const BASE = location.pathname.includes("NEW_HASENE")
+const BASE = self.location.pathname.includes("NEW_HASENE")
   ? "/NEW_HASENE/"
   : "/";
 
@@ -58,9 +58,6 @@ self.addEventListener("activate", (event) => {
       return self.clients.claim();
     })
   );
-
-  // Hemen aktif ol
-  self.clients.claim();
 });
 
 // ===============================
