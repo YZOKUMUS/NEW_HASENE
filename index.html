@@ -3613,6 +3613,59 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     localStorage.removeItem('hasene_wordStats');
     localStorage.removeItem('dailyXP');
     localStorage.removeItem('unlockedAchievements'); // Achievement sistemini de sıfırla
+    
+    // =========================================
+    // 🔥 LİDERLİK TABLOSU SIFIRLA (MOBİL UYUMLU)
+    // =========================================
+    try {
+        localStorage.removeItem('hasene_weeklyScores');
+        localStorage.removeItem('hasene_monthlyScores');
+        // Boş obje olarak set et (mobil uyumluluk için)
+        localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
+        localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
+    } catch(e) {
+        log.error('Liderlik tablosu sıfırlama hatası:', e);
+    }
+    
+    // =========================================
+    // 🔥 DETAYLI İSTATİSTİKLER SIFIRLA (MOBİL UYUMLU)
+    // =========================================
+    try {
+        localStorage.removeItem('dailyCorrect');
+        localStorage.removeItem('dailyWrong');
+        localStorage.removeItem('hasene_detailedStats');
+        localStorage.removeItem('hasene_dailyStats');
+        localStorage.removeItem('hasene_weeklyStats');
+        localStorage.removeItem('hasene_monthlyStats');
+        localStorage.removeItem('hasene_trendStats');
+        localStorage.removeItem('hasene_streakData'); // Detaylı istatistikler için
+        // Boş değerler set et (mobil uyumluluk için)
+        localStorage.setItem('dailyCorrect', '0');
+        localStorage.setItem('dailyWrong', '0');
+    } catch(e) {
+        log.error('Detaylı istatistikler sıfırlama hatası:', e);
+    }
+    
+    // =========================================
+    // 🔥 BİLDİRİMLER SIFIRLA (MOBİL UYUMLU)
+    // =========================================
+    try {
+        localStorage.removeItem('hasene_notifications');
+        localStorage.removeItem('hasene_notificationSettings');
+        localStorage.removeItem('hasene_lastNotificationDate');
+    } catch(e) {
+        log.error('Bildirimler sıfırlama hatası:', e);
+    }
+    
+    // =========================================
+    // 🔥 SOSYAL PAYLAŞIM SIFIRLA (MOBİL UYUMLU)
+    // =========================================
+    try {
+        localStorage.removeItem('hasene_socialShare');
+        localStorage.removeItem('hasene_shareHistory');
+    } catch(e) {
+        log.error('Sosyal paylaşım sıfırlama hatası:', e);
+    }
 
     // =========================================
     // 🔥 URL GEÇMİŞ TEMİZLE
@@ -3758,6 +3811,78 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     // Başarılar Modal istatistiklerini güncelle (sıfırlanmış durumda)
     if (typeof updateBadgesModalStats === 'function') {
         updateBadgesModalStats();
+    }
+    
+    // =========================================
+    // 🔥 YENİ PANELLERİ GÜNCELLE (MOBİL UYUMLU)
+    // =========================================
+    
+    // Liderlik tablosunu güncelle (eğer açıksa)
+    try {
+        if (typeof closeLeaderboard === 'function') {
+            // Liderlik tablosu modal'ı açıksa kapat
+            const leaderboardModal = document.getElementById('leaderboardModal');
+            if (leaderboardModal && leaderboardModal.style.display !== 'none') {
+                closeLeaderboard();
+            }
+        }
+        
+        // Liderlik tablosu verilerini zorla sıfırla (mobil için)
+        if (typeof getWeeklyScores === 'function' && typeof getMonthlyScores === 'function') {
+            // Fonksiyonlar varsa, verileri manuel olarak sıfırla
+            localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
+            localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
+        } else {
+            // Fonksiyonlar yoksa direkt sıfırla
+            localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
+            localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
+        }
+    } catch(e) {
+        log.error('Liderlik tablosu güncelleme hatası:', e);
+    }
+    
+    // Detaylı istatistikleri güncelle (eğer fonksiyon varsa)
+    try {
+        if (typeof updateDetailedStats === 'function') {
+            updateDetailedStats();
+        }
+        // Detaylı istatistik verilerini zorla sıfırla (mobil için)
+        localStorage.setItem('dailyCorrect', '0');
+        localStorage.setItem('dailyWrong', '0');
+        localStorage.removeItem('hasene_streakData');
+    } catch(e) {
+        log.error('Detaylı istatistikler güncelleme hatası:', e);
+    }
+    
+    // Bildirimleri güncelle (eğer fonksiyon varsa)
+    try {
+        if (typeof updateNotifications === 'function') {
+            updateNotifications();
+        }
+    } catch(e) {
+        log.error('Bildirimler güncelleme hatası:', e);
+    }
+    
+    // Mobil cihazlarda localStorage'ı zorla temizle (tüm hasene_ ile başlayan key'ler)
+    try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('hasene_weekly') || key.startsWith('hasene_monthly') || 
+                       key.startsWith('hasene_detailed') || key.startsWith('hasene_notification') ||
+                       key.startsWith('hasene_social') || key.startsWith('hasene_streakData'))) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => {
+            try {
+                localStorage.removeItem(key);
+            } catch(e) {
+                log.debug('Key silme hatası (kritik değil):', key, e);
+            }
+        });
+    } catch(e) {
+        log.error('localStorage temizleme hatası:', e);
     }
 
     showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");

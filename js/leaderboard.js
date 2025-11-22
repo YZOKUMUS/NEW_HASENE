@@ -116,10 +116,10 @@ function showLeaderboard(type = 'weekly') {
     const currentRank = sortedScores.findIndex(s => s.key === currentKey) + 1;
 
     modal.innerHTML = `
-        <div class="leaderboard-container">
+        <div class="leaderboard-container" onclick="event.stopPropagation();">
             <div class="leaderboard-header">
                 <h2 class="leaderboard-title">${type === 'weekly' ? '📅 Haftalık' : '📆 Aylık'} Liderlik Tablosu</h2>
-                <button class="leaderboard-close-btn" onclick="closeLeaderboard()">✕</button>
+                <button class="leaderboard-close-btn" id="leaderboardCloseBtn" onclick="event.stopPropagation(); closeLeaderboard();" style="cursor: pointer; z-index: 10001; position: relative;">✕</button>
             </div>
             <div class="leaderboard-tabs">
                 <button class="leaderboard-tab ${type === 'weekly' ? 'active' : ''}" onclick="showLeaderboard('weekly')">
@@ -154,6 +154,18 @@ function showLeaderboard(type = 'weekly') {
 
     document.body.appendChild(modal);
 
+    // Close butonuna event listener ekle (güvenli)
+    setTimeout(() => {
+        const closeBtn = document.getElementById('leaderboardCloseBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                closeLeaderboard();
+            });
+        }
+    }, 100);
+
     // Modal dışına tıklanınca kapat
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -161,19 +173,27 @@ function showLeaderboard(type = 'weekly') {
         }
     });
 
-    // Global fonksiyon
-    window.closeLeaderboard = () => {
-        const modal = document.getElementById('leaderboardModal');
-        if (modal) {
-            modal.style.display = 'none';
-            setTimeout(() => {
-                if (modal.parentNode) {
-                    modal.parentNode.removeChild(modal);
-                }
-            }, 300);
+    // ESC tuşu ile kapat
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeLeaderboard();
+            document.removeEventListener('keydown', escHandler);
         }
-        delete window.closeLeaderboard;
     };
+    document.addEventListener('keydown', escHandler);
+}
+
+// Global kapatma fonksiyonu (her zaman mevcut olmalı)
+function closeLeaderboard() {
+    const modal = document.getElementById('leaderboardModal');
+    if (modal) {
+        modal.style.display = 'none';
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        }, 300);
+    }
 }
 
 // Dönem formatla
@@ -196,5 +216,6 @@ function updateLeaderboardScores(score) {
 
 // Global fonksiyonlar
 window.showLeaderboard = showLeaderboard;
+window.closeLeaderboard = closeLeaderboard;
 window.updateLeaderboardScores = updateLeaderboardScores;
 

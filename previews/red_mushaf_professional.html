@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasene - Profesyonel RED MUSHAF Icon Tasarımı</title>
+    <style>
+        @font-face {
+            font-family: 'Uthmani';
+            src: url('../assets/fonts/KFGQPC Uthmanic Script HAFS Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #DC143C;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 1.2em;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .current-png-icon {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            object-fit: cover;
+            box-shadow: 0 8px 24px rgba(220, 20, 60, 0.4);
+            border: none;
+            background: transparent;
+        }
+        
+        .current-png-wrapper {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            overflow: visible;
+            box-shadow: 0 8px 24px rgba(220, 20, 60, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        
+        .current-png-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border: none;
+            border-radius: 0;
+        }
+        
+        .icon-section {
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        /* Mevcut Icon */
+        .icon-current {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            box-shadow: 0 8px 24px rgba(220, 20, 60, 0.4);
+            position: relative;
+            border: 4px solid rgba(255,255,255,0.3);
+            color: #FFFFFF;
+        }
+        
+        .icon-current .crescent-star {
+            position: absolute;
+            top: 20px;
+            font-size: 0.5em;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .icon-current .book-container {
+            position: relative;
+            width: 1.2em;
+            height: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-current .book-page {
+            position: absolute;
+            width: 0.55em;
+            height: 0.9em;
+            background: rgba(255,255,255,0.95);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.28em;
+            font-weight: 800;
+            color: #8B0000;
+            text-shadow: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-family: 'Uthmani', 'Arial', sans-serif;
+            direction: rtl;
+            line-height: 1.1;
+            padding: 6px 4px;
+        }
+        
+        .icon-current .book-page-left {
+            left: 0;
+            border-right: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-current .book-page-right {
+            right: 0;
+            border-left: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-current .arabic-text {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.25em;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            direction: rtl;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* Profesyonel Icon - Versiyon 1: Klasik Geliştirilmiş */
+        .icon-pro-1 {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF6347 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            box-shadow: 
+                0 0 0 8px rgba(255,255,255,0.1),
+                0 0 0 12px rgba(220, 20, 60, 0.2),
+                0 12px 40px rgba(0,0,0,0.4),
+                inset 0 2px 10px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            color: #FFFFFF;
+        }
+        
+        .icon-pro-1::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+        
+        .icon-pro-1 .crescent-star {
+            position: absolute;
+            top: 15px;
+            font-size: 0.5em;
+            z-index: 3;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+        
+        .icon-pro-1 .book-container {
+            position: relative;
+            width: 1.2em;
+            height: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .icon-pro-1 .book-page {
+            position: absolute;
+            width: 0.55em;
+            height: 0.9em;
+            background: rgba(255,255,255,0.95);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.28em;
+            font-weight: 800;
+            color: #8B0000;
+            text-shadow: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Uthmani', 'Arial', sans-serif;
+            direction: rtl;
+            line-height: 1.1;
+            padding: 6px 4px;
+        }
+        
+        .icon-pro-1 .book-page-left {
+            left: 0;
+            border-right: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-1 .book-page-right {
+            right: 0;
+            border-left: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-1 .arabic-text {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.22em;
+            font-weight: 700;
+            z-index: 3;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            direction: rtl;
+            font-family: 'Arial', sans-serif;
+            white-space: nowrap;
+        }
+        
+        .icon-pro-1 .year-badge {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.8);
+            color: #FFFFFF;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.25em;
+            font-weight: 700;
+            z-index: 4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        /* Profesyonel Icon - Versiyon 2: Modern Minimalist */
+        .icon-pro-2 {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 85px;
+            box-shadow: 
+                0 0 0 6px rgba(255,255,255,0.15),
+                0 16px 48px rgba(220, 20, 60, 0.5),
+                inset 0 2px 15px rgba(255,255,255,0.1);
+            position: relative;
+            border: 3px solid rgba(255,255,255,0.2);
+            color: #FFD700;
+        }
+        
+        .icon-pro-2 .crescent-star {
+            position: absolute;
+            top: 18px;
+            font-size: 0.5em;
+            z-index: 3;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+        }
+        
+        .icon-pro-2 .book-container {
+            position: relative;
+            width: 1.2em;
+            height: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .icon-pro-2 .book-page {
+            position: absolute;
+            width: 0.55em;
+            height: 0.9em;
+            background: rgba(255,255,255,0.95);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.28em;
+            font-weight: 800;
+            color: #8B0000;
+            text-shadow: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            font-family: 'Uthmani', 'Arial', sans-serif;
+            direction: rtl;
+            line-height: 1.1;
+            padding: 6px 4px;
+        }
+        
+        .icon-pro-2 .book-page-left {
+            left: 0;
+            border-right: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-2 .book-page-right {
+            right: 0;
+            border-left: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-2 .arabic-text {
+            position: absolute;
+            bottom: 18px;
+            font-size: 0.2em;
+            font-weight: 700;
+            z-index: 3;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            direction: rtl;
+            font-family: 'Arial', sans-serif;
+            white-space: nowrap;
+        }
+        
+        .icon-pro-2 .hasene-text {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.95);
+            font-size: 0.18em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        /* Profesyonel Icon - Versiyon 3: Premium Deri Cilt */
+        .icon-pro-3 {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(139, 0, 0, 0.1) 0px,
+                    rgba(139, 0, 0, 0.1) 2px,
+                    transparent 2px,
+                    transparent 8px
+                ),
+                linear-gradient(135deg, #654321 0%, #8B4513 30%, #DC143C 70%, #B22222 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 75px;
+            box-shadow: 
+                0 0 0 10px rgba(101, 67, 33, 0.3),
+                0 0 0 14px rgba(220, 20, 60, 0.2),
+                0 20px 60px rgba(0,0,0,0.6),
+                inset 0 4px 20px rgba(0,0,0,0.3),
+                inset 0 -4px 20px rgba(255,255,255,0.1);
+            position: relative;
+            border: 4px solid rgba(101, 67, 33, 0.5);
+            color: #FFD700;
+        }
+        
+        .icon-pro-3::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            bottom: 10%;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 20%;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+        }
+        
+        .icon-pro-3 .crescent-star {
+            position: absolute;
+            top: 12px;
+            font-size: 0.5em;
+            z-index: 3;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+        }
+        
+        .icon-pro-3 .book-container {
+            position: relative;
+            width: 1.2em;
+            height: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .icon-pro-3 .book-page {
+            position: absolute;
+            width: 0.55em;
+            height: 0.9em;
+            background: rgba(255,255,255,0.95);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.28em;
+            font-weight: 800;
+            color: #8B0000;
+            text-shadow: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            font-family: 'Uthmani', 'Arial', sans-serif;
+            direction: rtl;
+            line-height: 1.1;
+            padding: 6px 4px;
+        }
+        
+        .icon-pro-3 .book-page-left {
+            left: 0;
+            border-right: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-3 .book-page-right {
+            right: 0;
+            border-left: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-3 .arabic-text {
+            position: absolute;
+            bottom: 12px;
+            font-size: 0.2em;
+            font-weight: 800;
+            z-index: 3;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+            direction: rtl;
+            font-family: 'Arial', sans-serif;
+            white-space: nowrap;
+        }
+        
+        .icon-pro-3 .year-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+            color: #8B0000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.22em;
+            font-weight: 800;
+            z-index: 4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            border: 2px solid rgba(139, 0, 0, 0.3);
+        }
+        
+        /* Profesyonel Icon - Versiyon 4: Ultra Modern */
+        .icon-pro-4 {
+            width: 256px;
+            height: 256px;
+            border-radius: 0;
+            background: 
+                radial-gradient(ellipse at top left, rgba(255,255,255,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom right, rgba(0,0,0,0.3) 0%, transparent 60%),
+                linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            box-shadow: 
+                0 0 0 8px rgba(255,255,255,0.1),
+                0 0 40px rgba(220, 20, 60, 0.6),
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 2px 15px rgba(255,255,255,0.15);
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.25);
+            color: #FFD700;
+        }
+        
+        .icon-pro-4 .crescent-star {
+            position: absolute;
+            top: 15px;
+            font-size: 0.5em;
+            z-index: 3;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+        }
+        
+        .icon-pro-4 .book-container {
+            position: relative;
+            width: 1.2em;
+            height: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+        
+        .icon-pro-4 .book-page {
+            position: absolute;
+            width: 0.55em;
+            height: 0.9em;
+            background: rgba(255,255,255,0.95);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.28em;
+            font-weight: 800;
+            color: #8B0000;
+            text-shadow: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+            font-family: 'Uthmani', 'Arial', sans-serif;
+            direction: rtl;
+            line-height: 1.1;
+            padding: 6px 4px;
+        }
+        
+        .icon-pro-4 .book-page-left {
+            left: 0;
+            border-right: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-4 .book-page-right {
+            right: 0;
+            border-left: 2px solid rgba(139,0,0,0.3);
+        }
+        
+        .icon-pro-4 .arabic-text {
+            position: absolute;
+            bottom: 18px;
+            font-size: 0.19em;
+            font-weight: 800;
+            z-index: 3;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.7),
+                0 0 8px rgba(255,255,255,0.3);
+            direction: rtl;
+            font-family: 'Arial', sans-serif;
+            white-space: nowrap;
+        }
+        
+        .icon-pro-4 .hasene-text {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.98);
+            font-size: 0.17em;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 2px 4px rgba(0,0,0,0.6),
+                0 0 10px rgba(255,255,255,0.3);
+            z-index: 2;
+        }
+        
+        .icon-pro-4 .year-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            color: #DC143C;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.2em;
+            font-weight: 700;
+            z-index: 4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .versions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .version-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #e9ecef;
+        }
+        
+        .version-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .version-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #DC143C;
+            margin-bottom: 15px;
+        }
+        
+        .version-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .version-features {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #555;
+        }
+        
+        .version-features strong {
+            color: #DC143C;
+        }
+        
+        .version-features ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        
+        .version-features li {
+            margin: 5px 0;
+        }
+        
+        .download-section {
+            background: linear-gradient(135deg, #DC143C 0%, #B22222 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .download-section h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .download-section p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            opacity: 0.95;
+        }
+        
+        .specs {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .specs h4 {
+            margin-bottom: 10px;
+        }
+        
+        .specs ul {
+            margin-left: 20px;
+        }
+        
+        .specs li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 RED MUSHAF - Profesyonel Versiyonlar</h1>
+        <p class="subtitle">Mevcut ikonunuzun geliştirilmiş profesyonel versiyonları</p>
+        
+        <div class="comparison">
+            <div class="icon-section">
+                <div class="section-title">📷 Mevcut PNG Dosyası</div>
+                <div class="icon-container">
+                    <div class="current-png-wrapper">
+                        <img src="../assets/images/icon-512-v4-RED-MUSHAF.png" alt="Mevcut Icon" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:#999;font-size:0.9em;\'>PNG dosyası yüklenemedi</div>';">
+                    </div>
+                    <p style="color: #666; margin-top: 15px;">Gerçek mevcut icon dosyası (beyaz alan kaldırıldı)</p>
+                </div>
+            </div>
+            <div class="icon-section">
+                <div class="section-title">Mevcut Versiyon (Simüle)</div>
+                <div class="icon-container">
+                    <div class="icon-current">
+                        <div class="crescent-star">☪</div>
+                        <div class="book-container">
+                            <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                            <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                        </div>
+                        <div class="arabic-text">HASENE</div>
+                    </div>
+                    <p style="color: #666;">Kitap içinde: Sol=محمد, Sağ=الله</p>
+                </div>
+            </div>
+            <div class="icon-section">
+                <div class="section-title">Profesyonel Versiyon 1</div>
+                <div class="icon-container">
+                    <div class="icon-pro-1">
+                        <div class="crescent-star">☪</div>
+                        <div class="book-container">
+                            <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                            <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                        </div>
+                        <div class="arabic-text">HASENE</div>
+                        <div class="year-badge">2025</div>
+                    </div>
+                    <p style="color: #666;">Geliştirilmiş gradient + efektler</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="versions-grid">
+            <!-- Versiyon 1 -->
+            <div class="version-card">
+                <div class="version-title">Versiyon 1: Klasik Geliştirilmiş</div>
+                <div class="icon-pro-1" style="width: 200px; height: 200px; font-size: 60px; margin: 0 auto 20px;">
+                    <div class="crescent-star">☪</div>
+                    <div class="book-container">
+                        <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                        <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                    </div>
+                    <div class="arabic-text">HASENE</div>
+                    <div class="year-badge">2025</div>
+                </div>
+                <div class="version-desc">
+                    Derin kırmızı gradient, çok katmanlı gölge efektleri, parlaklık animasyonu
+                </div>
+                <div class="version-features">
+                    <strong>Özellikler:</strong>
+                    <ul>
+                        <li>☪ Ay-yıldız (üst kısım)</li>
+                        <li>📖 Açık kitap (orta) - Sol sayfa: محمد, Sağ sayfa: الله</li>
+                        <li>HASENE yazısı (alt)</li>
+                        <li>3 katmanlı gradient (koyu → orta → açık kırmızı)</li>
+                        <li>Çok katmanlı gölge efektleri</li>
+                        <li>Parlaklık animasyonu (shine effect)</li>
+                        <li>2025 yıl rozeti</li>
+                        <li>İnce beyaz kenarlık</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Versiyon 2 -->
+            <div class="version-card">
+                <div class="version-title">Versiyon 2: Modern Minimalist</div>
+                <div class="icon-pro-2" style="width: 200px; height: 200px; font-size: 65px; margin: 0 auto 20px;">
+                    <div class="crescent-star">☪</div>
+                    <div class="book-container">
+                        <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                        <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                    </div>
+                    <div class="arabic-text">HASENE</div>
+                    <div class="hasene-text">HASENE</div>
+                </div>
+                <div class="version-desc">
+                    Temiz görünüm, radial gradient, HASENE yazısı, minimal tasarım
+                </div>
+                <div class="version-features">
+                    <strong>Özellikler:</strong>
+                    <ul>
+                        <li>☪ Ay-yıldız (üst kısım)</li>
+                        <li>📖 Açık kitap (orta) - Sol sayfa: محمد, Sağ sayfa: الله</li>
+                        <li>HASENE yazısı (alt)</li>
+                        <li>Radial gradient (ışık efekti)</li>
+                        <li>HASENE yazısı (alt kısımda)</li>
+                        <li>Güçlü gölge efektleri</li>
+                        <li>İnce beyaz kenarlık</li>
+                        <li>Modern ve şık görünüm</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Versiyon 3 -->
+            <div class="version-card">
+                <div class="version-title">Versiyon 3: Premium Deri Cilt</div>
+                <div class="icon-pro-3" style="width: 200px; height: 200px; font-size: 55px; margin: 0 auto 20px;">
+                    <div class="crescent-star">☪</div>
+                    <div class="book-container">
+                        <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                        <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                    </div>
+                    <div class="arabic-text">HASENE</div>
+                    <div class="year-badge">2025</div>
+                </div>
+                <div class="version-desc">
+                    Deri cilt dokusu, altın kenarlık, klasik mushaf görünümü
+                </div>
+                <div class="version-features">
+                    <strong>Özellikler:</strong>
+                    <ul>
+                        <li>☪ Ay-yıldız (üst kısım)</li>
+                        <li>📖 Açık kitap (orta) - Sol sayfa: محمد, Sağ sayfa: الله</li>
+                        <li>HASENE yazısı (alt)</li>
+                        <li>Deri dokusu efekti (texture)</li>
+                        <li>Kahverengi-kırmızı geçiş</li>
+                        <li>Altın kenarlık ve rozet</li>
+                        <li>Derin gölge efektleri</li>
+                        <li>Geleneksel mushaf görünümü</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Versiyon 4 -->
+            <div class="version-card">
+                <div class="version-title">Versiyon 4: Ultra Modern</div>
+                <div class="icon-pro-4" style="width: 200px; height: 200px; font-size: 60px; margin: 0 auto 20px;">
+                    <div class="crescent-star">☪</div>
+                    <div class="book-container">
+                        <div class="book-page book-page-left" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">محمد</div>
+                        <div class="book-page book-page-right" style="font-family: 'Uthmani', 'Arial', sans-serif; direction: rtl;">الله</div>
+                    </div>
+                    <div class="arabic-text">HASENE</div>
+                    <div class="hasene-text">HASENE</div>
+                    <div class="year-badge">2025</div>
+                </div>
+                <div class="version-desc">
+                    Çift gradient, HASENE + 2025, glow efekti, premium görünüm
+                </div>
+                <div class="version-features">
+                    <strong>Özellikler:</strong>
+                    <ul>
+                        <li>☪ Ay-yıldız (üst kısım)</li>
+                        <li>📖 Açık kitap (orta) - Sol sayfa: محمد, Sağ sayfa: الله</li>
+                        <li>HASENE yazısı (alt)</li>
+                        <li>Çift radial gradient</li>
+                        <li>HASENE yazısı + 2025 rozeti</li>
+                        <li>Glow efekti (ışık halesi)</li>
+                        <li>Çok katmanlı gölge</li>
+                        <li>Ultra modern görünüm</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <h3>📥 Tasarım Özellikleri</h3>
+            <p>Tüm versiyonlar 512x512 piksel olarak hazırlanmalı</p>
+            <div class="specs">
+                <h4>Teknik Özellikler:</h4>
+                <ul>
+                    <li><strong>Boyut:</strong> 512x512 piksel (Android için)</li>
+                    <li><strong>Format:</strong> PNG (şeffaf arka plan desteklenir)</li>
+                    <li><strong>Kenar Boşluğu:</strong> %10-15 (adaptive icon için)</li>
+                    <li><strong>Renk Derinliği:</strong> 24-bit RGB</li>
+                    <li><strong>Optimizasyon:</strong> Dosya boyutu < 500KB önerilir</li>
+                </ul>
+                <h4 style="margin-top: 15px;">Tasarım İpuçları:</h4>
+                <ul>
+                    <li>Küçük boyutlarda da net görünmeli (192x192 test edin)</li>
+                    <li>Yüksek kontrast kullanın</li>
+                    <li>Yazılar okunabilir boyutta olmalı</li>
+                    <li>Adaptive icon için kenarlarda boşluk bırakın</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
