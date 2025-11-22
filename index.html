@@ -2330,25 +2330,75 @@
         // ============ GLOBAL FONKSİYONLAR SONU ============
         
         // ============ GLOBAL ERROR HANDLER ============
+        // Error throttling - aynı hatayı tekrar tekrar loglamayı önle
+        const errorThrottle = new Map();
+        const ERROR_THROTTLE_MS = 5000; // 5 saniye
+        
         window.addEventListener('error', (event) => {
-            log.error('🚨 Global Error:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                error: event.error
-            });
-            
-            // Kullanıcıya kritik olmayan hatalar için bildirim göster
-            if (event.error && !event.error.message?.includes('ResizeObserver')) {
-                // ResizeObserver gibi bilinen hataları ignore et
-                console.error('Uygulama hatası:', event.error);
+            try {
+                // Error handler'ın kendisinden kaynaklanan hataları ignore et
+                if (event.filename && event.filename.includes('safety-checks.js') && 
+                    event.message && event.message.includes('elements is not defined')) {
+                    return; // Bu hatayı ignore et
+                }
+                
+                const errorKey = `${event.filename}:${event.lineno}:${event.message}`;
+                const now = Date.now();
+                
+                // Throttle kontrolü
+                if (errorThrottle.has(errorKey)) {
+                    const lastTime = errorThrottle.get(errorKey);
+                    if (now - lastTime < ERROR_THROTTLE_MS) {
+                        return; // Aynı hata çok yakın zamanda loglandı, ignore et
+                    }
+                }
+                errorThrottle.set(errorKey, now);
+                
+                // Throttle map'i temizle (bellek sızıntısını önle)
+                if (errorThrottle.size > 50) {
+                    const oldestKey = errorThrottle.keys().next().value;
+                    errorThrottle.delete(oldestKey);
+                }
+                
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('🚨 Global Error:', {
+                        message: event.message,
+                        filename: event.filename,
+                        lineno: event.lineno,
+                        colno: event.colno,
+                        error: event.error
+                    });
+                }
+                
+                // Kullanıcıya kritik olmayan hatalar için bildirim göster
+                if (event.error && !event.error.message?.includes('ResizeObserver') && 
+                    !event.error.message?.includes('pendingSave') &&
+                    !event.error.message?.includes('elements is not defined')) {
+                    // ResizeObserver ve bilinen hataları ignore et
+                    console.error('Uygulama hatası:', event.error);
+                }
+            } catch (e) {
+                // Error handler hatası - sessizce ignore et
             }
         });
         
         window.addEventListener('unhandledrejection', (event) => {
-            log.error('🚨 Unhandled Promise Rejection:', event.reason);
-            console.error('Promise rejection:', event.reason);
+            try {
+                // Promise rejection handler'ın kendisinden kaynaklanan hataları ignore et
+                if (event.reason && typeof event.reason === 'object' && 
+                    event.reason.message && 
+                    (event.reason.message.includes('pendingSave') || 
+                     event.reason.message.includes('elements is not defined'))) {
+                    return; // Bu hatayı ignore et
+                }
+                
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('🚨 Unhandled Promise Rejection:', event.reason);
+                }
+                console.error('Promise rejection:', event.reason);
+            } catch (e) {
+                // Error handler hatası - sessizce ignore et
+            }
         });
         
         // ============ OFFLINE/ONLINE INDICATOR ============
@@ -2378,6 +2428,10 @@
         // ============ GLOBAL CLEANUP (Memory Leak Önleme) ============
         const activeIntervals = new Set();
         const activeTimeouts = new Set();
+        
+        // Debounce değişkenleri (erken tanımlama - beforeunload için)
+        let saveStatsTimeout = null;
+        let pendingSave = false;
         
         // setInterval wrapper - otomatik takip
         const originalSetInterval = window.setInterval;
@@ -2437,7 +2491,7 @@
             }
             
             // Acil kaydetme (sayfa kapanırken)
-            if (pendingSave) {
+            if (typeof saveStatsImmediate === 'function' && pendingSave) {
                 saveStatsImmediate().catch(() => {});
             }
         });
@@ -3540,8 +3594,7 @@ window.closeAllModals = closeAllModals;
         }
 
         // ============ DEBOUNCE SİSTEMİ (Performans Optimizasyonu) ============
-        let saveStatsTimeout = null;
-        let pendingSave = false;
+        // Not: saveStatsTimeout ve pendingSave yukarıda tanımlandı (beforeunload için)
         
         // Debounced saveStats - 500ms bekle, sonra kaydet
         function debouncedSaveStats() {

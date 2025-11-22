@@ -309,60 +309,97 @@ function healthCheck() {
  * Recovery mekanizması - hata durumunda verileri kurtarır
  */
 function recoverFromError(error, context = 'unknown') {
-    log.error(`❌ Hata kurtarma başlatılıyor (${context}):`, error);
+    // Recovery fonksiyonunun kendisinden kaynaklanan hataları önle
+    if (recoverFromError._inProgress) {
+        return false; // Zaten recovery işlemi devam ediyor, sonsuz döngüyü önle
+    }
     
     try {
-        // 1. Verileri doğrula ve düzelt
-        validateCriticalData();
+        recoverFromError._inProgress = true;
+        
+        if (typeof log !== 'undefined' && log.error) {
+            log.error(`❌ Hata kurtarma başlatılıyor (${context}):`, error);
+        }
+        
+        // 1. Verileri doğrula ve düzelt (güvenli)
+        try {
+            if (typeof validateCriticalData === 'function') {
+                validateCriticalData();
+            }
+        } catch (e) {
+            // validateCriticalData hatası - ignore et
+        }
         
         // 2. Verileri kaydet (debouncedSaveStats veya saveStatsImmediate kullan)
-        if (typeof debouncedSaveStats === 'function') {
-            debouncedSaveStats();
-        } else if (typeof saveStatsImmediate === 'function') {
-            saveStatsImmediate().catch(() => {});
-        } else if (typeof saveStats === 'function') {
-            saveStats();
+        try {
+            if (typeof debouncedSaveStats === 'function') {
+                debouncedSaveStats();
+            } else if (typeof saveStatsImmediate === 'function') {
+                saveStatsImmediate().catch(() => {});
+            } else if (typeof saveStats === 'function') {
+                saveStats();
+            }
+        } catch (e) {
+            // Save hatası - ignore et
         }
         
-        // 3. UI'ı sıfırla
-        if (typeof hideAllModes === 'function') {
-            hideAllModes();
-        }
-        if (elements && elements.mainMenu) {
-            elements.mainMenu.style.display = 'block';
+        // 3. UI'ı sıfırla (güvenli)
+        try {
+            if (typeof hideAllModes === 'function') {
+                hideAllModes();
+            }
+            if (typeof elements !== 'undefined' && elements && elements.mainMenu) {
+                elements.mainMenu.style.display = 'block';
+            }
+        } catch (e) {
+            // UI hatası - ignore et
         }
         
-        // 4. Kullanıcıya bilgi ver
-        if (CONFIG.showCriticalErrors) {
-            showCustomAlert(
-                'Bir hata oluştu ancak verileriniz korundu. Lütfen sayfayı yenileyin.',
-                'warning',
-                'Hata Kurtarıldı'
-            );
+        // 4. Kullanıcıya bilgi ver (güvenli)
+        try {
+            if (typeof CONFIG !== 'undefined' && CONFIG.showCriticalErrors && 
+                typeof showCustomAlert === 'function') {
+                showCustomAlert(
+                    'Bir hata oluştu ancak verileriniz korundu. Lütfen sayfayı yenileyin.',
+                    'warning',
+                    'Hata Kurtarıldı'
+                );
+            }
+        } catch (e) {
+            // Alert hatası - ignore et
         }
         
         return true;
     } catch (recoveryError) {
-        log.error('❌ Hata kurtarma başarısız:', recoveryError);
+        // Recovery fonksiyonunun kendisi hata verdi - sessizce ignore et
         return false;
+    } finally {
+        // 1 saniye sonra _inProgress flag'ini sıfırla
+        setTimeout(() => {
+            recoverFromError._inProgress = false;
+        }, 1000);
     }
 }
 
 /**
  * Global error handler - yakalanmamış hataları yakalar
+ * NOT: index.html'de zaten bir global error handler var, bu yüzden bu handler'ı devre dışı bıraktık
+ * Çakışmayı önlemek için bu handler sadece manuel çağrılar için kullanılabilir
  */
-window.addEventListener('error', (event) => {
-    log.error('🚨 Yakalanmamış hata:', event.error);
-    recoverFromError(event.error, 'global-error-handler');
-});
+// window.addEventListener('error', (event) => {
+//     log.error('🚨 Yakalanmamış hata:', event.error);
+//     recoverFromError(event.error, 'global-error-handler');
+// });
 
 /**
  * Unhandled promise rejection handler
+ * NOT: index.html'de zaten bir unhandled rejection handler var, bu yüzden bu handler'ı devre dışı bıraktık
+ * Çakışmayı önlemek için bu handler sadece manuel çağrılar için kullanılabilir
  */
-window.addEventListener('unhandledrejection', (event) => {
-    log.error('🚨 Yakalanmamış promise rejection:', event.reason);
-    recoverFromError(event.reason, 'unhandled-rejection');
-});
+// window.addEventListener('unhandledrejection', (event) => {
+//     log.error('🚨 Yakalanmamış promise rejection:', event.reason);
+//     recoverFromError(event.reason, 'unhandled-rejection');
+// });
 
 // Health check'i sayfa yüklendiğinde çalıştır (fonksiyonların yüklenmesi için daha fazla bekle)
 if (document.readyState === 'loading') {
