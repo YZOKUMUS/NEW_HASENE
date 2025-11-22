@@ -32,8 +32,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/icon-192-v4-RED-MUSHAF.png">
     
-    <!-- Manifest - Dinamik olarak oluşturulacak (local vs production için) -->
-    <link rel="manifest" id="manifestLink" href="manifest.json">
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
 
 
 
@@ -2472,92 +2472,6 @@
         });
         
         // DOM yüklendikten sonra çalıştır
-        // Manifest.json'u dinamik olarak oluştur (local vs production için)
-        function createDynamicManifest() {
-            const isProduction = window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost';
-            const basePath = isProduction ? '/NEW_HASENE/' : './';
-            
-            const manifest = {
-                name: "Hasene Arapça Dersi",
-                short_name: "Hasene",
-                description: "İslami Arapça öğrenme platformu: kelime çeviri, ayet okuma, dua ezberleme, hadis öğrenme ve talebe destekli eğitim.",
-                start_url: isProduction ? "/NEW_HASENE/index.html" : "./index.html",
-                scope: isProduction ? "/NEW_HASENE/" : "./",
-                display: "standalone",
-                orientation: "portrait-primary",
-                background_color: "#667eea",
-                theme_color: "#764ba2",
-                lang: "tr",
-                icons: [
-                    {
-                        src: basePath + "assets/images/icon-192-v4-RED-MUSHAF.png",
-                        sizes: "192x192",
-                        type: "image/png",
-                        purpose: "any maskable"
-                    },
-                    {
-                        src: basePath + "assets/images/icon-512-v4-RED-MUSHAF.png",
-                        sizes: "512x512",
-                        type: "image/png",
-                        purpose: "any maskable"
-                    }
-                ],
-                categories: ["education", "games"],
-                screenshots: [
-                    {
-                        src: basePath + "assets/images/icon-512-v4-RED-MUSHAF.png",
-                        sizes: "512x512",
-                        type: "image/png",
-                        label: "Ana ekran"
-                    }
-                ],
-                shortcuts: [
-                    {
-                        name: "Kelime Çevir",
-                        short_name: "Kelime",
-                        description: "Arapça kelimelerin Türkçe Meâl karşılığını Bul",
-                        url: isProduction ? "/NEW_HASENE/index.html?mode=kelime" : "./index.html?mode=kelime",
-                        icons: [
-                            {
-                                src: basePath + "assets/images/icon-192-v4-RED-MUSHAF.png",
-                                sizes: "192x192",
-                                type: "image/png"
-                            }
-                        ]
-                    },
-                    {
-                        name: "Vazifeler",
-                        short_name: "Vazifeler",
-                        description: "Günlük vazifelerini kontrol et",
-                        url: isProduction ? "/NEW_HASENE/index.html?mode=tasks" : "./index.html?mode=tasks",
-                        icons: [
-                            {
-                                src: basePath + "assets/images/icon-192-v4-RED-MUSHAF.png",
-                                sizes: "192x192",
-                                type: "image/png"
-                            }
-                        ]
-                    }
-                ],
-                prefer_related_applications: false
-            };
-            
-            // Manifest link'ini güncelle
-            const manifestLink = document.getElementById('manifestLink');
-            if (manifestLink) {
-                const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                manifestLink.href = url;
-            }
-        }
-        
-        // Sayfa yüklendiğinde manifest'i oluştur
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', createDynamicManifest);
-        } else {
-            createDynamicManifest();
-        }
-        
         document.addEventListener('DOMContentLoaded', function() {
             // (commented) DOM yüklendi log removed during cleanup
             
