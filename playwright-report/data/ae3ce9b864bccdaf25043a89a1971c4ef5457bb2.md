@@ -1,0 +1,178 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]: 1 / 6
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: 👋
+        - heading "Ehlen ve Sehlen!" [level=2] [ref=e8]
+        - paragraph [ref=e9]:
+          - text: Kur'an-ı Kerim kelimelerini öğrenmek için hazır mısın?
+          - text: Bu kısa turda sana dersi tanıtacağız.
+      - generic:
+        - generic: 🎮
+        - heading "6 Farklı Ders Türü" [level=2]
+        - generic:
+          - generic:
+            - text: 📚
+            - strong: Kelime Çevir
+            - text: "- Kelimeleri öğren"
+          - generic:
+            - text: 🎧
+            - strong: Dinle & Bul
+            - text: "- Dinleyerek bul"
+          - generic:
+            - text: 📝
+            - strong: Boşluk Doldur
+            - text: "- Ayetleri tamamla"
+          - generic:
+            - text: 📖
+            - strong: Ayet Oku
+            - text: "- Ayetleri oku"
+          - generic:
+            - text: 🤲
+            - strong: Dua Öğren
+            - text: "- Duaları öğren"
+          - generic:
+            - text: 📜
+            - strong: Hadis Oku
+            - text: "- Hadisleri oku"
+      - generic:
+        - generic: 📿
+        - heading "Hasene Sistemi" [level=2]
+        - paragraph:
+          - text: Her doğru cevap ile
+          - strong: Hasene
+          - text: kazanırsın!
+          - generic:
+            - text: • 100 Hasene = 1 ⭐ Yıldız
+            - text: • Her 3 doğru = +5 Hasene İhsan
+            - text: • Günlük virdi tamamla = +1,000 Hasene
+      - generic:
+        - generic: 🎯
+        - heading "Günlük Vazifeler" [level=2]
+        - paragraph:
+          - text: Her gün yeni vazifeler seni bekliyor!
+          - generic:
+            - text: • 8 temel vazife + 3 fazilet vazifesi
+            - text: • Tüm vazifeleri tamamla = +2,500 Hasene
+            - text: • Her gün sıfırlanır
+      - generic:
+        - generic: 🔥
+        - heading "Muvazebet (Streak)" [level=2]
+        - paragraph:
+          - text: Her gün talebe et, serini bozma!
+          - generic:
+            - text: • Her gün talebe ederek serini artır
+            - text: • Günlük virdi tamamla = +1 gün
+            - text: • En uzun serini kırma!
+      - generic:
+        - generic: 🚀
+        - heading "Hazırsın!" [level=2]
+        - paragraph:
+          - text: Artık derslere başlayabilirsin!
+          - generic:
+            - text: Hayırlı talebe ve muvaffakiyetler!
+            - text: Her gün biraz daha terakki et! 📈
+    - generic [ref=e10]:
+      - button "Atla" [ref=e11] [cursor=pointer]
+      - button "İleri →" [ref=e12] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Ehlen ve Sehlen! 👋
+          - generic [ref=e19]: Bugün hangi dersi çalışmak istersin?
+        - button "Karanlık modu aç/kapat" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: 🌙
+        - 'button "Test: Tüm İstatistikleri Sıfırla" [ref=e22] [cursor=pointer]':
+          - generic [ref=e23]: 🔄
+      - region "Oyuncu istatistikleri" [ref=e24]:
+        - group "Hasene puanı" [ref=e25]:
+          - generic [ref=e26]: "0"
+          - generic [ref=e27]: Hasene
+        - group "Yıldız puanı" [ref=e28]:
+          - generic [ref=e29]: "0"
+          - generic [ref=e30]: ⭐ Yıldız
+        - group "Oyuncu mertebesi" [ref=e31]:
+          - generic [ref=e32]: "1"
+          - generic [ref=e33]: Mertebe
+      - region "Günlük vird ilerlemesi" [ref=e34]:
+        - generic [ref=e35]:
+          - button "Günlük vird ayarlarını aç" [ref=e36] [cursor=pointer]:
+            - generic [ref=e37]: 🎯 Günlük Vird
+            - generic [ref=e38]: ⚙️
+          - generic [ref=e39]: 0 / 2.700
+      - generic [ref=e41]:
+        - button "Hasene puan sistemi hakkında bilgi göster" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: 📿
+          - text: Hasene Bilgi
+        - button "İstatistikler modalını aç" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 📊
+          - text: İstatistikler
+    - group "Zorluk seviyesi seçimi" [ref=e46]:
+      - generic [ref=e47]: Zorluk Mertebesi
+      - radiogroup "Zorluk seviyesi" [ref=e48]:
+        - radio "Kolay zorluk seviyesini seç" [ref=e49] [cursor=pointer]: 🌱 Kolay
+        - radio "Orta zorluk seviyesini seç" [checked] [ref=e50] [cursor=pointer]: ⚖️ Orta
+        - radio "Zor zorluk seviyesini seç" [ref=e51] [cursor=pointer]: 🔥 Zor
+    - generic [ref=e52]:
+      - generic [ref=e53]: 📚 Ders Türleri
+      - generic [ref=e54]:
+        - button "Kelime Çevir oyununu başlat - Arapça kelimelerin Türkçe Meâl karşılığını bul" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: 🔄
+          - generic [ref=e57]: Kelime Çevir
+          - generic [ref=e58]: Arapça kelimelerin Türkçe Meâl karşılığını Bul
+        - button "Dinle ve Bul oyununu başlat - Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç" [ref=e59] [cursor=pointer]:
+          - generic [ref=e60]: 🎧
+          - generic [ref=e61]: Dinle ve Bul
+          - generic [ref=e62]: Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç
+        - button "Boşluk Doldur oyununu başlat - Ayetteki eksik kelimeyi tamamla" [ref=e63] [cursor=pointer]:
+          - generic [ref=e64]: ✏️
+          - generic [ref=e65]: Boşluk Doldur
+          - generic [ref=e66]: Ayetteki eksik kelimeyi tamamla
+        - button "Dua Et modunu aç - Kuran'da geçen duaları dinle ve öğren" [ref=e67] [cursor=pointer]:
+          - generic [ref=e68]: 🤲
+          - generic [ref=e69]: Dua Et
+          - generic [ref=e70]: Kuran'da geçen duaları dinle ve öğren
+        - button "Ayet Oku modunu aç - Ayetin Arapça'sını oku ,dinle ve meâli idrak et" [ref=e71] [cursor=pointer]:
+          - generic [ref=e72]: 📖
+          - generic [ref=e73]: Ayet Oku
+          - generic [ref=e74]: Ayetin Arapça'sını oku ,dinle ve meâli idrak et
+        - button "Hadis Oku modunu aç - Hadis-i şerifleri oku ve istifade et" [ref=e75] [cursor=pointer]:
+          - generic [ref=e76]: 📚
+          - generic [ref=e77]: Hadis Oku
+          - generic [ref=e78]: Hadis-i şerifleri oku ve istifade et
+  - navigation "Ana navigasyon menüsü" [ref=e79]:
+    - button "İstatistikler modalını aç" [ref=e80] [cursor=pointer]:
+      - generic [ref=e81]: 📊
+      - generic [ref=e82]: İstatistikler
+    - button "Muvaffakiyetler modalını aç" [ref=e83] [cursor=pointer]:
+      - generic [ref=e84]: 🏆
+      - generic [ref=e85]: Muvaffakiyetler
+    - button "Takvim modalını aç" [ref=e86] [cursor=pointer]:
+      - generic [ref=e87]: 📅
+      - generic [ref=e88]: Takvim
+    - button "Günlük vazifeler modalını aç" [ref=e89] [cursor=pointer]:
+      - generic [ref=e90]: 📋
+      - generic [ref=e91]: Vazifeler
+  - generic [ref=e92]:
+    - generic [ref=e93] [cursor=pointer]:
+      - generic [ref=e94]: 🏠
+      - generic [ref=e95]: Ana Sayfa
+    - generic [ref=e96] [cursor=pointer]:
+      - generic [ref=e97]: 📊
+      - generic [ref=e98]: İstatistikler
+    - generic [ref=e99] [cursor=pointer]:
+      - generic [ref=e100]: 🏆
+      - generic [ref=e101]: Başarılar
+    - generic [ref=e102] [cursor=pointer]:
+      - generic [ref=e103]: ✅
+      - generic [ref=e104]: Görevler
+      - generic [ref=e105]: "11"
+    - generic [ref=e106] [cursor=pointer]:
+      - generic [ref=e107]: 📅
+      - generic [ref=e108]: Takvim
+```
