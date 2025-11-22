@@ -7,8 +7,9 @@ const BASE = location.pathname.includes("NEW_HASENE")
   ? "/NEW_HASENE/"
   : "/";
 
-// Cache adı
-const CACHE_VERSION = "safe-v2";
+// Cache adı - Versiyon artırıldı (eski cache'leri temizlemek için)
+// Her güncellemede bu versiyonu artırın: v3 -> v4 -> v5...
+const CACHE_VERSION = "safe-v3";
 const CACHE_NAME = `hasene-safe-${CACHE_VERSION}`;
 
 // Minimum app shell (TAM YOL KULLANILIYOR)
@@ -39,40 +40,80 @@ self.addEventListener("install", (event) => {
 // ACTIVATE
 // ===============================
 self.addEventListener("activate", (event) => {
-  console.log("🚀 SAFE SW ACTIVATE…");
+  console.log("🚀 SAFE SW ACTIVATE - Tüm eski cache'ler temizleniyor…");
 
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    caches.keys().then((keys) => {
+      // Tüm eski cache'leri sil (yeni versiyon hariç)
+      return Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) {
+          if (!key.includes(CACHE_VERSION)) {
+            console.log("🗑️ Eski cache siliniyor:", key);
             return caches.delete(key);
           }
         })
-      )
-    )
+      );
+    }).then(() => {
+      // Tüm client'lara yeni Service Worker'ı bildir
+      return self.clients.claim();
+    })
   );
 
+  // Hemen aktif ol
   self.clients.claim();
 });
 
 // ===============================
-// FETCH
+// FETCH - NETWORK FIRST STRATEGY (Yeni içerik öncelikli)
 // ===============================
 self.addEventListener("fetch", (event) => {
   const request = event.request;
+  const url = new URL(request.url);
 
+  // HTML dosyaları için NETWORK FIRST (her zaman güncel versiyon)
+  if (request.mode === "navigate" || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Network'ten başarılı yanıt geldi, cache'e kaydet ve göster
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Network hatası, cache'den göster
+          return caches.match(request).then((cached) => {
+            return cached || caches.match(`${BASE}index.html`);
+          });
+        })
+    );
+    return;
+  }
+
+  // Diğer dosyalar için STALE WHILE REVALIDATE (Hızlı göster, arka planda güncelle)
   event.respondWith(
     caches.match(request).then((cached) => {
-      return (
-        cached ||
-        fetch(request).catch(() => {
-          // Navigasyon isteklerinde fallback
-          if (request.mode === "navigate") {
-            return caches.match(`${BASE}index.html`);
+      // Cache'den göster (hızlı)
+      const fetchPromise = fetch(request)
+        .then((response) => {
+          // Arka planda cache'i güncelle
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
           }
+          return response;
         })
-      );
+        .catch(() => {
+          // Network hatası, cache'den göster
+          return cached;
+        });
+
+      // Cache varsa hemen göster, yoksa network'ü bekle
+      return cached || fetchPromise;
     })
   );
 });

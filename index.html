@@ -11676,9 +11676,46 @@ function showMainMenu() {
         const basePath = window.location.pathname.includes("NEW_HASENE") ? "/NEW_HASENE/" : "./";
         const swPath = basePath === "./" ? "./sw.js" : "/NEW_HASENE/sw.js";
         
-        navigator.serviceWorker.register(swPath, { scope: basePath })
-            .then(() => console.log("SW registered ✔", swPath))
-            .catch(err => console.log("SW registration failed ❌", err));
+        // Önce mevcut Service Worker'ları kontrol et ve güncelle
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+            // Tüm eski Service Worker'ları kaldır (yeniden kayıt için)
+            return Promise.all(
+                registrations.map((registration) => {
+                    console.log("🔄 Eski Service Worker kaldırılıyor...");
+                    return registration.unregister();
+                })
+            );
+        }).then(() => {
+            // Yeni Service Worker'ı kaydet
+            return navigator.serviceWorker.register(swPath, { 
+                scope: basePath,
+                updateViaCache: 'none' // Her zaman yeni versiyonu kontrol et
+            });
+        }).then((registration) => {
+            console.log("✅ Yeni Service Worker kaydedildi ✔", swPath);
+            
+            // Service Worker güncellemesi kontrolü
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'activated') {
+                        console.log("🔄 Yeni Service Worker aktif! Sayfa yenileniyor...");
+                        // Yeni Service Worker aktif olduğunda sayfayı yenile
+                        window.location.reload();
+                    }
+                });
+            });
+            
+            // Her saat başı güncelleme kontrolü
+            setInterval(() => {
+                registration.update();
+            }, 60 * 60 * 1000); // 1 saat
+            
+            // Sayfa yüklendiğinde güncelleme kontrolü
+            registration.update();
+        }).catch(err => {
+            console.log("❌ Service Worker kayıt hatası:", err);
+        });
     }
 </script>
 
