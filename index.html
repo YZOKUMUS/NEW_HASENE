@@ -4021,6 +4021,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // SESSION PUAN FONKSİYONLARI
         function addSessionPoints(points) {
             log.game(`💰 === addSessionPoints(${points}) ÇAĞRILDI ===`);
+            
+            // Her puan eklendiğinde liderlik tablosunu güncelle (anlık güncelleme)
+            if (typeof updateLeaderboardScores === 'function' && points > 0) {
+                updateLeaderboardScores(points);
+                log.game(`📊 Liderlik tablosu güncellendi: +${points} Hasene`);
+            }
             log.game(`📊 Önce: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
             
             // Güvenli puan ekleme - NaN kontrolü
