@@ -484,8 +484,8 @@ body.dark-mode .stat-item-minimal {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 28px !important;
+    height: 28px !important;
     border-radius: 50% !important;
     align-items: center !important;
     justify-content: center !important;
@@ -521,10 +521,10 @@ body.dark-mode #darkModeToggle:hover {
 /* Dark Mode Toggle - Mobil Optimizasyonu */
 @media (max-width: 600px) {
     #darkModeToggle {
-        width: 44px !important; /* Minimum touch target size */
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
+        width: 32px !important; /* Minimum touch target size */
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
         touch-action: manipulation !important;
         -webkit-tap-highlight-color: transparent !important;
     }
