@@ -95,6 +95,19 @@ function getWeekNumber(date) {
 
 // Liderlik tablosu göster
 function showLeaderboard(type = 'weekly') {
+    // Önce mevcut modal'ı kaldır (eğer varsa)
+    const existingModal = document.getElementById('leaderboardModal');
+    if (existingModal && existingModal.parentNode) {
+        existingModal.parentNode.removeChild(existingModal);
+    }
+    
+    // ESC tuşu event listener'larını temizle
+    const escHandlers = document._leaderboardEscHandlers || [];
+    escHandlers.forEach(handler => {
+        document.removeEventListener('keydown', handler);
+    });
+    document._leaderboardEscHandlers = [];
+    
     const modal = document.createElement('div');
     modal.className = 'modal leaderboard-modal';
     modal.id = 'leaderboardModal';
@@ -119,7 +132,7 @@ function showLeaderboard(type = 'weekly') {
         <div class="leaderboard-container" onclick="event.stopPropagation();">
             <div class="leaderboard-header">
                 <h2 class="leaderboard-title">${type === 'weekly' ? '📅 Haftalık' : '📆 Aylık'} Liderlik Tablosu</h2>
-                <button class="leaderboard-close-btn" id="leaderboardCloseBtn" onclick="event.stopPropagation(); closeLeaderboard();" style="cursor: pointer; z-index: 10001; position: relative;">✕</button>
+                <button class="leaderboard-close-btn" id="leaderboardCloseBtn" onclick="if(typeof closeLeaderboard === 'function') { event.stopPropagation(); event.preventDefault(); closeLeaderboard(); } return false;" style="cursor: pointer; z-index: 10001; position: relative; touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-width: 44px; min-height: 44px; pointer-events: auto;">✕</button>
             </div>
             <div class="leaderboard-tabs">
                 <button class="leaderboard-tab ${type === 'weekly' ? 'active' : ''}" onclick="showLeaderboard('weekly')">
@@ -154,17 +167,42 @@ function showLeaderboard(type = 'weekly') {
 
     document.body.appendChild(modal);
 
-    // Close butonuna event listener ekle (güvenli)
-    setTimeout(() => {
-        const closeBtn = document.getElementById('leaderboardCloseBtn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
+    // Close butonuna event listener ekle (hem onclick hem de addEventListener)
+    // Hemen ekle, setTimeout kullanma (daha hızlı)
+    const closeBtn = document.getElementById('leaderboardCloseBtn');
+    if (closeBtn) {
+        // Önce mevcut event listener'ları temizle (clone ile)
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        // Close fonksiyonunu direkt çağır (en güvenilir yöntem)
+        const handleClose = (e) => {
+            if (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                closeLeaderboard();
-            });
-        }
-    }, 100);
+            }
+            closeLeaderboard();
+            return false;
+        };
+        
+        // Yeni event listener ekle (click) - capture phase'de
+        newCloseBtn.addEventListener('click', handleClose, { capture: true, once: false, passive: false });
+        
+        // Touch event için de ekle (mobil cihazlar için) - capture phase'de
+        newCloseBtn.addEventListener('touchend', handleClose, { capture: true, once: false, passive: false });
+        
+        // Mouse event için de ekle (tüm cihazlar için)
+        newCloseBtn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+        }, { capture: true, once: false, passive: false });
+        
+        // Onclick attribute'u da ekle (güvenlik için - direkt fonksiyon çağrısı)
+        newCloseBtn.setAttribute('onclick', 'event.stopPropagation(); event.preventDefault(); if(typeof closeLeaderboard === "function") { closeLeaderboard(); } return false;');
+        
+        // Global erişim için window'a ekle
+        window._leaderboardCloseHandler = handleClose;
+    }
 
     // Modal dışına tıklanınca kapat
     modal.addEventListener('click', (e) => {
@@ -178,9 +216,21 @@ function showLeaderboard(type = 'weekly') {
         if (e.key === 'Escape') {
             closeLeaderboard();
             document.removeEventListener('keydown', escHandler);
+            // Handler listesinden kaldır
+            if (document._leaderboardEscHandlers) {
+                const index = document._leaderboardEscHandlers.indexOf(escHandler);
+                if (index > -1) {
+                    document._leaderboardEscHandlers.splice(index, 1);
+                }
+            }
         }
     };
     document.addEventListener('keydown', escHandler);
+    // Handler'ı listeye ekle
+    if (!document._leaderboardEscHandlers) {
+        document._leaderboardEscHandlers = [];
+    }
+    document._leaderboardEscHandlers.push(escHandler);
 }
 
 // Global kapatma fonksiyonu (her zaman mevcut olmalı)
