@@ -238,3 +238,10 @@ function closeCustomAlert() {
 // Global erişim için
 window.closeCustomAlert = closeCustomAlert;
 
+// Jest testleri için export (Node.js ortamında)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getLocalDateString
+    };
+}
+

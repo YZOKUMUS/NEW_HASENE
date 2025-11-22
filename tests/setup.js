@@ -1,5 +1,5 @@
 // Jest Setup File
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
 
 // Mock localStorage
 const localStorageMock = {

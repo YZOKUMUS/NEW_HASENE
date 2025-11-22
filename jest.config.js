@@ -1,7 +1,7 @@
 // Jest Configuration
 module.exports = {
     testEnvironment: 'jsdom',
-    roots: ['<rootDir>/tests', '<rootDir>/js'],
+    roots: ['<rootDir>/tests/unit', '<rootDir>/js'],
     testMatch: [
         '**/__tests__/**/*.js',
         '**/?(*.)+(spec|test).js'
@@ -17,6 +17,12 @@ module.exports = {
     moduleNameMapper: {
         '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
     },
-    testTimeout: 10000
+    testTimeout: 10000,
+    transform: {
+        '^.+\\.js$': 'babel-jest'
+    },
+    transformIgnorePatterns: [
+        'node_modules/(?!(.*\\.mjs$))'
+    ]
 };
 
