@@ -12141,10 +12141,14 @@ function showMainMenu() {
         // Mobil cihaz kontrolü
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        // Sadece mobil cihazlarda butonu göster
+        // Mobil cihazlarda butonu göster (beforeinstallprompt event'i geldiğinde)
         if (pwaInstallBtn && isMobile) {
             pwaInstallBtn.style.display = 'block';
             log.debug('📲 PWA install butonu görünür (mobil cihaz, beforeinstallprompt)');
+        } else if (pwaInstallBtn && !isMobile) {
+            // Masaüstünde de göster (talimatlar için)
+            pwaInstallBtn.style.display = 'block';
+            log.debug('💻 PWA install butonu görünür (masaüstü, talimatlar için)');
         }
     });
     
