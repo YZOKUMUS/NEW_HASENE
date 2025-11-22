@@ -238,7 +238,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .welcome-minimal {
@@ -246,32 +246,34 @@ body {
 }
 
 .welcome-title-minimal {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: #333;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
     transition: color 0.3s ease;
+    line-height: 1.2;
 }
 
 .welcome-subtitle-minimal {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     font-weight: 500;
     transition: color 0.3s ease;
+    line-height: 1.2;
 }
 
 /* Compact Stats Row */
 .stats-row-minimal {
     display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 6px;
+    margin-bottom: 6px;
 }
 
 .stat-item-minimal {
     flex: 1;
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 12px;
-    padding: 10px 8px;
+    border-radius: 10px;
+    padding: 8px 6px;
     text-align: center;
     border: 1px solid rgba(0,0,0,0.05);
     transition: all 0.2s;
@@ -288,9 +290,9 @@ body.dark-mode .stat-item-minimal {
 }
 
 .stat-value-minimal {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
     line-height: 1.2;
 }
 
@@ -304,25 +306,26 @@ body.dark-mode .stat-item-minimal {
 
 .stat-value-minimal.level {
     color: #667eea;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .stat-label-minimal {
-    font-size: 9px;
+    font-size: 8px;
     color: #888;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    line-height: 1.1;
 }
 
 /* Compact Daily Goal */
 .daily-goal-minimal {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 14px;
-    padding: 12px 14px;
+    border-radius: 12px;
+    padding: 8px 10px;
     position: relative;
     overflow: hidden;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .daily-goal-minimal::before {
@@ -340,7 +343,7 @@ body.dark-mode .stat-item-minimal {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     position: relative;
     z-index: 1;
 }
@@ -403,24 +406,26 @@ body.dark-mode .stat-item-minimal {
 }
 
 .goal-title-minimal {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    line-height: 1.2;
 }
 
 .goal-progress-minimal {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: rgba(255,255,255,0.9);
+    line-height: 1.2;
 }
 
 .progress-bar-minimal {
     width: 100%;
-    height: 6px;
+    height: 5px;
     background: rgba(255,255,255,0.25);
-    border-radius: 6px;
+    border-radius: 5px;
     overflow: hidden;
     position: relative;
     z-index: 1;
@@ -445,28 +450,29 @@ body.dark-mode .stat-item-minimal {
 /* Quick Info Buttons - Minimal */
 .quick-info-minimal {
     display: flex !important;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 6px;
+    margin-bottom: 8px;
 }
 
 .info-btn-minimal {
     flex: 1;
     background: #f8f9fa;
     border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 11px;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 10px;
     font-weight: 600;
     color: #667eea;
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
-    min-height: 44px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
 }
 
 /* Dark Mode Toggle Button - Özel Stil (Sağ Üst Köşe) */
@@ -838,7 +844,7 @@ body.dark-mode #darkModeToggle:hover {
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-    margin-top: 4px; /* Reduce gap to bring games closer to hero section */
+    margin-top: 0px; /* Kompakt header için gap azaltıldı */
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -851,7 +857,7 @@ body.dark-mode .games-section {
     font-size: 18px;
     font-weight: 700;
     color: #333;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     text-align: center;
     transition: color 0.3s ease;
 }
@@ -1235,46 +1241,47 @@ body.dark-mode .section-title {
     
     .welcome-title,
     .welcome-title-minimal {
-        font-size: 18px !important;
+        font-size: 15px !important;
     }
     
     .welcome-subtitle-minimal {
-        font-size: 11px !important;
+        font-size: 9px !important;
     }
     
     .stat-card,
     .stat-item-minimal {
-        padding: 10px 6px !important;
+        padding: 8px 5px !important;
     }
     
     .stat-value,
     .stat-value-minimal {
-        font-size: 16px !important;
-    }
-    
-    .stat-value-minimal.level {
         font-size: 14px !important;
     }
     
+    .stat-value-minimal.level {
+        font-size: 12px !important;
+    }
+    
     .stat-label-minimal {
-        font-size: 8px !important;
+        font-size: 7px !important;
     }
     
     .daily-goal-minimal {
-        padding: 10px 12px !important;
+        padding: 8px 10px !important;
     }
     
     .goal-title-minimal {
-        font-size: 11px !important;
+        font-size: 10px !important;
     }
     
     .goal-progress-minimal {
-        font-size: 10px !important;
+        font-size: 9px !important;
     }
     
     .info-btn-minimal {
-        font-size: 10px !important;
-        padding: 8px 10px !important;
+        font-size: 9px !important;
+        padding: 6px 8px !important;
+        min-height: 32px !important;
     }
     
     .difficulty-minimal {
