@@ -512,6 +512,24 @@ body.dark-mode #darkModeToggle:hover {
     line-height: 1 !important;
 }
 
+/* Dark Mode Toggle - Mobil Optimizasyonu */
+@media (max-width: 600px) {
+    #darkModeToggle {
+        width: 44px !important; /* Minimum touch target size */
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    /* Mobilde hover efektlerini kaldır, touch için optimize et */
+    #darkModeToggle:active {
+        transform: scale(0.95) !important;
+        transition: transform 0.1s !important;
+    }
+}
+
 .info-btn-minimal:hover {
     background: #e9ecef;
     transform: translateY(-1px);
