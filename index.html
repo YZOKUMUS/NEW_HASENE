@@ -1506,74 +1506,8 @@
         
         // ============ GLOBAL FONKSİYONLAR (onclick için erişilebilir olmalı) ============
         
-        function switchStatsTab(tabName) {
-            log.stats('🔄 switchStatsTab ÇAĞRILDI, tabName:', tabName);
-            
-            // İçerik divlerini gizle/göster
-            const generalContent = document.getElementById('statsContentGeneral');
-            const wordsContent = document.getElementById('statsContentWords');
-            const generalTab = document.getElementById('statsTabGeneral');
-            const wordsTab = document.getElementById('statsTabWords');
-            
-            // NULL KONTROL - Elementler yoksa hata ver
-            if (!generalContent || !wordsContent || !generalTab || !wordsTab) {
-                log.error('❌ HATA: İstatistik tab elementleri bulunamadı!', {
-                    generalContent: !!generalContent,
-                    wordsContent: !!wordsContent,
-                    generalTab: !!generalTab,
-                    wordsTab: !!wordsTab
-                });
-                return;
-            }
-            
-            log.elements('📍 Element kontrol:', {
-                generalContent: !!generalContent,
-                wordsContent: !!wordsContent,
-                generalTab: !!generalTab,
-                wordsTab: !!wordsTab
-            });
-            
-            if (tabName === 'general') {
-                generalContent.style.display = 'block';
-                wordsContent.style.display = 'none';
-                
-                // Tab butonlarını güncelle
-                generalTab.style.background = 'linear-gradient(135deg, #8B4513 0%, #D2691E 100%)';
-                generalTab.style.color = 'white';
-                generalTab.style.border = 'none';
-                
-                wordsTab.style.background = 'white';
-                wordsTab.style.color = '#666';
-                wordsTab.style.border = '2px solid #e0e0e0';
-            } else if (tabName === 'words') {
-                log.stats('📝 Kelimeler sekmesine geçiliyor...');
-                generalContent.style.display = 'none';
-                wordsContent.style.display = 'block';
-                
-                log.elements('📍 wordsContent display SONRASI:', window.getComputedStyle(wordsContent).display);
-                log.elements('📍 wordsContent visibility:', window.getComputedStyle(wordsContent).visibility);
-                log.elements('📍 wordsContent height:', window.getComputedStyle(wordsContent).height);
-                log.elements('📍 wordsContent offsetHeight:', wordsContent.offsetHeight);
-                
-                // Tab butonlarını güncelle
-                wordsTab.style.background = 'linear-gradient(135deg, #8B4513 0%, #D2691E 100%)';
-                wordsTab.style.color = 'white';
-                wordsTab.style.border = 'none';
-                
-                generalTab.style.background = 'white';
-                generalTab.style.color = '#666';
-                generalTab.style.border = '2px solid #e0e0e0';
-                
-                // Kelime istatistiklerini güncelle
-                log.stats('🔍 updateWordStatistics fonksiyon tipi:', typeof updateWordStatistics);
-                if (typeof updateWordStatistics === 'function') {
-                    log.stats('✅ updateWordStatistics çağrılıyor...');
-                    updateWordStatistics();
-                } else {
-                    log.error('❌ updateWordStatistics fonksiyon DEĞİL!');
-                }
-            }
-        }
+        // NOT: switchStatsTab fonksiyonu kaldırıldı - Stats modal'da tab sistemi yok
+        // Stats modal tek bir scroll edilebilir içerik olarak çalışıyor
         
         // Daily Goal Functions
         function showDailyGoalSettings() {
@@ -1727,7 +1661,7 @@
             const progressTextEl = document.getElementById('dailyGoalProgressText');
             const goalTextEl = document.getElementById('dailyGoalText');
             const goalButton = document.querySelector('.goal-settings-btn');
-            const goalButtonIcon = document.getElementById('goalButtonIcon');
+            const goalButtonIcon = document.getElementById('goalButtonIcon'); // Opsiyonel element
             
             if (!progressEl || !progressTextEl || !goalTextEl) {
                 log.error('❌ HATA: Günlük hedef elementleri bulunamadı!');
