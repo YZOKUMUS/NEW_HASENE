@@ -11,8 +11,9 @@ export default defineConfig({
     build: {
         outDir: "dist",
         assetsDir: "assets",
-        // Capacitor için public path ayarı
-        base: "./",
+        // GitHub Pages için base path (repository adı: NEW_HASENE)
+        // Development'ta "./" kullanılır, production'da "/NEW_HASENE/" kullanılır
+        base: process.env.NODE_ENV === 'production' ? '/NEW_HASENE/' : './',
         // Mevcut yapıyı koru - sadece optimize et
         rollupOptions: {
             input: {
