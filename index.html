@@ -6832,10 +6832,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
             }
             
-            // Liderlik tablosu güncelle - Sadece oyun bitiminde bir kez çağrılır
-            if (typeof updateLeaderboardScores === 'function' && points > 0) {
-                updateLeaderboardScores(points);
-            }
+            // NOT: Liderlik tablosu artık addSessionPoints içinde her puan eklendiğinde güncelleniyor
+            // Burada tekrar güncellemeye gerek yok (çift ekleme önlenir)
             
             updateStatsBar(); // Global barı güncelle
             checkAchievements(); // Başarımları kontrol et
