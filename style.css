@@ -84,19 +84,19 @@ body.dark-mode .difficulty-title-minimal {
 }
 
 body.dark-mode .game-card {
-    background: var(--card-bg) !important;
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #333 !important;
+    border-color: #e0e0e0 !important;
 }
 
 body.dark-mode .game-title {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
     font-weight: 700 !important;
 }
 
 body.dark-mode .game-desc {
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: #4a4a4a !important;
     opacity: 1 !important;
 }
 
