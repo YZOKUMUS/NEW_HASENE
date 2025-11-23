@@ -8,18 +8,25 @@ function saveWeeklyScore(score, date = new Date()) {
     const weekKey = getWeekKey(date);
     const weeklyScores = getWeeklyScores();
     
+    console.log(`📊 saveWeeklyScore çağrıldı: score=${score}, weekKey=${weekKey}`);
+    
     if (!weeklyScores[weekKey]) {
         weeklyScores[weekKey] = {
             score: 0,
             startDate: getWeekStart(date).toISOString(),
             endDate: getWeekEnd(date).toISOString()
         };
+        console.log(`📅 Yeni hafta oluşturuldu: ${weekKey}`);
     }
     
+    const oldScore = weeklyScores[weekKey].score;
     weeklyScores[weekKey].score += score;
     weeklyScores[weekKey].lastUpdate = new Date().toISOString();
     
+    console.log(`💰 Haftalık skor güncellendi: ${oldScore} + ${score} = ${weeklyScores[weekKey].score}`);
+    
     localStorage.setItem('hasene_weeklyScores', JSON.stringify(weeklyScores));
+    console.log(`✅ Haftalık skor kaydedildi: ${weeklyScores[weekKey].score} Hasene`);
 }
 
 // Aylık skor kaydet
@@ -303,10 +310,16 @@ function formatPeriod(key, type) {
 
 // Skor güncelle (oyun sonunda çağrılır)
 function updateLeaderboardScores(score) {
+    console.log(`📊 updateLeaderboardScores çağrıldı: score=${score}, type=${typeof score}, isNaN=${isNaN(score)}`);
+    
     // Sadece geçerli pozitif skorları ekle
     if (typeof score === 'number' && score > 0 && !isNaN(score)) {
+        console.log(`✅ Geçerli skor, haftalık ve aylık skorlara ekleniyor...`);
         saveWeeklyScore(score);
         saveMonthlyScore(score);
+        console.log(`✅ updateLeaderboardScores tamamlandı: +${score} Hasene`);
+    } else {
+        console.warn(`⚠️ Geçersiz skor: score=${score}, type=${typeof score}, isNaN=${isNaN(score)}`);
     }
 }
 
