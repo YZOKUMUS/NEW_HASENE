@@ -466,7 +466,7 @@
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="boslukQuestionNumber">Sual 1 / 10</div>
                 <div class="question-icon">✏️</div>
-                <div class="arabic" id="boslukAyetText" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
+                <div class="arabic" id="boslukAyetText" style="margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
                 <div class="duolingo-question-hint" id="boslukQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Eksik kelimeyi seç</div>
                 <div class="sure-info" id="boslukSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
                 
@@ -10785,6 +10785,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
             // UI güncelle
             elements.boslukAyetText.textContent = displayText;
+            
+            // Dark mode kontrolü - ayet metninin rengini ayarla
+            if (document.body.classList.contains('dark-mode')) {
+                elements.boslukAyetText.style.color = '#ffffff';
+            } else {
+                elements.boslukAyetText.style.color = '';
+            }
 
             // Seçenekler oluştur (boşluğa gelecek kelime)
             const wrongWords = [];
@@ -11110,6 +11117,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // innerHTML ile set et
             elements.boslukAyetText.innerHTML = finalText;
+            
+            // Dark mode kontrolü - ayet metninin rengini ayarla
+            if (document.body.classList.contains('dark-mode')) {
+                elements.boslukAyetText.style.color = '#ffffff';
+            } else {
+                elements.boslukAyetText.style.color = '';
+            }
             
             // Ekstra güvenlik için direct style da uygula
             setTimeout(() => {

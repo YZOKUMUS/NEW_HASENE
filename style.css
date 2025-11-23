@@ -1727,7 +1727,9 @@ body.dark-mode #arabicWord.arabic-large {
 
 /* Boşluk Doldur oyunu için Arapça metin - dark mode */
 body.dark-mode #boslukAyetText,
-body.dark-mode #boslukAyetText.arabic {
+body.dark-mode #boslukAyetText.arabic,
+body.dark-mode .bosluk-mode #boslukAyetText,
+body.dark-mode .bosluk-mode #boslukAyetText.arabic {
     color: #ffffff !important;
 }
 
@@ -4216,6 +4218,10 @@ body.dark-mode .bosluk-mode {
     background: #fff;
     flex: 1;
     position: relative;
+}
+
+body.dark-mode .bosluk-mode .duolingo-question-area {
+    background: transparent !important;
 }
 
 .bosluk-mode .duolingo-question-number {
