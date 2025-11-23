@@ -4600,11 +4600,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function addSessionPoints(points) {
             log.game(`💰 === addSessionPoints(${points}) ÇAĞRILDI ===`);
             
-            // Her puan eklendiğinde liderlik tablosunu güncelle (anlık güncelleme)
-            if (typeof updateLeaderboardScores === 'function' && points > 0) {
-                updateLeaderboardScores(points);
-                log.game(`📊 Liderlik tablosu güncellendi: +${points} Hasene`);
-            }
+            // NOT: Liderlik tablosu güncellemesi addToGlobalPoints içinde yapılıyor
+            // Burada anlık güncelleme yapılmaz çünkü çift ekleme sorununa neden olur
+            // Combo bonusu da dahil tüm puanlar sessionScore'a eklenir
+            // Oyun bitiminde addToGlobalPoints çağrıldığında tek seferde eklenir
+            
             log.game(`📊 Önce: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
             
             // Güvenli puan ekleme - NaN kontrolü
@@ -4653,11 +4653,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // COMBO BONUSUNU DAILY XP'YE DE EKLE
                 addDailyXP(comboBonus);
                 
-                // COMBO BONUSUNU LİDERLİK TABLOSUNA DA EKLE
-                if (typeof updateLeaderboardScores === 'function' && comboBonus > 0) {
-                    updateLeaderboardScores(comboBonus);
-                    log.game(`📊 Liderlik tablosu güncellendi (combo bonusu): +${comboBonus} Hasene`);
-                }
+                // NOT: Combo bonusu liderlik tablosuna ayrı eklenmez
+                // Çünkü zaten totalPoints'e ekleniyor ve addSessionPoints içinde
+                // her puan eklendiğinde updateLeaderboardScores çağrılıyor
+                // Ayrı eklemek çift sayılmaya neden olur
                 
                 log.game(`🔥 Combo bonusu: +${comboBonus} XP`);
                 
@@ -7552,8 +7551,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
             }
             
-            // NOT: Liderlik tablosu artık addSessionPoints içinde her puan eklendiğinde güncelleniyor
-            // Burada tekrar güncellemeye gerek yok (çift ekleme önlenir)
+            // Liderlik tablosunu güncelle (sadece oyun bitiminde, çift ekleme önlenir)
+            if (typeof updateLeaderboardScores === 'function' && points > 0) {
+                updateLeaderboardScores(points);
+                log.game(`📊 Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
+            }
             
             updateStatsBar(); // Global barı güncelle
             checkAchievements(); // Başarımları kontrol et
