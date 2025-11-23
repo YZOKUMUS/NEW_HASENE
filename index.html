@@ -1113,7 +1113,7 @@
 
             <!-- Filtreleme Butonları -->
             <div style="display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap;">
-                <button id="filterAll" class="filter-btn active" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #3498db; color: white; font-size: 0.85em; cursor: pointer;">
+                <button id="filterAll" class="filter-btn active" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #2980b9; color: white; font-size: 0.85em; cursor: pointer;">
                     Hepsi
                 </button>
                 <button id="filterFavorites" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
@@ -1142,16 +1142,47 @@
             <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #f39c12;">
                 <div style="font-size: 0.9em; color: #856404; font-weight: bold; margin-bottom: 6px;">💡 Öğrenme İpuçları</div>
                 <div style="font-size: 0.8em; color: #666; line-height: 1.6;">
-                    <strong>📚 Zorlanılan Kelimeler:</strong><br>
-                    • İlk oyundan itibaren görünebilir<br>
-                    • Muvaffakiyet oranı %60'ın altında VEYA ustalık mertebesi 1.0'ın altında olan kelimeler<br>
-                    • Yanlış cevap verdiğin kelimeler hemen bu kategoride görünür<br><br>
+                    <strong>📚 Hepsi Sekmesi:</strong><br>
+                    • Buton üzerindeki sayı, <strong>toplam çalıştığın kelime sayısını</strong> gösterir<br>
+                    • Tüm kelimeler ayrı kartlar olarak listelenir<br>
+                    • Her kelimenin istatistikleri (doğru, yanlış, başarı oranı, ustalık) gösterilir<br><br>
+                    
+                    <strong>⭐ Favoriler Sekmesi:</strong><br>
+                    • Buton üzerindeki sayı, <strong>favori kelime sayısını</strong> gösterir<br>
+                    • Her kelime ayrı bir kart olarak listelenir<br>
+                    • Kelime kartlarındaki ⭐ butonuna tıklayarak favorilere ekleyebilirsin<br>
+                    • Favoriler, son görülme zamanına göre sıralanır<br><br>
+                    
+                    <strong>🔄 Tekrar Kelimeleri:</strong><br>
+                    • Buton üzerindeki sayı, <strong>tekrar gerektiren FARKLI kelime sayısını</strong> gösterir<br>
+                    • Her kelime ayrı bir kart olarak listelenir<br>
+                    • Başarı oranı %60'ın altında olan kelimeler<br>
+                    • Ustalık seviyesi 2.0'ın altında olan kelimeler<br>
+                    • 3 günden fazla görülmeyen kelimeler<br>
+                    • Toplam 5'ten az deneme yapılan kelimeler<br>
+                    • <strong>Örnek:</strong> 3 farklı kelimeye yanlış cevap verirsen → buton "🔄 Tekrar (3)" gösterir<br>
+                    • <small style="color: #999;">💡 Test için: Konsolda <code>testReviewWords()</code> yazın</small><br><br>
                     
                     <strong>✅ Öğrenildi Kelimeler:</strong><br>
+                    • Buton üzerindeki sayı, <strong>öğrenilmiş kelime sayısını</strong> gösterir<br>
+                    • Her kelime ayrı bir kart olarak listelenir<br>
                     • En az 15 doğru cevap ve %60 muvaffakiyet oranı gerekir<br>
                     • Ustalık mertebesi 3.0'ın üzerinde olmalı<br>
                     • Her doğru cevap +0.2, her yanlış cevap -0.5 ustalık puanı verir<br>
                     • Tahmini: 15-20 soru (yanlışlar varsa daha fazla)<br><br>
+                    
+                    <strong>📚 Zorlanılan Kelimeler:</strong><br>
+                    • Buton üzerindeki sayı, <strong>zorlandığın kelime sayısını</strong> gösterir<br>
+                    • Her kelime ayrı bir kart olarak listelenir<br>
+                    • İlk oyundan itibaren görünebilir<br>
+                    • Muvaffakiyet oranı %60'ın altında VEYA ustalık mertebesi 1.0'ın altında olan kelimeler<br>
+                    • Yanlış cevap verdiğin kelimeler hemen bu kategoride görünür<br><br>
+                    
+                    <strong>🕐 Son Görülen Kelimeler:</strong><br>
+                    • Buton üzerindeki sayı, <strong>son 7 günde görülen kelime sayısını</strong> gösterir<br>
+                    • Her kelime ayrı bir kart olarak listelenir<br>
+                    • Son görülme zamanına göre sıralanır (en yeni önce)<br>
+                    • Son bir hafta içinde çalıştığın tüm kelimeleri gösterir<br><br>
                     
                     <strong>🔄 Genel:</strong><br>
                     • Zorlandığın kelimeler otomatik olarak daha sık gösterilir<br>
@@ -1870,10 +1901,14 @@
                 if (typeof loadFavorites === 'function') loadFavorites();
                 if (typeof loadReviewWords === 'function') loadReviewWords();
                 
+                // Tüm butonları güncelle
+                updateAllTabButtons();
+                
                 if (filterAll && !filterAll.hasAttribute('data-listener-added')) {
                     filterAll.onclick = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
+                        updateAllTabButtons();
                         filterWordStats('all');
                     };
                     filterAll.setAttribute('data-listener-added', 'true');
@@ -1883,6 +1918,7 @@
                         e.stopPropagation();
                         e.preventDefault();
                         if (typeof loadFavorites === 'function') loadFavorites();
+                        updateAllTabButtons();
                         filterWordStats('favorites');
                     };
                     filterFavorites.setAttribute('data-listener-added', 'true');
@@ -1891,7 +1927,10 @@
                     filterReview.onclick = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        if (typeof loadReviewWords === 'function') loadReviewWords();
+                        if (typeof loadReviewWords === 'function') {
+                            loadReviewWords();
+                        }
+                        updateAllTabButtons();
                         filterWordStats('review');
                     };
                     filterReview.setAttribute('data-listener-added', 'true');
@@ -1900,6 +1939,7 @@
                     filterMastered.onclick = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
+                        updateAllTabButtons();
                         filterWordStats('mastered');
                     };
                     filterMastered.setAttribute('data-listener-added', 'true');
@@ -1908,6 +1948,7 @@
                     filterStruggling.onclick = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
+                        updateAllTabButtons();
                         filterWordStats('struggling');
                     };
                     filterStruggling.setAttribute('data-listener-added', 'true');
@@ -1916,6 +1957,7 @@
                     filterRecent.onclick = (e) => {
                         e.stopPropagation();
                         e.preventDefault();
+                        updateAllTabButtons();
                         filterWordStats('recent');
                     };
                     filterRecent.setAttribute('data-listener-added', 'true');
@@ -1925,6 +1967,221 @@
                 log.error('Stack trace:', error.stack);
             }
         }
+        
+        // Tüm sekme butonlarını güncelle (kelime sayıları ile)
+        function updateAllTabButtons() {
+            try {
+                const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
+                if (!loadWordStatsFn) {
+                    // loadWordStats henüz yüklenmemiş, sadece mevcut sayıları güncelle
+                    return;
+                }
+                
+                const wordStats = loadWordStatsFn();
+                if (!wordStats || typeof wordStats !== 'object') {
+                    return;
+                }
+                
+                const totalWords = Object.keys(wordStats).length;
+                const now = Date.now();
+                const oneDay = 24 * 60 * 60 * 1000;
+                
+                // Favoriler sayısı
+                if (typeof loadFavorites === 'function') {
+                    loadFavorites();
+                }
+                const favoriteWords = (typeof window !== 'undefined' && window.favoriteWords && Array.isArray(window.favoriteWords))
+                    ? window.favoriteWords
+                    : [];
+                
+                // Tekrar sayısı
+                if (typeof loadReviewWords === 'function') {
+                    loadReviewWords();
+                }
+                const reviewWords = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords))
+                    ? window.reviewWords
+                    : [];
+                
+                // Öğrenildi sayısı
+                let masteredCount = 0;
+                // Zorlanılan sayısı
+                let strugglingCount = 0;
+                // Son görülen sayısı (son 7 gün)
+                let recentCount = 0;
+                
+                Object.values(wordStats).forEach(stat => {
+                    if (!stat) return;
+                    
+                    const totalAttempts = (stat.correct || 0) + (stat.wrong || 0);
+                    // Başarı oranını hesapla (eğer yoksa)
+                    let successRate = stat.successRate;
+                    if (typeof successRate === 'undefined' || successRate === null) {
+                        successRate = totalAttempts > 0 ? ((stat.correct || 0) / totalAttempts) : 0;
+                    }
+                    const masteryLevel = stat.masteryLevel || 0;
+                    const lastSeen = stat.lastSeen || now;
+                    const daysSinceLastSeen = (now - lastSeen) / oneDay;
+                    
+                    // Öğrenildi: ustalık >= 3.0 ve başarı >= 60%
+                    if (masteryLevel >= 3.0 && successRate >= 0.6) {
+                        masteredCount++;
+                    }
+                    
+                    // Zorlanılan: başarı < 60% veya ustalık < 1.0
+                    if (successRate < 0.6 || masteryLevel < 1.0) {
+                        strugglingCount++;
+                    }
+                    
+                    // Son görülen: son 7 gün içinde
+                    if (daysSinceLastSeen < 7) {
+                        recentCount++;
+                    }
+                });
+                
+                // Hepsi butonu
+                const filterAllBtn = document.getElementById('filterAll');
+                if (filterAllBtn) {
+                    filterAllBtn.textContent = totalWords > 0 ? `Hepsi (${totalWords})` : 'Hepsi';
+                    filterAllBtn.title = `${totalWords} kelime istatistiği var`;
+                }
+                
+                // Favoriler butonu
+                const filterFavoritesBtn = document.getElementById('filterFavorites');
+                if (filterFavoritesBtn) {
+                    const count = favoriteWords.length;
+                    filterFavoritesBtn.textContent = count > 0 ? `⭐ Favoriler (${count})` : '⭐ Favoriler';
+                    filterFavoritesBtn.title = count > 0 ? `${count} favori kelime` : 'Favori kelime yok';
+                }
+                
+                // Tekrar butonu
+                const filterReviewBtn = document.getElementById('filterReview');
+                if (filterReviewBtn) {
+                    const count = reviewWords.length;
+                    filterReviewBtn.textContent = count > 0 ? `🔄 Tekrar (${count})` : '🔄 Tekrar';
+                    filterReviewBtn.title = count > 0 ? `${count} kelime tekrar gerektiriyor` : 'Tekrar gerektiren kelime yok';
+                }
+                
+                // Öğrenildi butonu
+                const filterMasteredBtn = document.getElementById('filterMastered');
+                if (filterMasteredBtn) {
+                    filterMasteredBtn.textContent = masteredCount > 0 ? `Öğrenildi (${masteredCount})` : 'Öğrenildi';
+                    filterMasteredBtn.title = masteredCount > 0 ? `${masteredCount} kelime öğrenildi` : 'Henüz öğrenilmiş kelime yok';
+                }
+                
+                // Zorlanılan butonu
+                const filterStrugglingBtn = document.getElementById('filterStruggling');
+                if (filterStrugglingBtn) {
+                    filterStrugglingBtn.textContent = strugglingCount > 0 ? `Zorlanılan (${strugglingCount})` : 'Zorlanılan';
+                    filterStrugglingBtn.title = strugglingCount > 0 ? `${strugglingCount} kelime ile zorlanıyorsun` : 'Zorlandığın kelime yok';
+                }
+                
+                // Son Görülen butonu
+                const filterRecentBtn = document.getElementById('filterRecent');
+                if (filterRecentBtn) {
+                    filterRecentBtn.textContent = recentCount > 0 ? `Son Görülen (${recentCount})` : 'Son Görülen';
+                    filterRecentBtn.title = recentCount > 0 ? `Son 7 günde ${recentCount} kelime görüldü` : 'Son 7 günde kelime görülmedi';
+                }
+                
+            } catch (error) {
+                log.error('❌ updateAllTabButtons hatası:', error);
+            }
+        }
+        
+        // Tekrar butonuna kelime sayısını ekle (geriye uyumluluk için)
+        function updateReviewButtonCount() {
+            updateAllTabButtons();
+        }
+        
+        // Test fonksiyonu: Tekrar listesini konsolda detaylı göster
+        function testReviewWords() {
+            console.log('🧪 TEKRAR KELİMELERİ TEST RAPORU');
+            console.log('=====================================');
+            
+            try {
+                // 1. loadWordStats kontrolü
+                const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
+                if (!loadWordStatsFn) {
+                    console.error('❌ loadWordStats fonksiyonu bulunamadı!');
+                    return;
+                }
+                
+                const wordStats = loadWordStatsFn();
+                const totalWords = Object.keys(wordStats).length;
+                console.log(`📊 Toplam kelime istatistiği: ${totalWords}`);
+                
+                // 2. loadReviewWords çağır
+                if (typeof loadReviewWords === 'function') {
+                    loadReviewWords();
+                } else {
+                    console.error('❌ loadReviewWords fonksiyonu bulunamadı!');
+                    return;
+                }
+                
+                const reviewWords = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords)) 
+                    ? window.reviewWords 
+                    : [];
+                
+                console.log(`🔄 Tekrar listesindeki kelime sayısı: ${reviewWords.length}`);
+                
+                if (reviewWords.length === 0) {
+                    console.log('ℹ️  Tekrar gerektiren kelime yok.');
+                    console.log('💡 Test için bir kelimeyi yanlış cevaplayın veya yeterince pratik yapmayın.');
+                    return;
+                }
+                
+                // 3. Her kelime için detaylı analiz
+                console.log('\n📋 TEKRAR LİSTESİ DETAYLARI:');
+                console.log('----------------------------');
+                
+                const oneDay = 24 * 60 * 60 * 1000;
+                const now = Date.now();
+                
+                reviewWords.forEach((wordId, index) => {
+                    const stats = wordStats[wordId];
+                    if (!stats) {
+                        console.log(`${index + 1}. ${wordId}: ❌ İstatistik bulunamadı`);
+                        return;
+                    }
+                    
+                    const daysSinceLastSeen = (now - stats.lastSeen) / oneDay;
+                    const totalAttempts = (stats.correct || 0) + (stats.wrong || 0);
+                    const successRate = stats.successRate || 0;
+                    const masteryLevel = stats.masteryLevel || 0;
+                    
+                    // Neden tekrar listesinde olduğunu belirle
+                    const reasons = [];
+                    if (successRate < 0.6) reasons.push(`Başarı oranı düşük (%${Math.round(successRate * 100)})`);
+                    if (masteryLevel < 2.0) reasons.push(`Ustalık seviyesi düşük (${masteryLevel.toFixed(1)})`);
+                    if (daysSinceLastSeen > 3) reasons.push(`${Math.round(daysSinceLastSeen)} gün önce görüldü`);
+                    if (totalAttempts < 5) reasons.push(`Yetersiz pratik (${totalAttempts} deneme)`);
+                    
+                    console.log(`\n${index + 1}. Kelime ID: ${wordId}`);
+                    console.log(`   📊 İstatistikler:`);
+                    console.log(`      - Doğru: ${stats.correct || 0}, Yanlış: ${stats.wrong || 0}, Toplam: ${totalAttempts}`);
+                    console.log(`      - Başarı oranı: %${Math.round(successRate * 100)}`);
+                    console.log(`      - Ustalık seviyesi: ${masteryLevel.toFixed(2)}`);
+                    console.log(`      - Son görülme: ${new Date(stats.lastSeen).toLocaleString('tr-TR')} (${Math.round(daysSinceLastSeen)} gün önce)`);
+                    console.log(`   🔄 Tekrar nedeni: ${reasons.join(', ')}`);
+                });
+                
+                // 4. Özet
+                console.log('\n📈 ÖZET:');
+                console.log(`   • Toplam kelime: ${totalWords}`);
+                console.log(`   • Tekrar gerektiren: ${reviewWords.length}`);
+                console.log(`   • Oran: %${Math.round((reviewWords.length / totalWords) * 100)}`);
+                
+                // 5. Buton güncellemesi
+                updateAllTabButtons();
+                console.log('✅ Tüm butonlar güncellendi');
+                
+            } catch (error) {
+                console.error('❌ Test hatası:', error);
+                console.error('Stack trace:', error.stack);
+            }
+        }
+        
+        // Global erişim için window'a ekle
+        window.testReviewWords = testReviewWords;
         
         function filterWordStats(filterType) {
             try {
@@ -1938,6 +2195,9 @@
                     loadReviewWords();
                 }
                 
+                // Tüm butonları güncelle
+                updateAllTabButtons();
+                
                 const wordStats = loadWordStats();
                 const listContainer = document.getElementById('wordStatsList');
                 log.stats('🔍 filterWordStats çağrıldı, filterType:', filterType, 'wordStats:', wordStats, 'toplam kelime:', Object.keys(wordStats).length);
@@ -1948,10 +2208,28 @@
                     return;
                 }
                 
-                // Filtre butonlarını güncelle
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                // Filtre butonlarını güncelle (her sekme için farklı renk)
+                const buttonColors = {
+                    'all': '#2980b9',      // Koyu mavi
+                    'favorites': '#f39c12', // Altın sarısı
+                    'review': '#1abc9c',    // Turkuaz
+                    'mastered': '#27ae60',  // Yeşil
+                    'struggling': '#e74c3c', // Kırmızı
+                    'recent': '#9b59b6'     // Mor
+                };
+                
+                const normalizedFilterType = String(filterType).toLowerCase();
+                const activeColor = buttonColors[normalizedFilterType] || buttonColors['all'];
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.background = '#95a5a6'; // Pasif renk (gri)
+                });
                 const filterBtn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
-                if (filterBtn) filterBtn.classList.add('active');
+                if (filterBtn) {
+                    filterBtn.classList.add('active');
+                    filterBtn.style.background = activeColor; // Sekme özel aktif renk
+                }
                 
                 let filteredStats = [];
                 
@@ -2123,8 +2401,72 @@
                 return;
             }
             
+            // Liste başlığı ekle (her sekme için açıklayıcı)
+            let listHeader = '';
+            if (filteredStats.length > 0) {
+                const count = filteredStats.length;
+                const colors = {
+                    'all': { bg: '#e8f2ff', border: '#2980b9', icon: '📚' }, // Koyu mavi
+                    'favorites': { bg: '#fff8e6', border: '#f39c12', icon: '⭐' }, // Altın sarısı
+                    'review': { bg: '#e8f4f8', border: '#1abc9c', icon: '🔄' }, // Turkuaz
+                    'mastered': { bg: '#d5f4e6', border: '#27ae60', icon: '✅' }, // Yeşil
+                    'struggling': { bg: '#ffe6e6', border: '#e74c3c', icon: '📚' }, // Kırmızı
+                    'recent': { bg: '#f0e6ff', border: '#9b59b6', icon: '🕐' } // Mor
+                };
+                
+                // filterType kontrolü ve renk seçimi (string olarak normalize et)
+                const normalizedFilterType = String(filterType).toLowerCase();
+                const color = colors[normalizedFilterType] || colors['all'];
+                
+                // Debug (sadece geliştirme için)
+                if (typeof log !== 'undefined' && log.stats) {
+                    log.stats('🎨 Liste başlığı - filterType:', filterType, 'normalized:', normalizedFilterType, 'renk:', color.border);
+                }
+                
+                const messages = {
+                    'all': {
+                        title: `${count} kelime istatistiği var`,
+                        desc: 'Tüm çalıştığın kelimeler aşağıda listelenmiştir.'
+                    },
+                    'favorites': {
+                        title: `${count} favori kelime`,
+                        desc: 'Favorilerine eklediğin kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
+                    },
+                    'review': {
+                        title: `${count} farklı kelime tekrar gerektiriyor`,
+                        desc: 'Her kelime ayrı bir kart olarak aşağıda listelenmiştir. Her kelimenin neden tekrar gerektirdiği kart üzerinde gösterilir.'
+                    },
+                    'mastered': {
+                        title: `${count} kelime öğrenildi`,
+                        desc: 'Ustalık seviyesi 3.0+ ve başarı oranı %60+ olan kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
+                    },
+                    'struggling': {
+                        title: `${count} kelime ile zorlanıyorsun`,
+                        desc: 'Başarı oranı %60 altında veya ustalık seviyesi 1.0 altında olan kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
+                    },
+                    'recent': {
+                        title: `Son 7 günde ${count} kelime görüldü`,
+                        desc: 'Son bir hafta içinde çalıştığın kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
+                    }
+                };
+                
+                const message = messages[filterType] || messages['all'];
+                
+                listHeader = `
+                    <div style="background: ${color.bg}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${color.border};">
+                        <div style="font-weight: 600; color: #2c3e50; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                            <span>${color.icon}</span>
+                            <span>${message.title}</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #666; margin-top: 4px;">
+                            ${message.desc}
+                        </div>
+                    </div>
+                `;
+            }
+            
             // (commented) Kelime listesi log removed during cleanup
-            listContainer.innerHTML = filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
+            listContainer.innerHTML = listHeader + filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
                 // Kelime verisi yoksa veya geçersizse bu kartı gösterme
                 if (!item.wordData || !item.wordData.kelime || item.wordData.kelime.includes('undefined') || item.wordData.kelime.includes('bosluk')) {
                     return ''; // Boş string döndür
@@ -2135,7 +2477,24 @@
                 const successPercent = Math.round(item.successRate * 100);
                 
                 const isFav = typeof isFavorite !== 'undefined' && isFavorite(item.wordId);
-                const needsReview = typeof reviewWords !== 'undefined' && reviewWords.includes(item.wordId);
+                const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(item.wordId)) ||
+                                   (typeof reviewWords !== 'undefined' && reviewWords.includes(item.wordId));
+                
+                // Tekrar nedeni (sadece review filtresinde göster)
+                let reviewReason = '';
+                if (filterType === 'review' && needsReview) {
+                    const oneDay = 24 * 60 * 60 * 1000;
+                    const daysSinceLastSeen = (Date.now() - item.lastSeen) / oneDay;
+                    const totalAttempts = (item.correct || 0) + (item.wrong || 0);
+                    const reasons = [];
+                    if (item.successRate < 0.6) reasons.push('Başarı %60 altı');
+                    if (item.masteryLevel < 2.0) reasons.push('Ustalık < 2.0');
+                    if (daysSinceLastSeen > 3) reasons.push(`${Math.round(daysSinceLastSeen)} gün önce`);
+                    if (totalAttempts < 5) reasons.push(`Pratik < 5`);
+                    if (reasons.length > 0) {
+                        reviewReason = `<div style="font-size: 0.7em; color: #e74c3c; margin-top: 4px; padding: 4px; background: #ffe6e6; border-radius: 4px;">🔄 Tekrar nedeni: ${reasons.join(', ')}</div>`;
+                    }
+                }
                 
                 return `
                     <div style="background: white; border-radius: 8px; padding: 12px; margin: 8px 0; border-left: 4px solid ${masteryColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;">
@@ -2172,6 +2531,7 @@
                         <div style="margin-top: 8px; font-size: 0.75em; color: #666; text-align: center;">
                             Son görülme: ${new Date(item.lastSeen).toLocaleDateString('tr-TR')}
                         </div>
+                        ${reviewReason}
                     </div>
                 `;
                 }).join('');
