@@ -1161,7 +1161,7 @@
                     • 3 günden fazla görülmeyen kelimeler<br>
                     • Toplam 5'ten az deneme yapılan kelimeler<br>
                     • <strong>Örnek:</strong> 3 farklı kelimeye yanlış cevap verirsen → buton "🔄 Tekrar (3)" gösterir<br>
-                    • <small style="color: #999;">💡 Test için: Konsolda <code>testReviewWords()</code> yazın</small><br><br>
+                    • <small style="color: #999; display: none;">💡 Debug modu: Konsolda <code>CONFIG.debugTest = true; testReviewWords()</code> yazın</small><br><br>
                     
                     <strong>✅ Öğrenildi Kelimeler:</strong><br>
                     • Buton üzerindeki sayı, <strong>öğrenilmiş kelime sayısını</strong> gösterir<br>
@@ -2122,27 +2122,36 @@
         }
         
         // Test fonksiyonu: Tekrar listesini konsolda detaylı göster
+        // Test fonksiyonu - sadece debug modunda çalışır
         function testReviewWords() {
-            console.log('🧪 TEKRAR KELİMELERİ TEST RAPORU');
-            console.log('=====================================');
+            // Debug modu kontrolü
+            if (typeof CONFIG === 'undefined' || !CONFIG.debugTest) {
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('❌ Test fonksiyonları sadece debug modunda çalışır. Konsolda: CONFIG.debugTest = true; yapın.');
+                }
+                return;
+            }
+            
+            log.debug('🧪 TEKRAR KELİMELERİ TEST RAPORU');
+            log.debug('=====================================');
             
             try {
                 // 1. loadWordStats kontrolü
                 const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
                 if (!loadWordStatsFn) {
-                    console.error('❌ loadWordStats fonksiyonu bulunamadı!');
+                    log.error('❌ loadWordStats fonksiyonu bulunamadı!');
                     return;
                 }
                 
                 const wordStats = loadWordStatsFn();
                 const totalWords = Object.keys(wordStats).length;
-                console.log(`📊 Toplam kelime istatistiği: ${totalWords}`);
+                log.debug(`📊 Toplam kelime istatistiği: ${totalWords}`);
                 
                 // 2. loadReviewWords çağır
                 if (typeof loadReviewWords === 'function') {
                     loadReviewWords();
                 } else {
-                    console.error('❌ loadReviewWords fonksiyonu bulunamadı!');
+                    log.error('❌ loadReviewWords fonksiyonu bulunamadı!');
                     return;
                 }
                 
@@ -2150,17 +2159,17 @@
                     ? window.reviewWords 
                     : [];
                 
-                console.log(`🔄 Tekrar listesindeki kelime sayısı: ${reviewWords.length}`);
+                log.debug(`🔄 Tekrar listesindeki kelime sayısı: ${reviewWords.length}`);
                 
                 if (reviewWords.length === 0) {
-                    console.log('ℹ️  Tekrar gerektiren kelime yok.');
-                    console.log('💡 Test için bir kelimeyi yanlış cevaplayın veya yeterince pratik yapmayın.');
+                    log.debug('ℹ️  Tekrar gerektiren kelime yok.');
+                    log.debug('💡 Test için bir kelimeyi yanlış cevaplayın veya yeterince pratik yapmayın.');
                     return;
                 }
                 
                 // 3. Her kelime için detaylı analiz
-                console.log('\n📋 TEKRAR LİSTESİ DETAYLARI:');
-                console.log('----------------------------');
+                log.debug('\n📋 TEKRAR LİSTESİ DETAYLARI:');
+                log.debug('----------------------------');
                 
                 const oneDay = 24 * 60 * 60 * 1000;
                 const now = Date.now();
@@ -2168,7 +2177,7 @@
                 reviewWords.forEach((wordId, index) => {
                     const stats = wordStats[wordId];
                     if (!stats) {
-                        console.log(`${index + 1}. ${wordId}: ❌ İstatistik bulunamadı`);
+                        log.debug(`${index + 1}. ${wordId}: ❌ İstatistik bulunamadı`);
                         return;
                     }
                     
@@ -2184,32 +2193,32 @@
                     if (daysSinceLastSeen > 3) reasons.push(`${Math.round(daysSinceLastSeen)} gün önce görüldü`);
                     if (totalAttempts < 5) reasons.push(`Yetersiz pratik (${totalAttempts} deneme)`);
                     
-                    console.log(`\n${index + 1}. Kelime ID: ${wordId}`);
-                    console.log(`   📊 İstatistikler:`);
-                    console.log(`      - Doğru: ${stats.correct || 0}, Yanlış: ${stats.wrong || 0}, Toplam: ${totalAttempts}`);
-                    console.log(`      - Başarı oranı: %${Math.round(successRate * 100)}`);
-                    console.log(`      - Ustalık seviyesi: ${masteryLevel.toFixed(2)}`);
-                    console.log(`      - Son görülme: ${new Date(stats.lastSeen).toLocaleString('tr-TR')} (${Math.round(daysSinceLastSeen)} gün önce)`);
-                    console.log(`   🔄 Tekrar nedeni: ${reasons.join(', ')}`);
+                    log.debug(`\n${index + 1}. Kelime ID: ${wordId}`);
+                    log.debug(`   📊 İstatistikler:`);
+                    log.debug(`      - Doğru: ${stats.correct || 0}, Yanlış: ${stats.wrong || 0}, Toplam: ${totalAttempts}`);
+                    log.debug(`      - Başarı oranı: %${Math.round(successRate * 100)}`);
+                    log.debug(`      - Ustalık seviyesi: ${masteryLevel.toFixed(2)}`);
+                    log.debug(`      - Son görülme: ${new Date(stats.lastSeen).toLocaleString('tr-TR')} (${Math.round(daysSinceLastSeen)} gün önce)`);
+                    log.debug(`   🔄 Tekrar nedeni: ${reasons.join(', ')}`);
                 });
                 
                 // 4. Özet
-                console.log('\n📈 ÖZET:');
-                console.log(`   • Toplam kelime: ${totalWords}`);
-                console.log(`   • Tekrar gerektiren: ${reviewWords.length}`);
-                console.log(`   • Oran: %${Math.round((reviewWords.length / totalWords) * 100)}`);
+                log.debug('\n📈 ÖZET:');
+                log.debug(`   • Toplam kelime: ${totalWords}`);
+                log.debug(`   • Tekrar gerektiren: ${reviewWords.length}`);
+                log.debug(`   • Oran: %${Math.round((reviewWords.length / totalWords) * 100)}`);
                 
                 // 5. Buton güncellemesi
                 updateAllTabButtons();
-                console.log('✅ Tüm butonlar güncellendi');
+                log.debug('✅ Tüm butonlar güncellendi');
                 
             } catch (error) {
-                console.error('❌ Test hatası:', error);
-                console.error('Stack trace:', error.stack);
+                log.error('❌ Test hatası:', error);
+                log.error('Stack trace:', error.stack);
             }
         }
         
-        // Global erişim için window'a ekle
+        // Global erişim için window'a ekle (sadece debug modunda çalışır)
         window.testReviewWords = testReviewWords;
         
         function filterWordStats(filterType) {
@@ -6906,8 +6915,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.stats('🔍 Analiz tamamlandı!');
         }
 
-        // Test fonksiyonları
+        // Test fonksiyonları - sadece debug modunda çalışır
         function testStreakScenarios() {
+            // Debug modu kontrolü
+            if (typeof CONFIG === 'undefined' || !CONFIG.debugTest) {
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('❌ Test fonksiyonları sadece debug modunda çalışır. Konsolda: CONFIG.debugTest = true; yapın.');
+                }
+                return;
+            }
+            
             log.stats('🧪 STREAK TEST SENARYOLARİ');
             log.stats('=============================');
             
@@ -6937,7 +6954,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             log.stats('=============================');
         }
 
-        // Geliştirici araçları - console'da çağırılabilir
+        // Geliştirici araçları - console'da çağırılabilir (sadece debug modunda çalışır)
         window.analyzeStreak = analyzeStreakSystem;
         window.testStreak = testStreakScenarios;
 

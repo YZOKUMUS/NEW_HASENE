@@ -5,6 +5,7 @@ const CONFIG = {
     debugElements: false,       // DOM element kontrolleri
     debugAudio: false,          // Ses sistemi debug'ları
     debugGameFlow: false,       // Oyun akışı debug'ları
+    debugTest: false,           // Test fonksiyonları (testReviewWords, testStreakScenarios)
     showCriticalErrors: true,   // Kritik hataları her zaman göster
     showWarnings: false,        // Uyarıları göster (false = sadece kritik hatalar)
     hapticEnabled: true,        // Haptic feedback (titreme) aktif mi
