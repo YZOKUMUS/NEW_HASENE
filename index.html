@@ -8109,6 +8109,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // if (sessionCorrect > 0) {
                 //     updateTaskProgress('toplamDogru', sessionCorrect);
                 // }
+                
+                // Session puanlarını global'e aktar (liderlik tablosu için)
+                console.log(`💰 [GERI BUTONU] Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                if (scoreToAdd > 0) {
+                    addToGlobalPoints(scoreToAdd, sessionCorrect);
+                    console.log(`✅ [GERI BUTONU] addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
+                }
                     } else {
                         forceLog('[4] Puan YOK - Direkt cikis');
                 }
@@ -8236,6 +8244,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
                     // updateTaskProgress('toplamDogru', boslukCorrect);
                         }
+                
+                // Session puanlarını global'e aktar (liderlik tablosu için)
+                console.log(`💰 [GERI BUTONU - BOSLUK] Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                if (scoreToAdd > 0) {
+                    addToGlobalPoints(scoreToAdd, sessionCorrect);
+                    console.log(`✅ [GERI BUTONU - BOSLUK] addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
+                }
                     } else {
                         forceLog('[4] Puan YOK - Direkt cikis');
                 }
@@ -8311,6 +8327,14 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
                     // updateTaskProgress('toplamDogru', dinleCorrect);
                         }
+                
+                // Session puanlarını global'e aktar (liderlik tablosu için)
+                console.log(`💰 [GERI BUTONU - DINLE] Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                if (scoreToAdd > 0) {
+                    addToGlobalPoints(scoreToAdd, sessionCorrect);
+                    console.log(`✅ [GERI BUTONU - DINLE] addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
+                }
                     } else {
                         forceLog('[4] Puan YOK - Direkt cikis');
                 }
