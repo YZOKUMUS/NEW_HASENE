@@ -8570,6 +8570,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // UI güncelle
             elements.arabicWord.textContent = currentQuestion.kelime;
             elements.sureInfo.textContent = `ID: ${currentQuestion.id} | Zorluk: ${currentQuestion.difficulty} | Aralık: ${diffLevel.minDiff}-${diffLevel.maxDiff}`;
+            
+            // Dark mode kontrolü - Arapça kelime rengini güncelle
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            if (elements.arabicWord) {
+                elements.arabicWord.style.color = isDarkMode ? '#ffffff' : '#1a1a1a';
+            }
 
             // Seçenekler oluştur
             const wrongAnswers = getWrongAnswers(3);
@@ -12762,6 +12768,38 @@ function showMainMenu() {
 
 <!-- DARK MODE TOGGLE -->
 <script>
+    // Arapça metinlerin renklerini dark mode'a göre güncelle
+    function updateArabicTextColors(isDark) {
+        const arabicElements = [
+            document.getElementById('arabicWord'),
+            document.getElementById('boslukAyetText'),
+            document.getElementById('ayetArabic'),
+            document.getElementById('duaArabic')
+        ];
+        
+        arabicElements.forEach(element => {
+            if (element) {
+                if (isDark) {
+                    element.style.color = '#ffffff';
+                } else {
+                    element.style.color = '#1a1a1a';
+                }
+            }
+        });
+        
+        // Soru ipuçları ve sure bilgisi
+        const hintElements = document.querySelectorAll('.duolingo-question-hint, #sureInfo');
+        hintElements.forEach(element => {
+            if (element) {
+                if (isDark) {
+                    element.style.color = '#b0b0b0';
+                } else {
+                    element.style.color = '#999';
+                }
+            }
+        });
+    }
+    
     // Dark Mode Toggle Function
     function toggleDarkMode() {
         const body = document.body;
@@ -12789,6 +12827,9 @@ function showMainMenu() {
                 darkModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             }
         }
+        
+        // Arapça metinlerin renklerini güncelle
+        updateArabicTextColors(isDark);
     }
     
     // Sayfa yüklendiğinde dark mode durumunu kontrol et
@@ -12797,11 +12838,15 @@ function showMainMenu() {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
         // Eğer kullanıcı tercihi varsa onu kullan, yoksa sistem tercihini kullan
-        if (savedDarkMode === 'enabled' || (savedDarkMode === null && prefersDark)) {
+        const isDark = savedDarkMode === 'enabled' || (savedDarkMode === null && prefersDark);
+        if (isDark) {
             document.body.classList.add('dark-mode');
             const darkModeIcon = document.getElementById('darkModeIcon');
             if (darkModeIcon) darkModeIcon.textContent = '☀️';
         }
+        
+        // Sayfa yüklendiğinde Arapça metinlerin renklerini güncelle
+        updateArabicTextColors(isDark);
         
         // Sistem tercihi değişikliğini dinle (sadece kullanıcı tercihi yoksa)
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
@@ -12810,10 +12855,12 @@ function showMainMenu() {
                     document.body.classList.add('dark-mode');
                     const darkModeIcon = document.getElementById('darkModeIcon');
                     if (darkModeIcon) darkModeIcon.textContent = '☀️';
+                    updateArabicTextColors(true);
                 } else {
                     document.body.classList.remove('dark-mode');
                     const darkModeIcon = document.getElementById('darkModeIcon');
                     if (darkModeIcon) darkModeIcon.textContent = '🌙';
+                    updateArabicTextColors(false);
                 }
             }
         });

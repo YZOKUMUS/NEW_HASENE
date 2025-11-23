@@ -1717,6 +1717,48 @@ body.dark-mode .arabic-text {
     color: #ffffff !important;
 }
 
+/* Kelime Çevir oyunu için Arapça kelime - dark mode */
+body.dark-mode #arabicWord,
+body.dark-mode .arabic-large,
+body.dark-mode #arabicWord.arabic-text,
+body.dark-mode #arabicWord.arabic-large {
+    color: #ffffff !important;
+}
+
+/* Boşluk Doldur oyunu için Arapça metin - dark mode */
+body.dark-mode #boslukAyetText,
+body.dark-mode #boslukAyetText.arabic {
+    color: #ffffff !important;
+}
+
+/* Ayet Oku oyunu için Arapça metin - dark mode */
+body.dark-mode #ayetArabic,
+body.dark-mode #ayetArabic.arabic {
+    color: #ffffff !important;
+}
+
+/* Dua Et oyunu için Arapça metin - dark mode */
+body.dark-mode #duaArabic,
+body.dark-mode #duaArabic.arabic {
+    color: #ffffff !important;
+}
+
+body.dark-mode .duolingo-question-hint {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #sureInfo {
+    color: #b0b0b0 !important;
+}
+
+/* Inline style'ları override etmek için daha spesifik kurallar */
+body.dark-mode div[id="arabicWord"][style*="color"],
+body.dark-mode div[id="boslukAyetText"][style*="color"],
+body.dark-mode div[id="ayetArabic"][style*="color"],
+body.dark-mode div[id="duaArabic"][style*="color"] {
+    color: #ffffff !important;
+}
+
 /* ----- AUDIO & HINT BUTTONS ----- */
 .audio-btn,
 .hint-btn {
@@ -3433,6 +3475,11 @@ body.dark-mode .bosluk-mode .feedback {
     display: flex;
     flex-direction: column;
     background: #fff;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .game-screen {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
 }
 
 /* Modern Game Header - Yeni Tasarım */
@@ -3520,6 +3567,11 @@ body.dark-mode .bosluk-mode .feedback {
     background: #fff;
     flex: 1;
     position: relative;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .game-screen .duolingo-question-area {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
 }
 
 .game-screen .duolingo-question-number {
@@ -3532,6 +3584,12 @@ body.dark-mode .bosluk-mode .feedback {
     font-size: 11px;
     font-weight: 600;
     color: #666;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode .game-screen .duolingo-question-number {
+    background: rgba(102, 126, 234, 0.2) !important;
+    color: #ffffff !important;
 }
 
 /* Ayet, Dua, Hadis modları için soru sayısı gösterimi */
@@ -3690,6 +3748,12 @@ body.dark-mode .bosluk-mode .feedback {
     padding: 15px 30px;
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .game-screen .duolingo-stats-bar {
+    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
+    border-top-color: rgba(102, 126, 234, 0.3) !important;
 }
 
 .game-screen .duolingo-stat-item {
@@ -3790,6 +3854,11 @@ body.dark-mode .bosluk-mode .feedback {
     display: flex;
     flex-direction: column;
     background: #fff;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .dinle-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
 }
 
 /* Dinle Mode için Duolingo Tarzı Stiller */
@@ -3990,6 +4059,12 @@ body.dark-mode .bosluk-mode .feedback {
     padding: 16px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .dinle-mode .duolingo-stats-bar {
+    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
+    border-top-color: rgba(102, 126, 234, 0.3) !important;
 }
 
 .dinle-mode .duolingo-stat-item {
@@ -4063,6 +4138,11 @@ body.dark-mode .bosluk-mode .feedback {
     display: flex;
     flex-direction: column;
     background: #fff;
+    transition: background 0.3s ease;
+}
+
+body.dark-mode .bosluk-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
 }
 
 /* Boşluk Mode için Duolingo Tarzı Stiller */
@@ -4279,6 +4359,12 @@ body.dark-mode .bosluk-mode .feedback {
     padding: 16px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-mode .bosluk-mode .duolingo-stats-bar {
+    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
+    border-top-color: rgba(102, 126, 234, 0.3) !important;
 }
 
 .bosluk-mode .duolingo-stat-item {
