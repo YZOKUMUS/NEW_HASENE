@@ -7552,9 +7552,16 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // Liderlik tablosunu güncelle (sadece oyun bitiminde, çift ekleme önlenir)
-            if (typeof updateLeaderboardScores === 'function' && points > 0) {
-                updateLeaderboardScores(points);
-                log.game(`📊 Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
+            if (typeof updateLeaderboardScores === 'function') {
+                if (points > 0) {
+                    log.game(`📊 Liderlik tablosu güncelleniyor: +${points} Hasene (sessionScore: ${points})`);
+                    updateLeaderboardScores(points);
+                    log.game(`✅ Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
+                } else {
+                    log.warn(`⚠️ Liderlik tablosu güncellenmedi: points=${points} (0 veya negatif)`);
+                }
+            } else {
+                log.error(`❌ updateLeaderboardScores fonksiyonu bulunamadı!`);
             }
             
             updateStatsBar(); // Global barı güncelle
@@ -8507,8 +8514,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // updateTaskProgress('kelimeCevir', sessionCorrect);
                 
                 // Session puanlarını global'e aktar
-                log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
-                addToGlobalPoints(sessionScore, sessionCorrect);
+                log.game(`💰 Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                addToGlobalPoints(scoreToAdd, sessionCorrect);
+                log.game(`✅ addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
                 
                 // Direkt ana menüye dön (popup yok)
                 log.debug(`🔄 Ana menüye dönülüyor...`);
@@ -10299,9 +10308,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
                 // updateTaskProgress('dinleBul', sessionCorrect);
                 
-                log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
+                log.game(`💰 Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
                 // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                addToGlobalPoints(scoreToAdd, sessionCorrect);
+                log.game(`✅ addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
                 
                 log.debug(`🔄 Ana menüye dönülüyor...`);
                 // Direkt ana menüye dön
@@ -10649,9 +10660,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
                 // updateTaskProgress('boslukDoldur', sessionCorrect);
                 
-                log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
+                log.game(`💰 Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
                 // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
+                const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                addToGlobalPoints(scoreToAdd, sessionCorrect);
+                log.game(`✅ addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
                 
                 log.debug(`🔄 Ana menüye dönülüyor...`);
                 // Direkt ana menüye dön
