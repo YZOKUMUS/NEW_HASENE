@@ -4270,17 +4270,47 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     // 🔥 DETAYLI İSTATİSTİKLER SIFIRLA (MOBİL UYUMLU)
     // =========================================
     try {
+        // Günlük doğru/yanlış değerlerini sıfırla
         localStorage.removeItem('dailyCorrect');
         localStorage.removeItem('dailyWrong');
+        localStorage.setItem('dailyCorrect', '0');
+        localStorage.setItem('dailyWrong', '0');
+        
+        // Tarih bazlı günlük verilerini temizle (hasene_daily_YYYY-MM-DD formatındaki tüm key'ler)
+        // localStorage'daki tüm key'leri tarayarak hasene_daily_ ile başlayanları temizle
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('hasene_daily_')) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // Ek güvenlik: Son 90 günün verilerini de temizle (eğer yukarıdaki tarama eksik kaldıysa)
+        const today = new Date();
+        for (let i = 0; i < 90; i++) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const dateKey = `${year}-${month}-${day}`;
+            const dayKey = `hasene_daily_${dateKey}`;
+            localStorage.removeItem(dayKey);
+        }
+        
+        // Genel detaylı istatistik key'lerini temizle
         localStorage.removeItem('hasene_detailedStats');
         localStorage.removeItem('hasene_dailyStats');
         localStorage.removeItem('hasene_weeklyStats');
         localStorage.removeItem('hasene_monthlyStats');
         localStorage.removeItem('hasene_trendStats');
-        localStorage.removeItem('hasene_streakData'); // Detaylı istatistikler için
-        // Boş değerler set et (mobil uyumluluk için)
-        localStorage.setItem('dailyCorrect', '0');
-        localStorage.setItem('dailyWrong', '0');
+        
+        // Streak data'yı temizle (detaylı istatistikler için kullanılıyor)
+        localStorage.removeItem('hasene_streakData');
+        
+        log.debug('✅ Detaylı istatistikler sıfırlandı (tarih bazlı veriler dahil)');
     } catch(e) {
         log.error('Detaylı istatistikler sıfırlama hatası:', e);
     }
