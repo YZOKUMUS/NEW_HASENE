@@ -6241,6 +6241,22 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Aylık takvimi oluştur
                 generateMonthlyCalendar();
                 
+                
+                
+                // Validasyon kontrolü (sadece debug modunda)
+                if (typeof log !== 'undefined' && log.debug) {
+                    // Sessiz validasyon - hataları logla ama kullanıcıya gösterme
+                    try {
+                        const todayStr = getLocalDateString();
+                        const validation = validateCurrentStreak(todayStr);
+                        if (!validation.isValid) {
+                            log.warn('⚠️ Takvim validasyon uyarısı:', validation.reason);
+                        }
+                    } catch (e) {
+                        log.debug('Takvim validasyon hatası (kritik değil):', e);
+                    }
+                }
+                
                 // Modal'ı göster
                 const calendarModal = document.getElementById('calendarModal');
                 if (calendarModal) {
@@ -6534,27 +6550,48 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         }
 
         function generateWeeklyStreakDisplay() {
-            // Son 7 günü hesapla
-            const today = new Date();
-            const weekDays = [];
-            const dayNames = ['Pz', 'Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct'];
-            
-            // Son 7 günü geriye doğru hesapla
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(today.getDate() - i);
-                weekDays.push({
-                    date: date,
-                    dateStr: getLocalDateString(date),
-                    dayName: dayNames[date.getDay()],
-                    isToday: i === 0
-                });
-            }
-            
-            // PlayDates set'ini oluştur
-            const playDatesSet = new Set(streakData.playDates);
-            const currentStreakDates = calculateCurrentStreakDates();
-            const currentStreakSet = new Set(currentStreakDates);
+            try {
+                // Null kontrolü
+                if (!streakData || !streakData.playDates) {
+                    log.warn('⚠️ streakData veya playDates bulunamadı, varsayılan değerler kullanılıyor');
+                    streakData = streakData || {};
+                    streakData.playDates = streakData.playDates || [];
+                }
+                
+                // Son 7 günü hesapla (Pazartesi'den başlayacak şekilde)
+                const today = new Date();
+                const weekDays = [];
+                // Pazartesi'den başlayan gün isimleri (aylık takvim ile uyumlu)
+                const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
+                
+                // Bugünün haftanın hangi günü olduğunu bul (Pazartesi = 0)
+                const todayDayOfWeek = (today.getDay() + 6) % 7; // 0=Pazartesi, 6=Pazar
+                
+                // Bu haftanın Pazartesi'sini bul
+                const monday = new Date(today);
+                monday.setDate(today.getDate() - todayDayOfWeek);
+                
+                // Son 7 günü Pazartesi'den başlayarak hesapla
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(monday);
+                    date.setDate(monday.getDate() + i);
+                    const dateStr = getLocalDateString(date);
+                    if (!dateStr) {
+                        log.error('❌ getLocalDateString null döndü!');
+                        continue;
+                    }
+                    weekDays.push({
+                        date: date,
+                        dateStr: dateStr,
+                        dayName: dayNames[i], // Pazartesi'den başlayarak sırayla
+                        isToday: dateStr === getLocalDateString(today)
+                    });
+                }
+                
+                // PlayDates set'ini oluştur
+                const playDatesSet = new Set(streakData.playDates || []);
+                const currentStreakDates = calculateCurrentStreakDates();
+                const currentStreakSet = new Set(currentStreakDates || []);
             
             // HTML oluştur - Duolingo Style
             let html = '';
@@ -6601,37 +6638,82 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             html += '</div>';
             
             // HTML'i yerleştir
-            document.getElementById('weeklyStreakDisplay').innerHTML = html;
+            const weeklyDisplay = document.getElementById('weeklyStreakDisplay');
+            if (!weeklyDisplay) {
+                log.error('❌ weeklyStreakDisplay elementi bulunamadı!');
+                return;
+            }
+            weeklyDisplay.innerHTML = html;
             
             // Streak sayısını güncelle
             const streakCountEl = document.getElementById('calendarStreakCount');
             if (streakCountEl) {
                 streakCountEl.textContent = streakData.currentStreak || 0;
+            } else {
+                log.warn('⚠️ calendarStreakCount elementi bulunamadı');
+            }
+            
+                // Debug: Haftalık takvim oluşturuldu
+                log.debug('✅ Haftalık takvim oluşturuldu:', {
+                    weekDays: weekDays.length,
+                    playedDays: weekDays.filter(d => playDatesSet.has(d.dateStr)).length,
+                    streakDays: weekDays.filter(d => currentStreakSet.has(d.dateStr)).length
+                });
+            } catch (error) {
+                log.error('❌ generateWeeklyStreakDisplay hatası:', error);
+                const weeklyDisplay = document.getElementById('weeklyStreakDisplay');
+                if (weeklyDisplay) {
+                    weeklyDisplay.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;">❌ Haftalık takvim yüklenirken hata oluştu</div>';
+                }
             }
         }
 
         function generateMonthlyCalendar() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth();
-            const todayDate = today.getDate();
-            const todayStr = getLocalDateString();
-            
-            // Ay adını güncelle
-            const monthNames = [
-                'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-                'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-            ];
-            document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
-            
-            // Takvim grid'ini temizle ve yeni HTML oluştur
-            const grid = document.getElementById('calendarGrid');
+            try {
+                // Null kontrolü
+                if (!streakData || !streakData.playDates) {
+                    log.warn('⚠️ streakData veya playDates bulunamadı, varsayılan değerler kullanılıyor');
+                    streakData = streakData || {};
+                    streakData.playDates = streakData.playDates || [];
+                }
+                
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                const todayDate = today.getDate();
+                const todayStr = getLocalDateString();
+                
+                if (!todayStr) {
+                    log.error('❌ getLocalDateString null döndü!');
+                    return;
+                }
+                
+                // Ay adını güncelle
+                const monthNames = [
+                    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+                ];
+                
+                const calendarMonthEl = document.getElementById('calendarMonth');
+                if (calendarMonthEl) {
+                    calendarMonthEl.textContent = `${monthNames[month]} ${year}`;
+                } else {
+                    log.warn('⚠️ calendarMonth elementi bulunamadı');
+                }
+                
+                // Takvim grid'ini temizle ve yeni HTML oluştur
+                const grid = document.getElementById('calendarGrid');
+                if (!grid) {
+                    log.error('❌ calendarGrid elementi bulunamadı!');
+                    return;
+                }
             
             // HTML string olarak oluştur
             let html = '';
             
             // Haftanın günlerini ekle (Duolingo style - üst satır)
-            const dayNames = ['Pz', 'Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct'];
+            // Pazartesi'den başlayan gün isimleri (haftalık takvim ile uyumlu)
+            const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
             dayNames.forEach(day => {
                 html += `<div style="text-align: center; font-weight: 600; font-size: 0.75em; color: #999; padding: 8px 0; display: flex; align-items: center; justify-content: center;">${day}</div>`;
             });
@@ -6692,9 +6774,29 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // HTML'i yerleştir
+            if (!grid) {
+                log.error('❌ calendarGrid elementi bulunamadı!');
+                return;
+            }
             grid.innerHTML = html;
+            
+                // Debug: Aylık takvim oluşturuldu
+                log.debug('✅ Aylık takvim oluşturuldu:', {
+                    month: `${monthNames[month]} ${year}`,
+                    daysInMonth: daysInMonth,
+                    startingDayOfWeek: startingDayOfWeek,
+                    totalBoxes: Math.ceil((startingDayOfWeek + daysInMonth) / 7) * 7
+                });
+            } catch (error) {
+                log.error('❌ generateMonthlyCalendar hatası:', error);
+                const grid = document.getElementById('calendarGrid');
+                if (grid) {
+                    grid.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;">❌ Aylık takvim yüklenirken hata oluştu</div>';
+                }
+            }
         }
 
+        
         // Global fonksiyonlar (window'a ekle ki HTML onclick çalışsın)
         window.showCalendarModal = showCalendarModal;
         window.closeCalendarModal = closeCalendarModal;
