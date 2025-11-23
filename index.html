@@ -7552,16 +7552,19 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             }
             
             // Liderlik tablosunu güncelle (sadece oyun bitiminde, çift ekleme önlenir)
+            console.log(`🔍 addToGlobalPoints çağrıldı: points=${points}, correctAnswers=${correctAnswers}`);
+            console.log(`🔍 updateLeaderboardScores fonksiyonu var mı?`, typeof updateLeaderboardScores);
+            
             if (typeof updateLeaderboardScores === 'function') {
                 if (points > 0) {
-                    log.game(`📊 Liderlik tablosu güncelleniyor: +${points} Hasene (sessionScore: ${points})`);
+                    console.log(`📊 Liderlik tablosu güncelleniyor: +${points} Hasene`);
                     updateLeaderboardScores(points);
-                    log.game(`✅ Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
+                    console.log(`✅ Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
                 } else {
-                    log.warn(`⚠️ Liderlik tablosu güncellenmedi: points=${points} (0 veya negatif)`);
+                    console.warn(`⚠️ Liderlik tablosu güncellenmedi: points=${points} (0 veya negatif)`);
                 }
             } else {
-                log.error(`❌ updateLeaderboardScores fonksiyonu bulunamadı!`);
+                console.error(`❌ updateLeaderboardScores fonksiyonu bulunamadı!`);
             }
             
             updateStatsBar(); // Global barı güncelle
@@ -8514,10 +8517,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // updateTaskProgress('kelimeCevir', sessionCorrect);
                 
                 // Session puanlarını global'e aktar
-                log.game(`💰 Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
+                console.log(`💰 Session puanları global'e aktarılıyor: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}`);
                 const scoreToAdd = sessionScore; // sessionScore'u sakla (sıfırlanmadan önce)
+                console.log(`🔍 addToGlobalPoints çağrılıyor: scoreToAdd=${scoreToAdd}`);
                 addToGlobalPoints(scoreToAdd, sessionCorrect);
-                log.game(`✅ addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
+                console.log(`✅ addToGlobalPoints çağrıldı: ${scoreToAdd} puan`);
                 
                 // Direkt ana menüye dön (popup yok)
                 log.debug(`🔄 Ana menüye dönülüyor...`);
