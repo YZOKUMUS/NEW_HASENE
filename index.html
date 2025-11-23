@@ -7555,13 +7555,20 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             console.log(`🔍 addToGlobalPoints çağrıldı: points=${points}, correctAnswers=${correctAnswers}`);
             console.log(`🔍 updateLeaderboardScores fonksiyonu var mı?`, typeof updateLeaderboardScores);
             
+            // Points kontrolü - mutlaka sayı olmalı ve pozitif olmalı
+            const pointsToAdd = typeof points === 'number' && !isNaN(points) && points > 0 ? points : 0;
+            
             if (typeof updateLeaderboardScores === 'function') {
-                if (points > 0) {
-                    console.log(`📊 Liderlik tablosu güncelleniyor: +${points} Hasene`);
-                    updateLeaderboardScores(points);
-                    console.log(`✅ Liderlik tablosu güncellendi (oyun bitimi): +${points} Hasene`);
+                if (pointsToAdd > 0) {
+                    console.log(`📊 Liderlik tablosu güncelleniyor: +${pointsToAdd} Hasene`);
+                    try {
+                        updateLeaderboardScores(pointsToAdd);
+                        console.log(`✅ Liderlik tablosu güncellendi (oyun bitimi): +${pointsToAdd} Hasene`);
+                    } catch (error) {
+                        console.error(`❌ Liderlik tablosu güncelleme hatası:`, error);
+                    }
                 } else {
-                    console.warn(`⚠️ Liderlik tablosu güncellenmedi: points=${points} (0 veya negatif)`);
+                    console.warn(`⚠️ Liderlik tablosu güncellenmedi: points=${points}, pointsToAdd=${pointsToAdd} (0 veya geçersiz)`);
                 }
             } else {
                 console.error(`❌ updateLeaderboardScores fonksiyonu bulunamadı!`);
