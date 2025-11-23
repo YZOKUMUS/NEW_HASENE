@@ -914,7 +914,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.1em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button onclick="event.stopPropagation(); if(typeof showDetailedStats === 'function') showDetailedStats();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Detaylı İstatistikler">
+                    <button id="detailedStatsBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 10;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Detaylı İstatistikler">
                         📈 Detaylı
                     </button>
                     <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
@@ -1750,23 +1750,43 @@
         
         // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
         function saveDailyStats() {
-            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-            const dayKey = `hasene_daily_${today}`;
-            
-            // Mevcut günlük verileri al veya yeni oluştur
-            const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-            const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
-            
-            // Tarih bazlı veriyi kaydet
-            const dayData = {
-                hasene: dailyHasene,
-                correct: dailyCorrect,
-                wrong: dailyWrong,
-                date: today
-            };
-            
-            localStorage.setItem(dayKey, JSON.stringify(dayData));
+            try {
+                const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
+                const dayKey = `hasene_daily_${today}`;
+                
+                // Mevcut günlük verileri al veya yeni oluştur
+                const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+                const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+                const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+                
+                console.log('💾 saveDailyStats çağrıldı:', {
+                    today,
+                    dayKey,
+                    dailyHasene,
+                    dailyCorrect,
+                    dailyWrong
+                });
+                
+                // Tarih bazlı veriyi kaydet
+                const dayData = {
+                    hasene: dailyHasene,
+                    correct: dailyCorrect,
+                    wrong: dailyWrong,
+                    date: today
+                };
+                
+                localStorage.setItem(dayKey, JSON.stringify(dayData));
+                
+                // Doğrulama: Kaydedilen veriyi oku
+                const saved = localStorage.getItem(dayKey);
+                if (saved) {
+                    console.log('✅ Günlük veriler kaydedildi:', JSON.parse(saved));
+                } else {
+                    console.error('❌ Günlük veriler kaydedilemedi!');
+                }
+            } catch (error) {
+                console.error('❌ saveDailyStats hatası:', error);
+            }
         }
         
         function addDailyXP(xp) {
@@ -2972,6 +2992,47 @@
             const statsBtn = document.getElementById('statsBtn');
             const calendarBtn = document.getElementById('calendarBtn');
             const xpInfoBtn = document.getElementById('xpInfoBtn');
+            
+            // Detaylı istatistikler butonuna event listener ekle (detailed-stats.js yüklendikten sonra)
+            setTimeout(() => {
+                const detailedStatsBtn = document.getElementById('detailedStatsBtn');
+                if (detailedStatsBtn) {
+                    const handleDetailedStatsClick = function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        
+                        console.log('📊 Detaylı buton tıklandı');
+                        
+                        if (typeof window.showDetailedStats === 'function') {
+                            console.log('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
+                            window.showDetailedStats();
+                        } else if (typeof showDetailedStats === 'function') {
+                            console.log('✅ showDetailedStats fonksiyonu bulundu (global değil), çağrılıyor...');
+                            showDetailedStats();
+                        } else {
+                            console.error('❌ showDetailedStats fonksiyonu bulunamadı!', typeof window.showDetailedStats, typeof showDetailedStats);
+                        }
+                        
+                        return false;
+                    };
+                    
+                    // Click event
+                    detailedStatsBtn.addEventListener('click', handleDetailedStatsClick, { capture: true, passive: false });
+                    
+                    // Touch event (mobil için)
+                    detailedStatsBtn.addEventListener('touchend', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleDetailedStatsClick(e);
+                        return false;
+                    }, { capture: true, passive: false });
+                    
+                    console.log('✅ Detaylı istatistikler butonu event listener eklendi');
+                } else {
+                    console.warn('⚠️ detailedStatsBtn elementi bulunamadı!');
+                }
+            }, 100); // 100ms gecikme ile detailed-stats.js yüklensin
             
             // ============ AYARLAR - BURADAN KONTROLEDEBİLİRSİN ============
             const CONFIG = {
@@ -5940,6 +6001,11 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 return;
             }
             
+            // Detaylı butonuna tıklanırsa kapatma (mobil için özel kontrol)
+            if (target && (target.id === 'detailedStatsBtn' || target.closest('#detailedStatsBtn'))) {
+                return;
+            }
+            
             // Filtre butonlarına tıklanırsa paneli kapatma
             if (target && (
                 target.id === 'filterAll' || 
@@ -8086,17 +8152,43 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const confirmed = await showCustomConfirm(sessionCorrect, sessionWrong, sessionScore);
                         forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
                 
-                if (!confirmed) {
+                        if (!confirmed) {
                             forceLog('[6] IPTAL - Cikis yapilmiyor');
                             return;
-                }
-                
+                        }
+                        
                         forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
-                // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor
-                // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-                // if (sessionCorrect > 0) {
-                //     updateTaskProgress('toplamDogru', sessionCorrect);
-                // }
+                        
+                        // Session değerlerini daily değerlere ekle (modal onaylandığında)
+                        // addSessionPoints ve addSessionWrong zaten güncelliyor ama emin olmak için tekrar kontrol et
+                        if (sessionCorrect > 0) {
+                            const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+                            // Eğer sessionCorrect henüz eklenmemişse ekle (güvenlik için)
+                            const newDailyCorrect = Math.max(currentDailyCorrect, sessionCorrect);
+                            if (newDailyCorrect !== currentDailyCorrect) {
+                                localStorage.setItem('dailyCorrect', newDailyCorrect.toString());
+                                forceLog(`[7.1] dailyCorrect güncellendi: ${currentDailyCorrect} -> ${newDailyCorrect}`);
+                            }
+                        }
+                        
+                        if (sessionWrong > 0) {
+                            const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+                            // Eğer sessionWrong henüz eklenmemişse ekle (güvenlik için)
+                            const newDailyWrong = Math.max(currentDailyWrong, sessionWrong);
+                            if (newDailyWrong !== currentDailyWrong) {
+                                localStorage.setItem('dailyWrong', newDailyWrong.toString());
+                                forceLog(`[7.2] dailyWrong güncellendi: ${currentDailyWrong} -> ${newDailyWrong}`);
+                            }
+                        }
+                        
+                        // Günlük istatistikleri kaydet (modal onaylandığında)
+                        if (typeof saveDailyStats === 'function') {
+                            forceLog('[7.3] saveDailyStats çağrılıyor...');
+                            saveDailyStats();
+                            forceLog('[7.4] saveDailyStats tamamlandı');
+                        } else {
+                            forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
+                        }
                     } else {
                         forceLog('[4] Puan YOK - Direkt cikis');
                 }
@@ -8214,8 +8306,30 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             forceLog('[6] IPTAL - Cikis yapilmiyor');
                             return;
                         }
-                
+                        
                         forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
+                        
+                        // Boşluk Doldur session değerlerini daily değerlere ekle
+                        if (boslukCorrect > 0) {
+                            const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+                            localStorage.setItem('dailyCorrect', (currentDailyCorrect + boslukCorrect).toString());
+                            forceLog(`[7.1] dailyCorrect güncellendi (bosluk): ${currentDailyCorrect} + ${boslukCorrect} = ${currentDailyCorrect + boslukCorrect}`);
+                        }
+                        
+                        if (boslukWrong > 0) {
+                            const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+                            localStorage.setItem('dailyWrong', (currentDailyWrong + boslukWrong).toString());
+                            forceLog(`[7.2] dailyWrong güncellendi (bosluk): ${currentDailyWrong} + ${boslukWrong} = ${currentDailyWrong + boslukWrong}`);
+                        }
+                        
+                        // Günlük istatistikleri kaydet (modal onaylandığında)
+                        if (typeof saveDailyStats === 'function') {
+                            forceLog('[7.3] saveDailyStats çağrılıyor...');
+                            saveDailyStats();
+                            forceLog('[7.4] saveDailyStats tamamlandı');
+                        } else {
+                            forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
+                        }
                 if (boslukCorrect > 0) {
                     // NOT: boslukDoldur zaten her doğru cevapta updateTaskProgress('boslukDoldur', 1) ile artırılıyor (satır 10411)
                     // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
@@ -8289,8 +8403,30 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             forceLog('[6] IPTAL - Cikis yapilmiyor');
                             return;
                         }
-                
+                        
                         forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
+                        
+                        // Dinle Bul session değerlerini daily değerlere ekle
+                        if (dinleCorrect > 0) {
+                            const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+                            localStorage.setItem('dailyCorrect', (currentDailyCorrect + dinleCorrect).toString());
+                            forceLog(`[7.1] dailyCorrect güncellendi (dinle): ${currentDailyCorrect} + ${dinleCorrect} = ${currentDailyCorrect + dinleCorrect}`);
+                        }
+                        
+                        if (dinleWrong > 0) {
+                            const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+                            localStorage.setItem('dailyWrong', (currentDailyWrong + dinleWrong).toString());
+                            forceLog(`[7.2] dailyWrong güncellendi (dinle): ${currentDailyWrong} + ${dinleWrong} = ${currentDailyWrong + dinleWrong}`);
+                        }
+                        
+                        // Günlük istatistikleri kaydet (modal onaylandığında)
+                        if (typeof saveDailyStats === 'function') {
+                            forceLog('[7.3] saveDailyStats çağrılıyor...');
+                            saveDailyStats();
+                            forceLog('[7.4] saveDailyStats tamamlandı');
+                        } else {
+                            forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
+                        }
                 if (dinleCorrect > 0) {
                     // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
                     // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı

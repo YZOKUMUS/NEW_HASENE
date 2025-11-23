@@ -16,65 +16,247 @@ function getDetailedStats() {
 
 // Günlük istatistikler
 function getDailyStats() {
-    const today = new Date().toISOString().split('T')[0];
-    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-    const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-    const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+    // getLocalDateString fonksiyonunu kullan (varsa)
+    const getLocalDateString = typeof window.getLocalDateString === 'function'
+        ? window.getLocalDateString
+        : (date = new Date()) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+    
+    const today = getLocalDateString();
+    
+    console.log('📊 getDailyStats çağrıldı, bugün:', today);
+    
+    // Önce tarih bazlı veriden oku (saveDailyStats tarih bazlı kaydediyor, bu yüzden bu daha güvenilir)
+    let dailyHasene = 0;
+    let dailyCorrect = 0;
+    let dailyWrong = 0;
+    
+    try {
+        const dayKey = `hasene_daily_${today}`;
+        const dayDataStr = localStorage.getItem(dayKey);
+        
+        if (dayDataStr) {
+            const dayData = JSON.parse(dayDataStr);
+            dailyHasene = parseInt(dayData.hasene) || 0;
+            dailyCorrect = parseInt(dayData.correct) || 0;
+            dailyWrong = parseInt(dayData.wrong) || 0;
+            
+            console.log('✅ Tarih bazlı veriden okundu:', {
+                dayKey,
+                dailyHasene,
+                dailyCorrect,
+                dailyWrong
+            });
+        } else {
+            console.warn('⚠️ Tarih bazlı veri bulunamadı:', dayKey);
+            
+            // Fallback: localStorage'dan direkt değerleri oku (geriye uyumluluk için)
+            dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+            dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+            dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+            
+            console.log('📊 localStorage değerleri (fallback):', {
+                dailyHasene,
+                dailyCorrect,
+                dailyWrong
+            });
+        }
+    } catch (e) {
+        console.error('❌ Tarih bazlı veri okuma hatası:', e);
+        
+        // Hata durumunda localStorage'dan direkt oku
+        dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+        dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+        dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+    }
+    
+    const total = dailyCorrect + dailyWrong;
+    // Accuracy'yi sayı olarak hesapla (string değil)
+    const accuracyValue = total > 0 ? (dailyCorrect / total) * 100 : 0;
+    const accuracy = accuracyValue.toFixed(1); // String formatı sadece gösterim için
+    
+    console.log('📊 getDailyStats hesaplama:', {
+        dailyCorrect,
+        dailyWrong,
+        total,
+        accuracyValue,
+        accuracy
+    });
+    
+    console.log('📊 getDailyStats sonuç:', {
+        date: today,
+        hasene: dailyHasene,
+        correct: dailyCorrect,
+        wrong: dailyWrong,
+        accuracy: accuracyValue // Sayı olarak logla
+    });
     
     return {
         date: today,
         hasene: dailyHasene,
         correct: dailyCorrect,
         wrong: dailyWrong,
-        accuracy: dailyCorrect + dailyWrong > 0 ? (dailyCorrect / (dailyCorrect + dailyWrong) * 100).toFixed(1) : 0
+        accuracy: accuracyValue // Sayı olarak döndür (parseFloat için)
     };
 }
 
 // Haftalık istatistikler
 function getWeeklyStats() {
-    const weeklyScores = getWeeklyScores();
-    const weekKey = getWeekKey(new Date());
-    const weekData = weeklyScores[weekKey] || { score: 0 };
-    
-    return {
-        week: weekKey,
-        hasene: weekData.score || 0,
-        days: getWeekPlayDays()
-    };
+    try {
+        // Global fonksiyonları kontrol et
+        const getWeeklyScores = typeof window.getWeeklyScores === 'function' 
+            ? window.getWeeklyScores 
+            : (typeof getWeeklyScores === 'function' ? getWeeklyScores : null);
+        
+        const getWeekKey = typeof window.getWeekKey === 'function'
+            ? window.getWeekKey
+            : (typeof getWeekKey === 'function' ? getWeekKey : null);
+        
+        if (!getWeeklyScores || !getWeekKey) {
+            // Fallback: localStorage'dan direkt oku
+            try {
+                const saved = localStorage.getItem('hasene_weeklyScores');
+                const weeklyScores = saved ? JSON.parse(saved) : {};
+                // Tüm skorları topla
+                let totalHasene = 0;
+                for (const key in weeklyScores) {
+                    if (weeklyScores[key] && typeof weeklyScores[key].score !== 'undefined') {
+                        totalHasene += parseInt(weeklyScores[key].score) || 0;
+                    }
+                }
+                return {
+                    week: 'current',
+                    hasene: totalHasene,
+                    days: 0
+                };
+            } catch (e) {
+                return {
+                    week: 'unknown',
+                    hasene: 0,
+                    days: 0
+                };
+            }
+        }
+        
+        const weeklyScores = getWeeklyScores();
+        const weekKey = getWeekKey(new Date());
+        const weekData = weeklyScores[weekKey] || { score: 0 };
+        
+        return {
+            week: weekKey,
+            hasene: weekData.score || 0,
+            days: typeof getWeekPlayDays === 'function' ? getWeekPlayDays() : 0
+        };
+    } catch (error) {
+        console.error('Haftalık istatistik hatası:', error);
+        return {
+            week: 'error',
+            hasene: 0,
+            days: 0
+        };
+    }
 }
 
 // Aylık istatistikler
 function getMonthlyStats() {
-    const monthlyScores = getMonthlyScores();
-    const monthKey = getMonthKey(new Date());
-    const monthData = monthlyScores[monthKey] || { score: 0 };
-    
-    return {
-        month: monthKey,
-        hasene: monthData.score || 0,
-        days: getMonthPlayDays()
-    };
+    try {
+        // Global fonksiyonları kontrol et
+        const getMonthlyScores = typeof window.getMonthlyScores === 'function'
+            ? window.getMonthlyScores
+            : (typeof getMonthlyScores === 'function' ? getMonthlyScores : null);
+        
+        const getMonthKey = typeof window.getMonthKey === 'function'
+            ? window.getMonthKey
+            : (typeof getMonthKey === 'function' ? getMonthKey : null);
+        
+        if (!getMonthlyScores || !getMonthKey) {
+            // Fallback: localStorage'dan direkt oku
+            try {
+                const saved = localStorage.getItem('hasene_monthlyScores');
+                const monthlyScores = saved ? JSON.parse(saved) : {};
+                // Tüm skorları topla
+                let totalHasene = 0;
+                for (const key in monthlyScores) {
+                    if (monthlyScores[key] && typeof monthlyScores[key].score !== 'undefined') {
+                        totalHasene += parseInt(monthlyScores[key].score) || 0;
+                    }
+                }
+                return {
+                    month: 'current',
+                    hasene: totalHasene,
+                    days: 0
+                };
+            } catch (e) {
+                return {
+                    month: 'unknown',
+                    hasene: 0,
+                    days: 0
+                };
+            }
+        }
+        
+        const monthlyScores = getMonthlyScores();
+        const monthKey = getMonthKey(new Date());
+        const monthData = monthlyScores[monthKey] || { score: 0 };
+        
+        return {
+            month: monthKey,
+            hasene: monthData.score || 0,
+            days: typeof getMonthPlayDays === 'function' ? getMonthPlayDays() : 0
+        };
+    } catch (error) {
+        console.error('Aylık istatistik hatası:', error);
+        return {
+            month: 'error',
+            hasene: 0,
+            days: 0
+        };
+    }
 }
 
 // Trend istatistikleri (son 7 gün)
 function getTrendStats() {
     const trends = [];
+    
+    // getLocalDateString fonksiyonunu kullan (varsa)
+    const getLocalDateString = typeof window.getLocalDateString === 'function'
+        ? window.getLocalDateString
+        : (date = new Date()) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+    
     const today = new Date();
     
     for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = getLocalDateString(date); // Tutarlı tarih formatı kullan
         
         // Bu günün skorunu al (localStorage'dan)
         const dayKey = `hasene_daily_${dateStr}`;
-        const dayData = JSON.parse(localStorage.getItem(dayKey) || '{}');
+        let dayData = {};
+        
+        try {
+            const dayDataStr = localStorage.getItem(dayKey);
+            if (dayDataStr) {
+                dayData = JSON.parse(dayDataStr);
+            }
+        } catch (e) {
+            console.error('Trend veri parse hatası:', e, dayKey);
+        }
         
         trends.push({
             date: dateStr,
-            hasene: dayData.hasene || 0,
-            correct: dayData.correct || 0,
-            wrong: dayData.wrong || 0
+            hasene: parseInt(dayData.hasene) || 0,
+            correct: parseInt(dayData.correct) || 0,
+            wrong: parseInt(dayData.wrong) || 0
         });
     }
     
@@ -110,53 +292,154 @@ function getMonthPlayDays() {
 
 // Detaylı istatistikler modal'ını göster
 function showDetailedStats() {
-    const stats = getDetailedStats();
+    console.log('📊 showDetailedStats çağrıldı!');
     
-    const modal = document.createElement('div');
-    modal.className = 'modal detailed-stats-modal';
-    modal.id = 'detailedStatsModal';
-    modal.style.display = 'flex';
-    modal.style.zIndex = '10000';
-
-    modal.innerHTML = `
-        <div class="detailed-stats-container">
-            <div class="detailed-stats-header">
-                <h2 class="detailed-stats-title">📊 Detaylı İstatistikler</h2>
-                <button class="detailed-stats-close-btn" onclick="closeDetailedStats()">✕</button>
-            </div>
-            <div class="detailed-stats-content" id="detailedStatsContent">
-                ${generateStatsHTML(stats)}
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // Modal dışına tıklanınca kapat
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeDetailedStats();
+    try {
+        // Önce mevcut detaylı istatistikler modal'ını kapat (eğer varsa)
+        const existingModal = document.getElementById('detailedStatsModal');
+        if (existingModal) {
+            existingModal.remove();
         }
-    });
-
-    // Global fonksiyon
-    window.closeDetailedStats = () => {
-        const modal = document.getElementById('detailedStatsModal');
-        if (modal) {
-            modal.style.display = 'none';
-            setTimeout(() => {
-                if (modal.parentNode) {
-                    modal.parentNode.removeChild(modal);
-                }
-            }, 300);
+        
+        // Önce istatistikler modal'ını kapat (eğer açıksa)
+        if (typeof closeStatsModal === 'function') {
+            const statsModal = document.getElementById('statsModal');
+            if (statsModal && statsModal.style.display !== 'none' && statsModal.style.display !== '') {
+                console.log('📊 İstatistikler modal\'ı kapatılıyor...');
+                closeStatsModal();
+                // Kısa bir gecikme ile detaylı istatistikleri aç (modal'ın tamamen kapanması için)
+                setTimeout(() => {
+                    openDetailedStatsModal();
+                }, 150);
+                return;
+            }
         }
-        delete window.closeDetailedStats;
-    };
+        
+        // Direkt aç
+        openDetailedStatsModal();
+    } catch (error) {
+        console.error('❌ showDetailedStats hatası:', error);
+    }
+}
+
+// Detaylı istatistikler modal'ını aç
+function openDetailedStatsModal() {
+    console.log('📊 openDetailedStatsModal çağrıldı!');
+    
+    try {
+        const stats = getDetailedStats();
+        console.log('📊 İstatistikler hazır:', stats);
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal detailed-stats-modal';
+        modal.id = 'detailedStatsModal';
+        modal.style.display = 'flex';
+        modal.style.zIndex = '10001'; // Stats modal'ından daha yüksek
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+
+        modal.innerHTML = `
+            <div class="detailed-stats-container" onclick="event.stopPropagation();">
+                <div class="detailed-stats-header">
+                    <h2 class="detailed-stats-title">📊 Detaylı İstatistikler</h2>
+                    <button class="detailed-stats-close-btn" id="detailedStatsCloseBtn" onclick="event.stopPropagation(); event.preventDefault(); closeDetailedStats(); return false;" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-width: 44px; min-height: 44px;">✕</button>
+                </div>
+                <div class="detailed-stats-content" id="detailedStatsContent">
+                    ${generateStatsHTML(stats)}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        console.log('✅ Modal DOM\'a eklendi');
+
+        // Body scroll'u engelle
+        document.body.style.overflow = 'hidden';
+
+        // Modal dışına tıklanınca kapat
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeDetailedStats();
+            }
+        });
+
+        // Close butonuna event listener ekle (mobil için)
+        requestAnimationFrame(() => {
+            const closeBtn = document.getElementById('detailedStatsCloseBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    closeDetailedStats();
+                    return false;
+                }, { capture: true, passive: false });
+                closeBtn.addEventListener('touchend', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    closeDetailedStats();
+                    return false;
+                }, { capture: true, passive: false });
+            }
+        });
+
+        // Global fonksiyon
+        window.closeDetailedStats = () => {
+            console.log('📊 closeDetailedStats çağrıldı');
+            const modal = document.getElementById('detailedStatsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Body scroll'u tekrar aktif et
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.removeChild(modal);
+                    }
+                }, 300);
+            }
+            delete window.closeDetailedStats;
+        };
+        
+        console.log('✅ Detaylı istatistikler modal\'ı açıldı!');
+    } catch (error) {
+        console.error('❌ openDetailedStatsModal hatası:', error);
+    }
 }
 
 // İstatistik HTML'i oluştur
 function generateStatsHTML(stats) {
-    const maxHasene = Math.max(...stats.trends.map(t => t.hasene), 1);
+    console.log('📊 generateStatsHTML çağrıldı, stats:', stats);
+    
+    // Güvenli sayı dönüşümü
+    const dailyHasene = parseInt(stats.daily.hasene) || 0;
+    const dailyCorrect = parseInt(stats.daily.correct) || 0;
+    const dailyWrong = parseInt(stats.daily.wrong) || 0;
+    
+    // Accuracy'yi hesapla (eğer gelmemişse)
+    let dailyAccuracy = parseFloat(stats.daily.accuracy) || 0;
+    
+    // Eğer accuracy 0 ise ama doğru/yanlış varsa, yeniden hesapla
+    if (dailyAccuracy === 0 && (dailyCorrect > 0 || dailyWrong > 0)) {
+        const total = dailyCorrect + dailyWrong;
+        if (total > 0) {
+            dailyAccuracy = (dailyCorrect / total) * 100;
+        }
+    }
+    
+    console.log('📊 Günlük istatistikler (formatlanmış):', {
+        hasene: dailyHasene,
+        correct: dailyCorrect,
+        wrong: dailyWrong,
+        accuracy: dailyAccuracy,
+        accuracyFormatted: dailyAccuracy.toFixed(1)
+    });
+    
+    const maxHasene = Math.max(...stats.trends.map(t => parseInt(t.hasene) || 0), 1);
     
     return `
         <div class="stats-section">
@@ -164,19 +447,19 @@ function generateStatsHTML(stats) {
             <div class="stats-grid">
                 <div class="stats-card">
                     <div class="stats-card-label">Hasene</div>
-                    <div class="stats-card-value">${stats.daily.hasene.toLocaleString()}</div>
+                    <div class="stats-card-value">${dailyHasene.toLocaleString('tr-TR')}</div>
                 </div>
                 <div class="stats-card">
                     <div class="stats-card-label">Doğru</div>
-                    <div class="stats-card-value">${stats.daily.correct}</div>
+                    <div class="stats-card-value">${dailyCorrect}</div>
                 </div>
                 <div class="stats-card">
                     <div class="stats-card-label">Yanlış</div>
-                    <div class="stats-card-value">${stats.daily.wrong}</div>
+                    <div class="stats-card-value">${dailyWrong}</div>
                 </div>
                 <div class="stats-card">
                     <div class="stats-card-label">Başarı Oranı</div>
-                    <div class="stats-card-value">${stats.daily.accuracy}%</div>
+                    <div class="stats-card-value">${dailyAccuracy.toFixed(1)}%</div>
                 </div>
             </div>
         </div>
