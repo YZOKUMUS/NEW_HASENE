@@ -83,6 +83,31 @@ body.dark-mode .difficulty-title-minimal {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
+/* Aydınlık modda oyun butonlarına renkli border */
+body:not(.dark-mode) #kelimeCevirBtn {
+    border: 3px solid #ff6b6b !important;
+}
+
+body:not(.dark-mode) #dinleBulBtn {
+    border: 3px solid #4ecdc4 !important;
+}
+
+body:not(.dark-mode) #boslukDoldurBtn {
+    border: 3px solid #45b7d1 !important;
+}
+
+body:not(.dark-mode) #duaEtBtn {
+    border: 3px solid #96ceb4 !important;
+}
+
+body:not(.dark-mode) #ayetOkuBtn {
+    border: 3px solid #feca57 !important;
+}
+
+body:not(.dark-mode) #hadisOkuBtn {
+    border: 3px solid #ff9ff3 !important;
+}
+
 body.dark-mode .game-card {
     background: #ffffff !important;
     background-color: #ffffff !important;
@@ -912,6 +937,37 @@ body.dark-mode .section-title {
     transform: translateY(-6px);
     box-shadow: 0 8px 30px rgba(0,0,0,0.2);
     border-color: #667eea;
+}
+
+/* Aydınlık modda hover durumunda border'ları daha belirgin yap */
+body:not(.dark-mode) #kelimeCevirBtn:hover {
+    border-color: #ff5252 !important;
+    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3) !important;
+}
+
+body:not(.dark-mode) #dinleBulBtn:hover {
+    border-color: #26a69a !important;
+    box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3) !important;
+}
+
+body:not(.dark-mode) #boslukDoldurBtn:hover {
+    border-color: #29b6f6 !important;
+    box-shadow: 0 8px 30px rgba(69, 183, 209, 0.3) !important;
+}
+
+body:not(.dark-mode) #duaEtBtn:hover {
+    border-color: #66bb6a !important;
+    box-shadow: 0 8px 30px rgba(150, 206, 180, 0.3) !important;
+}
+
+body:not(.dark-mode) #ayetOkuBtn:hover {
+    border-color: #ffca28 !important;
+    box-shadow: 0 8px 30px rgba(254, 202, 87, 0.3) !important;
+}
+
+body:not(.dark-mode) #hadisOkuBtn:hover {
+    border-color: #f48fb1 !important;
+    box-shadow: 0 8px 30px rgba(255, 159, 243, 0.3) !important;
 }
 
 .game-card:hover::before {
