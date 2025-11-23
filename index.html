@@ -9053,10 +9053,12 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 addSessionWrong(); // Session yanlış sayısını artır
                 
                 log.game(`💸 Puan cezası uygulanıyor: ${CONFIG.wrongAnswerPenalty} puan`);
-                log.game(`📊 Eski score: ${score}`);
-                // Puan cezası
-                score = Math.max(0, score - CONFIG.wrongAnswerPenalty);
-                log.game(`📊 Yeni score: ${score}`);
+                log.game(`📊 Eski sessionScore: ${sessionScore}`);
+                // Puan cezası - sessionScore'dan düş (UI'da görünür olması için)
+                sessionScore = Math.max(0, sessionScore - CONFIG.wrongAnswerPenalty);
+                // Geriye uyumluluk için eski score değişkenini de güncelle
+                score = sessionScore;
+                log.game(`📊 Yeni sessionScore: ${sessionScore}`);
                 
                 // Can kaybı
                 if (mode.lives > 0) {
