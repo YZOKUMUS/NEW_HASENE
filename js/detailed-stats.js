@@ -216,9 +216,17 @@ function generateStatsHTML(stats) {
 
 // Kısa tarih formatı
 function formatDateShort(dateStr) {
-    const date = new Date(dateStr);
+    // YYYY-MM-DD formatındaki tarih string'ini parse et
+    const parts = dateStr.split('-');
+    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    
+    // getDay() Pazar=0, Pazartesi=1, ..., Cumartesi=6 döner
+    // Array'de Pazartesi=0, Salı=1, ..., Pazar=6 olacak şekilde ayarla
     const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-    return days[date.getDay()];
+    const dayIndex = date.getDay();
+    // Pazar günü 0, ama array'de 6. index
+    const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+    return days[adjustedIndex];
 }
 
 // Global fonksiyonlar

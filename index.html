@@ -1749,6 +1749,27 @@
             }
         }
         
+        // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
+        function saveDailyStats() {
+            const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
+            const dayKey = `hasene_daily_${today}`;
+            
+            // Mevcut günlük verileri al veya yeni oluştur
+            const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+            const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+            const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+            
+            // Tarih bazlı veriyi kaydet
+            const dayData = {
+                hasene: dailyHasene,
+                correct: dailyCorrect,
+                wrong: dailyWrong,
+                date: today
+            };
+            
+            localStorage.setItem(dayKey, JSON.stringify(dayData));
+        }
+        
         function addDailyXP(xp) {
             const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
             const lastDate = localStorage.getItem('lastDailyGoalDate');
@@ -1759,6 +1780,11 @@
             if (lastDate !== today && lastDate !== todayOldFormat) {
                 localStorage.setItem('dailyXP', '0');
                 localStorage.setItem('lastDailyGoalDate', today);
+                
+                // Günlük verileri sıfırla
+                localStorage.setItem('dailyHasene', '0');
+                localStorage.setItem('dailyCorrect', '0');
+                localStorage.setItem('dailyWrong', '0');
             }
             
             const currentXP = parseInt(localStorage.getItem('dailyHasene')) || 0;
@@ -1766,6 +1792,9 @@
             const newXP = currentXP + xp;
             
             localStorage.setItem('dailyHasene', newXP.toString());
+            
+            // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
+            saveDailyStats();
             
             // Hedef tamamlandıysa
             if (currentXP < goalXP && newXP >= goalXP) {
@@ -4589,8 +4618,15 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Bugünkü toplam doğru cevap sayısını güncelle
             dailyTasks.todayStats.toplamDogru++;
             
+            // Daily correct sayısını localStorage'a kaydet (detaylı istatistikler için)
+            const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+            localStorage.setItem('dailyCorrect', (currentDailyCorrect + 1).toString());
+            
             // Daily XP ekle
             addDailyXP(points);
+            
+            // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
+            saveDailyStats();
             
             // Doğru cevap sesi
             playSound('correct');
@@ -4644,6 +4680,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             if (dailyTasks && dailyTasks.todayStats) {
                 dailyTasks.todayStats.toplamYanlis = (dailyTasks.todayStats.toplamYanlis || 0) + 1;
             }
+            
+            // Daily wrong sayısını localStorage'a kaydet (detaylı istatistikler için)
+            const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+            localStorage.setItem('dailyWrong', (currentDailyWrong + 1).toString());
+            
+            // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
+            saveDailyStats();
             
             // Yanlış cevap sesi
             playSound('wrong');
