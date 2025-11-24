@@ -2847,6 +2847,9 @@ body.dark-mode .bosluk-mode .feedback {
     max-width: 500px !important;
     width: 90% !important;
     text-align: left !important;
+    /* Aydınlık mod için default */
+    background: #ffffff;
+    color: #222;
 }
 
 .calendar-content::-webkit-scrollbar {
@@ -2867,6 +2870,41 @@ body.dark-mode .bosluk-mode .feedback {
     background: #4db300;
 }
 
+/* Aydınlık mod için explicit kurallar (override dark mode rules) */
+body:not(.dark-mode) .calendar-content {
+    background: #ffffff !important;
+    color: #222 !important;
+}
+
+body:not(.dark-mode) #calendarMonth {
+    color: #1a1a1a !important;
+    border-bottom-color: #e0e0e0 !important;
+}
+
+body:not(.dark-mode) #weeklyStreakDisplay {
+    background: linear-gradient(135deg, #f7f7f7 0%, #e9ecef 100%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+
+/* ===== DARK MODE - CALENDAR MODAL ===== */
+/* Only apply dark mode when body has .dark-mode class */
+body.dark-mode .calendar-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .calendar-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode .calendar-content::-webkit-scrollbar-thumb {
+    background: #4db300;
+}
+
+body.dark-mode .calendar-content::-webkit-scrollbar-thumb:hover {
+    background: #58cc02;
+}
+
 .modal-btn {
     width:100%;
     background:#F4C430;
@@ -2875,6 +2913,74 @@ body.dark-mode .bosluk-mode .feedback {
     border-radius:12px;
     font-weight:700;
     margin-top:15px;
+}
+
+/* ===== DARK MODE - CALENDAR MODAL SPECIFIC ELEMENTS ===== */
+body.dark-mode #calendarModal .calendar-content {
+    background: #1e1e1e !important;
+}
+
+body.dark-mode #calendarModal > .modal-content > div:first-child > h3 {
+    color: #58cc02 !important;
+}
+
+body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] {
+    background: linear-gradient(135deg, #4db300 0%, #3a9000 100%) !important;
+    box-shadow: 0 4px 12px rgba(77, 179, 0, 0.4) !important;
+}
+
+body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] h3,
+body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] > div {
+    color: white !important;
+    opacity: 1 !important;
+}
+
+body.dark-mode #calendarMonth {
+    color: #e0e0e0 !important;
+    border-bottom-color: #444 !important;
+}
+
+body.dark-mode #weeklyStreakDisplay {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #fff"] {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #f7f7f7"] {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+body.dark-mode #calendarGrid > div[style*="color: #999"] {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #calendarGrid > div[style*="background: #58cc02"],
+body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #58cc02"] {
+    background: #4db300 !important;
+}
+
+body.dark-mode #calendarGrid > div[style*="background: #e5e5e5"],
+body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5e5e5"] {
+    background: #2a2a2a !important;
+    border-color: #2a2a2a !important;
+    color: #666 !important;
+}
+
+body.dark-mode #calendarGrid > div[style*="background: #f7f7f7"] {
+    background: #1a1a1a !important;
+    border-color: #1a1a1a !important;
+    color: #555 !important;
+}
+
+body.dark-mode #calendarGrid > div[style*="background: #e5f4e3"],
+body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e3"] {
+    background: #1e3a1e !important;
+    border-color: #58cc02 !important;
 }
 
 /* ----- RESPONSIVE ----- */

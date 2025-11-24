@@ -799,7 +799,7 @@
 
     <!-- Takvim Modal - Duolingo Style -->
     <div class="modal" id="calendarModal" onclick="handleCalendarModalClick(event)" role="dialog" aria-modal="true" aria-labelledby="calendarModalTitle" aria-label="Takvim modalı">
-        <div class="modal-content calendar-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; background: #ffffff; border-radius: 16px; touch-action: pan-y;">
+        <div class="modal-content calendar-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 24px; border-radius: 16px; touch-action: pan-y;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #58cc02;">📅 Takvim</h3>
@@ -6357,7 +6357,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Eğer takvim açıksa otomatik yenile (mavi -> yeşil)
                 const calendarModal = document.getElementById('calendarModal');
                 if (calendarModal && calendarModal.style.display === 'flex') {
-                    generateCalendar();
+                    generateWeeklyStreakDisplay();
+                    generateMonthlyCalendar();
                 }
             }
         }
@@ -6388,7 +6389,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Aylık takvimi oluştur
                 generateMonthlyCalendar();
                 
-                
+                // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
+                initCalendarModalTouchEvents();
                 
                 // Validasyon kontrolü (sadece debug modunda)
                 if (typeof log !== 'undefined' && log.debug) {
@@ -6705,6 +6707,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     streakData.playDates = streakData.playDates || [];
                 }
                 
+                // Dark mode kontrolü
+                const isDarkMode = document.body.classList.contains('dark-mode') || 
+                                 window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
                 // Son 7 günü hesapla (Pazartesi'den başlayacak şekilde)
                 const today = new Date();
                 const weekDays = [];
@@ -6746,7 +6752,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Gün isimleri (üst satır)
             html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;">';
             weekDays.forEach(day => {
-                const dayColor = day.isToday ? '#58cc02' : '#999';
+                const dayColor = day.isToday ? '#58cc02' : (isDarkMode ? '#b0b0b0' : '#999');
                 const fontWeight = day.isToday ? '700' : '400';
                 html += `<div style="text-align: center; font-size: 0.75em; color: ${dayColor}; font-weight: ${fontWeight};">${day.dayName}</div>`;
             });
@@ -6766,17 +6772,21 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
                     } else {
                         // Bugün henüz oynanmadı - mavi kenarlık
-                        boxStyle += ' background: #e5f4e3; color: #58cc02; border: 2px solid #58cc02;';
+                        const todayBg = isDarkMode ? '#1e3a1e' : '#e5f4e3';
+                        boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
                     }
                 } else if (isInStreak && hasPlayed) {
                     // Streak günü - altın/yeşil (Duolingo style)
                     boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700;';
                 } else if (hasPlayed) {
                     // Oynandı ama streak dışında - yeşil
-                    boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
+                    const playedBg = isDarkMode ? '#4db300' : '#58cc02';
+                    boxStyle += ` background: ${playedBg}; color: white; border: 2px solid ${playedBg};`;
                 } else {
                     // Oynanmadı - gri
-                    boxStyle += ' background: #e5e5e5; color: #999; border: 2px solid #e5e5e5;';
+                    const emptyBg = isDarkMode ? '#2a2a2a' : '#e5e5e5';
+                    const emptyColor = isDarkMode ? '#666' : '#999';
+                    boxStyle += ` background: ${emptyBg}; color: ${emptyColor}; border: 2px solid ${emptyBg};`;
                 }
                 
                 const icon = hasPlayed ? '✓' : '';
@@ -6824,6 +6834,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     streakData.playDates = streakData.playDates || [];
                 }
                 
+                // Dark mode kontrolü
+                const isDarkMode = document.body.classList.contains('dark-mode') || 
+                                 window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
                 const today = new Date();
                 const year = today.getFullYear();
                 const month = today.getMonth();
@@ -6861,8 +6875,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Haftanın günlerini ekle (Duolingo style - üst satır)
             // Pazartesi'den başlayan gün isimleri (haftalık takvim ile uyumlu)
             const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
+            const dayNameColor = isDarkMode ? '#b0b0b0' : '#999';
             dayNames.forEach(day => {
-                html += `<div style="text-align: center; font-weight: 600; font-size: 0.75em; color: #999; padding: 8px 0; display: flex; align-items: center; justify-content: center;">${day}</div>`;
+                html += `<div style="text-align: center; font-weight: 600; font-size: 0.75em; color: ${dayNameColor}; padding: 8px 0; display: flex; align-items: center; justify-content: center;">${day}</div>`;
             });
             
             // Ayın ilk gününün haftanın hangi günü olduğunu bul
@@ -6898,20 +6913,26 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02; box-shadow: 0 2px 8px rgba(88, 204, 2, 0.3);';
                     } else {
                         // Bugün henüz oynanmadı - mavi kenarlık
-                        boxStyle += ' background: #e5f4e3; color: #58cc02; border: 2px solid #58cc02;';
+                        const todayBg = isDarkMode ? '#1e3a1e' : '#e5f4e3';
+                        boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
                     }
                 } else if (isInStreak && hasPlayed) {
                     // Streak günü - altın (Duolingo style)
                     boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);';
                 } else if (hasPlayed) {
                     // Oynandı ama streak dışında - yeşil
-                    boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
+                    const playedBg = isDarkMode ? '#4db300' : '#58cc02';
+                    boxStyle += ` background: ${playedBg}; color: white; border: 2px solid ${playedBg};`;
                 } else if (day < todayDate) {
                     // Geçmiş gün - oynanmadı - gri
-                    boxStyle += ' background: #e5e5e5; color: #999; border: 2px solid #e5e5e5;';
+                    const pastBg = isDarkMode ? '#2a2a2a' : '#e5e5e5';
+                    const pastColor = isDarkMode ? '#666' : '#999';
+                    boxStyle += ` background: ${pastBg}; color: ${pastColor}; border: 2px solid ${pastBg};`;
                 } else {
                     // Gelecek gün - açık gri
-                    boxStyle += ' background: #f7f7f7; color: #ccc; border: 2px solid #f7f7f7;';
+                    const futureBg = isDarkMode ? '#1a1a1a' : '#f7f7f7';
+                    const futureColor = isDarkMode ? '#555' : '#ccc';
+                    boxStyle += ` background: ${futureBg}; color: ${futureColor}; border: 2px solid ${futureBg};`;
                 }
                 
                 const content = hasPlayed ? '✓' : day;
