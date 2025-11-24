@@ -8719,6 +8719,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Karışık modda currentGameData kullan
             const dataSource = currentGameData || kelimeBulData || [];
             
+            // Güvenlik kontrolü
+            if (!dataSource || dataSource.length === 0) {
+                log.error('❌ Dinle ve Bul: Veri kaynağı bulunamadı!');
+                showCustomAlert('Oyun verileri yüklenemedi! Sayfayı yenileyin.', 'error');
+                return;
+            }
+            
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
             let filteredData = dataSource.filter(w => 
@@ -8770,6 +8777,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Karışık modda currentGameData kullan
             const dataSource = currentGameData || kelimeBulData || [];
+            
+            // Güvenlik kontrolü
+            if (!dataSource || dataSource.length === 0) {
+                log.error('❌ Boşluk Doldur: Veri kaynağı bulunamadı!');
+                showCustomAlert('Oyun verileri yüklenemedi! Sayfayı yenileyin.', 'error');
+                return;
+            }
             
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
@@ -8830,6 +8844,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Karışık modda currentGameData kullan
             const dataSource = currentGameData || kelimeBulData || [];
+            
+            // Güvenlik kontrolü
+            if (!dataSource || dataSource.length === 0) {
+                log.error('❌ Kelime Çevir: Veri kaynağı bulunamadı!');
+                showCustomAlert('Oyun verileri yüklenemedi! Sayfayı yenileyin.', 'error');
+                return;
+            }
             
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
@@ -8894,6 +8915,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // ÖNEMLI: currentGameData'ya ata (diğer fonksiyonlar bunu kullanıyor)
             currentGameData = kelimeBulData;
+            log.game(`✅ currentGameData atandı: ${currentGameData.length} kelime`);
             
             // Karışık soru havuzu oluştur (CONFIG'den)
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
