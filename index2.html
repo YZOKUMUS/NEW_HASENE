@@ -8684,6 +8684,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             // Soru tipi badge'ini güncelle
             const badge = document.getElementById('questionTypeBadge');
             if (badge) {
+                badge.style.display = 'block'; // Görünür yap
                 if (questionType === 'kelime') {
                     badge.textContent = '🔄 Kelime Çevir';
                     badge.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
@@ -8701,9 +8702,111 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             log.game(`📋 Soru ${window.mixedQuestionIndex}/10 - Tip: ${questionType}`);
             
-            // İlgili soru tipini yükle (mevcut kodları kullan)
-            // Not: Şimdilik sadece kelime çevir yükle, diğerleri için ek kod gerekebilir
-            loadStandardQuestion();
+            // ÖNEMLI: Soru tipine göre FARKLI fonksiyonlar çağır!
+            if (questionType === 'kelime') {
+                loadStandardQuestion(); // Kelime Çevir
+            } else if (questionType === 'dinle') {
+                loadDinleQuestion(); // Dinle ve Bul
+            } else if (questionType === 'bosluk') {
+                loadBoslukQuestion(); // Boşluk Doldur
+            }
+        }
+        
+        // ============ DİNLE VE BUL SORU YÜKLEME ============
+        function loadDinleQuestion() {
+            log.game('🎧 Dinle ve Bul sorusu yükleniyor...');
+            
+            // Zorluk filtreleme
+            const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
+            let filteredData = kelimeBulData.filter(w => 
+                w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
+            );
+            
+            if (filteredData.length === 0) {
+                filteredData = kelimeBulData;
+            }
+            
+            // Rastgele kelime seç
+            currentQuestion = filteredData[Math.floor(Math.random() * filteredData.length)];
+            
+            // UI güncelle
+            elements.arabicWord.textContent = '🔊 Dinle ve Kelimeyi Bul';
+            elements.sureInfo.textContent = `${currentQuestion.sure_adi} ${currentQuestion.sure_no}:${currentQuestion.ayet_no}`;
+            
+            // Seçenekler oluştur (Arapça kelimeler)
+            const wrongAnswers = getWrongAnswers(3);
+            let allOptions = [
+                { text: currentQuestion.kelime, correct: true },
+                ...wrongAnswers.map(w => ({ text: w.kelime, correct: false }))
+            ];
+            
+            // Karıştır
+            allOptions = shuffleArray(allOptions);
+            
+            // Seçenekleri göster
+            elements.options.innerHTML = '';
+            allOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('option-btn');
+                button.onclick = () => checkAnswer(button, option.correct);
+                elements.options.appendChild(button);
+            });
+            
+            // Ses çal (otomatik)
+            if (currentQuestion.ses_url) {
+                playSoundFromUrl(currentQuestion.ses_url);
+            }
+            
+            updateUI();
+        }
+        
+        // ============ BOŞLUK DOLDUR SORU YÜKLEME ============
+        function loadBoslukQuestion() {
+            log.game('✏️ Boşluk Doldur sorusu yükleniyor...');
+            
+            // Zorluk filtreleme
+            const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
+            let filteredData = kelimeBulData.filter(w => 
+                w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
+            );
+            
+            if (filteredData.length === 0) {
+                filteredData = kelimeBulData;
+            }
+            
+            // Rastgele kelime seç
+            currentQuestion = filteredData[Math.floor(Math.random() * filteredData.length)];
+            
+            // Ayet metninde kelimeyi boşluk ile değiştir
+            const ayetText = currentQuestion.ayet || `... ${currentQuestion.kelime} ...`;
+            const ayetWithBlank = ayetText.replace(currentQuestion.kelime, '_____');
+            
+            // UI güncelle
+            elements.arabicWord.textContent = ayetWithBlank;
+            elements.sureInfo.textContent = `${currentQuestion.sure_adi} ${currentQuestion.sure_no}:${currentQuestion.ayet_no} - Boşluğu doldur`;
+            
+            // Seçenekler oluştur (Arapça kelimeler)
+            const wrongAnswers = getWrongAnswers(3);
+            let allOptions = [
+                { text: currentQuestion.kelime, correct: true },
+                ...wrongAnswers.map(w => ({ text: w.kelime, correct: false }))
+            ];
+            
+            // Karıştır
+            allOptions = shuffleArray(allOptions);
+            
+            // Seçenekleri göster
+            elements.options.innerHTML = '';
+            allOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('option-btn');
+                button.onclick = () => checkAnswer(button, option.correct);
+                elements.options.appendChild(button);
+            });
+            
+            updateUI();
         }
         
         // Standart soru yükleme (eski loadQuestion mantığı)
