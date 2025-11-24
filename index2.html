@@ -8828,14 +8828,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             const mode = CONFIG.gameModes.klasik; // Karışık modda klasik mod kullan
             
+            // Karışık modda currentGameData kullan
+            const dataSource = currentGameData || kelimeBulData || [];
+            
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-            let filteredData = kelimeBulData.filter(w => 
+            let filteredData = dataSource.filter(w => 
                 w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
             );
             
             if (filteredData.length === 0) {
-                filteredData = kelimeBulData;
+                filteredData = dataSource;
             }
             
             // Akıllı kelime seçimi
@@ -8888,6 +8891,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 showCustomAlert('Kelime verileri yüklenemedi!', 'error');
                 return;
             }
+            
+            // ÖNEMLI: currentGameData'ya ata (diğer fonksiyonlar bunu kullanıyor)
+            currentGameData = kelimeBulData;
             
             // Karışık soru havuzu oluştur (CONFIG'den)
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
@@ -10098,7 +10104,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         // ============ YANLIŞ CEVAPLAR ============
         function getWrongAnswers(count) {
             const wrong = [];
-            const filtered = kelimeBulData.filter(w => w.id !== currentQuestion.id);
+            const dataSource = currentGameData || kelimeBulData || [];
+            const filtered = dataSource.filter(w => w.id !== currentQuestion.id);
             
             while (wrong.length < count && filtered.length > 0) {
                 const idx = Math.floor(Math.random() * filtered.length);
