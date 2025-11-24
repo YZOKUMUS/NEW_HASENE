@@ -3,6 +3,14 @@
 // sanitizeHTML, safeSetHTML, showLoading, hideLoading, encryptData, decryptData,
 // secureSetItem, secureGetItem, showCustomAlert fonksiyonları kullanılabilir
 
+// ============ HELPER FUNCTIONS ============
+// ⚡ SPEED ANIMATIONS SYSTEM
+function addSpeedAnimation(element, type = 'fade-in') {
+    if (!element) return;
+    element.classList.add(`speed-${type}`);
+    setTimeout(() => element.classList.remove(`speed-${type}`), 600);
+}
+
 // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
 /**
  * StorageManager - Merkezi LocalStorage yönetimi
