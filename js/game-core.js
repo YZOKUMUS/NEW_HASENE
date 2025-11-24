@@ -2725,6 +2725,118 @@ function showAchievementUnlock(achievement) {
 // Veri değişkenleri artık js/data-loader.js'de tanımlı (lazy loading için)
 // kelimeBulData, ayetOkuData, duaData, hadisData global olarak erişilebilir
 
+// ============ MERKEZI GAME STATE (Tüm oyun durumu burada) ============
+/**
+ * gameState - Tüm oyun durumunu tek bir objede toplar
+ * Avantajlar:
+ * - Merkezi state yönetimi
+ * - Kolay debug (tek objede tüm state)
+ * - Daha iyi performans izleme
+ * - State history tutma imkanı
+ */
+const gameState = {
+    // === CURRENT QUESTION STATE ===
+    question: {
+        current: null,
+        ayetIndex: 0,
+        duaIndex: 0,
+        hadisIndex: 0,
+        count: 0,
+        hintUsed: false,
+        recentAnswerPositions: []  // Son 10 sorunun doğru cevap pozisyonları
+    },
+    
+    // === QUESTION COUNTS PER GAME TYPE ===
+    questionCounts: {
+        ayet: 0,
+        dua: 0,
+        hadis: 0,
+        dinle: 0,
+        bosluk: 0
+    },
+    
+    // === SESSION STATE (Mevcut oyun oturumu) ===
+    session: {
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        comboCount: 0,
+        startTime: null
+    },
+    
+    // === GAME TYPE SCORES ===
+    gameScores: {
+        kelimeCevir: { score: 0, correct: 0, wrong: 0 },
+        dinleBul: { score: 0, correct: 0, wrong: 0 },
+        boslukDoldur: { score: 0, correct: 0, wrong: 0 }
+    },
+    
+    // === GLOBAL (PERSISTENT) STATE ===
+    global: {
+        totalPoints: 0,
+        starPoints: 0,
+        level: 1,
+        badges: {
+            bronze: 0,
+            silver: 0,
+            gold: 0,
+            diamond: 0
+        },
+        streak: {
+            currentStreak: 0,
+            bestStreak: 0,
+            lastPlayDate: '',
+            totalPlayDays: 0,
+            dailyGoal: 5,
+            todayProgress: 0,
+            todayDate: '',
+            playDates: []
+        },
+        dailyTasks: {
+            lastTaskDate: '',
+            tasks: [],
+            bonusTasks: [],
+            completedTasks: [],
+            rewardsClaimed: false,
+            todayStats: {
+                kelimeCevir: 0,
+                dinleBul: 0,
+                boslukDoldur: 0,
+                ayetOku: 0,
+                duaOgre: 0,
+                hadisOku: 0,
+                toplamDogru: 0,
+                toplamYanlis: 0,
+                toplamPuan: 0,
+                perfectStreak: 0,
+                farklıZorluk: new Set()
+            }
+        }
+    },
+    
+    // === GAME SETTINGS ===
+    settings: {
+        currentMode: CONFIG.defaultMode,
+        currentDifficulty: CONFIG.defaultDifficulty,
+        lives: 0,
+        timeLeft: 0
+    },
+    
+    // === AUDIO/MEDIA STATE ===
+    media: {
+        currentAudio: null,
+        isListening: false
+    },
+    
+    // === TIMERS ===
+    timers: {
+        main: null,
+        questionTimer: null
+    }
+};
+
+// ============ GERIYE UYUMLU DEĞİŞKENLER (Backward Compatibility) ============
+// Mevcut kodu kırmamak için eski değişken isimlerini gameState'e bağlıyoruz
 let currentQuestion = null;
 let currentAyetIndex = 0;
 let currentDuaIndex = 0;
