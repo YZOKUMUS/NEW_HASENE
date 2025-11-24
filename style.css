@@ -2778,6 +2778,29 @@ body.dark-mode #badgesScrollableContent::-webkit-scrollbar-thumb {
     background: #667eea;
 }
 
+/* Badges Modal - Dark Mode Complete Support */
+body.dark-mode #badgesModal .badges-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #badgesModal .badges-header-new {
+    background: linear-gradient(135deg, #4a5eb0 0%, #5a3d76 100%) !important;
+}
+
+body.dark-mode #badgesModal h3,
+body.dark-mode #badgesModal h4 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #badgesModal .badge-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #badgesModal .badge-desc {
+    color: #b0b0b0 !important;
+}
+
 body.dark-mode .badge-card {
     background: #2a2a2a !important;
     border-color: #444 !important;
@@ -3163,6 +3186,142 @@ body.dark-mode #customAlertOKBtn:hover {
 
 body.dark-mode .custom-confirm .modal-content {
     background: #1e1e1e !important;
+}
+
+/* ===== DARK MODE - DAILY TASKS MODAL ===== */
+body.dark-mode #dailyTasksModal .modal-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #dailyTasksModal h3 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-card {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-card.completed {
+    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
+    border-color: #4caf50 !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-desc {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-reward {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #dailyTasksModal .daily-task-progress-bar {
+    background: #1a1a1a !important;
+}
+
+body.dark-mode #dailyTasksModal #dailyTasksScrollableContent::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode #dailyTasksModal #dailyTasksScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+}
+
+/* ===== DARK MODE - STATS MODAL ===== */
+body.dark-mode #statsModal .modal-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #statsModal h3 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #statsModal h4 {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #statsModal .stat-value {
+    color: #ffffff !important;
+}
+
+body.dark-mode #statsModal .stat-label {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #statsModal #statsScrollableContent::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode #statsModal #statsScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+}
+
+/* ===== DARK MODE - ONBOARDING MODAL ===== */
+body.dark-mode #onboardingModal .onboarding-modal {
+    background: rgba(26, 26, 26, 0.98) !important;
+}
+
+body.dark-mode #onboardingModal .modal-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #onboardingModal h2 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #onboardingModal p {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #onboardingModal button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+}
+
+/* ===== DARK MODE - GAME OVER MODAL ===== */
+body.dark-mode #gameOverModal {
+    background: rgba(26, 26, 26, 0.95) !important;
+}
+
+body.dark-mode #gameOverModal .modal-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #gameOverModal h3 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #gameOverModal button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+}
+
+/* ===== DARK MODE - GENEL MODAL ===== */
+body.dark-mode #modal {
+    background: rgba(26, 26, 26, 0.95) !important;
+}
+
+body.dark-mode #modal .modal-content {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #modal h3,
+body.dark-mode #modal h2 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #modal p {
+    color: #b0b0b0 !important;
 }
 
 body.dark-mode .custom-confirm-title {
