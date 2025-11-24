@@ -1087,6 +1087,113 @@ body.dark-mode .game-card {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* ============ DARK MODE - ANA MENÜ KARTLARI (Analytics Cards) ============ */
+
+/* Günlük Hedef Durumu - Sarı gradient kart */
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] {
+    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #333"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"] {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #856404"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] strong {
+    color: #ffffff !important;
+}
+
+/* Kelime Ameli - Gri kart */
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] {
+    background: #1f2937 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #333"] {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #27ae60"] {
+    color: #34d399 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #e74c3c"] {
+    color: #f87171 !important;
+}
+
+/* Öğrenme Haritası - Mavi-pembe gradient kart */
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d1f3d 100%) !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
+    color: #d1d5db !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #27ae60"] {
+    color: #34d399 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #e74c3c"] {
+    color: #f87171 !important;
+}
+
+/* Liderlik Tablosu - Sarı gradient kart */
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] {
+    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"] {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
+    color: #fbbf24 !important;
+}
+
+/* Liderlik Tablosu başlığı */
+body.dark-mode #mainMenu h4[style*="color: #667eea"] {
+    color: #818cf8 !important;
+}
+
+/* Liderlik listesi boş mesaj */
+body.dark-mode #mainMenu div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Liderlik tablosu notu (gri kutu) */
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"][style*="color: #666"] {
+    background: #1f2937 !important;
+    color: #d1d5db !important;
+}
+
 .game-card::before {
     content: '';
     position: absolute;
