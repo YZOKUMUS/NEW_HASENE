@@ -8798,8 +8798,26 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             log.game('✅ Karışık sorular hazır:', shuffled);
             
-            // İlk soruyu başlat
-            startGame();
+            // Session değişkenlerini sıfırla
+            sessionScore = 0;
+            sessionCorrect = 0;
+            sessionWrong = 0;
+            questionCount = 0;
+            comboCount = 0;
+            
+            // Ekranları ayarla
+            if (elements.modeSelector) elements.modeSelector.style.display = 'none';
+            if (elements.mainMenu) elements.mainMenu.style.display = 'none';
+            if (elements.gameScreen) elements.gameScreen.style.display = 'block';
+            
+            // Navigasyon bar'ı gizle
+            hideBottomNavBar();
+            
+            // UI güncelle
+            updateUI();
+            
+            // İlk soruyu yükle
+            loadQuestion();
         }
         
         // Kelime Çevir modu - oyun modları seçici ile başlar (ESKİ)
