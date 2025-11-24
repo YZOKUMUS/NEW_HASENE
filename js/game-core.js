@@ -4103,6 +4103,11 @@ if (typeof getWeeklyScores === 'function' && typeof getMonthlyScores === 'functi
     localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
     localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
 }
+
+// Liderlik tablosunu sıfırlanmış değerlerle güncelle
+if (typeof updateLeaderboard === 'function') {
+    updateLeaderboard();
+}
     } catch(e) {
 log.error('Liderlik tablosu güncelleme hatası:', e);
     }
