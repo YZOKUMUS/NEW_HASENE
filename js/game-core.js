@@ -83,46 +83,6 @@ function updateArabicTextColoring() {
     // Hata önleme için
 }
 
-// 🏠 NAVIGATION - ANA MENÜ
-function goToMainMenu() {
-    log.debug('🏠 Ana menüye dönülüyor...');
-    
-    // Timer varsa durdur
-    if (typeof stopTimer === 'function') {
-        stopTimer();
-    }
-    
-    // Oyun seslerini durdur
-    if (typeof currentAudio !== 'undefined' && currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    
-    // Tüm modalları kapat
-    closeAllModals();
-    
-    // Tüm oyun modlarını gizle
-    hideAllModes();
-    
-    // Ana menüyü göster
-    if (elements.mainMenu) {
-        elements.mainMenu.style.display = 'block';
-    } else {
-        const mainMenu = document.getElementById('mainMenu');
-        if (mainMenu) mainMenu.style.display = 'block';
-    }
-    
-    // Navigasyon bar'ı göster
-    showBottomNavBar();
-    
-    // Settings butonunu gizle (ana menüde gerekmez)
-    if (elements.settingsBtn) {
-        elements.settingsBtn.style.display = 'none';
-    }
-    
-    log.debug('✅ Ana menü gösterildi');
-}
-
 // 🌙 DARK MODE TOGGLE
 function toggleDarkMode() {
     const body = document.body;
@@ -154,7 +114,6 @@ function toggleDarkMode() {
 
 // Global erişim için (inline onclick handlers için gerekli)
 window.updateArabicTextColoring = updateArabicTextColoring;
-window.goToMainMenu = goToMainMenu;
 window.toggleDarkMode = toggleDarkMode;
 
 // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
@@ -3165,6 +3124,49 @@ function hideAllModes() {
         }
     });
 }
+
+// 🏠 NAVIGATION - ANA MENÜ
+function goToMainMenu() {
+    log.debug('🏠 Ana menüye dönülüyor...');
+    
+    // Timer varsa durdur
+    if (typeof stopTimer === 'function') {
+        stopTimer();
+    }
+    
+    // Oyun seslerini durdur
+    if (typeof currentAudio !== 'undefined' && currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    // Tüm modalları kapat
+    closeAllModals();
+    
+    // Tüm oyun modlarını gizle
+    hideAllModes();
+    
+    // Ana menüyü göster
+    if (elements.mainMenu) {
+        elements.mainMenu.style.display = 'block';
+    } else {
+        const mainMenu = document.getElementById('mainMenu');
+        if (mainMenu) mainMenu.style.display = 'block';
+    }
+    
+    // Navigasyon bar'ı göster
+    showBottomNavBar();
+    
+    // Settings butonunu gizle (ana menüde gerekmez)
+    if (elements.settingsBtn) {
+        elements.settingsBtn.style.display = 'none';
+    }
+    
+    log.debug('✅ Ana menü gösterildi');
+}
+
+// Global erişim için
+window.goToMainMenu = goToMainMenu;
 
 function playAudio(audioUrl, button) {
     // Eğer ses çalıyorsa durdur
