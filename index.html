@@ -1835,6 +1835,117 @@
         const storage = new StorageManager();
 
         /**
+         * DOM Helper - Güvenli DOM element erişimi ve güncelleme
+         * Null safety ile hata riski azaltılır
+         */
+        const DOM = {
+            /**
+             * Element'i güvenli şekilde al
+             * @param {string} id - Element ID
+             * @param {string} context - Hata mesajında gösterilecek context
+             * @returns {HTMLElement|null}
+             */
+            get(id, context = '') {
+                const el = document.getElementById(id);
+                if (!el && context) {
+                    log.warn(`⚠️ Element bulunamadı: ${id} ${context ? `(${context})` : ''}`);
+                }
+                return el;
+            },
+
+            /**
+             * Text content'i güvenli şekilde güncelle
+             * @param {string} id - Element ID
+             * @param {string} value - Yeni text değeri
+             * @returns {boolean} - Başarılı mı?
+             */
+            setText(id, value) {
+                const el = this.get(id);
+                if (el) {
+                    el.textContent = value;
+                    return true;
+                }
+                return false;
+            },
+
+            /**
+             * HTML content'i güvenli şekilde güncelle
+             * @param {string} id - Element ID
+             * @param {string} html - Yeni HTML değeri
+             * @returns {boolean} - Başarılı mı?
+             */
+            setHTML(id, html) {
+                const el = this.get(id);
+                if (el) {
+                    el.innerHTML = html;
+                    return true;
+                }
+                return false;
+            },
+
+            /**
+             * Class ekle (güvenli)
+             * @param {string} id - Element ID
+             * @param {string} className - Eklenecek class
+             * @returns {boolean} - Başarılı mı?
+             */
+            addClass(id, className) {
+                const el = this.get(id);
+                if (el) {
+                    el.classList.add(className);
+                    return true;
+                }
+                return false;
+            },
+
+            /**
+             * Class kaldır (güvenli)
+             * @param {string} id - Element ID
+             * @param {string} className - Kaldırılacak class
+             * @returns {boolean} - Başarılı mı?
+             */
+            removeClass(id, className) {
+                const el = this.get(id);
+                if (el) {
+                    el.classList.remove(className);
+                    return true;
+                }
+                return false;
+            },
+
+            /**
+             * Style güncelle (güvenli)
+             * @param {string} id - Element ID
+             * @param {string} property - CSS property
+             * @param {string} value - CSS value
+             * @returns {boolean} - Başarılı mı?
+             */
+            setStyle(id, property, value) {
+                const el = this.get(id);
+                if (el) {
+                    el.style[property] = value;
+                    return true;
+                }
+                return false;
+            },
+
+            /**
+             * Birden fazla element için text güncelle
+             * @param {Object} updates - { elementId: value, ... }
+             * @returns {number} - Başarılı güncelleme sayısı
+             */
+            setTextBatch(updates) {
+                let successCount = 0;
+                for (const [id, value] of Object.entries(updates)) {
+                    if (this.setText(id, value)) {
+                        successCount++;
+                    }
+                }
+                return successCount;
+            }
+        };
+
+        /**
          * EventListenerManager - Memory leak'leri önlemek için merkezi event listener yönetimi
          * WeakMap kullanarak elementler için listener'ları takip eder
          */
@@ -2085,7 +2196,7 @@
                 return;
             }
             
-            // Progress bar güncelle (yeni minimal tasarım için)
+            // Progress bar güncelle (yeni minimal tasarım için) - DOM helper ile güvenli
             const progressBar = document.querySelector('.daily-goal-card .progress-bar');
             const progressBarMinimal = document.querySelector('.progress-fill-minimal');
             if (progressBar) {
@@ -2099,15 +2210,12 @@
                 progressEl.style.width = progressPercent + '%';
                 progressEl.setAttribute('aria-valuenow', Math.round(progressPercent));
             }
-            if (progressTextEl) {
-                // Minimal tasarım için format: "945 / 2,700"
-                const formattedDailyXP = dailyXP.toLocaleString('tr-TR');
-                const formattedGoalXP = goalXP.toLocaleString('tr-TR');
-                progressTextEl.textContent = formattedDailyXP + ' / ' + formattedGoalXP;
-            }
-            if (goalTextEl) {
-                goalTextEl.textContent = 'Günlük Vird: ' + goalXP + ' Hasene';
-            }
+            
+            // Text güncelle - formatlanmış versiyon
+            const formattedDailyXP = dailyXP.toLocaleString('tr-TR');
+            const formattedGoalXP = goalXP.toLocaleString('tr-TR');
+            DOM.setText('dailyGoalProgressText', `${formattedDailyXP} / ${formattedGoalXP}`);
+            DOM.setText('dailyGoalText', `Günlük Vird: ${goalXP} Hasene`);
             
             // Hedef tamamlandıysa
             if (isCompleted) {
