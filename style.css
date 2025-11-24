@@ -2655,6 +2655,8 @@ body.dark-mode .bosluk-mode .feedback {
     max-width: 500px !important;
     width: 90% !important;
     text-align: left !important;
+    background: #ffffff;
+    color: #222;
 }
 
 .stats-content::-webkit-scrollbar {
@@ -2673,6 +2675,28 @@ body.dark-mode .bosluk-mode .feedback {
 
 .stats-content::-webkit-scrollbar-thumb:hover {
     background: #5568d3;
+}
+
+/* ===== DARK MODE - STATS MODAL ===== */
+body.dark-mode .stats-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .stats-content h3 {
+    color: #667eea !important;
+}
+
+body.dark-mode .stats-content::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode .stats-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+}
+
+body.dark-mode .stats-content::-webkit-scrollbar-thumb:hover {
+    background: #7d8fff;
 }
 
 /* Badges Modal - Özel Stil */
@@ -2698,6 +2722,82 @@ body.dark-mode .bosluk-mode .feedback {
 
 .badges-content::-webkit-scrollbar-thumb:hover {
     background: #5568d3;
+}
+
+/* ===== DARK MODE - BADGES MODAL ===== */
+body.dark-mode .badges-container {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .badges-header {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+    border-bottom-color: #444 !important;
+}
+
+body.dark-mode .badges-header h2 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .stats-summary {
+    background: #2a2a2a !important;
+}
+
+body.dark-mode .stat-item {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .stat-value {
+    color: #ffffff !important;
+}
+
+body.dark-mode .stat-label {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .category-tabs {
+    background: #2a2a2a !important;
+    border-bottom-color: #444 !important;
+}
+
+body.dark-mode .category-tab {
+    color: #b0b0b0 !important;
+    background: transparent !important;
+}
+
+body.dark-mode .category-tab.active {
+    color: #667eea !important;
+    border-bottom-color: #667eea !important;
+}
+
+body.dark-mode #badgesScrollableContent::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+body.dark-mode #badgesScrollableContent::-webkit-scrollbar-thumb {
+    background: #667eea;
+}
+
+body.dark-mode .badge-card {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .badge-card.unlocked {
+    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
+    border-color: #4db300 !important;
+}
+
+body.dark-mode .badge-title {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .badge-desc {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .badge-status {
+    color: #b0b0b0 !important;
 }
 
 /* Badges Modal - Yeni Duolingo Tarzı Tasarım */
@@ -2884,6 +2984,213 @@ body:not(.dark-mode) #calendarMonth {
 body:not(.dark-mode) #weeklyStreakDisplay {
     background: linear-gradient(135deg, #f7f7f7 0%, #e9ecef 100%) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+
+/* ===== DARK MODE - DAILY TASKS MODAL ===== */
+body.dark-mode .daily-tasks-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .daily-tasks-header {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
+    border-bottom-color: #444 !important;
+}
+
+body.dark-mode .daily-tasks-title {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .daily-tasks-progress-card {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .daily-tasks-progress-title {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .daily-tasks-progress-count {
+    color: #ffffff !important;
+}
+
+body.dark-mode .daily-tasks-progress-total {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .daily-tasks-progress-bar-container {
+    background: #1a1a1a !important;
+}
+
+body.dark-mode .daily-tasks-progress-bar {
+    background: linear-gradient(90deg, #4db300 0%, #58cc02 100%) !important;
+}
+
+body.dark-mode .daily-tasks-section {
+    background: transparent !important;
+}
+
+body.dark-mode .daily-tasks-section-title {
+    color: #e0e0e0 !important;
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .daily-tasks-section-title.bonus {
+    background: linear-gradient(135deg, #3a3a00 0%, #2a2a00 100%) !important;
+}
+
+body.dark-mode .task-card {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .task-card.completed {
+    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
+    border-color: #4db300 !important;
+}
+
+body.dark-mode .task-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .task-desc {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .task-progress {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .daily-tasks-reward-section {
+    background: linear-gradient(135deg, #2a2a00 0%, #1e1e00 100%) !important;
+    border-color: #ffd700 !important;
+}
+
+body.dark-mode .daily-tasks-reward-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .daily-tasks-reward-desc {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .daily-tasks-reward-btn {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
+    color: #1a1a1a !important;
+}
+
+/* ===== DARK MODE - DAILY GOAL MODAL ===== */
+body.dark-mode #dailyGoalModal .modal-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #dailyGoalModal h3 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #dailyGoalModal p {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .goal-option {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .goal-option:hover {
+    background: #333 !important;
+    border-color: #58cc02 !important;
+}
+
+body.dark-mode .goal-option.selected {
+    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
+    border-color: #58cc02 !important;
+}
+
+/* ===== DARK MODE - XP INFO MODAL ===== */
+body.dark-mode #xpInfoModal .modal-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #xpInfoModal h3 {
+    color: #667eea !important;
+}
+
+body.dark-mode #xpInfoModal h4 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #xpInfoModal p,
+body.dark-mode #xpInfoModal li {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #xpInfoModal strong {
+    color: #ffffff !important;
+}
+
+body.dark-mode .xp-info-section {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+/* ===== DARK MODE - CUSTOM ALERT MODAL ===== */
+body.dark-mode #customAlertModal .modal-content {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #customAlertTitle {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode #customAlertMessage {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode #customAlertOKBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #customAlertOKBtn:hover {
+    background: linear-gradient(135deg, #7d8fff 0%, #8d5bb2 100%) !important;
+}
+
+body.dark-mode .custom-confirm .modal-content {
+    background: #1e1e1e !important;
+}
+
+body.dark-mode .custom-confirm-title {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .custom-confirm-message {
+    color: #b0b0b0 !important;
+}
+
+body.dark-mode .custom-confirm-btn {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .custom-confirm-btn:hover {
+    background: #333 !important;
+}
+
+body.dark-mode .custom-confirm-btn.confirm {
+    background: linear-gradient(135deg, #4db300 0%, #58cc02 100%) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .custom-confirm-btn.cancel {
+    background: linear-gradient(135deg, #d32f2f 0%, #e74c3c 100%) !important;
+    color: #ffffff !important;
 }
 
 /* ===== DARK MODE - CALENDAR MODAL ===== */
