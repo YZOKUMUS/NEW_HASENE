@@ -3864,9 +3864,11 @@ try {
     try {
 localStorage.removeItem('hasene_weeklyScores');
 localStorage.removeItem('hasene_monthlyScores');
+localStorage.removeItem('haseneLeaderboard'); // Ana liderlik tablosu
 // Boş obje olarak set et (mobil uyumluluk için)
 localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
 localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
+localStorage.setItem('haseneLeaderboard', JSON.stringify([])); // Ana liderlik tablosu boş array
     } catch(e) {
 log.error('Liderlik tablosu sıfırlama hatası:', e);
     }
