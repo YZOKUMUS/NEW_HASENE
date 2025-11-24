@@ -3640,33 +3640,70 @@ body.dark-mode #statsModal div[style*="linear-gradient"][style*="#845EC2"][style
 }
 
 /* Tüm #333 renkli text'ler için genel override (en güçlü) */
-body.dark-mode #statsModal *[style*="color: #333"] {
-    color: #e5e7eb !important;
+body.dark-mode #statsModal *[style*="color: #333"],
+body.dark-mode #statsModal div[style*="color: #333"],
+body.dark-mode #statsModal span[style*="color: #333"],
+body.dark-mode #statsModal strong[style*="color: #333"] {
+    color: #ffffff !important;
 }
 
 /* Tüm #666 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #666"] {
-    color: #d1d5db !important;
+body.dark-mode #statsModal *[style*="color: #666"],
+body.dark-mode #statsModal div[style*="color: #666"],
+body.dark-mode #statsModal span[style*="color: #666"],
+body.dark-mode #statsModal strong[style*="color: #666"] {
+    color: #e5e7eb !important;
 }
 
 /* Tüm #555 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #555"] {
-    color: #d1d5db !important;
+body.dark-mode #statsModal *[style*="color: #555"],
+body.dark-mode #statsModal div[style*="color: #555"],
+body.dark-mode #statsModal span[style*="color: #555"],
+body.dark-mode #statsModal strong[style*="color: #555"] {
+    color: #e5e7eb !important;
 }
 
 /* Tüm #888 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #888"] {
-    color: #9ca3af !important;
+body.dark-mode #statsModal *[style*="color: #888"],
+body.dark-mode #statsModal div[style*="color: #888"],
+body.dark-mode #statsModal span[style*="color: #888"],
+body.dark-mode #statsModal strong[style*="color: #888"] {
+    color: #d1d5db !important;
 }
 
-/* Span elementleri için genel override */
+/* Span elementleri için genel override - daha güçlü */
 body.dark-mode #statsModal span {
-    color: inherit !important;
+    color: #e5e7eb !important;
 }
 
-/* Strong elementleri için genel override */
+body.dark-mode #statsModal span[style*="color: #333"] {
+    color: #ffffff !important;
+}
+
+body.dark-mode #statsModal span[style*="color: #666"] {
+    color: #e5e7eb !important;
+}
+
+/* Strong elementleri için genel override - daha güçlü */
 body.dark-mode #statsModal strong {
-    color: inherit !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode #statsModal strong[style*="color: #333"] {
+    color: #ffffff !important;
+}
+
+/* Div elementleri için genel override */
+body.dark-mode #statsModal div {
+    color: #e5e7eb !important;
+}
+
+/* Font-weight: 500 ve 600 olan text'ler için daha belirgin */
+body.dark-mode #statsModal div[style*="font-weight: 500"],
+body.dark-mode #statsModal div[style*="font-weight: 600"],
+body.dark-mode #statsModal span[style*="font-weight: 500"],
+body.dark-mode #statsModal span[style*="font-weight: 600"] {
+    color: #ffffff !important;
 }
 
 /* Detaylı buton */
