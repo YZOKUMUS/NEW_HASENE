@@ -1966,6 +1966,196 @@
         };
 
         /**
+         * Performance Monitor - Performans izleme ve optimizasyon
+         * Memory, timing ve render performansını izler
+         */
+        const PerformanceMonitor = {
+            enabled: false, // CONFIG.debug true olunca otomatik aktif olur
+            
+            /**
+             * Fonksiyon çalışma süresini ölç
+             * @param {string} name - Fonksiyon adı
+             * @param {Function} fn - Ölçülecek fonksiyon
+             * @returns {*} - Fonksiyonun return değeri
+             */
+            measure(name, fn) {
+                if (!this.enabled) return fn();
+                
+                const start = performance.now();
+                const result = fn();
+                const end = performance.now();
+                const duration = (end - start).toFixed(2);
+                
+                if (duration > 16.67) { // 60 FPS threshold (1000ms / 60fps = 16.67ms)
+                    log.warn(`⚠️ Slow function: ${name} took ${duration}ms (>16.67ms threshold)`);
+                } else {
+                    log.debug(`⏱️ ${name}: ${duration}ms`);
+                }
+                
+                return result;
+            },
+
+            /**
+             * Async fonksiyon çalışma süresini ölç
+             * @param {string} name - Fonksiyon adı
+             * @param {Function} fn - Ölçülecek async fonksiyon
+             * @returns {Promise<*>}
+             */
+            async measureAsync(name, fn) {
+                if (!this.enabled) return await fn();
+                
+                const start = performance.now();
+                const result = await fn();
+                const end = performance.now();
+                const duration = (end - start).toFixed(2);
+                
+                log.debug(`⏱️ ${name} (async): ${duration}ms`);
+                return result;
+            },
+
+            /**
+             * Memory kullanımını raporla
+             */
+            logMemory() {
+                if (!this.enabled || !performance.memory) return;
+                
+                const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(2);
+                const total = (performance.memory.totalJSHeapSize / 1048576).toFixed(2);
+                const limit = (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2);
+                
+                log.debug(`💾 Memory: ${used}MB / ${total}MB (Limit: ${limit}MB)`);
+            },
+
+            /**
+             * Storage kullanımını raporla
+             */
+            logStorage() {
+                if (!this.enabled) return;
+                
+                const stats = storage.getStats();
+                log.debug(`💾 Storage: ${stats.usedMB}MB / ${stats.totalMB}MB (${stats.percent}%) - ${stats.itemCount} items`);
+            },
+
+            /**
+             * Tüm performans metriklerini raporla
+             */
+            report() {
+                if (!this.enabled) return;
+                
+                log.debug('\n📊 === PERFORMANCE REPORT ===');
+                this.logMemory();
+                this.logStorage();
+                log.debug('===========================\n');
+            }
+        };
+
+        /**
+         * Error Boundary - Global hata yakalama ve raporlama
+         * Production'da kullanıcıya friendly mesaj, console'a detaylı log
+         */
+        const ErrorBoundary = {
+            /**
+             * Güvenli fonksiyon wrapper
+             * @param {Function} fn - Çalıştırılacak fonksiyon
+             * @param {*} fallbackValue - Hata durumunda döndürülecek değer
+             * @param {string} context - Hata context'i
+             * @returns {*}
+             */
+            safe(fn, fallbackValue = null, context = 'Unknown') {
+                try {
+                    return fn();
+                } catch (error) {
+                    log.error(`❌ Error in ${context}:`, error);
+                    log.error('Stack trace:', error.stack);
+                    
+                    if (CONFIG.showCriticalErrors) {
+                        showCustomAlert(
+                            `Bir hata oluştu: ${context}`,
+                            'error'
+                        );
+                    }
+                    
+                    return fallbackValue;
+                }
+            },
+
+            /**
+             * Güvenli async fonksiyon wrapper
+             * @param {Function} fn - Çalıştırılacak async fonksiyon
+             * @param {*} fallbackValue - Hata durumunda döndürülecek değer
+             * @param {string} context - Hata context'i
+             * @returns {Promise<*>}
+             */
+            async safeAsync(fn, fallbackValue = null, context = 'Unknown') {
+                try {
+                    return await fn();
+                } catch (error) {
+                    log.error(`❌ Async error in ${context}:`, error);
+                    log.error('Stack trace:', error.stack);
+                    
+                    if (CONFIG.showCriticalErrors) {
+                        showCustomAlert(
+                            `Bir hata oluştu: ${context}`,
+                            'error'
+                        );
+                    }
+                    
+                    return fallbackValue;
+                }
+            },
+
+            /**
+             * Global error handler'ı başlat
+             */
+            init() {
+                // Uncaught errors
+                window.addEventListener('error', (event) => {
+                    log.error('❌ Global error:', event.error);
+                    log.error('  Message:', event.message);
+                    log.error('  File:', event.filename);
+                    log.error('  Line:', event.lineno);
+                    log.error('  Column:', event.colno);
+                    
+                    // Kullanıcıya bildirme
+                    if (CONFIG.showCriticalErrors) {
+                        showCustomAlert(
+                            'Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin.',
+                            'error'
+                        );
+                    }
+                    
+                    return true; // Prevent default error handling
+                });
+                
+                // Unhandled promise rejections
+                window.addEventListener('unhandledrejection', (event) => {
+                    log.error('❌ Unhandled promise rejection:', event.reason);
+                    log.error('  Promise:', event.promise);
+                    
+                    if (CONFIG.showCriticalErrors) {
+                        showCustomAlert(
+                            'Bir işlem başarısız oldu. Lütfen tekrar deneyin.',
+                            'error'
+                        );
+                    }
+                    
+                    event.preventDefault();
+                });
+                
+                log.debug('✅ ErrorBoundary initialized');
+            }
+        };
+
+        // Performance monitoring'i CONFIG.debug ile aktif et
+        if (CONFIG.debug) {
+            PerformanceMonitor.enabled = true;
+            log.debug('⚡ PerformanceMonitor enabled');
+        }
+
+        // Error boundary'yi başlat
+        ErrorBoundary.init();
+
+        /**
          * DOM Helper - Güvenli DOM element erişimi ve güncelleme
          * Null safety ile hata riski azaltılır
          */
