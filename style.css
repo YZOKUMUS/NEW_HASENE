@@ -3821,6 +3821,14 @@ body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e
     flex-direction: column;
 }
 
+/* Dark mode - Ayet, Dua, Hadis mode containers */
+body.dark-mode .ayet-mode,
+body.dark-mode .dua-mode,
+body.dark-mode .hadis-mode {
+    background: #1a1a2e !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6) !important;
+}
+
 /* Card container styles */
 .ayet-card,
 .dua-card,
@@ -3837,6 +3845,15 @@ body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e
     max-height: calc(100vh - 250px);
 }
 
+/* Dark mode - Ayet, Dua, Hadis card containers */
+body.dark-mode .ayet-card,
+body.dark-mode .dua-card,
+body.dark-mode .hadis-card {
+    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
 /* Sure/Ayet info styles */
 .sure-info {
     text-align: center;
@@ -3848,6 +3865,12 @@ body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e
     border-radius: 12px;
     margin-bottom: 10px;
     word-break: break-word;
+}
+
+/* Dark mode - Sure info */
+body.dark-mode .sure-info {
+    color: #D4A574 !important;
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.08)) !important;
 }
 
 /* Arabic text styles - responsive */
@@ -3882,6 +3905,12 @@ body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e
     font-family: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 500;
     letter-spacing: 0.01em;
+}
+
+/* Dark mode - Translation text (Ayet Oku ve Dua Et modları) */
+body.dark-mode .translation {
+    color: #e0e0e0 !important;
+    background: rgba(45, 45, 60, 0.8) !important;
 }
 
 /* Audio button - centered and larger */
