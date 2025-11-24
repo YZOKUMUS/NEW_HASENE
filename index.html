@@ -1536,6 +1536,158 @@
         
         // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
         /**
+         * StorageManager - Merkezi LocalStorage yönetimi
+         * Error handling, caching ve quota management ile güvenli storage
+         */
+        class StorageManager {
+            constructor() {
+                this.storageAvailable = this.checkStorageAvailability();
+                this.cache = new Map();
+                log.debug('🗄️ StorageManager başlatıldı', { available: this.storageAvailable });
+            }
+
+            checkStorageAvailability() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    log.error('❌ LocalStorage kullanılamıyor:', e);
+                    return false;
+                }
+            }
+
+            get(key, defaultValue = null) {
+                if (!this.storageAvailable) {
+                    log.warn('⚠️ Storage kullanılamıyor, default döndürülüyor');
+                    return defaultValue;
+                }
+
+                if (this.cache.has(key)) {
+                    return this.cache.get(key);
+                }
+
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value === null) {
+                        return defaultValue;
+                    }
+
+                    try {
+                        const parsed = JSON.parse(value);
+                        this.cache.set(key, parsed);
+                        return parsed;
+                    } catch (e) {
+                        this.cache.set(key, value);
+                        return value;
+                    }
+                } catch (error) {
+                    log.error(`❌ Storage okuma hatası (${key}):`, error);
+                    return defaultValue;
+                }
+            }
+
+            set(key, value) {
+                if (!this.storageAvailable) {
+                    log.warn('⚠️ Storage kullanılamıyor, veri kaydedilmedi');
+                    return false;
+                }
+
+                try {
+                    const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+                    localStorage.setItem(key, serialized);
+                    this.cache.set(key, value);
+                    return true;
+                } catch (error) {
+                    log.error(`❌ Storage yazma hatası (${key}):`, error);
+                    
+                    if (error.name === 'QuotaExceededError') {
+                        log.error('💥 Storage kotası doldu! Temizlik yapılıyor...');
+                        this.cleanup();
+                        
+                        try {
+                            const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+                            localStorage.setItem(key, serialized);
+                            this.cache.set(key, value);
+                            log.debug(`💾 Temizlikten sonra kaydedildi: ${key}`);
+                            return true;
+                        } catch (retryError) {
+                            log.error(`❌ Temizlikten sonra bile başarısız: ${key}`);
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            remove(key) {
+                if (!this.storageAvailable) return false;
+
+                try {
+                    localStorage.removeItem(key);
+                    this.cache.delete(key);
+                    log.debug(`🗑️ Storage'dan silindi: ${key}`);
+                    return true;
+                } catch (error) {
+                    log.error(`❌ Storage silme hatası (${key}):`, error);
+                    return false;
+                }
+            }
+
+            clear() {
+                if (!this.storageAvailable) return false;
+
+                try {
+                    localStorage.clear();
+                    this.cache.clear();
+                    log.debug('🧹 Storage temizlendi');
+                    return true;
+                } catch (error) {
+                    log.error('❌ Storage temizleme hatası:', error);
+                    return false;
+                }
+            }
+
+            cleanup() {
+                const keysToRemove = [];
+                keysToRemove.forEach(key => this.remove(key));
+                log.debug('🧹 Storage cleanup tamamlandı');
+            }
+
+            getAllKeys() {
+                if (!this.storageAvailable) return [];
+
+                try {
+                    return Object.keys(localStorage);
+                } catch (error) {
+                    log.error('❌ Storage key listesi alınamadı:', error);
+                    return [];
+                }
+            }
+
+            getSize() {
+                if (!this.storageAvailable) return 0;
+
+                try {
+                    let totalSize = 0;
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            totalSize += localStorage[key].length + key.length;
+                        }
+                    }
+                    return totalSize;
+                } catch (error) {
+                    log.error('❌ Storage boyutu hesaplanamadı:', error);
+                    return 0;
+                }
+            }
+        }
+
+        // Global storage manager
+        const storage = new StorageManager();
+
+        /**
          * EventListenerManager - Memory leak'leri önlemek için merkezi event listener yönetimi
          * WeakMap kullanarak elementler için listener'ları takip eder
          */
