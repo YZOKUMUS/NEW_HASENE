@@ -961,72 +961,115 @@ function closeDailyGoalModal() {
 window.showDailyGoalSettings = showDailyGoalSettings;
 window.closeDailyGoalModal = closeDailyGoalModal;
 
-// Daily Goal Modal için touch event'leri
-let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
-let dailyGoalModalIsScrolling = false;
+// ============ GENERIC MODAL TOUCH EVENT MANAGER ============
+/**
+ * Tek bir fonksiyon ile tüm modallar için touch event'leri yönetir
+ * DRY (Don't Repeat Yourself) prensibi
+ */
+const modalTouchState = new Map(); // Her modal için ayrı state
 
-function initDailyGoalModalTouchEvents() {
-    const dailyGoalModal = document.getElementById('dailyGoalModal');
-    if (!dailyGoalModal) return;
+function initGenericModalTouchEvents(modalId, closeCallback) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+        log.warn(`⚠️ Modal bulunamadı: ${modalId}`);
+        return;
+    }
     
     // Eğer zaten eklenmişse, tekrar ekleme
-    if (dailyGoalModal.hasAttribute('data-touch-events-initialized')) return;
-    dailyGoalModal.setAttribute('data-touch-events-initialized', 'true');
+    if (modal.hasAttribute('data-touch-events-initialized')) {
+        return;
+    }
+    modal.setAttribute('data-touch-events-initialized', 'true');
     
-    // Modal overlay için touch event'leri
-    dailyGoalModal.addEventListener('touchstart', function(e) {
+    // Bu modal için state oluştur
+    modalTouchState.set(modalId, {
+        touchStart: { x: 0, y: 0, time: 0 },
+        isScrolling: false
+    });
+    
+    const getState = () => modalTouchState.get(modalId);
+    
+    // Touch start event
+    eventManager.add(modal, 'touchstart', function(e) {
         if (e.target && e.target.closest('.modal-content')) {
             return;
         }
         
         const touch = e.touches[0];
-        dailyGoalModalTouchStart = {
+        const state = getState();
+        state.touchStart = {
             x: touch.clientX,
             y: touch.clientY,
             time: Date.now()
         };
-        dailyGoalModalIsScrolling = false;
+        state.isScrolling = false;
     }, { passive: true });
     
-    dailyGoalModal.addEventListener('touchmove', function(e) {
+    // Touch move event
+    eventManager.add(modal, 'touchmove', function(e) {
         if (e.target && e.target.closest('.modal-content')) {
             return;
         }
         
-        if (dailyGoalModalTouchStart.x !== 0 || dailyGoalModalTouchStart.y !== 0) {
+        const state = getState();
+        if (state.touchStart.x !== 0 || state.touchStart.y !== 0) {
             const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - dailyGoalModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - dailyGoalModalTouchStart.y);
+            const deltaX = Math.abs(touch.clientX - state.touchStart.x);
+            const deltaY = Math.abs(touch.clientY - state.touchStart.y);
             if (deltaX > 10 || deltaY > 10) {
-                dailyGoalModalIsScrolling = true;
+                state.isScrolling = true;
             }
         }
     }, { passive: true });
     
-    dailyGoalModal.addEventListener('touchend', function(e) {
-        if (dailyGoalModalIsScrolling) {
-            dailyGoalModalIsScrolling = false;
-            dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
+    // Touch end event
+    eventManager.add(modal, 'touchend', function(e) {
+        const state = getState();
+        
+        if (state.isScrolling) {
+            state.isScrolling = false;
+            state.touchStart = { x: 0, y: 0, time: 0 };
             return;
         }
         
         const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - dailyGoalModalTouchStart.time;
-        const deltaX = Math.abs(touch.clientX - dailyGoalModalTouchStart.x);
-        const deltaY = Math.abs(touch.clientY - dailyGoalModalTouchStart.y);
+        const deltaTime = Date.now() - state.touchStart.time;
+        const deltaX = Math.abs(touch.clientX - state.touchStart.x);
+        const deltaY = Math.abs(touch.clientY - state.touchStart.y);
         
+        // Tap tespit edildi (hızlı dokunma, az hareket)
         if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
             if (e.target && e.target.closest('.modal-content')) {
                 return;
             }
-            if (e.target && (e.target.id === 'closeDailyGoalBtn' || e.target.closest('#closeDailyGoalBtn'))) {
+            // Close button kontrolü (varsayılan close button id pattern'i)
+            const closeButtonId = `close${modalId.charAt(0).toUpperCase() + modalId.slice(1, -5)}Btn`;
+            if (e.target && (e.target.id === closeButtonId || e.target.closest(`#${closeButtonId}`))) {
                 return;
             }
-            closeDailyGoalModal();
+            // Modal dışına tap edildi, modalı kapat
+            if (typeof closeCallback === 'function') {
+                closeCallback();
+            }
         }
         
-        dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
+        state.touchStart = { x: 0, y: 0, time: 0 };
     }, { passive: true });
+    
+    log.debug(`✅ Generic touch events initialized for: ${modalId}`);
+}
+
+// ============ ESKI MODAL TOUCH EVENT FONKSİYONLARI (Backward Compatibility) ============
+// Yeni kodda initGenericModalTouchEvents kullanılmalı
+// Eski fonksiyonlar generic fonksiyonu çağırır
+
+// Daily Goal Modal için touch event'leri
+let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 }; // DEPRECATED
+let dailyGoalModalIsScrolling = false; // DEPRECATED
+
+function initDailyGoalModalTouchEvents() {
+    // Yeni generic fonksiyon kullan
+    initGenericModalTouchEvents('dailyGoalModal', closeDailyGoalModal);
 }
 
 // Her yere tıklayınca kapatma fonksiyonu
