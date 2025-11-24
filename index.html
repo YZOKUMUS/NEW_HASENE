@@ -1847,7 +1847,7 @@
                 const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
                 const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
                 
-                console.log('💾 saveDailyStats çağrıldı:', {
+                log.debug('💾 saveDailyStats çağrıldı:', {
                     today,
                     dayKey,
                     dailyHasene,
@@ -1868,12 +1868,12 @@
                 // Doğrulama: Kaydedilen veriyi oku
                 const saved = localStorage.getItem(dayKey);
                 if (saved) {
-                    console.log('✅ Günlük veriler kaydedildi:', JSON.parse(saved));
+                    log.debug('✅ Günlük veriler kaydedildi:', JSON.parse(saved));
                 } else {
-                    console.error('❌ Günlük veriler kaydedilemedi!');
+                    log.error('❌ Günlük veriler kaydedilemedi!');
                 }
             } catch (error) {
-                console.error('❌ saveDailyStats hatası:', error);
+                log.error('❌ saveDailyStats hatası:', error);
             }
         }
         
@@ -2880,7 +2880,7 @@
                     !event.error.message?.includes('pendingSave') &&
                     !event.error.message?.includes('elements is not defined')) {
                     // ResizeObserver ve bilinen hataları ignore et
-                    console.error('Uygulama hatası:', event.error);
+                    log.error('Uygulama hatası:', event.error);
                 }
             } catch (e) {
                 // Error handler hatası - sessizce ignore et
@@ -2900,7 +2900,7 @@
                 if (typeof log !== 'undefined' && log.error) {
                     log.error('🚨 Unhandled Promise Rejection:', event.reason);
                 }
-                console.error('Promise rejection:', event.reason);
+                log.error('Promise rejection:', event.reason);
             } catch (e) {
                 // Error handler hatası - sessizce ignore et
             }
@@ -3090,16 +3090,16 @@
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         
-                        console.log('📊 Detaylı buton tıklandı');
+                        log.debug('📊 Detaylı buton tıklandı');
                         
                         if (typeof window.showDetailedStats === 'function') {
-                            console.log('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
+                            log.debug('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
                             window.showDetailedStats();
                         } else if (typeof showDetailedStats === 'function') {
-                            console.log('✅ showDetailedStats fonksiyonu bulundu (global değil), çağrılıyor...');
+                            log.debug('✅ showDetailedStats fonksiyonu bulundu (global değil), çağrılıyor...');
                             showDetailedStats();
                         } else {
-                            console.error('❌ showDetailedStats fonksiyonu bulunamadı!', typeof window.showDetailedStats, typeof showDetailedStats);
+                            log.error('❌ showDetailedStats fonksiyonu bulunamadı!', typeof window.showDetailedStats, typeof showDetailedStats);
                         }
                         
                         return false;
@@ -3116,9 +3116,9 @@
                         return false;
                     }, { capture: true, passive: false });
                     
-                    console.log('✅ Detaylı istatistikler butonu event listener eklendi');
+                    log.debug('✅ Detaylı istatistikler butonu event listener eklendi');
                 } else {
-                    console.warn('⚠️ detailedStatsBtn elementi bulunamadı!');
+                    log.warn('⚠️ detailedStatsBtn elementi bulunamadı!');
                 }
             }, 100); // 100ms gecikme ile detailed-stats.js yüklensin
             
@@ -3218,7 +3218,7 @@
                 );
 
                 if (!confirmModal || !confirmCorrect || !confirmWrong || !confirmXP || !confirmOK || !confirmCancel) {
-                    console.error('[MODAL] HATA - Elementler bulunamadi!');
+                    log.error('[MODAL] HATA - Elementler bulunamadi!');
                     resolve(true);
                     return;
                 }
@@ -5435,7 +5435,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             } else {
                 // Fallback: Eğer unifiedEventHandler yüklenmemişse eski sistemi kullan
-                console.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor (xpInfoModal)');
+                log.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor (xpInfoModal)');
                 
                 if (xpInfoModal.hasAttribute('data-touch-events-initialized')) return;
                 xpInfoModal.setAttribute('data-touch-events-initialized', 'true');
@@ -8402,8 +8402,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
-                    console.error('HATA - Geri butonu:', error);
-                    console.error('HATA - Stack:', error.stack);
+                    log.error('HATA - Geri butonu:', error);
+                    log.error('HATA - Stack:', error.stack);
                     hideAllModes();
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
@@ -8414,7 +8414,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             };
         } else {
-            console.warn('⚠️ backFromGameBtn elementi bulunamadı!');
+            log.warn('⚠️ backFromGameBtn elementi bulunamadı!');
         }
 
         if (elements.backFromAyetBtn) {
@@ -8547,8 +8547,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
-                    console.error('HATA - Bosluk geri butonu:', error);
-                    console.error('HATA - Stack:', error.stack);
+                    log.error('HATA - Bosluk geri butonu:', error);
+                    log.error('HATA - Stack:', error.stack);
                     hideAllModes();
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
@@ -8559,7 +8559,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             };
         } else {
-            console.warn('⚠️ backFromBoslukBtn elementi bulunamadı!');
+            log.warn('⚠️ backFromBoslukBtn elementi bulunamadı!');
         }
 
         if (elements.backFromDinleBtn) {
@@ -8646,8 +8646,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
                     forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
                 } catch (error) {
-                    console.error('HATA - Dinle geri butonu:', error);
-                    console.error('HATA - Stack:', error.stack);
+                    log.error('HATA - Dinle geri butonu:', error);
+                    log.error('HATA - Stack:', error.stack);
                     hideAllModes();
                     if (elements.mainMenu) {
                         elements.mainMenu.style.display = 'block';
@@ -8658,7 +8658,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             };
         } else {
-            console.warn('⚠️ backFromDinleBtn elementi bulunamadı!');
+            log.warn('⚠️ backFromDinleBtn elementi bulunamadı!');
         }
 
         // ============ MOD SEÇİCİYİ BAŞLAT (Sadece Kelime Çevir için) ============
@@ -9396,7 +9396,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 
                 // currentQuestion kontrolü
                 if (!currentQuestion || !currentQuestion.anlam) {
-                    console.warn('⚠️ İpucu: currentQuestion bulunamadı!');
+                    log.warn('⚠️ İpucu: currentQuestion bulunamadı!');
                     return;
                 }
                 
@@ -9404,7 +9404,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Sadece game-screen içindeki butonları ara
                 const gameScreen = document.getElementById('gameScreen');
                 if (!gameScreen) {
-                    console.warn('⚠️ İpucu: gameScreen bulunamadı!');
+                    log.warn('⚠️ İpucu: gameScreen bulunamadı!');
                     return;
                 }
                 
@@ -9441,7 +9441,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                         elements.hintBtn.disabled = true;
                     }
                 } else {
-                    console.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
+                    log.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
                 }
             };
             // Masaüstü için onclick
@@ -12716,7 +12716,7 @@ function showMainMenu() {
 
                 const opts = document.querySelectorAll('#options .option');
                 if (!opts || opts.length === 0) {
-                    console.warn('⚠️ No options rendered yet; ensure kelime data is loaded');
+                    log.warn('⚠️ No options rendered yet; ensure kelime data is loaded');
                     return false;
                 }
                 // Click first option
@@ -12746,7 +12746,7 @@ function showMainMenu() {
             // Tüm eski Service Worker'ları kaldır (yeniden kayıt için)
             return Promise.all(
                 registrations.map((registration) => {
-                    console.log("🔄 Eski Service Worker kaldırılıyor...");
+                    log.debug("🔄 Eski Service Worker kaldırılıyor...");
                     return registration.unregister();
                 })
             );
@@ -12757,14 +12757,14 @@ function showMainMenu() {
                 updateViaCache: 'none' // Her zaman yeni versiyonu kontrol et
             });
         }).then((registration) => {
-            console.log("✅ Yeni Service Worker kaydedildi ✔", swPath);
+            log.debug("✅ Yeni Service Worker kaydedildi ✔", swPath);
             
             // Service Worker güncellemesi kontrolü
             registration.addEventListener('updatefound', () => {
                 const newWorker = registration.installing;
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'activated') {
-                        console.log("🔄 Yeni Service Worker aktif! Sayfa yenileniyor...");
+                        log.debug("🔄 Yeni Service Worker aktif! Sayfa yenileniyor...");
                         // Yeni Service Worker aktif olduğunda sayfayı yenile
                         window.location.reload();
                     }
@@ -12779,7 +12779,7 @@ function showMainMenu() {
             // Sayfa yüklendiğinde güncelleme kontrolü
             registration.update();
         }).catch(err => {
-            console.log("❌ Service Worker kayıt hatası:", err);
+            log.error("❌ Service Worker kayıt hatası:", err);
         });
     }
 </script>
@@ -13087,8 +13087,8 @@ function showMainMenu() {
         const darkModeIcon = document.getElementById('darkModeIcon');
         
         // Debug
-        console.log('Dark mode toggled:', isDark);
-        console.log('Body classes:', body.className);
+        log.debug('Dark mode toggled:', isDark);
+        log.debug('Body classes:', body.className);
         
         // LocalStorage'a kaydet
         localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
