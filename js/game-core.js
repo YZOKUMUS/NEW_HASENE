@@ -123,9 +123,39 @@ function goToMainMenu() {
     log.debug('✅ Ana menü gösterildi');
 }
 
+// 🌙 DARK MODE TOGGLE
+function toggleDarkMode() {
+    const body = document.body;
+    const isDark = body.classList.toggle('dark-mode');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    
+    // Debug
+    log.debug('Dark mode toggled:', isDark);
+    log.debug('Body classes:', body.className);
+    
+    // LocalStorage'a kaydet
+    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    
+    // Icon güncelle
+    if (darkModeIcon) {
+        darkModeIcon.textContent = isDark ? '☀️' : '🌙';
+    }
+    
+    // Buton stilini güncelle
+    const darkModeBtn = document.getElementById('darkModeToggle');
+    if (darkModeBtn) {
+        if (isDark) {
+            darkModeBtn.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+        } else {
+            darkModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        }
+    }
+}
+
 // Global erişim için (inline onclick handlers için gerekli)
 window.updateArabicTextColoring = updateArabicTextColoring;
 window.goToMainMenu = goToMainMenu;
+window.toggleDarkMode = toggleDarkMode;
 
 // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
 /**
@@ -967,6 +997,10 @@ function closeDailyGoalModal() {
         log.debug('🔒 Daily Goal Modal kapatıldı ve temizlendi');
     }
 }
+
+// Global erişim için (inline onclick handlers)
+window.showDailyGoalSettings = showDailyGoalSettings;
+window.closeDailyGoalModal = closeDailyGoalModal;
 
 // Daily Goal Modal için touch event'leri
 let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
