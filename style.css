@@ -3395,6 +3395,111 @@ body.dark-mode #statsModal #statsScrollableContent::-webkit-scrollbar-thumb {
     background: #667eea;
 }
 
+/* ============ DARK MODE - İSTATİSTİKLER MODAL KOMPLE OVERRIDE ============ */
+
+/* Gradient background'ları dark mode versiyonlarına çevir */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#667eea"][style*="#764ba2"] {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%) !important;
+    border-left: 4px solid #3b82f6 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff7e6"][style*="#ffe6d9"] {
+    background: linear-gradient(135deg, #3a2817 0%, #292524 100%) !important;
+    border-left: 4px solid #f97316 !important;
+}
+
+/* Tüm beyaz kutuları dark yap */
+body.dark-mode #statsModal div[style*="background: white"],
+body.dark-mode #statsModal div[style*="background: #fff"] {
+    background: #2d3748 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+/* Text renkleri */
+body.dark-mode #statsModal div[style*="color: #555"],
+body.dark-mode #statsModal div[style*="color: #666"],
+body.dark-mode #statsModal div[style*="color: #888"],
+body.dark-mode #statsModal div[style*="color: #aaa"] {
+    color: #d1d5db !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #333"] {
+    color: #e5e7eb !important;
+}
+
+/* Başlıklar */
+body.dark-mode #statsModal h3[style*="color: #667eea"] {
+    color: #818cf8 !important;
+}
+
+body.dark-mode #statsModal h4[style*="color: #2980b9"] {
+    color: #60a5fa !important;
+}
+
+body.dark-mode #statsModal h4[style*="color: #d68910"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #statsModal h4[style*="color: white"] {
+    color: #ffffff !important;
+}
+
+/* Rozet kartları içindeki renkli text'ler */
+body.dark-mode #statsModal div[style*="color: #cd7f32"] {
+    color: #f59e0b !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #c0c0c0"] {
+    color: #d1d5db !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #ffd700"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #00d9ff"] {
+    color: #06b6d4 !important;
+}
+
+/* Muvaffakiyet Analizi kartları içindeki renkli text'ler */
+body.dark-mode #statsModal div[style*="color: #27ae60"] {
+    color: #34d399 !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #3498db"] {
+    color: #60a5fa !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #e67e22"] {
+    color: #fb923c !important;
+}
+
+body.dark-mode #statsModal div[style*="color: #9b59b6"] {
+    color: #a78bfa !important;
+}
+
+/* Oyun Türü İstatistikleri section */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] {
+    background: #1f2937 !important;
+}
+
+body.dark-mode #statsModal div[style*="background: #e9ecef"] {
+    background: #111827 !important;
+}
+
+/* Detaylı buton */
+body.dark-mode #statsModal button[style*="linear-gradient"][style*="#667eea"] {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
+}
+
+body.dark-mode #statsModal button[style*="color: white"] {
+    color: #ffffff !important;
+}
+
 /* ===== DARK MODE - ONBOARDING MODAL ===== */
 body.dark-mode #onboardingModal .onboarding-modal {
     background: rgba(26, 26, 26, 0.98) !important;
