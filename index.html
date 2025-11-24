@@ -1534,6 +1534,91 @@
         // sanitizeHTML, safeSetHTML, showLoading, hideLoading, encryptData, decryptData,
         // secureSetItem, secureGetItem, showCustomAlert fonksiyonları kullanılabilir
         
+        // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
+        /**
+         * EventListenerManager - Memory leak'leri önlemek için merkezi event listener yönetimi
+         * WeakMap kullanarak elementler için listener'ları takip eder
+         */
+        class EventListenerManager {
+            constructor() {
+                this.listeners = new WeakMap();
+                log.debug('🎧 EventListenerManager başlatıldı');
+            }
+            
+            /**
+             * Event listener ekle ve kaydet
+             * @param {HTMLElement} element - Hedef element
+             * @param {string} event - Event tipi (click, touchstart vb.)
+             * @param {Function} handler - Event handler fonksiyonu
+             * @param {Object} options - addEventListener options
+             */
+            add(element, event, handler, options = {}) {
+                if (!element) {
+                    log.warn('⚠️ EventListenerManager.add: element null!');
+                    return;
+                }
+                
+                // Element için listener listesi al veya oluştur
+                let elementListeners = this.listeners.get(element);
+                if (!elementListeners) {
+                    elementListeners = [];
+                    this.listeners.set(element, elementListeners);
+                }
+                
+                // Listener'ı ekle
+                element.addEventListener(event, handler, options);
+                elementListeners.push({ event, handler, options });
+                
+                log.debug(`➕ Listener eklendi: ${event} (Toplam: ${elementListeners.length})`);
+            }
+            
+            /**
+             * Belirli bir element için tüm listener'ları temizle
+             * @param {HTMLElement} element - Temizlenecek element
+             */
+            cleanup(element) {
+                if (!element) {
+                    log.warn('⚠️ EventListenerManager.cleanup: element null!');
+                    return;
+                }
+                
+                const elementListeners = this.listeners.get(element);
+                if (!elementListeners) {
+                    log.debug('ℹ️ Temizlenecek listener yok');
+                    return;
+                }
+                
+                // Tüm listener'ları kaldır
+                let removed = 0;
+                elementListeners.forEach(({ event, handler, options }) => {
+                    element.removeEventListener(event, handler, options);
+                    removed++;
+                });
+                
+                // WeakMap'ten sil
+                this.listeners.delete(element);
+                
+                log.debug(`🧹 ${removed} listener temizlendi`);
+            }
+            
+            /**
+             * Birden fazla element için temizlik yap
+             * @param {Array<HTMLElement>} elements - Temizlenecek elementler
+             */
+            cleanupMultiple(elements) {
+                if (!Array.isArray(elements)) {
+                    log.warn('⚠️ EventListenerManager.cleanupMultiple: elements array değil!');
+                    return;
+                }
+                
+                elements.forEach(element => this.cleanup(element));
+                log.debug(`🧹 ${elements.length} element için cleanup tamamlandı`);
+            }
+        }
+        
+        // Global instance oluştur
+        const eventManager = new EventListenerManager();
+        
         // ============ GLOBAL FONKSİYONLAR (onclick için erişilebilir olmalı) ============
         
         // NOT: switchStatsTab fonksiyonu kaldırıldı - Stats modal'da tab sistemi yok
@@ -1552,7 +1637,10 @@
         function closeDailyGoalModal() {
             const modal = document.getElementById('dailyGoalModal');
             if (modal) {
+                // Event listener'ları temizle (memory leak prevention)
+                eventManager.cleanup(modal);
                 modal.style.display = 'none';
+                log.debug('🔒 Daily Goal Modal kapatıldı ve temizlendi');
             }
         }
         
@@ -5081,6 +5169,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function closeBadgesModal() {
             const modal = document.getElementById('badgesModal');
             if (modal) {
+                // Event listener'ları temizle (memory leak prevention)
+                const scrollableContent = document.getElementById('badgesScrollableContent');
+                eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
+                
                 modal.style.display = 'none';
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
@@ -5113,6 +5205,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
                 }
+                
+                log.debug('🔒 Badges Modal kapatıldı ve temizlendi');
             }
         }
         
@@ -5191,16 +5285,24 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                     });
                 }
             } else {
-                // Fallback: Eğer unifiedEventHandler yüklenmemişse eski sistemi kullan
-                console.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor');
+                // Fallback: Eğer unifiedEventHandler yüklenmemişse eventManager kullanan sistemi kullan
+                log.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi (eventManager) kullanılıyor');
                 
-                // Category tab event listener'larını ekle (her modal açılışında)
+                // Önce eski listener'ları temizle
+                if (badgesModal.hasAttribute('data-fallback-events-initialized')) {
+                    eventManager.cleanup(badgesModal);
+                    const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
+                    if (categoryTabsContainer) {
+                        eventManager.cleanup(categoryTabsContainer);
+                    }
+                    log.debug('🔄 Badges Modal: Eski fallback listener\'lar temizlendi');
+                }
+                badgesModal.setAttribute('data-fallback-events-initialized', 'true');
+                
+                // Category tab event listener'larını ekle
                 const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
                 if (categoryTabsContainer) {
-                    const newContainer = categoryTabsContainer.cloneNode(true);
-                    categoryTabsContainer.parentNode.replaceChild(newContainer, categoryTabsContainer);
-                    
-                    newContainer.addEventListener('click', function(e) {
+                    eventManager.add(categoryTabsContainer, 'click', function(e) {
                         const tab = e.target.closest('.category-tab');
                         if (tab) {
                             e.preventDefault();
@@ -5212,9 +5314,9 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                             }
                             return false;
                         }
-                    }, true);
+                    }, { capture: true });
                     
-                    newContainer.addEventListener('touchend', function(e) {
+                    eventManager.add(categoryTabsContainer, 'touchend', function(e) {
                         const tab = e.target.closest('.category-tab');
                         if (tab) {
                             e.preventDefault();
@@ -5875,6 +5977,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function closeStatsModal() {
             const modal = document.getElementById('statsModal');
             if (modal) {
+                // Event listener'ları temizle (memory leak prevention)
+                const scrollableContent = document.getElementById('statsScrollableContent');
+                eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
+                
                 modal.style.display = 'none';
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
@@ -5907,6 +6013,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
                 }
+                
+                log.debug('🔒 Stats Modal kapatıldı ve temizlendi');
             }
         }
         
@@ -5921,24 +6029,27 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const statsScrollableContent = document.getElementById('statsScrollableContent');
             if (!statsModal) return;
             
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (statsModal.hasAttribute('data-touch-events-initialized')) return;
+            // Eğer zaten eklenmişse, önce temizle
+            if (statsModal.hasAttribute('data-touch-events-initialized')) {
+                eventManager.cleanupMultiple([statsModal, statsScrollableContent].filter(Boolean));
+                log.debug('🔄 Stats Modal: Eski listener\'lar temizlendi, yeni eklenecek');
+            }
             statsModal.setAttribute('data-touch-events-initialized', 'true');
             
             // Scroll edilebilir içerik alanında scroll algılama
             if (statsScrollableContent) {
-                statsScrollableContent.addEventListener('touchstart', function(e) {
+                eventManager.add(statsScrollableContent, 'touchstart', function(e) {
                     statsModalIsScrolling = false;
                 }, { passive: true });
                 
-                statsScrollableContent.addEventListener('touchmove', function(e) {
+                eventManager.add(statsScrollableContent, 'touchmove', function(e) {
                     // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                     statsModalIsScrolling = true;
                 }, { passive: true });
             }
             
             // Modal overlay için touch event'leri
-            statsModal.addEventListener('touchstart', function(e) {
+            eventManager.add(statsModal, 'touchstart', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
                 const target = e.target;
                 if (target && statsScrollableContent && (
@@ -5958,7 +6069,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 statsModalIsScrolling = false;
             }, { passive: true });
             
-            statsModal.addEventListener('touchmove', function(e) {
+            eventManager.add(statsModal, 'touchmove', function(e) {
                 // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
                 const target = e.target;
                 if (target && statsScrollableContent && (
@@ -5981,7 +6092,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             }, { passive: true });
             
-            statsModal.addEventListener('touchend', function(e) {
+            eventManager.add(statsModal, 'touchend', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
                 const target = e.target;
                 if (target && statsScrollableContent && (
@@ -6419,6 +6530,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function closeCalendarModal() {
             const modal = document.getElementById('calendarModal');
             if (modal) {
+                // Event listener'ları temizle (memory leak prevention)
+                const scrollableContent = document.getElementById('calendarScrollableContent');
+                eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
+                
                 modal.style.display = 'none';
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
@@ -6446,6 +6561,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
                 }
+                
+                log.debug('🔒 Calendar Modal kapatıldı ve temizlendi');
             }
         }
         
@@ -6463,24 +6580,27 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
             if (!dailyTasksModal) return;
             
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) return;
+            // Eğer zaten eklenmişse, önce temizle
+            if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) {
+                eventManager.cleanupMultiple([dailyTasksModal, dailyTasksScrollableContent].filter(Boolean));
+                log.debug('🔄 Daily Tasks Modal: Eski listener\'lar temizlendi, yeni eklenecek');
+            }
             dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
             
             // Scroll edilebilir içerik alanında scroll algılama
             if (dailyTasksScrollableContent) {
-                dailyTasksScrollableContent.addEventListener('touchstart', function(e) {
+                eventManager.add(dailyTasksScrollableContent, 'touchstart', function(e) {
                     dailyTasksModalIsScrolling = false;
                 }, { passive: true });
                 
-                dailyTasksScrollableContent.addEventListener('touchmove', function(e) {
+                eventManager.add(dailyTasksScrollableContent, 'touchmove', function(e) {
                     // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                     dailyTasksModalIsScrolling = true;
                 }, { passive: true });
             }
             
             // Modal overlay için touch event'leri
-            dailyTasksModal.addEventListener('touchstart', function(e) {
+            eventManager.add(dailyTasksModal, 'touchstart', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
                 const target = e.target;
                 if (target && dailyTasksScrollableContent && (
@@ -6500,7 +6620,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 dailyTasksModalIsScrolling = false;
             }, { passive: true });
             
-            dailyTasksModal.addEventListener('touchmove', function(e) {
+            eventManager.add(dailyTasksModal, 'touchmove', function(e) {
                 // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
                 const target = e.target;
                 if (target && dailyTasksScrollableContent && (
@@ -6523,7 +6643,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             }, { passive: true });
             
-            dailyTasksModal.addEventListener('touchend', function(e) {
+            eventManager.add(dailyTasksModal, 'touchend', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
                 const target = e.target;
                 if (target && dailyTasksScrollableContent && (
@@ -6572,24 +6692,27 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             const calendarScrollableContent = document.getElementById('calendarScrollableContent');
             if (!calendarModal) return;
             
-            // Eğer zaten eklenmişse, tekrar ekleme
-            if (calendarModal.hasAttribute('data-touch-events-initialized')) return;
+            // Eğer zaten eklenmişse, önce temizle
+            if (calendarModal.hasAttribute('data-touch-events-initialized')) {
+                eventManager.cleanupMultiple([calendarModal, calendarScrollableContent].filter(Boolean));
+                log.debug('🔄 Calendar Modal: Eski listener\'lar temizlendi, yeni eklenecek');
+            }
             calendarModal.setAttribute('data-touch-events-initialized', 'true');
             
             // Scroll edilebilir içerik alanında scroll algılama
             if (calendarScrollableContent) {
-                calendarScrollableContent.addEventListener('touchstart', function(e) {
+                eventManager.add(calendarScrollableContent, 'touchstart', function(e) {
                     calendarModalIsScrolling = false;
                 }, { passive: true });
                 
-                calendarScrollableContent.addEventListener('touchmove', function(e) {
+                eventManager.add(calendarScrollableContent, 'touchmove', function(e) {
                     // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
                     calendarModalIsScrolling = true;
                 }, { passive: true });
             }
             
             // Modal overlay için touch event'leri
-            calendarModal.addEventListener('touchstart', function(e) {
+            eventManager.add(calendarModal, 'touchstart', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
                 const target = e.target;
                 if (target && calendarScrollableContent && (
@@ -6609,7 +6732,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 calendarModalIsScrolling = false;
             }, { passive: true });
             
-            calendarModal.addEventListener('touchmove', function(e) {
+            eventManager.add(calendarModal, 'touchmove', function(e) {
                 // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
                 const target = e.target;
                 if (target && calendarScrollableContent && (
@@ -6632,7 +6755,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 }
             }, { passive: true });
             
-            calendarModal.addEventListener('touchend', function(e) {
+            eventManager.add(calendarModal, 'touchend', function(e) {
                 // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
                 const target = e.target;
                 if (target && calendarScrollableContent && (
@@ -7268,6 +7391,10 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function closeDailyTasksModal() {
             const modal = document.getElementById('dailyTasksModal');
             if (modal) {
+                // Event listener'ları temizle (memory leak prevention)
+                const scrollableContent = document.getElementById('dailyTasksScrollableContent');
+                eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
+                
                 modal.style.display = 'none';
                 modal.style.zIndex = '';
                 // Body scroll'u tekrar aktif et
@@ -7300,6 +7427,8 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 if (elements && elements.mainMenu) {
                     elements.mainMenu.style.display = 'block';
                 }
+                
+                log.debug('🔒 Daily Tasks Modal kapatıldı ve temizlendi');
             }
         }
         
