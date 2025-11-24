@@ -132,9 +132,9 @@ function getWeeklyStats() {
                     }
                 } catch (e) {
                     // Parse hatası, devam et
-                }
             }
-            
+        }
+        
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -189,9 +189,9 @@ function getMonthlyStats() {
                     }
                 } catch (e) {
                     // Parse hatası, devam et
-                }
             }
-            
+        }
+        
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -284,23 +284,23 @@ function getWeekEnd(date) {
 // Hafta oynama günleri
 function getWeekPlayDays() {
     try {
-        const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
-        const playDates = streakData.playDates || [];
+    const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
+    const playDates = streakData.playDates || [];
         
         if (playDates.length === 0) {
             return 0;
         }
         
-        const weekStart = getWeekStart(new Date());
-        const weekEnd = getWeekEnd(new Date());
-        
+    const weekStart = getWeekStart(new Date());
+    const weekEnd = getWeekEnd(new Date());
+    
         // YYYY-MM-DD formatındaki tarihleri karşılaştır
         const weekStartStr = weekStart.toISOString().split('T')[0];
         const weekEndStr = weekEnd.toISOString().split('T')[0];
         
         const daysPlayed = playDates.filter(dateStr => {
             return dateStr >= weekStartStr && dateStr <= weekEndStr;
-        }).length;
+    }).length;
         
         console.log('📅 Haftalık hesaplama:', {
             weekStart: weekStartStr,
@@ -319,24 +319,24 @@ function getWeekPlayDays() {
 // Ay oynama günleri
 function getMonthPlayDays() {
     try {
-        const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
-        const playDates = streakData.playDates || [];
+    const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
+    const playDates = streakData.playDates || [];
         
         if (playDates.length === 0) {
             return 0;
         }
         
-        const today = new Date();
-        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
         // YYYY-MM-DD formatına çevir
         const monthStartStr = monthStart.toISOString().split('T')[0];
         const monthEndStr = monthEnd.toISOString().split('T')[0];
         
         const daysPlayed = playDates.filter(dateStr => {
             return dateStr >= monthStartStr && dateStr <= monthEndStr;
-        }).length;
+    }).length;
         
         console.log('📅 Aylık hesaplama:', {
             monthStart: monthStartStr,
