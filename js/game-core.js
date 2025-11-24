@@ -11,6 +11,81 @@ function addSpeedAnimation(element, type = 'fade-in') {
     setTimeout(() => element.classList.remove(`speed-${type}`), 600);
 }
 
+// 🎯 NAVIGATION HELPER
+function setActiveNavItem(index) {
+    // Yeni bottom-nav için
+    document.querySelectorAll('.bottom-nav .nav-item').forEach((item, i) => {
+        item.classList.toggle('active', i === index);
+    });
+    // Eski flutter-nav-item için geriye dönük uyumluluk
+    document.querySelectorAll('.flutter-nav-item').forEach((item, i) => {
+        item.classList.toggle('active', i === index);
+    });
+}
+
+// 🎆 SUCCESS ANIMATIONS - CONFETTI SYSTEM
+function triggerConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+
+    // 50 konfeti parçası oluştur
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        container.appendChild(confetti);
+    }
+
+    // 3 saniye sonra temizle
+    setTimeout(() => {
+        if (container.parentNode) {
+            container.parentNode.removeChild(container);
+        }
+    }, 3000);
+}
+
+function triggerSuccessBurst(element) {
+    if (!element) return;
+    element.classList.add('success-burst');
+    setTimeout(() => element.classList.remove('success-burst'), 800);
+}
+
+// 📱 HAPTIC FEEDBACK SYSTEM
+function triggerHaptic(type = 'medium') {
+    // CONFIG kontrolü ile haptic feedback
+    if (!CONFIG.hapticEnabled) return;
+    
+    try {
+        // Modern haptic feedback API
+        if ('vibrate' in navigator) {
+            const patterns = {
+                light: [10],
+                medium: [20],
+                heavy: [50],
+                success: [20, 50, 20],
+                error: [50, 100, 50],
+                combo: [20, 30, 20, 30, 50],
+                warning: [30, 50, 30]
+            };
+            navigator.vibrate(patterns[type] || patterns.medium);
+        }
+    } catch (error) {
+        log.debug('Haptic feedback not supported');
+    }
+}
+
+// 🌐 ARABIC TEXT HELPER (Deprecated but kept for compatibility)
+function updateArabicTextColoring() {
+    // Fonksiyon kaldırıldı ama hala çağrılıyor, boş fonksiyon olarak tanımlı
+    // Hata önleme için
+}
+
+// Global erişim için
+window.updateArabicTextColoring = updateArabicTextColoring;
+
 // ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
 /**
  * StorageManager - Merkezi LocalStorage yönetimi
