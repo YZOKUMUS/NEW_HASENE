@@ -1835,6 +1835,137 @@
         const storage = new StorageManager();
 
         /**
+         * Storage Schemas - Kritik veriler için validation şemaları
+         * Type safety ve data integrity sağlar
+         */
+        const StorageSchemas = {
+            // User Data Schemas
+            dailyGoalHasene: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) > 0 },
+            dailyGoalLevel: { type: 'string', validate: (v) => ['easy', 'normal', 'serious'].includes(v) },
+            dailyHasene: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
+            dailyCorrect: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
+            dailyWrong: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
+            
+            // Game State Schemas
+            hasene_totalPoints: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
+            hasene_wordStats: { type: 'object', validate: (v) => typeof v === 'object' && !Array.isArray(v) },
+            hasene_dailyTasks: { type: 'object', required: ['todayStats'], validate: (v) => v.todayStats !== undefined },
+            
+            // Achievement Schemas
+            unlockedAchievements: { type: 'array', validate: (v) => Array.isArray(v) },
+            hasene_badges: { type: 'object', validate: (v) => typeof v === 'object' },
+            
+            // Streak Data Schema
+            hasene_streakData: { 
+                type: 'object', 
+                required: ['currentStreak', 'bestStreak', 'playDates'],
+                validate: (v) => {
+                    return v.currentStreak !== undefined && 
+                           v.bestStreak !== undefined && 
+                           Array.isArray(v.playDates);
+                }
+            }
+        };
+
+        /**
+         * Storage Helper - Schema validation ile güvenli storage erişimi
+         */
+        const StorageHelper = {
+            /**
+             * Validation ile güvenli get
+             * @param {string} key - Storage key
+             * @param {*} defaultValue - Default değer
+             * @returns {*} - Validated değer veya default
+             */
+            getSafe(key, defaultValue = null) {
+                const schema = StorageSchemas[key];
+                if (!schema) {
+                    // Schema yoksa normal get
+                    return storage.get(key, defaultValue);
+                }
+                
+                const value = storage.get(key, defaultValue);
+                if (value === defaultValue) {
+                    return value;
+                }
+                
+                // Type check
+                const actualType = Array.isArray(value) ? 'array' : typeof value;
+                if (actualType !== schema.type) {
+                    log.warn(`⚠️ Type mismatch for ${key}: expected ${schema.type}, got ${actualType}. Using default.`);
+                    return defaultValue;
+                }
+                
+                // Custom validation
+                if (schema.validate && !schema.validate(value)) {
+                    log.warn(`⚠️ Validation failed for ${key}. Using default.`);
+                    return defaultValue;
+                }
+                
+                // Required fields check (for objects)
+                if (schema.required && actualType === 'object') {
+                    for (const field of schema.required) {
+                        if (!(field in value)) {
+                            log.warn(`⚠️ Missing required field "${field}" in ${key}. Using default.`);
+                            return defaultValue;
+                        }
+                    }
+                }
+                
+                return value;
+            },
+
+            /**
+             * Validation ile güvenli set
+             * @param {string} key - Storage key
+             * @param {*} value - Değer
+             * @returns {boolean} - Başarılı mı?
+             */
+            setSafe(key, value) {
+                const schema = StorageSchemas[key];
+                if (!schema) {
+                    // Schema yoksa normal set
+                    return storage.set(key, value);
+                }
+                
+                // Type check
+                const actualType = Array.isArray(value) ? 'array' : typeof value;
+                if (actualType !== schema.type) {
+                    log.error(`❌ Cannot save ${key}: type mismatch (expected ${schema.type}, got ${actualType})`);
+                    return false;
+                }
+                
+                // Custom validation
+                if (schema.validate && !schema.validate(value)) {
+                    log.error(`❌ Cannot save ${key}: validation failed`);
+                    return false;
+                }
+                
+                // Required fields check
+                if (schema.required && actualType === 'object') {
+                    for (const field of schema.required) {
+                        if (!(field in value)) {
+                            log.error(`❌ Cannot save ${key}: missing required field "${field}"`);
+                            return false;
+                        }
+                    }
+                }
+                
+                return storage.set(key, value);
+            },
+
+            /**
+             * Schema tanımı ekle (runtime'da)
+             * @param {string} key - Storage key
+             * @param {Object} schema - Schema tanımı
+             */
+            addSchema(key, schema) {
+                StorageSchemas[key] = schema;
+                log.debug(`📋 Schema eklendi: ${key}`);
+            }
+        };
+
+        /**
          * DOM Helper - Güvenli DOM element erişimi ve güncelleme
          * Null safety ile hata riski azaltılır
          */
