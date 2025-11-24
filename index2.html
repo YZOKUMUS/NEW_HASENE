@@ -8716,14 +8716,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function loadDinleQuestion() {
             log.game('🎧 Dinle ve Bul sorusu yükleniyor...');
             
+            // Karışık modda currentGameData kullan
+            const dataSource = currentGameData || kelimeBulData || [];
+            
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-            let filteredData = kelimeBulData.filter(w => 
+            let filteredData = dataSource.filter(w => 
                 w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
             );
             
             if (filteredData.length === 0) {
-                filteredData = kelimeBulData;
+                filteredData = dataSource;
             }
             
             // Rastgele kelime seç
@@ -8765,14 +8768,17 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         function loadBoslukQuestion() {
             log.game('✏️ Boşluk Doldur sorusu yükleniyor...');
             
+            // Karışık modda currentGameData kullan
+            const dataSource = currentGameData || kelimeBulData || [];
+            
             // Zorluk filtreleme
             const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-            let filteredData = kelimeBulData.filter(w => 
+            let filteredData = dataSource.filter(w => 
                 w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
             );
             
             if (filteredData.length === 0) {
-                filteredData = kelimeBulData;
+                filteredData = dataSource;
             }
             
             // Rastgele kelime seç
