@@ -2149,17 +2149,18 @@
             };
             
             const goal = goals[level];
-            localStorage.setItem('dailyGoalLevel', level);
-            localStorage.setItem('dailyGoalHasene', goal.hasene);
+            // Storage manager ile güvenli kaydet
+            storage.set('dailyGoalLevel', level);
+            storage.set('dailyGoalHasene', goal.hasene.toString());
             
             // Günlük Hasene'yi sıfırla (her gün başta)
             const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-            const lastDate = localStorage.getItem('lastDailyGoalDate');
+            const lastDate = storage.get('lastDailyGoalDate');
             // Eski format (toDateString) kontrolü - geriye uyumluluk için
             const todayOldFormat = new Date().toDateString();
             if (lastDate !== today && lastDate !== todayOldFormat) {
-                localStorage.setItem('dailyXP', '0');
-                localStorage.setItem('lastDailyGoalDate', today);
+                storage.set('dailyXP', '0');
+                storage.set('lastDailyGoalDate', today);
             }
             
             updateDailyGoalDisplay();
@@ -2170,9 +2171,9 @@
         }
         
         function updateDailyGoalDisplay() {
-            const goalXP = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
-            const dailyXP = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const goalLevel = localStorage.getItem('dailyGoalLevel') || 'normal';
+            const goalXP = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
+            const dailyXP = parseInt(storage.get('dailyHasene', '0')) || 0;
+            const goalLevel = storage.get('dailyGoalLevel', 'normal');
             
             const goals = {
                 easy: { name: 'Rahat', icon: '🌱' },
@@ -2249,10 +2250,10 @@
                 const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
                 const dayKey = `hasene_daily_${today}`;
                 
-                // Mevcut günlük verileri al veya yeni oluştur
-                const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-                const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-                const dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+                // Mevcut günlük verileri al veya yeni oluştur (storage manager ile)
+                const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+                const dailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
+                const dailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
                 
                 log.debug('💾 saveDailyStats çağrıldı:', {
                     today,
@@ -2270,12 +2271,12 @@
                     date: today
                 };
                 
-                localStorage.setItem(dayKey, JSON.stringify(dayData));
+                storage.set(dayKey, dayData);
                 
                 // Doğrulama: Kaydedilen veriyi oku
-                const saved = localStorage.getItem(dayKey);
+                const saved = storage.get(dayKey);
                 if (saved) {
-                    log.debug('✅ Günlük veriler kaydedildi:', JSON.parse(saved));
+                    log.debug('✅ Günlük veriler kaydedildi:', saved);
                 } else {
                     log.error('❌ Günlük veriler kaydedilemedi!');
                 }
@@ -2286,26 +2287,26 @@
         
         function addDailyXP(xp) {
             const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-            const lastDate = localStorage.getItem('lastDailyGoalDate');
+            const lastDate = storage.get('lastDailyGoalDate');
             // Eski format (toDateString) kontrolü - geriye uyumluluk için
             const todayOldFormat = new Date().toDateString();
             
-            // Yeni gün başladıysa sıfırla
+            // Yeni gün başladıysa sıfırla (storage manager ile)
             if (lastDate !== today && lastDate !== todayOldFormat) {
-                localStorage.setItem('dailyXP', '0');
-                localStorage.setItem('lastDailyGoalDate', today);
+                storage.set('dailyXP', '0');
+                storage.set('lastDailyGoalDate', today);
                 
                 // Günlük verileri sıfırla
-                localStorage.setItem('dailyHasene', '0');
-                localStorage.setItem('dailyCorrect', '0');
-                localStorage.setItem('dailyWrong', '0');
+                storage.set('dailyHasene', '0');
+                storage.set('dailyCorrect', '0');
+                storage.set('dailyWrong', '0');
             }
             
-            const currentXP = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const goalXP = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+            const currentXP = parseInt(storage.get('dailyHasene', '0')) || 0;
+            const goalXP = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
             const newXP = currentXP + xp;
             
-            localStorage.setItem('dailyHasene', newXP.toString());
+            storage.set('dailyHasene', newXP.toString());
             
             // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
             saveDailyStats();
@@ -3724,8 +3725,8 @@
                 { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
                 { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5 },
                 { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük virdi tamamla', icon: '⭐', condition: () => {
-                    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                    const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+                    const goalHasene = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
                     return dailyHasene >= goalHasene;
                 }},
                 { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7 },
@@ -4706,12 +4707,12 @@ window.closeAllModals = closeAllModals;
     window.dailyTasks = dailyTasks; // Global erişim için güncelle
 
     // ================================
-// 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA
+// 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA (Storage Manager ile)
 // ================================
-localStorage.setItem("dailyGoalHasene", "2700");  // hedef sıfır → 2700 varsayılan
-localStorage.setItem("dailyHasene", "0");         // günlük kazanılan XP sıfır
-localStorage.setItem("dailyGoalLevel", "normal"); // varsayılan zorluk
-localStorage.removeItem("lastDailyXPReset");       // reset tarihi temizle
+storage.set("dailyGoalHasene", "2700");  // hedef sıfır → 2700 varsayılan
+storage.set("dailyHasene", "0");         // günlük kazanılan XP sıfır
+storage.set("dailyGoalLevel", "normal"); // varsayılan zorluk
+storage.remove("lastDailyXPReset");      // reset tarihi temizle
 
 // UI Güncelle → Barları sıfırla
 const bar = document.getElementById("dailyGoalProgress");
