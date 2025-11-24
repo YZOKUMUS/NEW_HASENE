@@ -107,52 +107,51 @@ function getDailyStats() {
 // Haftalık istatistikler
 function getWeeklyStats() {
     try {
-        // Global fonksiyonları kontrol et
-        const getWeeklyScores = typeof window.getWeeklyScores === 'function' 
-            ? window.getWeeklyScores 
-            : (typeof getWeeklyScores === 'function' ? getWeeklyScores : null);
+        let totalHasene = 0;
+        let daysPlayed = 0;
         
-        const getWeekKey = typeof window.getWeekKey === 'function'
-            ? window.getWeekKey
-            : (typeof getWeekKey === 'function' ? getWeekKey : null);
+        const weekStart = getWeekStart(new Date());
+        const weekEnd = getWeekEnd(new Date());
+        const weekStartStr = weekStart.toISOString().split('T')[0];
+        const weekEndStr = weekEnd.toISOString().split('T')[0];
         
-        if (!getWeeklyScores || !getWeekKey) {
-            // Fallback: localStorage'dan direkt oku
-            try {
-                const saved = localStorage.getItem('hasene_weeklyScores');
-                const weeklyScores = saved ? JSON.parse(saved) : {};
-                // Tüm skorları topla
-                let totalHasene = 0;
-                for (const key in weeklyScores) {
-                    if (weeklyScores[key] && typeof weeklyScores[key].score !== 'undefined') {
-                        totalHasene += parseInt(weeklyScores[key].score) || 0;
+        // Bu haftanın günlerini tara
+        const currentDate = new Date(weekStart);
+        while (currentDate <= weekEnd) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const dayKey = `hasene_daily_${dateStr}`;
+            
+            const dayData = localStorage.getItem(dayKey);
+            if (dayData) {
+                try {
+                    const parsed = JSON.parse(dayData);
+                    const hasene = parseInt(parsed.hasene) || 0;
+                    if (hasene > 0) {
+                        totalHasene += hasene;
+                        daysPlayed++;
                     }
+                } catch (e) {
+                    // Parse hatası, devam et
                 }
-                return {
-                    week: 'current',
-                    hasene: totalHasene,
-                    days: 0
-                };
-            } catch (e) {
-                return {
-                    week: 'unknown',
-                    hasene: 0,
-                    days: 0
-                };
             }
+            
+            currentDate.setDate(currentDate.getDate() + 1);
         }
         
-        const weeklyScores = getWeeklyScores();
-        const weekKey = getWeekKey(new Date());
-        const weekData = weeklyScores[weekKey] || { score: 0 };
+        console.log('📅 Haftalık istatistik:', {
+            weekStart: weekStartStr,
+            weekEnd: weekEndStr,
+            totalHasene: totalHasene,
+            daysPlayed: daysPlayed
+        });
         
         return {
-            week: weekKey,
-            hasene: weekData.score || 0,
-            days: typeof getWeekPlayDays === 'function' ? getWeekPlayDays() : 0
+            week: `${weekStartStr} - ${weekEndStr}`,
+            hasene: totalHasene,
+            days: daysPlayed
         };
     } catch (error) {
-        console.error('Haftalık istatistik hatası:', error);
+        console.error('❌ Haftalık istatistik hatası:', error);
         return {
             week: 'error',
             hasene: 0,
@@ -164,52 +163,52 @@ function getWeeklyStats() {
 // Aylık istatistikler
 function getMonthlyStats() {
     try {
-        // Global fonksiyonları kontrol et
-        const getMonthlyScores = typeof window.getMonthlyScores === 'function'
-            ? window.getMonthlyScores
-            : (typeof getMonthlyScores === 'function' ? getMonthlyScores : null);
+        let totalHasene = 0;
+        let daysPlayed = 0;
         
-        const getMonthKey = typeof window.getMonthKey === 'function'
-            ? window.getMonthKey
-            : (typeof getMonthKey === 'function' ? getMonthKey : null);
+        const today = new Date();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const monthStartStr = monthStart.toISOString().split('T')[0];
+        const monthEndStr = monthEnd.toISOString().split('T')[0];
         
-        if (!getMonthlyScores || !getMonthKey) {
-            // Fallback: localStorage'dan direkt oku
-            try {
-                const saved = localStorage.getItem('hasene_monthlyScores');
-                const monthlyScores = saved ? JSON.parse(saved) : {};
-                // Tüm skorları topla
-                let totalHasene = 0;
-                for (const key in monthlyScores) {
-                    if (monthlyScores[key] && typeof monthlyScores[key].score !== 'undefined') {
-                        totalHasene += parseInt(monthlyScores[key].score) || 0;
+        // Bu ayın günlerini tara
+        const currentDate = new Date(monthStart);
+        while (currentDate <= monthEnd) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const dayKey = `hasene_daily_${dateStr}`;
+            
+            const dayData = localStorage.getItem(dayKey);
+            if (dayData) {
+                try {
+                    const parsed = JSON.parse(dayData);
+                    const hasene = parseInt(parsed.hasene) || 0;
+                    if (hasene > 0) {
+                        totalHasene += hasene;
+                        daysPlayed++;
                     }
+                } catch (e) {
+                    // Parse hatası, devam et
                 }
-                return {
-                    month: 'current',
-                    hasene: totalHasene,
-                    days: 0
-                };
-            } catch (e) {
-                return {
-                    month: 'unknown',
-                    hasene: 0,
-                    days: 0
-                };
             }
+            
+            currentDate.setDate(currentDate.getDate() + 1);
         }
         
-        const monthlyScores = getMonthlyScores();
-        const monthKey = getMonthKey(new Date());
-        const monthData = monthlyScores[monthKey] || { score: 0 };
+        console.log('📅 Aylık istatistik:', {
+            monthStart: monthStartStr,
+            monthEnd: monthEndStr,
+            totalHasene: totalHasene,
+            daysPlayed: daysPlayed
+        });
         
         return {
-            month: monthKey,
-            hasene: monthData.score || 0,
-            days: typeof getMonthPlayDays === 'function' ? getMonthPlayDays() : 0
+            month: `${today.toLocaleString('tr-TR', { month: 'long', year: 'numeric' })}`,
+            hasene: totalHasene,
+            days: daysPlayed
         };
     } catch (error) {
-        console.error('Aylık istatistik hatası:', error);
+        console.error('❌ Aylık istatistik hatası:', error);
         return {
             month: 'error',
             hasene: 0,
@@ -263,31 +262,94 @@ function getTrendStats() {
     return trends;
 }
 
+// ============ HAFTA/AY YARDIMCI FONKSİYONLARI ============
+// Haftanın başlangıcı (Pazartesi)
+function getWeekStart(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0); // Günün başına ayarla
+    const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
+    return new Date(d.setDate(diff));
+}
+
+// Haftanın sonu (Pazar)
+function getWeekEnd(date) {
+    const weekStart = getWeekStart(date);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999); // Günün sonuna ayarla
+    return weekEnd;
+}
+
 // Hafta oynama günleri
 function getWeekPlayDays() {
-    const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
-    const playDates = streakData.playDates || [];
-    const weekStart = getWeekStart(new Date());
-    const weekEnd = getWeekEnd(new Date());
-    
-    return playDates.filter(date => {
-        const playDate = new Date(date);
-        return playDate >= weekStart && playDate <= weekEnd;
-    }).length;
+    try {
+        const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
+        const playDates = streakData.playDates || [];
+        
+        if (playDates.length === 0) {
+            return 0;
+        }
+        
+        const weekStart = getWeekStart(new Date());
+        const weekEnd = getWeekEnd(new Date());
+        
+        // YYYY-MM-DD formatındaki tarihleri karşılaştır
+        const weekStartStr = weekStart.toISOString().split('T')[0];
+        const weekEndStr = weekEnd.toISOString().split('T')[0];
+        
+        const daysPlayed = playDates.filter(dateStr => {
+            return dateStr >= weekStartStr && dateStr <= weekEndStr;
+        }).length;
+        
+        console.log('📅 Haftalık hesaplama:', {
+            weekStart: weekStartStr,
+            weekEnd: weekEndStr,
+            playDates: playDates,
+            daysPlayed: daysPlayed
+        });
+        
+        return daysPlayed;
+    } catch (error) {
+        console.error('❌ getWeekPlayDays hatası:', error);
+        return 0;
+    }
 }
 
 // Ay oynama günleri
 function getMonthPlayDays() {
-    const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
-    const playDates = streakData.playDates || [];
-    const today = new Date();
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
-    return playDates.filter(date => {
-        const playDate = new Date(date);
-        return playDate >= monthStart && playDate <= monthEnd;
-    }).length;
+    try {
+        const streakData = JSON.parse(localStorage.getItem('hasene_streakData') || '{}');
+        const playDates = streakData.playDates || [];
+        
+        if (playDates.length === 0) {
+            return 0;
+        }
+        
+        const today = new Date();
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        // YYYY-MM-DD formatına çevir
+        const monthStartStr = monthStart.toISOString().split('T')[0];
+        const monthEndStr = monthEnd.toISOString().split('T')[0];
+        
+        const daysPlayed = playDates.filter(dateStr => {
+            return dateStr >= monthStartStr && dateStr <= monthEndStr;
+        }).length;
+        
+        console.log('📅 Aylık hesaplama:', {
+            monthStart: monthStartStr,
+            monthEnd: monthEndStr,
+            playDates: playDates,
+            daysPlayed: daysPlayed
+        });
+        
+        return daysPlayed;
+    } catch (error) {
+        console.error('❌ getMonthPlayDays hatası:', error);
+        return 0;
+    }
 }
 
 // Detaylı istatistikler modal'ını göster
