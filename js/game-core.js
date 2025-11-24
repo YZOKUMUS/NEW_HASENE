@@ -93,7 +93,7 @@ function goToMainMenu() {
     }
     
     // Oyun seslerini durdur
-    if (currentAudio) {
+    if (typeof currentAudio !== 'undefined' && currentAudio) {
         currentAudio.pause();
         currentAudio = null;
     }
