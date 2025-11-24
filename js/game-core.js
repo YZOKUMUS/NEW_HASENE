@@ -2836,13 +2836,14 @@ const gameState = {
 };
 
 // ============ GERIYE UYUMLU DEĞİŞKENLER (Backward Compatibility) ============
-// Mevcut kodu kırmamak için eski değişken isimlerini gameState'e bağlıyoruz
+// Mevcut kodu kırmamak için eski değişken isimlerini koruyoruz
+// Yavaş yavaş bu değişkenleri gameState'e migrate edeceğiz
+
 let currentQuestion = null;
 let currentAyetIndex = 0;
 let currentDuaIndex = 0;
 let currentHadisIndex = 0;
-let hintUsed = false; // Her soru için ipucu kullanıldı mı? (genel scope)
-// Soru sayısı takibi (ayet, dua, hadis modları için)
+let hintUsed = false; 
 let ayetQuestionCount = 0;
 let duaQuestionCount = 0;
 let hadisQuestionCount = 0;
