@@ -369,6 +369,10 @@
 
         <!-- Bottom Navigation Bar -->
         <nav id="bottomNavBar" class="bottom-nav" style="display: flex;" role="navigation" aria-label="Ana navigasyon menüsü">
+            <button class="nav-item" onclick="goToMainMenu()" title="Ana Menü" aria-label="Ana menüye dön" role="button" tabindex="0">
+                <span class="nav-icon" aria-hidden="true">🏠</span>
+                <span class="nav-label">Ana Menü</span>
+            </button>
             <button class="nav-item" onclick="showStatsModal()" title="İstatistikler" aria-label="İstatistikler modalını aç" role="button" tabindex="0">
                 <span class="nav-icon" aria-hidden="true">📊</span>
                 <span class="nav-label">İstatistikler</span>
@@ -9038,13 +9042,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Geri butonları
         elements.backToMenuBtn.onclick = () => {
-            // Ensure all modes are hidden and return to main menu
-            hideAllModes();
-            if (elements.mainMenu) elements.mainMenu.style.display = 'block';
-            if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
+            goToMainMenu(); // Ana menüye dönüş fonksiyonunu kullan
         };
 
         if (elements.backFromGameBtn) {
@@ -13299,6 +13297,46 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
     <script>
 
 // Ana menüyü göster - uses hideAllGameScreens from main script
+// ============ ANA MENÜYE DÖNÜŞ FONKSİYONU ============
+function goToMainMenu() {
+    log.debug('🏠 Ana menüye dönülüyor...');
+    
+    // Timer varsa durdur
+    if (typeof stopTimer === 'function') {
+        stopTimer();
+    }
+    
+    // Oyun seslerini durdur
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    // Tüm modalları kapat
+    closeAllModals();
+    
+    // Tüm oyun modlarını gizle
+    hideAllModes();
+    
+    // Ana menüyü göster
+    if (elements.mainMenu) {
+        elements.mainMenu.style.display = 'block';
+    } else {
+        const mainMenu = document.getElementById('mainMenu');
+        if (mainMenu) mainMenu.style.display = 'block';
+    }
+    
+    // Navigasyon bar'ı göster
+    showBottomNavBar();
+    
+    // Settings butonunu gizle (ana menüde gerekmez)
+    if (elements.settingsBtn) {
+        elements.settingsBtn.style.display = 'none';
+    }
+    
+    log.debug('✅ Ana menü gösterildi');
+}
+
 function showMainMenu() {
     // Tüm ekranları ve modal'ları gizle
     if (typeof hideAllGameScreens === 'function') {
