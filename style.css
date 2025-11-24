@@ -3598,6 +3598,77 @@ body.dark-mode #statsModal div[style*="background: #e9ecef"] {
     background: #111827 !important;
 }
 
+/* Oyun Türü İstatistikleri section (yeşil gradient) */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] {
+    background: linear-gradient(135deg, #1a3a1a 0%, #0f2a0f 100%) !important;
+    border-left: 4px solid #34d399 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] h4[style*="color: #27ae60"] {
+    color: #34d399 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] span[style*="color: #333"] {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] strong[style*="color: #27ae60"] {
+    color: #34d399 !important;
+}
+
+/* Bugünkü Amel section (sarı-turuncu gradient) */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] {
+    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
+    border-left: 4px solid #fbbf24 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] h4[style*="color: #b7950b"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Kelime İstatistikleri section (mor-mavi gradient) */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#845EC2"][style*="#4E8397"] {
+    background: linear-gradient(135deg, #2d1f3d 0%, #1e3a5f 100%) !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#845EC2"][style*="#4E8397"] div[style*="opacity: 0.9"] {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+/* Tüm #333 renkli text'ler için genel override (en güçlü) */
+body.dark-mode #statsModal *[style*="color: #333"] {
+    color: #e5e7eb !important;
+}
+
+/* Tüm #666 renkli text'ler için genel override */
+body.dark-mode #statsModal *[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Tüm #555 renkli text'ler için genel override */
+body.dark-mode #statsModal *[style*="color: #555"] {
+    color: #d1d5db !important;
+}
+
+/* Tüm #888 renkli text'ler için genel override */
+body.dark-mode #statsModal *[style*="color: #888"] {
+    color: #9ca3af !important;
+}
+
+/* Span elementleri için genel override */
+body.dark-mode #statsModal span {
+    color: inherit !important;
+}
+
+/* Strong elementleri için genel override */
+body.dark-mode #statsModal strong {
+    color: inherit !important;
+}
+
 /* Detaylı buton */
 body.dark-mode #statsModal button[style*="linear-gradient"][style*="#667eea"] {
     background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
