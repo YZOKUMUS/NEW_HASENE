@@ -961,72 +961,115 @@ function closeDailyGoalModal() {
 window.showDailyGoalSettings = showDailyGoalSettings;
 window.closeDailyGoalModal = closeDailyGoalModal;
 
-// Daily Goal Modal için touch event'leri
-let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
-let dailyGoalModalIsScrolling = false;
+// ============ GENERIC MODAL TOUCH EVENT MANAGER ============
+/**
+ * Tek bir fonksiyon ile tüm modallar için touch event'leri yönetir
+ * DRY (Don't Repeat Yourself) prensibi
+ */
+const modalTouchState = new Map(); // Her modal için ayrı state
 
-function initDailyGoalModalTouchEvents() {
-    const dailyGoalModal = document.getElementById('dailyGoalModal');
-    if (!dailyGoalModal) return;
+function initGenericModalTouchEvents(modalId, closeCallback) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+        log.warn(`⚠️ Modal bulunamadı: ${modalId}`);
+        return;
+    }
     
     // Eğer zaten eklenmişse, tekrar ekleme
-    if (dailyGoalModal.hasAttribute('data-touch-events-initialized')) return;
-    dailyGoalModal.setAttribute('data-touch-events-initialized', 'true');
+    if (modal.hasAttribute('data-touch-events-initialized')) {
+        return;
+    }
+    modal.setAttribute('data-touch-events-initialized', 'true');
     
-    // Modal overlay için touch event'leri
-    dailyGoalModal.addEventListener('touchstart', function(e) {
+    // Bu modal için state oluştur
+    modalTouchState.set(modalId, {
+        touchStart: { x: 0, y: 0, time: 0 },
+        isScrolling: false
+    });
+    
+    const getState = () => modalTouchState.get(modalId);
+    
+    // Touch start event
+    eventManager.add(modal, 'touchstart', function(e) {
         if (e.target && e.target.closest('.modal-content')) {
             return;
         }
         
         const touch = e.touches[0];
-        dailyGoalModalTouchStart = {
+        const state = getState();
+        state.touchStart = {
             x: touch.clientX,
             y: touch.clientY,
             time: Date.now()
         };
-        dailyGoalModalIsScrolling = false;
+        state.isScrolling = false;
     }, { passive: true });
     
-    dailyGoalModal.addEventListener('touchmove', function(e) {
+    // Touch move event
+    eventManager.add(modal, 'touchmove', function(e) {
         if (e.target && e.target.closest('.modal-content')) {
             return;
         }
         
-        if (dailyGoalModalTouchStart.x !== 0 || dailyGoalModalTouchStart.y !== 0) {
+        const state = getState();
+        if (state.touchStart.x !== 0 || state.touchStart.y !== 0) {
             const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - dailyGoalModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - dailyGoalModalTouchStart.y);
+            const deltaX = Math.abs(touch.clientX - state.touchStart.x);
+            const deltaY = Math.abs(touch.clientY - state.touchStart.y);
             if (deltaX > 10 || deltaY > 10) {
-                dailyGoalModalIsScrolling = true;
+                state.isScrolling = true;
             }
         }
     }, { passive: true });
     
-    dailyGoalModal.addEventListener('touchend', function(e) {
-        if (dailyGoalModalIsScrolling) {
-            dailyGoalModalIsScrolling = false;
-            dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
+    // Touch end event
+    eventManager.add(modal, 'touchend', function(e) {
+        const state = getState();
+        
+        if (state.isScrolling) {
+            state.isScrolling = false;
+            state.touchStart = { x: 0, y: 0, time: 0 };
             return;
         }
         
         const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - dailyGoalModalTouchStart.time;
-        const deltaX = Math.abs(touch.clientX - dailyGoalModalTouchStart.x);
-        const deltaY = Math.abs(touch.clientY - dailyGoalModalTouchStart.y);
+        const deltaTime = Date.now() - state.touchStart.time;
+        const deltaX = Math.abs(touch.clientX - state.touchStart.x);
+        const deltaY = Math.abs(touch.clientY - state.touchStart.y);
         
+        // Tap tespit edildi (hızlı dokunma, az hareket)
         if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
             if (e.target && e.target.closest('.modal-content')) {
                 return;
             }
-            if (e.target && (e.target.id === 'closeDailyGoalBtn' || e.target.closest('#closeDailyGoalBtn'))) {
+            // Close button kontrolü (varsayılan close button id pattern'i)
+            const closeButtonId = `close${modalId.charAt(0).toUpperCase() + modalId.slice(1, -5)}Btn`;
+            if (e.target && (e.target.id === closeButtonId || e.target.closest(`#${closeButtonId}`))) {
                 return;
             }
-            closeDailyGoalModal();
+            // Modal dışına tap edildi, modalı kapat
+            if (typeof closeCallback === 'function') {
+                closeCallback();
+            }
         }
         
-        dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 };
+        state.touchStart = { x: 0, y: 0, time: 0 };
     }, { passive: true });
+    
+    log.debug(`✅ Generic touch events initialized for: ${modalId}`);
+}
+
+// ============ ESKI MODAL TOUCH EVENT FONKSİYONLARI (Backward Compatibility) ============
+// Yeni kodda initGenericModalTouchEvents kullanılmalı
+// Eski fonksiyonlar generic fonksiyonu çağırır
+
+// Daily Goal Modal için touch event'leri
+let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 }; // DEPRECATED
+let dailyGoalModalIsScrolling = false; // DEPRECATED
+
+function initDailyGoalModalTouchEvents() {
+    // Yeni generic fonksiyon kullan
+    initGenericModalTouchEvents('dailyGoalModal', closeDailyGoalModal);
 }
 
 // Her yere tıklayınca kapatma fonksiyonu
@@ -2725,12 +2768,125 @@ function showAchievementUnlock(achievement) {
 // Veri değişkenleri artık js/data-loader.js'de tanımlı (lazy loading için)
 // kelimeBulData, ayetOkuData, duaData, hadisData global olarak erişilebilir
 
+// ============ MERKEZI GAME STATE (Tüm oyun durumu burada) ============
+/**
+ * gameState - Tüm oyun durumunu tek bir objede toplar
+ * Avantajlar:
+ * - Merkezi state yönetimi
+ * - Kolay debug (tek objede tüm state)
+ * - Daha iyi performans izleme
+ * - State history tutma imkanı
+ */
+const gameState = {
+    // === CURRENT QUESTION STATE ===
+    question: {
+        current: null,
+        ayetIndex: 0,
+        duaIndex: 0,
+        hadisIndex: 0,
+        count: 0,
+        hintUsed: false,
+        recentAnswerPositions: []  // Son 10 sorunun doğru cevap pozisyonları
+    },
+    
+    // === QUESTION COUNTS PER GAME TYPE ===
+    questionCounts: {
+        ayet: 0,
+        dua: 0,
+        hadis: 0,
+        dinle: 0,
+        bosluk: 0
+    },
+    
+    // === SESSION STATE (Mevcut oyun oturumu) ===
+    session: {
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        comboCount: 0,
+        startTime: null
+    },
+    
+    // === GAME TYPE SCORES ===
+    gameScores: {
+        kelimeCevir: { score: 0, correct: 0, wrong: 0 },
+        dinleBul: { score: 0, correct: 0, wrong: 0 },
+        boslukDoldur: { score: 0, correct: 0, wrong: 0 }
+    },
+    
+    // === GLOBAL (PERSISTENT) STATE ===
+    global: {
+        totalPoints: 0,
+        starPoints: 0,
+        level: 1,
+        badges: {
+            bronze: 0,
+            silver: 0,
+            gold: 0,
+            diamond: 0
+        },
+        streak: {
+            currentStreak: 0,
+            bestStreak: 0,
+            lastPlayDate: '',
+            totalPlayDays: 0,
+            dailyGoal: 5,
+            todayProgress: 0,
+            todayDate: '',
+            playDates: []
+        },
+        dailyTasks: {
+            lastTaskDate: '',
+            tasks: [],
+            bonusTasks: [],
+            completedTasks: [],
+            rewardsClaimed: false,
+            todayStats: {
+                kelimeCevir: 0,
+                dinleBul: 0,
+                boslukDoldur: 0,
+                ayetOku: 0,
+                duaOgre: 0,
+                hadisOku: 0,
+                toplamDogru: 0,
+                toplamYanlis: 0,
+                toplamPuan: 0,
+                perfectStreak: 0,
+                farklıZorluk: new Set()
+            }
+        }
+    },
+    
+    // === GAME SETTINGS ===
+    settings: {
+        currentMode: CONFIG.defaultMode,
+        currentDifficulty: CONFIG.defaultDifficulty,
+        lives: 0,
+        timeLeft: 0
+    },
+    
+    // === AUDIO/MEDIA STATE ===
+    media: {
+        currentAudio: null,
+        isListening: false
+    },
+    
+    // === TIMERS ===
+    timers: {
+        main: null,
+        questionTimer: null
+    }
+};
+
+// ============ GERIYE UYUMLU DEĞİŞKENLER (Backward Compatibility) ============
+// Mevcut kodu kırmamak için eski değişken isimlerini koruyoruz
+// Yavaş yavaş bu değişkenleri gameState'e migrate edeceğiz
+
 let currentQuestion = null;
 let currentAyetIndex = 0;
 let currentDuaIndex = 0;
 let currentHadisIndex = 0;
-let hintUsed = false; // Her soru için ipucu kullanıldı mı? (genel scope)
-// Soru sayısı takibi (ayet, dua, hadis modları için)
+let hintUsed = false; 
 let ayetQuestionCount = 0;
 let duaQuestionCount = 0;
 let hadisQuestionCount = 0;
