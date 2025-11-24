@@ -928,36 +928,18 @@
             <!-- Scroll Edilebilir İçerik -->
             <div id="statsScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
 
-            <!-- Genel Özet - Modern Tasarım -->
+            <!-- Mertebe Terakki Barı - Modern -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
-                <h3 style="font-size: 14px; margin-bottom: 12px; opacity: 0.9; font-weight: 600;">📊 Genel Özet</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;">
-                    <div class="stat-item">
-                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="statsLevel">1</div>
-                        <div style="font-size: 11px; opacity: 0.9;">Mertebe</div>
-                    </div>
-                    <div class="stat-item">
-                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="statsPoints">0</div>
-                        <div style="font-size: 11px; opacity: 0.9;">Hasene</div>
-                    </div>
-                    <div class="stat-item">
-                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="statsStars">0</div>
-                        <div style="font-size: 11px; opacity: 0.9;">⭐ Yıldız</div>
-                    </div>
+                <h3 style="font-size: 14px; margin-bottom: 12px; opacity: 0.9; font-weight: 600;">📈 Mertebe Terakkisi</h3>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; opacity: 0.9; font-weight: 600;">
+                    <span>Mertebe <span id="statsCurrentLevel">1</span></span>
+                    <span>Mertebe <span id="statsNextLevel">2</span></span>
                 </div>
-                
-                <!-- Mertebe Terakki Barı - Modern -->
-                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2);">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; opacity: 0.9; font-weight: 600;">
-                        <span>Mertebe <span id="statsCurrentLevel">1</span></span>
-                        <span>Mertebe <span id="statsNextLevel">2</span></span>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                        <div id="statsLevelProgress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Mertebe ilerleme çubuğu" style="background: rgba(255,255,255,0.95); height: 100%; width: 0%; border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
-                    </div>
-                    <div style="font-size: 11px; margin-top: 6px; opacity: 0.9; font-weight: 500;">
-                        <span id="statsLevelPointsNeeded">0</span> hasene daha
-                    </div>
+                <div style="background: rgba(255,255,255,0.2); height: 8px; border-radius: 8px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                    <div id="statsLevelProgress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Mertebe ilerleme çubuğu" style="background: rgba(255,255,255,0.95); height: 100%; width: 0%; border-radius: 8px; transition: width 0.5s ease; box-shadow: 0 2px 8px rgba(255,255,255,0.5);"></div>
+                </div>
+                <div style="font-size: 11px; margin-top: 6px; opacity: 0.9; font-weight: 500;">
+                    <span id="statsLevelPointsNeeded">0</span> hasene daha
                 </div>
             </div>
 
@@ -5188,14 +5170,6 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
         updateDailyGoalDisplay();
     }
 
-    // İstatistikler Modal - Genel Özet
-    const statsLevelEl = document.getElementById('statsLevel');
-    const statsPointsEl = document.getElementById('statsPoints');
-    const statsStarsEl = document.getElementById('statsStars');
-    if (statsLevelEl) statsLevelEl.textContent = '1';
-    if (statsPointsEl) statsPointsEl.textContent = '0';
-    if (statsStarsEl) statsStarsEl.textContent = '0';
-
     // İstatistikler Modal - Seviye İlerleme Barı
     const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
     const statsNextLevelEl = document.getElementById('statsNextLevel');
@@ -6291,15 +6265,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 // Body scroll'u engelle
                 document.body.style.overflow = 'hidden';
                 
-                // Genel istatistikleri güncelle (null check ile)
-            const statsLevelEl = document.getElementById('statsLevel');
-            const statsPointsEl = document.getElementById('statsPoints');
-            const statsStarsEl = document.getElementById('statsStars');
-            if (statsLevelEl) statsLevelEl.textContent = level;
-            if (statsPointsEl) statsPointsEl.textContent = totalPoints.toLocaleString();
-            if (statsStarsEl) statsStarsEl.textContent = starPoints;
-            
-            // Seviye ilerleme barını hesapla
+                // Seviye ilerleme barını hesapla
             let currentLevelStart, nextLevelStart;
             const nextLevel = level + 1;
             
