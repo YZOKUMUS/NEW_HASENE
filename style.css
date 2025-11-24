@@ -1656,6 +1656,14 @@ body.dark-mode .diff-btn:hover:not(.active) {
     border-color: rgba(102, 126, 234, 0.5) !important;
 }
 
+body.dark-mode .mode-btn.active,
+body.dark-mode .diff-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-color: #667eea !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+}
+
 .mode-btn,
 .diff-btn {
     width: 100%;
