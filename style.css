@@ -1095,28 +1095,28 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffea
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #333"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #856404"] {
-    color: #fbbf24 !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] strong {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 /* Kelime Ameli - Gri kart */
@@ -1125,27 +1125,27 @@ body.dark-mode #mainMenu div[style*="background: #f8f9fa"] {
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #333"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #666"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #27ae60"] {
-    color: #34d399 !important;
+    color: #27ae60 !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #e74c3c"] {
-    color: #f87171 !important;
+    color: #e74c3c !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] span {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] * {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 /* Öğrenme Haritası - Mavi-pembe gradient kart */
@@ -1154,35 +1154,35 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8ed
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #27ae60"] {
-    color: #34d399 !important;
+    color: #27ae60 !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
-    color: #fbbf24 !important;
+    color: #f39c12 !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #e74c3c"] {
-    color: #f87171 !important;
+    color: #e74c3c !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] * {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 /* Liderlik Tablosu - Sarı gradient kart */
@@ -1191,23 +1191,23 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd7
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"] {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
-    color: #fbbf24 !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] span {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] * {
-    color: #ffffff !important;
+    color: #1a1a1a !important;
 }
 
 /* Liderlik Tablosu başlığı */
