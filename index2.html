@@ -8738,13 +8738,13 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
             
             // Seçenekler oluştur
             const wrongAnswers = getWrongAnswers(3);
-            const allOptions = [
+            let allOptions = [
                 { text: currentQuestion.anlam, correct: true },
                 ...wrongAnswers.map(w => ({ text: w.anlam, correct: false }))
             ];
             
-            // Shuffle
-            shuffleArray(allOptions);
+            // Shuffle (sonucu geri al)
+            allOptions = shuffleArray(allOptions);
             
             // Seçenekleri göster
             elements.options.innerHTML = '';
@@ -8752,7 +8752,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
                 const button = document.createElement('button');
                 button.textContent = option.text;
                 button.classList.add('option-btn');
-                button.onclick = () => checkAnswer(option.correct, option.text);
+                button.onclick = () => checkAnswer(button, option.correct); // FIX: Doğru parametreler
                 elements.options.appendChild(button);
             });
             
