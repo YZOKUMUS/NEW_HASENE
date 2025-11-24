@@ -1650,9 +1650,62 @@
             }
 
             cleanup() {
+                if (!this.storageAvailable) return;
+                
                 const keysToRemove = [];
-                keysToRemove.forEach(key => this.remove(key));
-                log.debug('🧹 Storage cleanup tamamlandı');
+                const now = Date.now();
+                const ONE_YEAR = 365 * 24 * 60 * 60 * 1000; // 1 yıl
+                
+                try {
+                    // 1. Geçici verileri temizle (temp, cache, old)
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            if (key.startsWith('temp_') || 
+                                key.startsWith('cache_') || 
+                                key.startsWith('old_') ||
+                                key.includes('_backup_') ||
+                                key.includes('_temp')) {
+                                keysToRemove.push(key);
+                            }
+                        }
+                    }
+                    
+                    // 2. 1 yıldan eski daily stats'ları temizle
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key) && key.startsWith('dailyStats_')) {
+                            try {
+                                const dateStr = key.replace('dailyStats_', '');
+                                const date = new Date(dateStr);
+                                if (!isNaN(date) && (now - date.getTime() > ONE_YEAR)) {
+                                    keysToRemove.push(key);
+                                }
+                            } catch (e) {
+                                // Geçersiz tarih formatı, sil
+                                keysToRemove.push(key);
+                            }
+                        }
+                    }
+                    
+                    // 3. Boş veya geçersiz verileri temizle
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            const value = localStorage.getItem(key);
+                            if (!value || value === 'undefined' || value === 'null' || value === '{}' || value === '[]') {
+                                keysToRemove.push(key);
+                            }
+                        }
+                    }
+                    
+                    // Temizliği uygula
+                    const removedCount = keysToRemove.length;
+                    keysToRemove.forEach(key => this.remove(key));
+                    
+                    log.debug(`🧹 Storage cleanup: ${removedCount} anahtar temizlendi`);
+                    return removedCount;
+                } catch (error) {
+                    log.error('❌ Storage cleanup hatası:', error);
+                    return 0;
+                }
             }
 
             getAllKeys() {
@@ -1681,6 +1734,100 @@
                     log.error('❌ Storage boyutu hesaplanamadı:', error);
                     return 0;
                 }
+            }
+
+            /**
+             * Veri doğrulama - Belirli bir key için beklenen veri yapısını kontrol et
+             * @param {string} key - Storage anahtarı
+             * @param {Object} schema - Beklenen veri şeması { type: 'object|array|number|string', required: ['field1', 'field2'] }
+             * @returns {boolean} - Veri geçerli mi?
+             */
+            validate(key, schema) {
+                const data = this.get(key);
+                if (data === null || data === undefined) {
+                    return false;
+                }
+
+                // Tip kontrolü
+                if (schema.type) {
+                    const actualType = Array.isArray(data) ? 'array' : typeof data;
+                    if (actualType !== schema.type) {
+                        log.warn(`⚠️ Storage validation failed: ${key} (expected ${schema.type}, got ${actualType})`);
+                        return false;
+                    }
+                }
+
+                // Required field kontrolü (sadece object için)
+                if (schema.required && typeof data === 'object' && !Array.isArray(data)) {
+                    for (const field of schema.required) {
+                        if (!(field in data)) {
+                            log.warn(`⚠️ Storage validation failed: ${key} missing required field "${field}"`);
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            /**
+             * Güvenli get - Schema validation ile birlikte
+             * @param {string} key - Storage anahtarı
+             * @param {*} defaultValue - Default değer
+             * @param {Object} schema - Opsiyonel validation şeması
+             * @returns {*} - Storage değeri veya default
+             */
+            getSafe(key, defaultValue = null, schema = null) {
+                const data = this.get(key, defaultValue);
+                
+                // Schema varsa validate et
+                if (schema && data !== defaultValue) {
+                    if (!this.validate(key, schema)) {
+                        log.warn(`⚠️ Invalid data for ${key}, returning default`);
+                        return defaultValue;
+                    }
+                }
+                
+                return data;
+            }
+
+            /**
+             * Storage kullanım istatistikleri
+             * @returns {Object} - { used: number, total: number, percent: number, itemCount: number }
+             */
+            getStats() {
+                if (!this.storageAvailable) {
+                    return { used: 0, total: 0, percent: 0, itemCount: 0 };
+                }
+
+                const used = this.getSize();
+                const total = 5 * 1024 * 1024; // 5MB (tarayıcı varsayılanı)
+                const percent = ((used / total) * 100).toFixed(2);
+                const itemCount = this.getAllKeys().length;
+
+                return {
+                    used,
+                    total,
+                    percent: parseFloat(percent),
+                    itemCount,
+                    usedMB: (used / (1024 * 1024)).toFixed(2),
+                    totalMB: (total / (1024 * 1024)).toFixed(2)
+                };
+            }
+
+            /**
+             * Otomatik temizlik - Storage %80 doluysa temizlik yap
+             * @returns {boolean} - Temizlik yapıldı mı?
+             */
+            autoCleanup() {
+                const stats = this.getStats();
+                if (stats.percent > 80) {
+                    log.warn(`⚠️ Storage %${stats.percent} dolu, otomatik temizlik başlatılıyor...`);
+                    const cleaned = this.cleanup();
+                    log.debug(`🧹 Otomatik temizlik: ${cleaned} anahtar silindi`);
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -3191,6 +3338,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // (commented) DOM yüklendi log removed during cleanup
             
+            // 🧹 Otomatik storage temizliği (başlangıçta)
+            storage.autoCleanup();
+            
             // Custom Alert Modal butonları için touch event'leri (passive)
             const customAlertCloseBtn = document.getElementById('customAlertCloseBtn');
             const customAlertOKBtn = document.getElementById('customAlertOKBtn');
@@ -3216,9 +3366,9 @@
             }
             
             // Daily Goal'u başlat
-            if (!localStorage.getItem('dailyGoalHasene')) {
-                localStorage.setItem('dailyGoalHasene', '2700');
-                localStorage.setItem('dailyGoalLevel', 'normal');
+            if (!storage.get('dailyGoalHasene')) {
+                storage.set('dailyGoalHasene', '2700');
+                storage.set('dailyGoalLevel', 'normal');
             }
             updateDailyGoalDisplay();
             
@@ -3486,7 +3636,7 @@
                 { id: 'xp_170000', name: 'Ustalar Ustası', desc: '170,000 Hasene topla', icon: '✨', condition: () => totalPoints >= 170000 }
             ];
             
-            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+            const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
             let newUnlocks = [];
             
             achievements.forEach(ach => {
@@ -3497,7 +3647,7 @@
             });
             
             if (newUnlocks.length > 0) {
-                localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+                storage.set('unlockedAchievements', unlockedAchievements);
                 newUnlocks.forEach(ach => {
                     setTimeout(() => {
                         showAchievementUnlock(ach);
@@ -5179,7 +5329,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Başarılar modal istatistiklerini güncelle
         function updateBadgesModalStats() {
-            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+            const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
             const totalAchievements = 20; // Toplam achievement sayısı
             const unlockedCount = unlockedAchievements.length;
             const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
@@ -5195,7 +5345,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
         // Tüm achievement'ları güncelle
         function updateAllAchievements() {
-            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+            const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
             const achievements = [
                 { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
                 { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5, progress: () => Math.min(comboCount || 0, 5) },
@@ -11963,7 +12113,7 @@ if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
 
                 // 3. BAŞARIM KONTROLÜ
                 log.debug('\n🏆 3. BAŞARIM SİSTEMİ KONTROLÜ:');
-                const unlockedAch = JSON.parse(localStorage.getItem('unlockedAchievements')) || [];
+                const unlockedAch = storage.getSafe('unlockedAchievements', [], { type: 'array' });
                 log.debug('   Açılan başarımlar:', unlockedAch.length, 'adet');
                 log.debug('   Liste:', unlockedAch.join(', '));
 
