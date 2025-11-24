@@ -1095,12 +1095,12 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffea
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #333"] {
-    color: #fbbf24 !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"] {
-    color: #e5e7eb !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #856404"] {
@@ -1111,17 +1111,25 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffea
     color: #ffffff !important;
 }
 
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span {
+    color: #ffffff !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
+    color: #ffffff !important;
+}
+
 /* Kelime Ameli - Gri kart */
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] {
     background: #1f2937 !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #333"] {
-    color: #e5e7eb !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #666"] {
-    color: #d1d5db !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #27ae60"] {
@@ -1132,17 +1140,25 @@ body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #e
     color: #f87171 !important;
 }
 
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] span {
+    color: #ffffff !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: #f8f9fa"] * {
+    color: #ffffff !important;
+}
+
 /* Öğrenme Haritası - Mavi-pembe gradient kart */
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] {
     background: linear-gradient(135deg, #1e3a5f 0%, #2d1f3d 100%) !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
-    color: #e5e7eb !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #d1d5db !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
@@ -1161,21 +1177,37 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8ed
     color: #f87171 !important;
 }
 
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span {
+    color: #ffffff !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] * {
+    color: #ffffff !important;
+}
+
 /* Liderlik Tablosu - Sarı gradient kart */
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] {
     background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"] {
-    color: #fbbf24 !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"] {
-    color: #e5e7eb !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
     color: #fbbf24 !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] span {
+    color: #ffffff !important;
+}
+
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] * {
+    color: #ffffff !important;
 }
 
 /* Liderlik Tablosu başlığı */
