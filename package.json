@@ -1,0 +1,30 @@
+{
+  "name": "hasene-arapca-dersi",
+  "version": "1.0.0",
+  "description": "Arapça öğrenmeyi eğlenceli hale getiren interaktif eğitim oyunu",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
+    "docs": "jsdoc -c jsdoc.config.json",
+    "docs:serve": "jsdoc -c jsdoc.config.json && npx serve out"
+  },
+  "keywords": [
+    "arapça",
+    "öğrenme",
+    "oyun",
+    "pwa",
+    "education"
+  ],
+  "author": "YZOKUMUS",
+  "license": "ISC",
+  "devDependencies": {
+    "@vitest/ui": "^1.0.0",
+    "jsdoc": "^4.0.2",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {}
+}
+
