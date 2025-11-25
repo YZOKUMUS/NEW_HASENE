@@ -235,13 +235,43 @@ function closeCustomAlert() {
     }
 }
 
-// Global erişim için
-window.closeCustomAlert = closeCustomAlert;
+// Global erişim için (tarayıcıda)
+if (typeof window !== 'undefined') {
+    window.closeCustomAlert = closeCustomAlert;
+    
+    // Test ortamı için fonksiyonları window'a ekle
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+        window.getLocalDateString = getLocalDateString;
+        window.sanitizeHTML = sanitizeHTML;
+        window.encryptData = encryptData;
+        window.decryptData = decryptData;
+        window.secureSetItem = secureSetItem;
+        window.secureGetItem = secureGetItem;
+        window.safeSetHTML = safeSetHTML;
+        window.hapticFeedback = hapticFeedback;
+        window.initSwipeGestures = initSwipeGestures;
+        window.showLoading = showLoading;
+        window.hideLoading = hideLoading;
+        window.showCustomAlert = showCustomAlert;
+    }
+}
 
-// Jest testleri için export (Node.js ortamında)
+// Test ortamı için export (Node.js/Vitest'te çalışır)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        getLocalDateString
+        getLocalDateString,
+        sanitizeHTML,
+        encryptData,
+        decryptData,
+        secureSetItem,
+        secureGetItem,
+        safeSetHTML,
+        hapticFeedback,
+        initSwipeGestures,
+        showLoading,
+        hideLoading,
+        showCustomAlert,
+        closeCustomAlert
     };
 }
 

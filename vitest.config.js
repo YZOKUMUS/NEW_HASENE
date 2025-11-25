@@ -6,6 +6,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.js'],
     include: ['tests/**/*.test.js'],
+    // CommonJS modüllerini destekle
+    server: {
+      deps: {
+        inline: ['../js/utils.js']
+      }
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

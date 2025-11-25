@@ -1,15 +1,5 @@
 // Vitest test setup dosyası
-import { expect, afterEach } from 'vitest';
-import { cleanup } from '@testing-library/jest-dom';
-import * as matchers from '@testing-library/jest-dom/matchers';
-
-// DOM temizleme
-afterEach(() => {
-  cleanup();
-});
-
-// Jest DOM matchers'ı ekle
-expect.extend(matchers);
+import { expect } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -60,4 +50,3 @@ global.log = {
   error: console.error,
   warn: console.warn
 };
-
