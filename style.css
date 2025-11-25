@@ -3734,6 +3734,333 @@ body.dark-mode #statsModal button[style*="color: white"] {
     color: #ffffff !important;
 }
 
+/* ============ EK DARK MODE OVERRIDE'LAR - İSTATİSTİKLER PANELİ ============ */
+
+/* #2c3e50 (dark blue-gray) renkli text'ler için */
+body.dark-mode #statsModal *[style*="color: #2c3e50"],
+body.dark-mode #statsModal div[style*="color: #2c3e50"],
+body.dark-mode #statsModal span[style*="color: #2c3e50"],
+body.dark-mode #statsModal strong[style*="color: #2c3e50"] {
+    color: #e5e7eb !important;
+}
+
+/* #856404 (dark brown) renkli text'ler için */
+body.dark-mode #statsModal *[style*="color: #856404"],
+body.dark-mode #statsModal div[style*="color: #856404"],
+body.dark-mode #statsModal span[style*="color: #856404"] {
+    color: #fbbf24 !important;
+}
+
+/* #999 (light gray) renkli text'ler için */
+body.dark-mode #statsModal *[style*="color: #999"],
+body.dark-mode #statsModal div[style*="color: #999"],
+body.dark-mode #statsModal span[style*="color: #999"],
+body.dark-mode #statsModal small[style*="color: #999"] {
+    color: #d1d5db !important;
+}
+
+/* Beyaz arka planlı kutular içindeki TÜM text'ler için genel override */
+body.dark-mode #statsModal div[style*="background: white"] *,
+body.dark-mode #statsModal div[style*="background: #fff"] * {
+    color: inherit !important;
+}
+
+/* Oyun Türü İstatistikleri section - beyaz kutular içindeki text'ler */
+body.dark-mode #statsModal div[style*="background: white"] span[style*="color: #333"],
+body.dark-mode #statsModal div[style*="background: #fff"] span[style*="color: #333"],
+body.dark-mode #statsModal div[style*="background: white"] div[style*="color: #333"],
+body.dark-mode #statsModal div[style*="background: #fff"] div[style*="color: #333"] {
+    color: #1f2937 !important;
+}
+
+/* Liderlik tablosu - kullanıcı olmayanlar için */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] span,
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div,
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] * {
+    color: #1f2937 !important;
+}
+
+/* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #333"],
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"],
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #666"] {
+    color: #e5e7eb !important;
+}
+
+/* Öğrenme İpuçları kutusu */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] * {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] div[style*="color: #856404"] {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Border-top ile ayrılan bölümler */
+body.dark-mode #statsModal div[style*="border-top: 2px solid #e0e0e0"] {
+    border-top-color: #4b5563 !important;
+}
+
+/* Hedef Tahmini bölümü - gradient içindeki text'ler */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
+    color: #1f2937 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #666"] {
+    color: #374151 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"] {
+    color: #4b5563 !important;
+}
+
+/* Öğrenme Haritası gradient içindeki text'ler */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"],
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
+    color: #1f2937 !important;
+}
+
+/* Liderlik tablosu - sarı gradient içindeki text'ler */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] * {
+    color: #1f2937 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"],
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"],
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
+    color: #1f2937 !important;
+}
+
+/* Liderlik listesi - boş mesaj */
+body.dark-mode #statsModal #leaderboardList div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Liderlik tablosu notu */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Filtre butonları - aktif olmayanlar */
+body.dark-mode #statsModal button.filter-btn:not(.active) {
+    background: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #statsModal button.filter-btn.active {
+    background: #2980b9 !important;
+    color: white !important;
+}
+
+/* Kelime İstatistikleri Listesi - boş mesaj */
+body.dark-mode #statsModal #wordStatsList div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Zaman Analizi bölümü içindeki text'ler */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Kelime Performans Özeti içindeki text'ler */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Genel text override - tüm inline color'lar için fallback */
+body.dark-mode #statsModal [style*="color"] {
+    /* Bu genel bir kural, ama daha spesifik kurallar üstün gelecek */
+}
+
+/* Small tag'ler için */
+body.dark-mode #statsModal small[style*="color: #666"],
+body.dark-mode #statsModal small[style*="color: #999"] {
+    color: #d1d5db !important;
+}
+
+/* Code tag'ler için */
+body.dark-mode #statsModal code {
+    background: #374151 !important;
+    color: #fbbf24 !important;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+/* Liderlik tablosu - dinamik oluşturulan liste öğeleri için */
+body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] {
+    background: #1f2937 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"][style*="#667eea"] {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
+    border-color: #667eea !important;
+}
+
+/* Kelime istatistikleri listesi için genel kurallar */
+body.dark-mode #statsModal #wordStatsList div[style*="background: white"],
+body.dark-mode #statsModal #wordStatsList div[style*="background: #fff"] {
+    background: #2d3748 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode #statsModal #wordStatsList div[style*="color: #333"],
+body.dark-mode #statsModal #wordStatsList div[style*="color: #666"],
+body.dark-mode #statsModal #wordStatsList div[style*="color: #555"] {
+    color: #e5e7eb !important;
+}
+
+/* Kelime istatistikleri - tekrar nedeni mesajları */
+body.dark-mode #statsModal #wordStatsList div[style*="background: #ffe6e6"] {
+    background: #3a1f1f !important;
+    border-color: #e74c3c !important;
+}
+
+body.dark-mode #statsModal #wordStatsList div[style*="background: #ffe6e6"] div[style*="color: #e74c3c"] {
+    color: #fca5a5 !important;
+}
+
+/* #aaa renkli text'ler için */
+body.dark-mode #statsModal *[style*="color: #aaa"],
+body.dark-mode #statsModal div[style*="color: #aaa"],
+body.dark-mode #statsModal span[style*="color: #aaa"] {
+    color: #9ca3af !important;
+}
+
+/* Mertebe sistemi section - gradient içindeki beyaz kutular */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="background: white"] {
+    background: #2d3748 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="color: #888"],
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="color: #aaa"] {
+    color: #d1d5db !important;
+}
+
+/* Yıldız sistemi section - gradient içindeki beyaz kutular */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="background: white"] {
+    background: #2d3748 !important;
+}
+
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="color: #555"],
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="color: #666"] {
+    color: #d1d5db !important;
+}
+
+/* Hasene Info Modal için dark mode (eğer varsa) */
+body.dark-mode #xpInfoModal .stats-content {
+    background: #1a1a1a !important;
+    color: #e5e7eb !important;
+}
+
+/* Liderlik tablosu - dinamik oluşturulan liste öğeleri için detaylı kurallar */
+body.dark-mode #statsModal #leaderboardList > div[style*="display: flex"] {
+    /* Dinamik oluşturulan liderlik öğeleri için */
+}
+
+body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] span,
+body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] div {
+    color: #1f2937 !important;
+}
+
+body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"] span,
+body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"] div {
+    color: white !important;
+}
+
+/* ============ ANALİTİK BÖLÜMÜ - ÖZEL RENK DÜZENLEMELERİ ============ */
+
+/* analyticsAvgSuccess - yeşil renk dark mode'da daha açık olmalı */
+body.dark-mode #statsModal #analyticsAvgSuccess,
+body.dark-mode #statsModal div[id="analyticsAvgSuccess"][style*="color: #27ae60"] {
+    color: #34d399 !important; /* Daha açık yeşil */
+}
+
+/* analyticsHardestWord - kırmızı renk dark mode'da daha açık olmalı */
+body.dark-mode #statsModal #analyticsHardestWord,
+body.dark-mode #statsModal div[id="analyticsHardestWord"][style*="color: #e74c3c"] {
+    color: #f87171 !important; /* Daha açık kırmızı/pembe */
+}
+
+/* Öğrenme Haritası bölümü - strong tag'leri dark mode'da daha açık olmalı */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
+    color: #1f2937 !important; /* Koyu ama okunabilir */
+}
+
+/* Öğrenme Haritası bölümü - yeşil nokta ve text */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #27ae60"] {
+    color: #10b981 !important; /* Daha açık yeşil */
+}
+
+/* Öğrenme Haritası bölümü - turuncu nokta ve text */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
+    color: #fbbf24 !important; /* Daha açık turuncu/sarı */
+}
+
+/* Öğrenme Haritası bölümü - kırmızı nokta ve text */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #e74c3c"] {
+    color: #f87171 !important; /* Daha açık kırmızı/pembe */
+}
+
+/* Kelime Performans Özeti bölümü - yeşil başarı oranı */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsAvgSuccess"],
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsAvgSuccess"][style*="color: #27ae60"] {
+    color: #34d399 !important; /* Daha açık yeşil */
+}
+
+/* Kelime Performans Özeti bölümü - kırmızı zor kelime */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsHardestWord"],
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsHardestWord"][style*="color: #e74c3c"] {
+    color: #f87171 !important; /* Daha açık kırmızı/pembe */
+}
+
+/* Genel olarak #27ae60 renkli tüm elementler için dark mode */
+body.dark-mode #statsModal *[style*="color: #27ae60"],
+body.dark-mode #statsModal div[style*="color: #27ae60"],
+body.dark-mode #statsModal span[style*="color: #27ae60"],
+body.dark-mode #statsModal strong[style*="color: #27ae60"] {
+    color: #34d399 !important; /* Daha açık yeşil */
+}
+
+/* Genel olarak #e74c3c renkli tüm elementler için dark mode */
+body.dark-mode #statsModal *[style*="color: #e74c3c"],
+body.dark-mode #statsModal div[style*="color: #e74c3c"],
+body.dark-mode #statsModal span[style*="color: #e74c3c"],
+body.dark-mode #statsModal strong[style*="color: #e74c3c"] {
+    color: #f87171 !important; /* Daha açık kırmızı/pembe */
+}
+
+/* Öğrenme Haritası bölümündeki tüm text'ler için genel override */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] {
+    /* Gradient zaten dark mode için ayarlanmış */
+}
+
+/* Öğrenme Haritası bölümü - tüm strong tag'leri için */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div strong,
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
+    color: #1f2937 !important; /* Koyu ama gradient arka planda okunabilir */
+    font-weight: 700 !important;
+}
+
+/* Öğrenme Haritası bölümü - başlık için */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
+    color: #1f2937 !important;
+}
+
+/* Öğrenme Haritası bölümü - genel text için */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
+    color: #1f2937 !important;
+}
+
+/* Öğrenme Haritası bölümü - span içindeki renkli nokta ve text kombinasyonları */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="margin-bottom: 8px"] {
+    color: #1f2937 !important;
+}
+
 /* ===== DARK MODE - ONBOARDING MODAL ===== */
 body.dark-mode #onboardingModal .onboarding-modal {
     background: rgba(26, 26, 26, 0.98) !important;
