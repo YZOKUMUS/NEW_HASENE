@@ -36,11 +36,28 @@ function getDailyStats() {
     let dailyWrong = 0;
     
     try {
-        const dayKey = `hasene_daily_${today}`;
-        const dayDataStr = localStorage.getItem(dayKey);
+        // storage manager'ı kullan (varsa), yoksa localStorage kullan
+        const storage = typeof window.storage !== 'undefined' ? window.storage : {
+            get: (key, defaultValue) => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value === null) return defaultValue;
+                    // JSON parse dene, başarısız olursa direkt değeri döndür
+                    try {
+                        return JSON.parse(value);
+                    } catch {
+                        return value;
+                    }
+                } catch {
+                    return defaultValue;
+                }
+            }
+        };
         
-        if (dayDataStr) {
-            const dayData = JSON.parse(dayDataStr);
+        const dayKey = `hasene_daily_${today}`;
+        const dayData = storage.get(dayKey);
+        
+        if (dayData && typeof dayData === 'object') {
             dailyHasene = parseInt(dayData.hasene) || 0;
             dailyCorrect = parseInt(dayData.correct) || 0;
             dailyWrong = parseInt(dayData.wrong) || 0;
@@ -54,12 +71,12 @@ function getDailyStats() {
         } else {
             console.warn('⚠️ Tarih bazlı veri bulunamadı:', dayKey);
             
-            // Fallback: localStorage'dan direkt değerleri oku (geriye uyumluluk için)
-            dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-            dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+            // Fallback: storage'dan direkt değerleri oku (geriye uyumluluk için)
+            dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+            dailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
+            dailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
             
-            console.log('📊 localStorage değerleri (fallback):', {
+            console.log('📊 storage değerleri (fallback):', {
                 dailyHasene,
                 dailyCorrect,
                 dailyWrong
@@ -69,9 +86,16 @@ function getDailyStats() {
         console.error('❌ Tarih bazlı veri okuma hatası:', e);
         
         // Hata durumunda localStorage'dan direkt oku
-        dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-        dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-        dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+        try {
+            dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
+            dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
+            dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
+        } catch (err) {
+            console.error('❌ localStorage okuma hatası:', err);
+            dailyHasene = 0;
+            dailyCorrect = 0;
+            dailyWrong = 0;
+        }
     }
     
     const total = dailyCorrect + dailyWrong;
@@ -115,26 +139,39 @@ function getWeeklyStats() {
         const weekStartStr = weekStart.toISOString().split('T')[0];
         const weekEndStr = weekEnd.toISOString().split('T')[0];
         
+        // storage manager'ı kullan (varsa), yoksa localStorage kullan
+        const storage = typeof window.storage !== 'undefined' ? window.storage : {
+            get: (key, defaultValue) => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value === null) return defaultValue;
+                    // JSON parse dene, başarısız olursa direkt değeri döndür
+                    try {
+                        return JSON.parse(value);
+                    } catch {
+                        return value;
+                    }
+                } catch {
+                    return defaultValue;
+                }
+            }
+        };
+        
         // Bu haftanın günlerini tara
         const currentDate = new Date(weekStart);
         while (currentDate <= weekEnd) {
             const dateStr = currentDate.toISOString().split('T')[0];
             const dayKey = `hasene_daily_${dateStr}`;
             
-            const dayData = localStorage.getItem(dayKey);
-            if (dayData) {
-                try {
-                    const parsed = JSON.parse(dayData);
-                    const hasene = parseInt(parsed.hasene) || 0;
-                    if (hasene > 0) {
-                        totalHasene += hasene;
-                        daysPlayed++;
-                    }
-                } catch (e) {
-                    // Parse hatası, devam et
+            const dayData = storage.get(dayKey);
+            if (dayData && typeof dayData === 'object') {
+                const hasene = parseInt(dayData.hasene) || 0;
+                if (hasene > 0) {
+                    totalHasene += hasene;
+                    daysPlayed++;
+                }
             }
-        }
-        
+            
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -172,26 +209,39 @@ function getMonthlyStats() {
         const monthStartStr = monthStart.toISOString().split('T')[0];
         const monthEndStr = monthEnd.toISOString().split('T')[0];
         
+        // storage manager'ı kullan (varsa), yoksa localStorage kullan
+        const storage = typeof window.storage !== 'undefined' ? window.storage : {
+            get: (key, defaultValue) => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value === null) return defaultValue;
+                    // JSON parse dene, başarısız olursa direkt değeri döndür
+                    try {
+                        return JSON.parse(value);
+                    } catch {
+                        return value;
+                    }
+                } catch {
+                    return defaultValue;
+                }
+            }
+        };
+        
         // Bu ayın günlerini tara
         const currentDate = new Date(monthStart);
         while (currentDate <= monthEnd) {
             const dateStr = currentDate.toISOString().split('T')[0];
             const dayKey = `hasene_daily_${dateStr}`;
             
-            const dayData = localStorage.getItem(dayKey);
-            if (dayData) {
-                try {
-                    const parsed = JSON.parse(dayData);
-                    const hasene = parseInt(parsed.hasene) || 0;
-                    if (hasene > 0) {
-                        totalHasene += hasene;
-                        daysPlayed++;
-                    }
-                } catch (e) {
-                    // Parse hatası, devam et
+            const dayData = storage.get(dayKey);
+            if (dayData && typeof dayData === 'object') {
+                const hasene = parseInt(dayData.hasene) || 0;
+                if (hasene > 0) {
+                    totalHasene += hasene;
+                    daysPlayed++;
+                }
             }
-        }
-        
+            
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -238,14 +288,32 @@ function getTrendStats() {
         date.setDate(date.getDate() - i);
         const dateStr = getLocalDateString(date); // Tutarlı tarih formatı kullan
         
-        // Bu günün skorunu al (localStorage'dan)
+        // Bu günün skorunu al (storage'dan)
         const dayKey = `hasene_daily_${dateStr}`;
         let dayData = {};
         
         try {
-            const dayDataStr = localStorage.getItem(dayKey);
-            if (dayDataStr) {
-                dayData = JSON.parse(dayDataStr);
+            // storage manager'ı kullan (varsa), yoksa localStorage kullan
+            const storage = typeof window.storage !== 'undefined' ? window.storage : {
+                get: (key, defaultValue) => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        if (value === null) return defaultValue;
+                        // JSON parse dene, başarısız olursa direkt değeri döndür
+                        try {
+                            return JSON.parse(value);
+                        } catch {
+                            return value;
+                        }
+                    } catch {
+                        return defaultValue;
+                    }
+                }
+            };
+            
+            const storedData = storage.get(dayKey);
+            if (storedData && typeof storedData === 'object') {
+                dayData = storedData;
             }
         } catch (e) {
             console.error('Trend veri parse hatası:', e, dayKey);

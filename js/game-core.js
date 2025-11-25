@@ -4345,9 +4345,9 @@ function addSessionPoints(points) {
     // Bugünkü toplam doğru cevap sayısını güncelle
     dailyTasks.todayStats.toplamDogru++;
     
-    // Daily correct sayısını localStorage'a kaydet (detaylı istatistikler için)
-    const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-    localStorage.setItem('dailyCorrect', (currentDailyCorrect + 1).toString());
+    // Daily correct sayısını storage'a kaydet (detaylı istatistikler için)
+    const currentDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
+    storage.set('dailyCorrect', (currentDailyCorrect + 1).toString());
     
     // Daily XP ekle
     addDailyXP(points);
@@ -4408,9 +4408,9 @@ function addSessionWrong() {
         dailyTasks.todayStats.toplamYanlis = (dailyTasks.todayStats.toplamYanlis || 0) + 1;
     }
     
-    // Daily wrong sayısını localStorage'a kaydet (detaylı istatistikler için)
-    const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
-    localStorage.setItem('dailyWrong', (currentDailyWrong + 1).toString());
+    // Daily wrong sayısını storage'a kaydet (detaylı istatistikler için)
+    const currentDailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
+    storage.set('dailyWrong', (currentDailyWrong + 1).toString());
     
     // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
     saveDailyStats();
@@ -5083,6 +5083,28 @@ function showStatsModal() {
     }
     if (typeof hideAllModes === 'function') {
         hideAllModes();
+    }
+    
+    // dailyTasks değerlerini localStorage'dan tekrar yükle (güncel değerler için)
+    try {
+        const savedTasks = localStorage.getItem('hasene_dailyTasks');
+        if (savedTasks) {
+            const parsedTasks = JSON.parse(savedTasks);
+            if (parsedTasks && parsedTasks.todayStats) {
+                // todayStats değerlerini güncelle (mevcut değerleri koru, sadece eksikleri ekle)
+                dailyTasks.todayStats = {
+                    ...dailyTasks.todayStats,
+                    ...parsedTasks.todayStats
+                };
+                // Set nesnelerini yeniden oluştur
+                if (parsedTasks.todayStats.farklıZorluk) {
+                    dailyTasks.todayStats.farklıZorluk = new Set(parsedTasks.todayStats.farklıZorluk || []);
+                }
+                log.debug('📊 dailyTasks.todayStats localStorage\'dan yüklendi:', dailyTasks.todayStats);
+            }
+        }
+    } catch (e) {
+        log.error('❌ dailyTasks yükleme hatası:', e);
     }
     
     // Synchronization: Wait for DOM updates before opening new modal
