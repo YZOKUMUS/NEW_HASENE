@@ -125,10 +125,12 @@ window.addEventListener('offline', () => {
 
 /**
  * İnternet bağlantısı kontrolü
+ * Event listener'lar ile güncellenen takip edilen durumu döndürür
  * @returns {boolean} Online mı?
  */
 function checkOnlineStatus() {
-    return navigator.onLine;
+    // Takip edilen durumu kullan (online/offline event listener'lar ile güncelleniyor)
+    return errorBoundaryOnlineStatus;
 }
 
 /**

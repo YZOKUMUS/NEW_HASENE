@@ -92,3 +92,4 @@ Rapor `coverage/` klasöründe HTML formatında oluşturulur.
 - Mock'lar setup.js'de tanımlı
 - Test dosyaları `tests/**/*.test.js` pattern'ine uymalı
 
+

@@ -170,3 +170,4 @@ async function triggerPWAInstall() {
 // Global erişim için
 window.triggerPWAInstall = triggerPWAInstall;
 
+

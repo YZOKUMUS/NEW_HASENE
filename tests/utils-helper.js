@@ -62,3 +62,4 @@ export const sanitizeHTML = global.sanitizeHTML;
 export const encryptData = global.encryptData;
 export const decryptData = global.decryptData;
 
+
