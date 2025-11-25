@@ -83,33 +83,66 @@ function updateArabicTextColoring() {
     // Hata önleme için
 }
 
-// 🌙 DARK MODE TOGGLE
-function toggleDarkMode() {
+// 🌙 DARK MODE HELPERS
+function updateDarkModeUI(isDark, persistPreference = true) {
     const body = document.body;
-    const isDark = body.classList.toggle('dark-mode');
+    if (!body) return;
+
+    body.classList.toggle('dark-mode', isDark);
+
     const darkModeIcon = document.getElementById('darkModeIcon');
-    
-    // Debug
-    log.debug('Dark mode toggled:', isDark);
-    log.debug('Body classes:', body.className);
-    
-    // LocalStorage'a kaydet
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    
-    // Icon güncelle
     if (darkModeIcon) {
         darkModeIcon.textContent = isDark ? '☀️' : '🌙';
     }
-    
-    // Buton stilini güncelle
+
     const darkModeBtn = document.getElementById('darkModeToggle');
     if (darkModeBtn) {
-        if (isDark) {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
-        } else {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        darkModeBtn.style.background = isDark
+            ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }
+
+    if (persistPreference) {
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    }
+
+    if (typeof log !== 'undefined' && typeof log.debug === 'function') {
+        log.debug('Dark mode state set:', { isDark });
+    }
+}
+
+function toggleDarkMode() {
+    const nextState = !document.body.classList.contains('dark-mode');
+    updateDarkModeUI(nextState, true);
+}
+
+function initDarkModePreference() {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldEnable = savedDarkMode === 'enabled' || (savedDarkMode === null && prefersDark);
+
+    updateDarkModeUI(shouldEnable, Boolean(savedDarkMode));
+
+    if (!savedDarkMode && window.matchMedia) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (event) => {
+            if (!localStorage.getItem('darkMode')) {
+                updateDarkModeUI(event.matches, false);
+            }
+        };
+
+        if (typeof mediaQuery.addEventListener === 'function') {
+            mediaQuery.addEventListener('change', handleChange);
+        } else if (typeof mediaQuery.addListener === 'function') {
+            mediaQuery.addListener(handleChange);
         }
     }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDarkModePreference, { once: true });
+} else {
+    initDarkModePreference();
 }
 
 // Global erişim için (inline onclick handlers için gerekli)
