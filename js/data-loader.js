@@ -64,9 +64,13 @@ async function parseJSONInWorker(jsonString) {
 }
 
 // ============ NETWORK - FETCH WITH RETRY ============
-async function fetchWithRetry(url, retries = 3, delay = 1000, useWorker = false) {
+async function fetchWithRetry(url, retries = null, delay = null, useWorker = false) {
+    // Constants'tan değerleri al
+    const maxRetries = retries || window.CONSTANTS?.ERROR?.MAX_RETRIES || 3;
+    const retryDelay = delay || window.CONSTANTS?.ERROR?.RETRY_DELAY || 1000;
+    
     // JSON yükleme hatalarında otomatik retry
-    for (let i = 0; i < retries; i++) {
+    for (let i = 0; i < maxRetries; i++) {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,13 +87,13 @@ async function fetchWithRetry(url, retries = 3, delay = 1000, useWorker = false)
                 return JSON.parse(text);
             }
         } catch (error) {
-            log.debug(`📡 Fetch attempt ${i + 1}/${retries} failed for ${url}`);
-            if (i === retries - 1) {
+            log.debug(`📡 Fetch attempt ${i + 1}/${maxRetries} failed for ${url}`);
+            if (i === maxRetries - 1) {
                 // Son deneme de başarısız
-                throw new Error(`Failed to load ${url} after ${retries} attempts: ${error.message}`);
+                throw new Error(`Failed to load ${url} after ${maxRetries} attempts: ${error.message}`);
             }
             // Retry öncesi bekle (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+            await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
         }
     }
 }

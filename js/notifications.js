@@ -131,7 +131,7 @@ function checkDailyReminder() {
     if (now >= reminderDate) {
         // Günlük vird kontrolü
         const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-        const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+        const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || (window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700);
 
         if (dailyHasene < goalHasene) {
             const remaining = goalHasene - dailyHasene;
@@ -258,7 +258,7 @@ function initNotifications() {
     setTimeout(() => {
         checkDailyReminder();
         checkStreakWarning();
-    }, 5000); // 5 saniye sonra
+    }, window.CONSTANTS?.UI?.NOTIFICATION_DURATION || 5000); // Notification duration
 }
 
 // Sayfa görünürlüğü değiştiğinde kontrol et

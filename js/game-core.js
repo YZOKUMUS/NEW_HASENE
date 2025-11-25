@@ -1089,13 +1089,12 @@ window.handleDailyGoalModalClick = handleDailyGoalModalClick;
 
 function setDailyGoal(level) {
     // 1 saat oyun = ~8000 Hasene
-    // Kolay: 10 dakika (~1300 Hasene)
-    // Normal: 20 dakika (~2700 Hasene)  
-    // Ciddi: 45 dakika (~6000 Hasene)
+    // Constants'tan goal değerlerini al
+    const goalOptions = window.CONSTANTS?.DAILY_GOAL?.OPTIONS || {};
     const goals = {
-        easy: { hasene: 1300, name: 'Rahat', icon: '🌱' },
-        normal: { hasene: 2700, name: 'Normal', icon: '🎯' },
-        serious: { hasene: 6000, name: 'Ciddi', icon: '🔥' }
+        easy: { hasene: goalOptions.EASY || 1300, name: 'Rahat', icon: '🌱' },
+        normal: { hasene: goalOptions.NORMAL || 2700, name: 'Normal', icon: '🎯' },
+        serious: { hasene: goalOptions.SERIOUS || 6000, name: 'Ciddi', icon: '🔥' }
     };
     
     const goal = goals[level];
@@ -1121,7 +1120,8 @@ function setDailyGoal(level) {
 }
 
 function updateDailyGoalDisplay() {
-    const goalXP = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
+    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
+    const goalXP = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
     const dailyXP = parseInt(storage.get('dailyHasene', '0')) || 0;
     const goalLevel = storage.get('dailyGoalLevel', 'normal');
     
@@ -1253,7 +1253,8 @@ function addDailyXP(xp) {
     }
     
     const currentXP = parseInt(storage.get('dailyHasene', '0')) || 0;
-    const goalXP = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
+    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
+    const goalXP = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
     const newXP = currentXP + xp;
     
     storage.set('dailyHasene', newXP.toString());
@@ -3391,21 +3392,25 @@ function playAudio(audioUrl, button) {
 }
 
 // ============ NETWORK - FETCH WITH RETRY ============
-async function fetchWithRetry(url, retries = 3, delay = 1000) {
+async function fetchWithRetry(url, retries = null, delay = null) {
+    // Constants'tan değerleri al
+    const maxRetries = retries || window.CONSTANTS?.ERROR?.MAX_RETRIES || 3;
+    const retryDelay = delay || window.CONSTANTS?.ERROR?.RETRY_DELAY || 1000;
+    
     // JSON yükleme hatalarında otomatik retry
-    for (let i = 0; i < retries; i++) {
+    for (let i = 0; i < maxRetries; i++) {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         } catch (error) {
-            log.debug(`📡 Fetch attempt ${i + 1}/${retries} failed for ${url}`);
-            if (i === retries - 1) {
+            log.debug(`📡 Fetch attempt ${i + 1}/${maxRetries} failed for ${url}`);
+            if (i === maxRetries - 1) {
                 // Son deneme de başarısız
-                throw new Error(`Failed to load ${url} after ${retries} attempts: ${error.message}`);
+                throw new Error(`Failed to load ${url} after ${maxRetries} attempts: ${error.message}`);
             }
             // Retry öncesi bekle (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+            await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
         }
     }
 }
@@ -3533,6 +3538,11 @@ function loadFromURL() {
 // ============ İSTATİSTİK BAR FONKSİYONLARI ============
 async function loadStats() {
     try {
+        // Loading state göster
+        if (typeof showLoading !== 'undefined') {
+            showLoading('İstatistikler yükleniyor...');
+        }
+        
         // IndexedDB'den yükle (üçüncü taraf çerez sorunu için)
         const savedPoints = await loadFromIndexedDB('hasene_totalPoints');
         const savedBadges = await loadFromIndexedDB('hasene_badges');
@@ -3541,7 +3551,8 @@ async function loadStats() {
         
         // Puanları yükle (IndexedDB öncelikli, localStorage yedek)
         totalPoints = parseInt(savedPoints || localStorage.getItem('hasene_totalPoints') || '0');
-        starPoints = Math.floor(totalPoints / 100);
+        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
+        starPoints = Math.floor(totalPoints / starThreshold);
         level = calculateLevel(totalPoints);
         
         log.debug('📊 IndexedDB yüklendi:', {totalPoints, savedPoints});
@@ -3550,7 +3561,8 @@ async function loadStats() {
         try {
             // localStorage dene
             totalPoints = parseInt(localStorage.getItem('hasene_totalPoints') || '0');
-            starPoints = Math.floor(totalPoints / 100);
+            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
+        starPoints = Math.floor(totalPoints / starThreshold);
             level = calculateLevel(totalPoints);
             log.debug('📊 localStorage yüklendi:', totalPoints);
         } catch (localError) {
@@ -3558,7 +3570,8 @@ async function loadStats() {
             // Son çare: URL'den yükle
             const urlLoaded = loadFromURL();
             if (urlLoaded) {
-                starPoints = Math.floor(totalPoints / 100);
+                const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
+        starPoints = Math.floor(totalPoints / starThreshold);
                 level = calculateLevel(totalPoints);
             } else {
                 // Hiçbir şey çalışmıyor, varsayılan değerler
@@ -3567,6 +3580,11 @@ async function loadStats() {
                 level = 1;
                 log.warn('⚠️ Hiçbir veri sistemi çalışmıyor, sıfırdan başlatılıyor');
             }
+        }
+    } finally {
+        // Loading state'i kapat
+        if (typeof hideLoading !== 'undefined') {
+            setTimeout(() => hideLoading(), 300);
         }
     }
     

@@ -4,9 +4,10 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { JSDOM } from 'jsdom';
 
-// utils.js dosyasını oku
+// constants.js ve utils.js dosyalarını oku
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const constantsCode = readFileSync(join(__dirname, '../js/constants.js'), 'utf-8');
 const utilsCode = readFileSync(join(__dirname, '../js/utils.js'), 'utf-8');
 
 // DOM ortamı oluştur
@@ -60,6 +61,9 @@ const localStorageMock = (() => {
   };
 })();
 global.localStorage = localStorageMock;
+
+// constants.js'i çalıştır (window.CONSTANTS için)
+eval(constantsCode);
 
 // utils.js'i çalıştır - fonksiyonları window objesine eklemek için
 eval(utilsCode);
