@@ -1094,28 +1094,15 @@ body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffea
     background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
 }
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #333"] {
-    color: #1a1a1a !important;
-}
-
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"] {
-    color: #1a1a1a !important;
-}
-
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #856404"] {
-    color: #1a1a1a !important;
-}
-
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] strong {
-    color: #1a1a1a !important;
-}
-
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span {
-    color: #1a1a1a !important;
-}
-
 body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
+    color: #1a1a1a !important;
+}
+
+/* Override lighter helper text to ensure readability */
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"],
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #666"],
+body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #555"] {
     color: #1a1a1a !important;
 }
 
