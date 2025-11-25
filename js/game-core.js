@@ -2427,7 +2427,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Daily Goal'u başlat
     if (!storage.get('dailyGoalHasene')) {
-        storage.set('dailyGoalHasene', '2700');
+        const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+        storage.set('dailyGoalHasene', defaultGoal.toString());
         storage.set('dailyGoalLevel', 'normal');
     }
     updateDailyGoalDisplay();
@@ -2677,7 +2678,8 @@ function checkAchievements() {
         { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5 },
         { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük virdi tamamla', icon: '⭐', condition: () => {
             const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-            const goalHasene = parseInt(storage.get('dailyGoalHasene', '2700')) || 2700;
+            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+            const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
             return dailyHasene >= goalHasene;
         }},
         { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7 },
@@ -2925,7 +2927,7 @@ let boslukWrong = 0;
 
 // GLOBAL (KALICI) PUANLAR
 let totalPoints = 0;  // Toplam oyun puanı (kalıcı)
-let starPoints = 0;   // Yıldız puanı (her 100 Hasene = 1 yıldız)
+let starPoints = 0;   // Yıldız puanı (her 100 Hasene = 1 yıldız - constants'tan alınır)
 let level = 1;        // Global seviye
 
 // ROZET SİSTEMİ
@@ -3551,7 +3553,7 @@ async function loadStats() {
         
         // Puanları yükle (IndexedDB öncelikli, localStorage yedek)
         totalPoints = parseInt(savedPoints || localStorage.getItem('hasene_totalPoints') || '0');
-        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
+        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
         starPoints = Math.floor(totalPoints / starThreshold);
         level = calculateLevel(totalPoints);
         
@@ -3833,7 +3835,8 @@ todayStats: {
     // ================================
 // 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA (Storage Manager ile)
 // ================================
-storage.set("dailyGoalHasene", "2700");  // hedef sıfır → 2700 varsayılan
+const defaultGoalReset = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+storage.set("dailyGoalHasene", defaultGoalReset.toString());  // hedef sıfır → varsayılan
 storage.set("dailyHasene", "0");         // günlük kazanılan XP sıfır
 storage.set("dailyGoalLevel", "normal"); // varsayılan zorluk
 storage.remove("lastDailyXPReset");      // reset tarihi temizle
@@ -3844,8 +3847,9 @@ const barText = document.getElementById("dailyGoalProgressText");
 const goalText = document.getElementById("dailyGoalText");
 
 if (bar) bar.style.width = "0%";
-if (barText) barText.textContent = `0 / 2700 Hasene`;
-if (goalText) goalText.textContent = `Günlük Vird: 2700 Hasene`;
+const defaultGoalDisplay = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+if (barText) barText.textContent = `0 / ${defaultGoalDisplay} Hasene`;
+if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasene`;
 
     // Her 1 hedeften 540 XP geliyorsa — dilersen değiştir
 
@@ -4201,7 +4205,8 @@ function updateStatsBar() {
     gamePointsEl.textContent = totalPoints;
     
     // Yıldız puanı güncelle (her 100 puana 1 yıldız - sık geri bildirim için)
-    starPoints = Math.floor(totalPoints / 100);
+    const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
+    starPoints = Math.floor(totalPoints / starThreshold);
     starPointsEl.textContent = starPoints;
     
     // Rozet sistemini güncelle (null check ile)
@@ -4583,11 +4588,13 @@ function updateAllAchievements() {
         { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5, progress: () => Math.min(comboCount || 0, 5) },
         { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük virdi tamamla', icon: '⭐', condition: () => {
             const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
             return dailyHasene >= goalHasene;
         }, progress: () => {
             const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
             // Division by zero check
             return goalHasene > 0 ? Math.min((dailyHasene / goalHasene) * 100, 100) : 0;
         }},
@@ -4676,7 +4683,8 @@ function updateAllAchievements() {
                     statusText.textContent = `${comboCount || 0}/5`;
                 } else if (ach.id === 'daily_goal') {
                     const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+                    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
                     statusText.textContent = `${dailyHasene}/${goalHasene}`;
                 } else if (ach.id === 'streak_7') {
                     statusText.textContent = `${streakData.currentStreak || 0}/7`;
@@ -5268,7 +5276,8 @@ function updateAnalyticsData() {
     if (analyticsQuestionPerHour) analyticsQuestionPerHour.textContent = questionsPerHour;
     
     // Günlük hedef durumu
-    const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || '2700');
+    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+    const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || defaultGoal.toString());
     const todayProgress = dailyTasks.todayStats.toplamPuan || 0;
     const goalProgressPercent = dailyGoalHasene > 0 ? Math.min(100, Math.round((todayProgress / dailyGoalHasene) * 100)) : 0;
     
@@ -7494,7 +7503,8 @@ elements.dinleBulBtn.onclick = async () => {
     // Header score güncelle (oyun başında)
     const dinleHeaderScore = document.getElementById('dinleHeaderScore');
     if (dinleHeaderScore) {
-        const currentStarPoints = Math.floor(totalPoints / 100);
+        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
+        const currentStarPoints = Math.floor(totalPoints / starThreshold);
         dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
     }
     
@@ -7697,7 +7707,8 @@ elements.boslukDoldurBtn.onclick = async () => {
     // Header score güncelle (oyun başında)
     const boslukHeaderScore = document.getElementById('boslukHeaderScore');
     if (boslukHeaderScore) {
-        const currentStarPoints = Math.floor(totalPoints / 100);
+        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
+        const currentStarPoints = Math.floor(totalPoints / starThreshold);
         boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
     }
     log.debug(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
@@ -8722,10 +8733,11 @@ function checkAnswer(button, isCorrect) {
         log.game(`📊 addSessionWrong() çağrılıyor...`);
         addSessionWrong(); // Session yanlış sayısını artır
         
-        log.game(`💸 Puan cezası uygulanıyor: ${CONFIG.wrongAnswerPenalty} puan`);
+        const wrongPenalty = window.CONSTANTS?.POINTS?.WRONG_PENALTY || CONFIG.wrongAnswerPenalty || 5; // Fallback: 5
+        log.game(`💸 Puan cezası uygulanıyor: ${wrongPenalty} puan`);
         log.game(`📊 Eski sessionScore: ${sessionScore}`);
         // Puan cezası - sessionScore'dan düş (UI'da görünür olması için)
-        sessionScore = Math.max(0, sessionScore - CONFIG.wrongAnswerPenalty);
+        sessionScore = Math.max(0, sessionScore - wrongPenalty);
         // Geriye uyumluluk için eski score değişkenini de güncelle
         score = sessionScore;
         log.game(`📊 Yeni sessionScore: ${sessionScore}`);
@@ -10384,7 +10396,8 @@ function checkDinleAnswer(button, isCorrect) {
         // Header score güncelle (yıldız gösterimi)
         const dinleHeaderScore = document.getElementById('dinleHeaderScore');
         if (dinleHeaderScore) {
-            const currentStarPoints = Math.floor(totalPoints / 100);
+            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
+        const currentStarPoints = Math.floor(totalPoints / starThreshold);
             dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
         }
         
@@ -10762,16 +10775,18 @@ function checkBoslukAnswer(button, isCorrect) {
         
         log.debug(`💰 Boşluk Doldur sabit puan: 10 puan ekleniyor`);
         log.debug(`📊 Boşluk score güncelleniyor: ${boslukScore} + 10 = ${boslukScore + 10}`);
-        boslukScore += 10; // Local oyun puanı
+        const pointsPerCorrect = window.CONSTANTS?.POINTS?.PER_CORRECT || 10; // Fallback: 10
+        boslukScore += pointsPerCorrect; // Local oyun puanı
         boslukCorrect++;
         
-        log.debug(`📊 addSessionPoints(10) çağrılıyor...`);
-        addSessionPoints(10); // Session puanına ekle
+        log.debug(`📊 addSessionPoints(${pointsPerCorrect}) çağrılıyor...`);
+        addSessionPoints(pointsPerCorrect); // Session puanına ekle
         
         // Header score güncelle (yıldız gösterimi)
         const boslukHeaderScore = document.getElementById('boslukHeaderScore');
         if (boslukHeaderScore) {
-            const currentStarPoints = Math.floor(totalPoints / 100);
+            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
+        const currentStarPoints = Math.floor(totalPoints / starThreshold);
             boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
         }
         
@@ -11386,7 +11401,8 @@ setTimeout(async () => {
         log.debug('   Bugünkü toplam puan:', dailyTasks.todayStats.toplamPuan);
         log.debug('   Günlük hedef:', dailyTasks.hedefler.toplamPuan);
         const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-        const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || 2700;
+        const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
+        const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
         log.debug('   Daily Hasene:', dailyHasene, '/', goalHasene);
         log.debug('   Günlük hedef tamamlandı mı?', dailyHasene >= goalHasene ? '✅ EVET' : '❌ HAYIR');
 
@@ -11437,9 +11453,10 @@ setTimeout(async () => {
     window.testSenaryo2 = function() {
         log.stats('\n🧪 SENARYO 2: Combo bonusu (3x doğru cevap)');
         resetPoints();
-        addSessionPoints(10);
-        addSessionPoints(10);
-        addSessionPoints(10); // 3. cevap combo bonusu tetikler
+        const pointsPerCorrect = window.CONSTANTS?.POINTS?.PER_CORRECT || 10; // Fallback: 10
+        addSessionPoints(pointsPerCorrect);
+        addSessionPoints(pointsPerCorrect);
+        addSessionPoints(pointsPerCorrect); // 3. cevap combo bonusu tetikler
         setTimeout(() => testSenkronizasyon(), 500);
     };
     
