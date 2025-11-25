@@ -96,11 +96,11 @@ window.addEventListener('unhandledrejection', (event) => {
 /**
  * Network error detection - İnternet bağlantısı kontrolü
  */
-let isOnline = navigator.onLine;
+let errorBoundaryOnlineStatus = navigator.onLine;
 let offlineNotificationShown = false;
 
 window.addEventListener('online', () => {
-    isOnline = true;
+    errorBoundaryOnlineStatus = true;
     offlineNotificationShown = false;
     log.debug('✅ İnternet bağlantısı geri geldi');
     
@@ -110,7 +110,7 @@ window.addEventListener('online', () => {
 });
 
 window.addEventListener('offline', () => {
-    isOnline = false;
+    errorBoundaryOnlineStatus = false;
     log.warn('⚠️ İnternet bağlantısı kesildi');
     
     if (!offlineNotificationShown && typeof showCustomAlert !== 'undefined') {

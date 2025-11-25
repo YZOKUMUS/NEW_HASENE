@@ -2195,8 +2195,9 @@ function selectIntelligentWord(filteredData) {
 
 // ============ GLOBAL ERROR HANDLER ============
 // Error throttling - aynı hatayı tekrar tekrar loglamayı önle
+// NOT: ERROR_THROTTLE_MS artık error-boundary.js'de tanımlı, burada kullanıyoruz
 const errorThrottle = new Map();
-const ERROR_THROTTLE_MS = 5000; // 5 saniye
+const GAME_CORE_ERROR_THROTTLE_MS = window.CONSTANTS?.ERROR?.THROTTLE_MS || 5000; // 5 saniye
 
 window.addEventListener('error', (event) => {
     try {
@@ -2212,7 +2213,7 @@ window.addEventListener('error', (event) => {
         // Throttle kontrolü
         if (errorThrottle.has(errorKey)) {
             const lastTime = errorThrottle.get(errorKey);
-            if (now - lastTime < ERROR_THROTTLE_MS) {
+            if (now - lastTime < GAME_CORE_ERROR_THROTTLE_MS) {
                 return; // Aynı hata çok yakın zamanda loglandı, ignore et
             }
         }
