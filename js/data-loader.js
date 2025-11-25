@@ -225,16 +225,30 @@ async function loadHadisData() {
 async function loadAllData() {
     try {
         showLoading('Veriler yükleniyor...');
-        await Promise.all([
+        const results = await Promise.all([
             loadKelimeData(),
             loadAyetData(),
             loadDuaData(),
             loadHadisData()
         ]);
         hideLoading();
+        
+        // Console'da test için sonuç döndür
+        const status = {
+            kelimeBul: { loaded: !!results[0], count: results[0]?.length || 0 },
+            ayetOku: { loaded: !!results[1], count: results[1]?.length || 0 },
+            dua: { loaded: !!results[2], count: results[2]?.length || 0 },
+            hadis: { loaded: !!results[3], count: results[3]?.length || 0 }
+        };
+        
+        log.debug('✅ Tüm veriler başarıyla yüklendi:', status);
+        console.log('✅ Tüm veriler başarıyla yüklendi:', status);
+        
+        return status;
     } catch (error) {
         hideLoading();
         log.error('Veri yükleme hatası:', error);
+        console.error('❌ Veri yükleme hatası:', error);
         throw error;
     }
 }

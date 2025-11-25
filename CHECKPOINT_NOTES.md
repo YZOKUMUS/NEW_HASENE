@@ -35,3 +35,5 @@ git reset --hard HEAD  # Son commit'e dön
 Bu checkpoint'ten sonra iyileştirmeler yapılacak. Sorun olursa bu noktaya geri dönülebilir.
 
 
+
+

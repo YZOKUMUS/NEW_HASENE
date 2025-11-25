@@ -171,3 +171,5 @@ async function triggerPWAInstall() {
 window.triggerPWAInstall = triggerPWAInstall;
 
 
+
+
