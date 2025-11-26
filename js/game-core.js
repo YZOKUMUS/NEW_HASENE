@@ -10473,14 +10473,41 @@ function checkDinleAnswer(button, isCorrect) {
     dinleQuestionCount++; // Soru sayacını artır
     log.debug(`📊 FINAL - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
     log.debug(`📊 FINAL - dinle: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
+
+    // 10. sorudan sonra oyunu otomatik bitir (ekstra 11. soruya geçme)
+    if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
+        log.game(`🏁 === OYUN BİTİŞİ (CEVAP SONRASI) ===`);
+        log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
+        log.game(`📊 Final oyun skorları: dinleScore=${dinleScore}, dinleCorrect=${dinleCorrect}, dinleWrong=${dinleWrong}`);
+        log.game(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
+
+        // Session puanlarını global'e aktar
+        addToGlobalPoints(sessionScore, sessionCorrect);
+
+        // Ana menüye dön
+        if (elements.dinleMode) elements.dinleMode.style.display = 'none';
+        if (elements.mainMenu) elements.mainMenu.style.display = 'block';
+        showBottomNavBar();
+
+        // Oyun değişkenlerini sıfırla
+        dinleScore = 0;
+        dinleCorrect = 0;
+        dinleWrong = 0;
+        dinleQuestionCount = 0;
+        updateDinleUI();
+
+        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+        return;
+    }
+
     log.debug(`🚨 === CEVAP KONTROLÜ BİTTİ ===`);
     log.debug(`🎨 UI güncelleniyor ve Next butonu gösteriliyor...`);
     updateDinleUI();
     // Show the Dinle 'Next' button
     if (elements.dinleNextBtn) {
-    elements.dinleNextBtn.style.display = 'block';
-    // 🔥 Animasyonu ekle
-    elements.dinleNextBtn.classList.add("next-appear");
+        elements.dinleNextBtn.style.display = 'block';
+        // 🔥 Animasyonu ekle
+        elements.dinleNextBtn.classList.add("next-appear");
     }
     log.debug(`✅ Cevap işlemi tamamen tamamlandı!`);
 }
