@@ -2696,6 +2696,7 @@ function checkAchievements() {
         { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene (1 Altın)', icon: '🥇', condition: () => totalPoints >= 25500 },
         { id: 'xp_51000', name: 'İkinci Altın', desc: '51,000 Hasene topla', icon: '🔥', condition: () => totalPoints >= 51000 },
         { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene (1 Elmas)', icon: '💎', condition: () => totalPoints >= 85000 },
+        { id: 'xp_100000', name: 'Hafız', desc: '100,000 Hasene kazan', icon: '📚', condition: () => totalPoints >= 100000 },
         { id: 'xp_170000', name: 'Ustalar Ustası', desc: '170,000 Hasene topla', icon: '✨', condition: () => totalPoints >= 170000 }
     ];
     
@@ -4081,7 +4082,7 @@ updateDailyGoalDisplay();
     const badgesTotalCountEl = document.getElementById('badgesTotalCount');
     const badgesProgressPercentEl = document.getElementById('badgesProgressPercent');
     if (badgesUnlockedCountEl) badgesUnlockedCountEl.textContent = '0';
-    if (badgesTotalCountEl) badgesTotalCountEl.textContent = '20';
+    if (badgesTotalCountEl) badgesTotalCountEl.textContent = '21';
     if (badgesProgressPercentEl) badgesProgressPercentEl.textContent = '0%';
 
     // Takvim Modal - Streak bilgisi
@@ -4568,7 +4569,7 @@ function showBadgeCategory(category, clickedElement) {
 // Başarılar modal istatistiklerini güncelle
 function updateBadgesModalStats() {
     const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-    const totalAchievements = 20; // Toplam achievement sayısı
+    const totalAchievements = 21; // Toplam achievement sayısı
     const unlockedCount = unlockedAchievements.length;
     const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
 
@@ -4619,7 +4620,8 @@ function updateAllAchievements() {
         { id: 'xp_2000', name: 'Mübtedi Yolcu', desc: '2,000 Hasene', icon: '🥉', condition: () => totalPoints >= 2000, progress: () => Math.min((totalPoints || 0) / 2000 * 100, 100) },
         { id: 'xp_8500', name: 'Gümüş Ustası', desc: '8,500 Hasene', icon: '🥈', condition: () => totalPoints >= 8500, progress: () => Math.min((totalPoints || 0) / 8500 * 100, 100) },
         { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene', icon: '🥇', condition: () => totalPoints >= 25500, progress: () => Math.min((totalPoints || 0) / 25500 * 100, 100) },
-        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) }
+        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) },
+        { id: 'xp_100000', name: 'Hafız', desc: '100,000 Hasene', icon: '📚', condition: () => totalPoints >= 100000, progress: () => Math.min((totalPoints || 0) / 100000 * 100, 100) }
     ];
 
     achievements.forEach(ach => {
@@ -11410,6 +11412,7 @@ setTimeout(async () => {
             { id: 'xp_25500', threshold: 25500, name: 'Altın Ustası' },
             { id: 'xp_51000', threshold: 51000, name: 'İkinci Altın' },
             { id: 'xp_85000', threshold: 85000, name: 'Elmas Ustası' },
+            { id: 'xp_100000', threshold: 100000, name: 'Hafız' },
             { id: 'xp_170000', threshold: 170000, name: 'Ustalar Ustası' }
         ];
 
