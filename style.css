@@ -2253,9 +2253,9 @@ body.dark-mode .bosluk-mode .feedback {
    ============================================ */
 
 .daily-tasks-content {
-    max-width: 500px !important;
-    width: 90% !important;
-    max-height: 95vh !important;
+    max-width: 460px !important;  /* Bir tık daha dar */
+    width: 88% !important;
+    max-height: 90vh !important;  /* Bir tık daha alçak */
     height: auto !important;
     text-align: left !important;
     border-radius: 24px !important;

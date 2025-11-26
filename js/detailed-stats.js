@@ -69,7 +69,10 @@ function getDailyStats() {
                 dailyWrong
             });
         } else {
-            console.warn('⚠️ Tarih bazlı veri bulunamadı:', dayKey);
+            // Bilgilendirme için debug seviyesinde log; uyarı göstermeye gerek yok
+            if (window && window.DEBUG_DETAILED_STATS) {
+                console.info('ℹ️ Tarih bazlı veri bulunamadı (normal durum olabilir):', dayKey);
+            }
             
             // Fallback: storage'dan direkt değerleri oku (geriye uyumluluk için)
             dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;

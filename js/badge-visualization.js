@@ -19,6 +19,7 @@
         'achievement-xp_8500': { emoji: '🥈', color: '#C0C0C0', glow: '#E8E8E8' }, // Gümüş
         'achievement-xp_25500': { emoji: '🥇', color: '#FFD700', glow: '#FFA500' }, // Altın
         'achievement-xp_85000': { emoji: '💎', color: '#B9F2FF', glow: '#E0F7FA' }, // Elmas
+        'achievement-xp_1000000': { emoji: '📖', color: '#8E24AA', glow: '#E1BEE7' }, // HAFIZ
         
         // Seri Başarılar
         'achievement-streak_7': { emoji: '🔥', color: '#FF6B35', glow: '#FF8C42' },

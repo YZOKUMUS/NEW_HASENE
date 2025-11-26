@@ -2696,7 +2696,8 @@ function checkAchievements() {
         { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene (1 Altın)', icon: '🥇', condition: () => totalPoints >= 25500 },
         { id: 'xp_51000', name: 'İkinci Altın', desc: '51,000 Hasene topla', icon: '🔥', condition: () => totalPoints >= 51000 },
         { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene (1 Elmas)', icon: '💎', condition: () => totalPoints >= 85000 },
-        { id: 'xp_170000', name: 'Ustalar Ustası', desc: '170,000 Hasene topla', icon: '✨', condition: () => totalPoints >= 170000 }
+        { id: 'xp_170000', name: 'Ustalar Ustası', desc: '170,000 Hasene topla', icon: '✨', condition: () => totalPoints >= 170000 },
+        { id: 'xp_1000000', name: 'HAFIZ', desc: '1,000,000 Hasene topla', icon: '📖', condition: () => totalPoints >= 1000000 }
     ];
     
     const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
@@ -4568,7 +4569,7 @@ function showBadgeCategory(category, clickedElement) {
 // Başarılar modal istatistiklerini güncelle
 function updateBadgesModalStats() {
     const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-    const totalAchievements = 20; // Toplam achievement sayısı
+    const totalAchievements = 21; // Toplam achievement sayısı (HAFIZ ile birlikte)
     const unlockedCount = unlockedAchievements.length;
     const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
 
@@ -4619,7 +4620,8 @@ function updateAllAchievements() {
         { id: 'xp_2000', name: 'Mübtedi Yolcu', desc: '2,000 Hasene', icon: '🥉', condition: () => totalPoints >= 2000, progress: () => Math.min((totalPoints || 0) / 2000 * 100, 100) },
         { id: 'xp_8500', name: 'Gümüş Ustası', desc: '8,500 Hasene', icon: '🥈', condition: () => totalPoints >= 8500, progress: () => Math.min((totalPoints || 0) / 8500 * 100, 100) },
         { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene', icon: '🥇', condition: () => totalPoints >= 25500, progress: () => Math.min((totalPoints || 0) / 25500 * 100, 100) },
-        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) }
+        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) },
+        { id: 'xp_1000000', name: 'HAFIZ', desc: '1,000,000 Hasene', icon: '📖', condition: () => totalPoints >= 1000000, progress: () => Math.min((totalPoints || 0) / 1000000 * 100, 100) }
     ];
 
     achievements.forEach(ach => {
@@ -11813,31 +11815,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const bagIcon = document.getElementById('bagIcon');
     
     // Dinamik Hadisler Listesi
+    // İstek üzerine sadece "bir harf okursa" hadisi bırakıldı
     const hadisler = [
         {
             arabic: 'مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا',
             turkish: '"Kim Allah\'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."',
             source: '(Tirmizi, Sevâbü\'l-Kur\'ân 16)'
-        },
-        {
-            arabic: 'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',
-            turkish: '"Sizin en hayırlınız, Kur\'an\'ı öğrenen ve öğretendir."',
-            source: '(Buhari, Fedâilü\'l-Kur\'ân 21)'
-        },
-        {
-            arabic: 'إِنَّ اللَّهَ يُحِبُّ إِذَا عَمِلَ أَحَدُكُمْ عَمَلًا أَنْ يُتْقِنَهُ',
-            turkish: '"Allah, sizden birinizin bir iş yaptığında onu mükemmel yapmasını sever."',
-            source: '(Taberani)'
-        },
-        {
-            arabic: 'طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ',
-            turkish: '"İlim öğrenmek her Müslümana farzdır."',
-            source: '(İbn Mâce)'
-        },          
-        {
-            arabic: 'إِنَّ الْأَجْرَ مَعَ الْمُصْطَلِحِينَ',
-            turkish: '"Kazancı, hakseverlerle birlikte olanlara verir."',
-            source: '(Ahmed bin Hanbel)'
         }
     ];
     
