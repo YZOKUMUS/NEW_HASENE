@@ -3608,13 +3608,16 @@ body.dark-mode #statsModal div[style*="color: #9b59b6"] {
     color: #a78bfa !important;
 }
 
-/* Oyun Türü İstatistikleri section */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] {
-    background: #1f2937 !important;
-}
-
-body.dark-mode #statsModal div[style*="background: #e9ecef"] {
+/* Oyun Türü İstatistikleri section - tüm açık arka planlı kartlar */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"],
+body.dark-mode #statsModal div[style*="background: #e9ecef"],
+body.dark-mode #statsModal div[style*="background: #e8f4f8"],
+body.dark-mode #statsModal div[style*="background: #e8f2ff"],
+body.dark-mode #statsModal div[style*="background: #f0e6ff"],
+body.dark-mode #statsModal div[style*="background: #fff8e6"],  /* Favoriler */
+body.dark-mode #statsModal div[style*="background: #d5f4e6"] {  /* Öğrenildi */
     background: #111827 !important;
+    color: #e5e7eb !important;
 }
 
 /* Oyun Türü İstatistikleri section (yeşil gradient) */
@@ -3698,14 +3701,11 @@ body.dark-mode #statsModal strong[style*="color: #999"] {
     color: #d1d5db !important;
 }
 
-/* Öğrenme Haritası sayıları - en yüksek öncelik (her yerde) */
-body.dark-mode #analyticsLearnedCount,
-body.dark-mode #analyticsPracticeCount,
-body.dark-mode #analyticsStrugglingCount,
+/* Öğrenme Haritası sayıları - en yüksek öncelik (sadece modal içinde) */
 body.dark-mode #statsModal #analyticsLearnedCount,
 body.dark-mode #statsModal #analyticsPracticeCount,
 body.dark-mode #statsModal #analyticsStrugglingCount {
-    color: #ffffff !important; /* Tam beyaz, gradient üzerinde net */
+    color: #111827 !important; /* Açık gradientte koyu ve okunaklı */
     font-weight: 700 !important;
 }
 
