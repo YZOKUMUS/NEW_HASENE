@@ -3690,6 +3690,25 @@ body.dark-mode #statsModal strong[style*="color: #888"] {
     color: #d1d5db !important;
 }
 
+/* Tüm #999 renkli yardımcı metinler için genel override */
+body.dark-mode #statsModal *[style*="color: #999"],
+body.dark-mode #statsModal div[style*="color: #999"],
+body.dark-mode #statsModal span[style*="color: #999"],
+body.dark-mode #statsModal strong[style*="color: #999"] {
+    color: #d1d5db !important;
+}
+
+/* Öğrenme Haritası sayıları - en yüksek öncelik (her yerde) */
+body.dark-mode #analyticsLearnedCount,
+body.dark-mode #analyticsPracticeCount,
+body.dark-mode #analyticsStrugglingCount,
+body.dark-mode #statsModal #analyticsLearnedCount,
+body.dark-mode #statsModal #analyticsPracticeCount,
+body.dark-mode #statsModal #analyticsStrugglingCount {
+    color: #ffffff !important; /* Tam beyaz, gradient üzerinde net */
+    font-weight: 700 !important;
+}
+
 /* Span elementleri için genel override - daha güçlü */
 body.dark-mode #statsModal span {
     color: #e5e7eb !important;
@@ -3773,17 +3792,15 @@ body.dark-mode #statsModal div[style*="background: #fff"] div[style*="color: #33
     color: #1f2937 !important;
 }
 
-/* Liderlik tablosu - kullanıcı olmayanlar için */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] span,
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div,
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] * {
-    color: #1f2937 !important;
+/* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular (genel metinler) */
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] {
+    background: #111827 !important;
 }
 
-/* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular (genel metinler) */
 body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #333"],
 body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #666"] {
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #666"],
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #999"] {
     color: #e5e7eb !important;
 }
 
@@ -3794,7 +3811,7 @@ body.dark-mode #statsModal #analyticsQuestionPerHour {
     font-weight: 700;
 }
 
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*=\"font-size: 0.7em\"][style*=\"Mevcut hızınızla\"] {
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="font-size: 0.7em"] {
     color: #d1d5db !important; /* Açık gri açıklama metni */
 }
 
@@ -4012,12 +4029,12 @@ body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style
     color: #fbbf24 !important; /* Daha açık turuncu/sarı */
 }
 
-/* Öğrenme Haritası bölümü - sayısal değerler (0 vb.) dark mode'da görünür olsun */
+/* Öğrenme Haritası bölümü - sayısal değerler (0 vb.) dark mode'da Koyu metin */
 body.dark-mode #statsModal #analyticsLearnedCount,
 body.dark-mode #statsModal #analyticsPracticeCount,
-body.dark-mode #statsModal #analyticsStruggleCount {
-    color: #f9fafb !important; /* Tam açık beyaz; arka planda net görünür */
-    font-weight: 600;
+body.dark-mode #statsModal #analyticsStrugglingCount {
+    color: #111827 !important; /* Koyu lacivert, açık gradientte net görünür */
+    font-weight: 700 !important;
 }
 
 /* Öğrenme Haritası bölümü - kırmızı nokta ve text */
@@ -4070,15 +4087,12 @@ body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style
     color: #1f2937 !important;
 }
 
-/* Öğrenme Haritası bölümü - genel text için */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #1f2937 !important;
+/* Öğrenme Haritası bölümü - genel text için (0 kelime dahil) */
+body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] > div[style*="font-size: 0.85em"] {
+    color: #e5e7eb !important; /* Satırların tamamı açık gri */
 }
 
-/* Öğrenme Haritası bölümü - span içindeki renkli nokta ve text kombinasyonları */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="margin-bottom: 8px"] {
-    color: #1f2937 !important;
-}
+/* Satır içindeki özel renkli noktalar korunur (yeşil/turuncu/kırmızı) – üstte tanımlı */
 
 /* ===== DARK MODE - ONBOARDING MODAL ===== */
 body.dark-mode #onboardingModal .onboarding-modal {
