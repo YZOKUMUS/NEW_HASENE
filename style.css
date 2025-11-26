@@ -3780,11 +3780,22 @@ body.dark-mode #statsModal div[style*="background: #f8f9fa"] * {
     color: #1f2937 !important;
 }
 
-/* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular */
+/* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular (genel metinler) */
 body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #333"],
 body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"],
 body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #666"] {
     color: #e5e7eb !important;
+}
+
+/* Detaylı Analitik - Bugünkü Aktiflik: sayısal değerler ve açıklama */
+body.dark-mode #statsModal #analyticsTodayTime,
+body.dark-mode #statsModal #analyticsQuestionPerHour {
+    color: #f9fafb !important; /* Tam beyaz, koyu zeminde çok net */
+    font-weight: 700;
+}
+
+body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*=\"font-size: 0.7em\"][style*=\"Mevcut hızınızla\"] {
+    color: #d1d5db !important; /* Açık gri açıklama metni */
 }
 
 /* Öğrenme İpuçları kutusu */
@@ -3818,10 +3829,10 @@ body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style
     color: #4b5563 !important;
 }
 
-/* Öğrenme Haritası gradient içindeki text'ler */
+/* Öğrenme Haritası gradient içindeki text'ler (dark mode'da daha aydınlık) */
 body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"],
 body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #1f2937 !important;
+    color: #e5e7eb !important; /* Açık gri - koyu mavi/pembe zeminde okunaklı */
 }
 
 /* Liderlik tablosu - sarı gradient içindeki text'ler */
@@ -3988,7 +3999,7 @@ body.dark-mode #statsModal div[id="analyticsHardestWord"][style*="color: #e74c3c
 
 /* Öğrenme Haritası bölümü - strong tag'leri dark mode'da daha açık olmalı */
 body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
-    color: #1f2937 !important; /* Koyu ama okunabilir */
+    color: #f9fafb !important; /* Başlık kısımları için daha parlak beyaz */
 }
 
 /* Öğrenme Haritası bölümü - yeşil nokta ve text */
@@ -3999,6 +4010,14 @@ body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style
 /* Öğrenme Haritası bölümü - turuncu nokta ve text */
 body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
     color: #fbbf24 !important; /* Daha açık turuncu/sarı */
+}
+
+/* Öğrenme Haritası bölümü - sayısal değerler (0 vb.) dark mode'da görünür olsun */
+body.dark-mode #statsModal #analyticsLearnedCount,
+body.dark-mode #statsModal #analyticsPracticeCount,
+body.dark-mode #statsModal #analyticsStruggleCount {
+    color: #f9fafb !important; /* Tam açık beyaz; arka planda net görünür */
+    font-weight: 600;
 }
 
 /* Öğrenme Haritası bölümü - kırmızı nokta ve text */
