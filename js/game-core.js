@@ -1359,6 +1359,81 @@ function playSound(type) {
     }
 }
 
+// ============ REVIEW/PRACTICE MODE FONKSİYONLARI ============
+/**
+ * Zorlanılan kelimeleri topla (Review Mode için)
+ * @returns {Array<string>} Zorlanılan kelime listesi
+ */
+function getStrugglingWords() {
+    try {
+        // loadWordStats fonksiyonunu bul (global veya window'da)
+        const loadWordStatsFn = typeof loadWordStats === 'function' 
+            ? loadWordStats 
+            : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' 
+                ? window.loadWordStats 
+                : null);
+        
+        if (!loadWordStatsFn) {
+            log.warn('⚠️ loadWordStats fonksiyonu bulunamadı, boş liste döndürülüyor');
+            return [];
+        }
+        
+        const wordStats = loadWordStatsFn();
+        if (!wordStats || typeof wordStats !== 'object') {
+            return [];
+        }
+        
+        // Zorlanılan kelimeleri filtrele
+        // Kriterler: successRate < 0.6 VEYA masteryLevel < 1.0
+        const strugglingWords = Object.keys(wordStats).filter(word => {
+            const stat = wordStats[word];
+            if (!stat || typeof stat !== 'object') return false;
+            
+            const successRate = parseFloat(stat.successRate) || 0;
+            const masteryLevel = parseFloat(stat.masteryLevel) || 0;
+            
+            return successRate < 0.6 || masteryLevel < 1.0;
+        });
+        
+        log.debug(`📚 Zorlanılan kelimeler bulundu: ${strugglingWords.length} kelime`);
+        return strugglingWords;
+    } catch (error) {
+        log.error('❌ getStrugglingWords hatası:', error);
+        return [];
+    }
+}
+
+/**
+ * Review Mode için kelime seçimi (zayıf kelimeleri daha sık göster)
+ * @param {Array<string>} allWords - Tüm kelime listesi
+ * @param {Array<string>} strugglingWords - Zorlanılan kelime listesi
+ * @returns {string} Seçilen kelime
+ */
+function selectWordForReview(allWords, strugglingWords) {
+    if (!allWords || allWords.length === 0) {
+        return null;
+    }
+    
+    // Eğer zorlanılan kelime yoksa, normal seçim yap
+    if (!strugglingWords || strugglingWords.length === 0) {
+        return allWords[Math.floor(Math.random() * allWords.length)];
+    }
+    
+    // %70 ihtimalle zorlanılan kelimelerden, %30 ihtimalle normal kelimelerden seç
+    const useStruggling = Math.random() < 0.7;
+    
+    if (useStruggling) {
+        // Zorlanılan kelimelerden seç
+        const availableStruggling = strugglingWords.filter(word => allWords.includes(word));
+        if (availableStruggling.length > 0) {
+            return availableStruggling[Math.floor(Math.random() * availableStruggling.length)];
+        }
+    }
+    
+    // Normal kelimelerden seç
+    return allWords[Math.floor(Math.random() * allWords.length)];
+}
+
 // ============ KELİME İSTATİSTİKLERİ FONKSİYONLARI ============
 function updateWordStatistics() {
     log.stats('📊 updateWordStatistics ÇAĞRILDI!');
@@ -2124,15 +2199,58 @@ function selectIntelligentWord(filteredData) {
     const wordStats = loadWordStats();
     const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
+    
+    // Review Mode kontrolü - currentMode güvenli erişim
+    const safeCurrentMode = typeof currentMode !== 'undefined' 
+        ? currentMode 
+        : (typeof window !== 'undefined' && window.currentMode) 
+            ? window.currentMode 
+            : (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.defaultMode) 
+                ? CONFIG.defaultMode 
+                : 'klasik';
+    
+    // CONFIG.gameModes güvenli erişim
+    const gameModes = (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.gameModes) 
+        ? CONFIG.gameModes 
+        : {};
+    
+    const mode = gameModes[safeCurrentMode];
+    const isReviewMode = mode && mode.reviewMode === true;
+    let strugglingWords = [];
+    
+    if (isReviewMode) {
+        // Review Mode: Zorlanılan kelimeleri topla
+        strugglingWords = getStrugglingWords();
+        log.debug(`🔄 Review Mode aktif - ${strugglingWords.length} zorlanılan kelime bulundu`);
+        
+        // Eğer zorlanılan kelime yoksa uyarı ver
+        if (strugglingWords.length === 0) {
+            log.warn('⚠️ Review Mode aktif ama zorlanılan kelime yok! Normal moda geçiliyor.');
+        }
+    }
 
     // Her kelime için öncelik puanı hesapla
     const wordsWithPriority = filteredData.map(word => {
         const stats = wordStats[word.id];
         let priorityScore = 1.0;
+        
+        // Zorlanılan kelimeleri tespit et (hem Review Mode hem normal mod için)
+        const isStrugglingWord = stats && (stats.successRate < 0.6 || stats.masteryLevel < 1.0);
+        
+        // Review Mode: Zorlanılan kelimelere ekstra öncelik ver (3x)
+        if (isReviewMode && strugglingWords.includes(word.id)) {
+            priorityScore *= 3.0; // Review Mode'da zorlanılan kelimelere 3x öncelik
+            log.debug(`🔄 Review Mode - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
+        } 
+        // Normal mod: Zorlanılan kelimelere orta öncelik ver (1.5x)
+        else if (!isReviewMode && isStrugglingWord) {
+            priorityScore *= 1.5; // Normal modda zorlanılan kelimelere 1.5x öncelik
+            log.debug(`📚 Normal Mod - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
+        }
 
         if (stats) {
             // Temel öncelik puanı (yanlış cevaplanan kelimeler daha öncelikli)
-            priorityScore = stats.priority;
+            priorityScore *= stats.priority;
 
             // Zaman faktörü (uzun süredir görülmeyen kelimeler)
             const daysSinceLastSeen = (now - stats.lastSeen) / oneDay;
@@ -2151,7 +2269,7 @@ function selectIntelligentWord(filteredData) {
             priorityScore *= Math.max(0.1, 2.0 - stats.masteryLevel / 5.0);
         } else {
             // Hiç görülmemiş kelimeler orta öncelikli
-            priorityScore = 1.2;
+            priorityScore *= 1.2;
         }
 
         return {
@@ -2179,16 +2297,47 @@ function selectIntelligentWord(filteredData) {
     
     let random = Math.random() * totalWeight;
 
+    let selectedWord = null;
+    
     for (const item of wordsWithPriority) {
         random -= item.priority;
         if (random <= 0) {
-            // (commented) Seçilen kelime log removed during cleanup
-            return item.word;
+            selectedWord = item.word;
+            
+            // Review Mode takibi: Eğer seçilen kelime zorlanılan kelimelerden ise
+            if (isReviewMode && strugglingWords.length > 0 && selectedWord && selectedWord.id) {
+                if (strugglingWords.includes(selectedWord.id)) {
+                    // Review mode'da zorlanılan kelime seçildi, takip et
+                    if (dailyTasks && dailyTasks.todayStats) {
+                        dailyTasks.todayStats.reviewWords = (dailyTasks.todayStats.reviewWords || 0) + 1;
+                        // Review görevlerini güncelle
+                        if (typeof updateTaskProgress === 'function') {
+                            updateTaskProgress('reviewWords', 1);
+                        }
+                    }
+                }
+            }
+            
+            return selectedWord;
         }
     }
 
     // Fallback: ilk kelimeyi döndür
-    return wordsWithPriority[0]?.word || filteredData[0];
+    selectedWord = wordsWithPriority[0]?.word || filteredData[0];
+    
+    // Review Mode takibi (fallback için de)
+    if (isReviewMode && strugglingWords.length > 0 && selectedWord && selectedWord.id) {
+        if (strugglingWords.includes(selectedWord.id)) {
+            if (dailyTasks && dailyTasks.todayStats) {
+                dailyTasks.todayStats.reviewWords = (dailyTasks.todayStats.reviewWords || 0) + 1;
+                if (typeof updateTaskProgress === 'function') {
+                    updateTaskProgress('reviewWords', 1);
+                }
+            }
+        }
+    }
+    
+    return selectedWord;
 }
 
 // ============ GLOBAL FONKSİYONLAR SONU ============
@@ -2522,6 +2671,15 @@ document.addEventListener('DOMContentLoaded', function() {
             lives: 3,
             showHint: false,
             minDifficulty: 7  // 7-10 arası zorluk
+        },
+        tekrar: {
+            name: '🔄 Tekrar Et',
+            description: 'Zorlandığın kelimeleri tekrar et',
+            questionsPerLevel: 15,
+            timeLimit: 0,
+            lives: 0,
+            showHint: true,
+            reviewMode: true  // Review mode aktif
         }
     },
 
@@ -2571,6 +2729,8 @@ function showCustomConfirm(correct, wrong, xp) {
         const confirmXP = document.getElementById('confirmXP');
         const confirmOK = document.getElementById('confirmOK');
         const confirmCancel = document.getElementById('confirmCancel');
+        const perfectLessonBonus = document.getElementById('perfectLessonBonus');
+        const perfectBonusAmount = document.getElementById('perfectBonusAmount');
 
         forceLog('[MODAL] Element kontrol:', 
             'Modal=' + !!confirmModal,
@@ -2590,7 +2750,25 @@ function showCustomConfirm(correct, wrong, xp) {
         forceLog('[MODAL] Degerler guncelleniyor...');
         confirmCorrect.textContent = correct;
         confirmWrong.textContent = wrong;
-        confirmXP.textContent = xp;
+        // Hasene değerini formatlı göster (binlik ayırıcı ile)
+        confirmXP.textContent = typeof xp === 'number' ? xp.toLocaleString('tr-TR') : xp;
+        
+        // Perfect Lesson kontrolü - Modal'da göster
+        const PERFECT_LESSON_TEST_MODE = true;
+        const MIN_QUESTIONS_FOR_PERFECT = 3;
+        const isPerfectLesson = PERFECT_LESSON_TEST_MODE && 
+                                 wrong === 0 && 
+                                 correct >= MIN_QUESTIONS_FOR_PERFECT && 
+                                 xp > 0;
+        
+        if (isPerfectLesson && perfectLessonBonus && perfectBonusAmount) {
+            const perfectBonus = Math.floor(xp * 0.5);
+            perfectBonusAmount.textContent = `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene`;
+            perfectLessonBonus.style.display = 'block';
+            forceLog('[MODAL] Perfect Lesson bonusu modal\'da gosteriliyor: +' + perfectBonus);
+        } else if (perfectLessonBonus) {
+            perfectLessonBonus.style.display = 'none';
+        }
 
         forceLog('[MODAL] Modal gosteriliyor...');
         
@@ -2659,15 +2837,26 @@ function showCustomConfirm(correct, wrong, xp) {
             resolve(false);
         };
 
+        // Modal dışına tıklayınca kapat (sadece modal overlay'ine tıklanırsa)
+        const handleModalClick = (e) => {
+            if (e.target === confirmModal) {
+                forceLog('[MODAL] Modal disina tiklandi - Kapatiliyor');
+                handleCancel(); // Cancel olarak işaretle
+            }
+        };
+
         const cleanup = () => {
             forceLog('[MODAL] Cleanup yapiliyor...');
             if (confirmOK) confirmOK.removeEventListener('click', handleOK);
             if (confirmCancel) confirmCancel.removeEventListener('click', handleCancel);
+            if (confirmModal) confirmModal.removeEventListener('click', handleModalClick);
         };
 
         forceLog('[MODAL] Event listener\'lar ekleniyor...');
         confirmOK.addEventListener('click', handleOK);
         confirmCancel.addEventListener('click', handleCancel);
+        confirmModal.addEventListener('click', handleModalClick);
+        
         forceLog('[MODAL] Event listener\'lar eklendi - Modal bekleniyor...');
     });
 }
@@ -2970,12 +3159,39 @@ let dailyTasks = {
         toplamYanlis: 0,  // Bugünkü toplam yanlış cevap sayısı
         toplamPuan: 0,
         perfectStreak: 0,
-        farklıZorluk: new Set()
+        farklıZorluk: new Set(),
+        reviewWords: 0,      // Yeni: Review mode kelime sayısı
+        comboCount: 0,      // Yeni: Combo sayısı
+        accuracy: 0,        // Yeni: Başarı oranı (%)
+        allGameModes: new Set(), // Yeni: Oynanan oyun modları
+        streakMaintain: 0   // Yeni: Seri koruma
+    }
+};
+
+// HAFTALIK GÖREVLER SİSTEMİ
+let weeklyTasks = {
+    lastWeekStart: '',   // Son hafta başlangıç tarihi (YYYY-MM-DD)
+    weekStart: '',       // Bu haftanın başlangıç tarihi
+    weekEnd: '',         // Bu haftanın bitiş tarihi
+    tasks: [],           // Haftalık görevler listesi
+    completedTasks: [],  // Tamamlanan haftalık görevler
+    rewardsClaimed: false, // Ödül toplandı mı?
+    weekStats: {         // Bu haftanın istatistikleri
+        totalHasene: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        daysPlayed: 0,
+        perfectDays: 0,   // Hiç yanlış yapmadan oynanan günler
+        streakDays: 0,    // Üst üste oynanan günler
+        allModesPlayed: new Set(), // Oynanan tüm oyun modları
+        reviewWordsCount: 0,
+        comboCount: 0
     }
 };
 
 // Global erişim için (bildirim sistemi için)
 window.dailyTasks = dailyTasks;
+window.weeklyTasks = weeklyTasks;
 
 // SESSION (OYUN İÇİ) PUANLAR
 let sessionScore = 0;     // Bu oyunun puanı
@@ -4362,6 +4578,17 @@ function addSessionPoints(points) {
     // Combo sistemi
     comboCount++;
     updateCombo();
+    
+    // Günlük görevler için combo takibi (en yüksek combo'yu takip et)
+    if (dailyTasks && dailyTasks.todayStats) {
+        dailyTasks.todayStats.comboCount = Math.max(dailyTasks.todayStats.comboCount || 0, comboCount);
+        // Combo görevlerini güncelle (her 3x combo için)
+        if (comboCount > 0 && comboCount % 3 === 0) {
+            if (typeof updateTaskProgress === 'function') {
+                updateTaskProgress('comboCount', 1);
+            }
+        }
+    }
     
     // Her 3 doğru cevapda combo bonusu
     if (comboCount > 0 && comboCount % 3 === 0) {
@@ -6784,6 +7011,11 @@ function checkDailyTasks() {
             updateTasksDisplay();
         }
     }
+    
+    // Haftalık görevleri de kontrol et
+    if (typeof checkWeeklyTasks === 'function') {
+        checkWeeklyTasks();
+    }
 }
 
 function generateDailyTasks(date) {
@@ -6799,7 +7031,7 @@ function generateDailyTasks(date) {
         { id: 'puan100', name: '100 puan topla', target: 100, current: 0, type: 'toplamPuan', reward: 1 }
     ];
 
-    // Bonus görevler listesi (daha fazla çeşitlilik)
+    // Genişletilmiş bonus görevler listesi (daha fazla çeşitlilik)
     const bonusTasksList = [
         { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 soru çöz', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
         { id: 'allDiff', name: '3 farklı zorlukta oyna', target: 3, current: 0, type: 'farklıZorluk', reward: 2 },
@@ -6808,11 +7040,18 @@ function generateDailyTasks(date) {
         { id: 'bosluk3', name: '3 boşluk doldur (bonus)', target: 3, current: 0, type: 'boslukDoldur', reward: 2 },
         { id: 'kelime10', name: '10 kelime çevir (bonus)', target: 10, current: 0, type: 'kelimeCevir', reward: 2 },
         { id: 'puan200', name: '200 puan topla (bonus)', target: 200, current: 0, type: 'toplamPuan', reward: 2 },
-        { id: 'dogru20', name: '20 doğru cevap ver (bonus)', target: 20, current: 0, type: 'toplamDogru', reward: 2 }
+        { id: 'dogru20', name: '20 doğru cevap ver (bonus)', target: 20, current: 0, type: 'toplamDogru', reward: 2 },
+        // Yeni çeşitli görevler
+        { id: 'review5', name: '5 zorlanılan kelimeyi tekrar et', target: 5, current: 0, type: 'reviewWords', reward: 2 },
+        { id: 'combo3x', name: '3x combo yap', target: 3, current: 0, type: 'comboCount', reward: 2 },
+        { id: 'accuracy80', name: '%80 başarı oranı yakala', target: 80, current: 0, type: 'accuracy', reward: 2 },
+        { id: 'allModes', name: 'Tüm oyun modlarını dene', target: 4, current: 0, type: 'allGameModes', reward: 3 },
+        { id: 'streakMaintain', name: 'Serini koru (günlük hedef)', target: 1, current: 0, type: 'streakMaintain', reward: 2 },
+        { id: 'puan500', name: '500 puan topla (mega bonus)', target: 500, current: 0, type: 'toplamPuan', reward: 3 }
     ];
 
-    // Rastgele 3 bonus görev seç (2'den 3'e çıkarıldı)
-    const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 3);
+    // Rastgele 4 bonus görev seç (3'ten 4'e çıkarıldı - daha fazla çeşitlilik)
+    const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 4);
 
     dailyTasks.lastTaskDate = date;
     dailyTasks.tasks = baseTasks;
@@ -6830,7 +7069,12 @@ function generateDailyTasks(date) {
         toplamYanlis: 0,
         toplamPuan: 0,
         perfectStreak: 0,
-        farklıZorluk: new Set()
+        farklıZorluk: new Set(),
+        reviewWords: 0,      // Yeni: Review mode kelime sayısı
+        comboCount: 0,       // Yeni: Combo sayısı
+        accuracy: 0,         // Yeni: Başarı oranı (%)
+        allGameModes: new Set(), // Yeni: Oynanan oyun modları
+        streakMaintain: 0    // Yeni: Seri koruma
     };
 
     log.debug('🎯 Yeni günlük görevler oluşturuldu:', {
@@ -6844,6 +7088,9 @@ function generateDailyTasks(date) {
 
     debouncedSaveStats(); // Debounced kaydetme
     
+    // Haftalık görevleri de kontrol et
+    checkWeeklyTasks();
+    
     // Görevler oluşturulduktan sonra badge'i güncelle
     // Not: checkDailyTasks() içinde de çağrılıyor ama burada da çağırmak daha güvenli
     setTimeout(() => {
@@ -6853,14 +7100,226 @@ function generateDailyTasks(date) {
     }, 100);
 }
 
+// ============ HAFTALIK GÖREVLER SİSTEMİ ============
+/**
+ * Haftanın başlangıç tarihini hesapla (Pazartesi)
+ * @param {Date} date - Tarih (varsayılan: bugün)
+ * @returns {string} Hafta başlangıç tarihi (YYYY-MM-DD)
+ */
+function getWeekStartDate(date = new Date()) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
+    const weekStart = new Date(d.setDate(diff));
+    return getLocalDateString(weekStart);
+}
+
+/**
+ * Haftanın bitiş tarihini hesapla (Pazar)
+ * @param {Date} date - Tarih (varsayılan: bugün)
+ * @returns {string} Hafta bitiş tarihi (YYYY-MM-DD)
+ */
+function getWeekEndDate(date = new Date()) {
+    const weekStart = new Date(getWeekStartDate(date));
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+    return getLocalDateString(weekEnd);
+}
+
+/**
+ * Haftalık görevleri kontrol et ve gerekirse oluştur
+ */
+function checkWeeklyTasks() {
+    const today = getLocalDateString();
+    const weekStart = getWeekStartDate();
+    
+    log.debug('🔍 Haftalık görev kontrolü:', {
+        bugün: today,
+        haftaBaşlangıç: weekStart,
+        sonHaftaBaşlangıç: weeklyTasks.lastWeekStart,
+        yeniHaftaMü: weeklyTasks.lastWeekStart !== weekStart
+    });
+    
+    // Eğer yeni hafta başladıysa görevleri yenile
+    if (weeklyTasks.lastWeekStart !== weekStart) {
+        log.debug('🔄 Yeni hafta başladı, haftalık görevler yenileniyor...');
+        generateWeeklyTasks(weekStart);
+        // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
+        // updateTasksDisplay zaten showDailyTasksModal içinde çağrılıyor
+    } else {
+        log.debug('✅ Aynı hafta, mevcut görevler korunuyor');
+        // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
+    }
+}
+
+/**
+ * Haftalık görevleri oluştur
+ * @param {string} weekStart - Hafta başlangıç tarihi (YYYY-MM-DD)
+ */
+function generateWeeklyTasks(weekStart) {
+    const weekEnd = getWeekEndDate(new Date(weekStart));
+    
+    // Haftalık görevler listesi (daha uzun vadeli hedefler)
+    const weeklyTasksList = [
+        { id: 'week_hasene5000', name: '5,000 Hasene topla', target: 5000, current: 0, type: 'totalHasene', reward: 5 },
+        { id: 'week_correct200', name: '200 doğru cevap ver', target: 200, current: 0, type: 'totalCorrect', reward: 5 },
+        { id: 'week_days5', name: '5 gün üst üste oyna', target: 5, current: 0, type: 'daysPlayed', reward: 5 },
+        { id: 'week_perfect3', name: '3 gün hiç yanlış yapmadan oyna', target: 3, current: 0, type: 'perfectDays', reward: 6 },
+        { id: 'week_allmodes', name: 'Tüm oyun modlarını oyna', target: 6, current: 0, type: 'allModesPlayed', reward: 7 },
+        { id: 'week_review50', name: '50 zorlanılan kelimeyi tekrar et', target: 50, current: 0, type: 'reviewWordsCount', reward: 6 },
+        { id: 'week_combo30', name: '30x combo yap', target: 30, current: 0, type: 'comboCount', reward: 5 },
+        { id: 'week_streak7', name: '7 gün seri koru', target: 7, current: 0, type: 'streakDays', reward: 8 }
+    ];
+    
+    weeklyTasks.lastWeekStart = weekStart;
+    weeklyTasks.weekStart = weekStart;
+    weeklyTasks.weekEnd = weekEnd;
+    weeklyTasks.tasks = weeklyTasksList;
+    weeklyTasks.completedTasks = [];
+    weeklyTasks.rewardsClaimed = false;
+    weeklyTasks.weekStats = {
+        totalHasene: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        daysPlayed: 0,
+        perfectDays: 0,
+        streakDays: 0,
+        allModesPlayed: new Set(),
+        reviewWordsCount: 0,
+        comboCount: 0
+    };
+    
+    log.debug('🎯 Yeni haftalık görevler oluşturuldu:', {
+        haftaBaşlangıç: weekStart,
+        haftaBitiş: weekEnd,
+        görevler: weeklyTasksList.length,
+        tamamlananlar: weeklyTasks.completedTasks.length,
+        stats: weeklyTasks.weekStats
+    });
+    
+    debouncedSaveStats(); // Debounced kaydetme
+    
+    // Görevler oluşturulduktan sonra badge'i güncelle
+    setTimeout(() => {
+        if (typeof updateTasksDisplay === 'function') {
+            updateTasksDisplay();
+        }
+    }, 100);
+}
+
+/**
+ * Haftalık görev ilerlemesini güncelle
+ * @param {string} statType - İstatistik tipi
+ * @param {number} amount - Miktar
+ */
+function updateWeeklyTaskProgress(statType, amount = 1) {
+    log.debug(`📋 updateWeeklyTaskProgress çağrıldı: ${statType} +${amount}`);
+    
+    // Haftalık istatistikleri güncelle
+    if (weeklyTasks.weekStats[statType] !== undefined) {
+        if (statType === 'allModesPlayed' && weeklyTasks.weekStats[statType] instanceof Set) {
+            // Set için özel işlem
+            if (typeof amount === 'string') {
+                weeklyTasks.weekStats[statType].add(amount);
+            }
+        } else {
+            const eskiDeger = weeklyTasks.weekStats[statType];
+            weeklyTasks.weekStats[statType] += amount;
+            log.debug(`📊 Haftalık ${statType}: ${eskiDeger} → ${weeklyTasks.weekStats[statType]}`);
+        }
+    }
+    
+    // Haftalık görevleri kontrol et ve güncelle
+    weeklyTasks.tasks.forEach(task => {
+        const eskiCurrent = task.current;
+        
+        // Görev tipine göre ilerlemeyi güncelle
+        if (task.type === statType) {
+            if (task.type === 'allModesPlayed') {
+                task.current = weeklyTasks.weekStats.allModesPlayed.size;
+            } else if (task.type === 'daysPlayed') {
+                // Günlük oynama: Bugün oynandıysa 1 gün ekle
+                const today = getLocalDateString();
+                const weekStart = getWeekStartDate();
+                const weekEnd = getWeekEndDate();
+                // Bu hafta içinde oynanan günleri say
+                if (streakData && streakData.playDates) {
+                    const weekDays = streakData.playDates.filter(date => 
+                        date >= weekStart && date <= weekEnd
+                    );
+                    task.current = Math.min(task.target, weekDays.length);
+                }
+            } else if (task.type === 'perfectDays') {
+                // Perfect günler: Hiç yanlış yapmadan oynanan günler
+                // Bu hafta için perfect gün sayısını hesapla (şimdilik basit)
+                task.current = Math.min(task.target, weeklyTasks.weekStats.perfectDays || 0);
+            } else if (task.type === 'streakDays') {
+                // Seri günler: Mevcut streak'i kullan
+                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
+            } else {
+                task.current = Math.min(task.target, weeklyTasks.weekStats[statType] || 0);
+            }
+        } else {
+            // Diğer görev tipleri için de kontrol et
+            if (task.type === 'daysPlayed') {
+                const today = getLocalDateString();
+                const weekStart = getWeekStartDate();
+                const weekEnd = getWeekEndDate();
+                if (streakData && streakData.playDates) {
+                    const weekDays = streakData.playDates.filter(date => 
+                        date >= weekStart && date <= weekEnd
+                    );
+                    task.current = Math.min(task.target, weekDays.length);
+                }
+            } else if (task.type === 'streakDays') {
+                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
+            } else if (task.type === 'allModesPlayed') {
+                task.current = weeklyTasks.weekStats.allModesPlayed.size;
+            }
+        }
+        
+        // Görev tamamlandı mı?
+        if (task.current >= task.target && !weeklyTasks.completedTasks.includes(task.id)) {
+            weeklyTasks.completedTasks.push(task.id);
+            log.debug(`✅ Haftalık görev tamamlandı: ${task.id} (${task.name})`);
+        }
+        
+        if (task.current !== eskiCurrent) {
+            log.debug(`📈 Haftalık görev ilerleme: ${task.id} → ${task.current}/${task.target}`);
+        }
+    });
+    
+    debouncedSaveStats(); // Debounced kaydetme
+}
+
 function updateTaskProgress(gameType, amount = 1) {
     log.debug(`📋 updateTaskProgress çağrıldı: ${gameType} +${amount}`);
     
+    // Oyun modu mapping (fonksiyon başında tanımla)
+    const gameModeMap = {
+        'kelimeCevir': 'kelimeCevir',
+        'dinleBul': 'dinleBul',
+        'boslukDoldur': 'boslukDoldur',
+        'ayetOku': 'ayetOku',
+        'duaOgre': 'duaOgre',
+        'hadisOku': 'hadisOku'
+    };
+    
     // Oyun tipine göre istatistiği güncelle
     if (dailyTasks.todayStats[gameType] !== undefined) {
-        const eskiDeger = dailyTasks.todayStats[gameType];
-        dailyTasks.todayStats[gameType] += amount;
-        log.debug(`📊 ${gameType}: ${eskiDeger} → ${dailyTasks.todayStats[gameType]}`);
+        // Set tipi için özel işlem
+        if (dailyTasks.todayStats[gameType] instanceof Set) {
+            if (typeof amount === 'string') {
+                dailyTasks.todayStats[gameType].add(amount);
+            }
+        } else {
+            const eskiDeger = dailyTasks.todayStats[gameType];
+            dailyTasks.todayStats[gameType] += amount;
+            log.debug(`📊 ${gameType}: ${eskiDeger} → ${dailyTasks.todayStats[gameType]}`);
+        }
     }
 
     // Zorluk takibi
@@ -6868,16 +7327,68 @@ function updateTaskProgress(gameType, amount = 1) {
         dailyTasks.todayStats.farklıZorluk.add(currentDifficulty);
         log.debug(`🎯 Zorluk eklendi: ${currentDifficulty}, toplam: ${dailyTasks.todayStats.farklıZorluk.size}`);
     }
+    
+    // Oyun modu takibi (allGameModes için)
+    if (gameType && typeof gameType === 'string' && gameModeMap[gameType]) {
+        if (dailyTasks.todayStats.allGameModes instanceof Set) {
+            dailyTasks.todayStats.allGameModes.add(gameModeMap[gameType]);
+        }
+    }
+    
+    // Başarı oranı hesapla (accuracy için)
+    if (dailyTasks.todayStats.toplamDogru > 0 || dailyTasks.todayStats.toplamYanlis > 0) {
+        const total = dailyTasks.todayStats.toplamDogru + dailyTasks.todayStats.toplamYanlis;
+        if (total > 0) {
+            dailyTasks.todayStats.accuracy = Math.round((dailyTasks.todayStats.toplamDogru / total) * 100);
+        }
+    }
 
     // Görevleri kontrol et ve güncelle
     const allTasks = [...dailyTasks.tasks, ...dailyTasks.bonusTasks];
     
     allTasks.forEach(task => {
         const eskiCurrent = task.current;
+        
+        // Görev tipine göre ilerlemeyi güncelle
         if (task.type === gameType) {
-            task.current = Math.min(task.target, dailyTasks.todayStats[gameType]);
-        } else if (task.type === 'farklıZorluk') {
-            task.current = dailyTasks.todayStats.farklıZorluk.size;
+            if (task.type === 'allGameModes') {
+                task.current = dailyTasks.todayStats.allGameModes.size;
+            } else if (task.type === 'farklıZorluk') {
+                task.current = dailyTasks.todayStats.farklıZorluk.size;
+            } else if (task.type === 'accuracy') {
+                task.current = dailyTasks.todayStats.accuracy;
+            } else if (task.type === 'comboCount') {
+                // Combo görevleri: En yüksek combo sayısını kullan
+                task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
+            } else if (task.type === 'reviewWords') {
+                task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
+            } else if (task.type === 'streakMaintain') {
+                // Seri koruma: Günlük hedef tamamlandıysa 1
+                const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+                const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
+                const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
+                task.current = dailyHasene >= goalHasene ? 1 : 0;
+            } else {
+                task.current = Math.min(task.target, dailyTasks.todayStats[gameType] || 0);
+            }
+        } else {
+            // Diğer görev tipleri için de kontrol et (gameType değişmese bile)
+            if (task.type === 'comboCount') {
+                task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
+            } else if (task.type === 'reviewWords') {
+                task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
+            } else if (task.type === 'accuracy') {
+                task.current = dailyTasks.todayStats.accuracy || 0;
+            } else if (task.type === 'streakMaintain') {
+                const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+                const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
+                const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
+                task.current = dailyHasene >= goalHasene ? 1 : 0;
+            } else if (task.type === 'allGameModes') {
+                task.current = dailyTasks.todayStats.allGameModes.size;
+            } else if (task.type === 'farklıZorluk') {
+                task.current = dailyTasks.todayStats.farklıZorluk.size;
+            }
         }
 
         // Görev tamamlandı mı?
@@ -6890,6 +7401,27 @@ function updateTaskProgress(gameType, amount = 1) {
             log.debug(`🎯 Görev ilerleme: ${task.id} ${eskiCurrent}/${task.target} → ${task.current}/${task.target}`);
         }
     });
+    
+    // Haftalık görevleri de güncelle
+    if (typeof updateWeeklyTaskProgress === 'function') {
+        // Haftalık görevler için uygun mapping
+        const weeklyStatMap = {
+            'toplamPuan': 'totalHasene',
+            'toplamDogru': 'totalCorrect',
+            'toplamYanlis': 'totalWrong',
+            'reviewWords': 'reviewWordsCount',
+            'comboCount': 'comboCount'
+        };
+        
+        if (weeklyStatMap[gameType]) {
+            updateWeeklyTaskProgress(weeklyStatMap[gameType], amount);
+        }
+        
+        // Oyun modu için
+        if (gameType && gameModeMap[gameType]) {
+            updateWeeklyTaskProgress('allModesPlayed', gameModeMap[gameType]);
+        }
+    }
 
     log.debug(`📋 Toplam tamamlanan görev: ${dailyTasks.completedTasks.length}`);
     debouncedSaveStats(); // Debounced kaydetme
@@ -6924,17 +7456,28 @@ function showDailyTasksModal() {
         // Günlük görevleri kontrol et ve güncelle
         checkDailyTasks();
         
+        // Haftalık görevleri kontrol et (eğer henüz oluşturulmadıysa)
+        if (typeof checkWeeklyTasks === 'function') {
+            checkWeeklyTasks();
+        }
+        
         // Debug: Görev durumunu logla
         log.debug('📋 Daily Tasks Debug:', {
             tasks: dailyTasks.tasks.length,
             bonusTasks: dailyTasks.bonusTasks.length,
             completed: dailyTasks.completedTasks.length,
             lastDate: dailyTasks.lastTaskDate,
-            today: getLocalDateString()
+            today: getLocalDateString(),
+            weeklyTasks: weeklyTasks.tasks ? weeklyTasks.tasks.length : 0
         });
         
         // Görev verilerini güncelle
         updateTasksDisplay();
+        
+        // Varsayılan olarak günlük sekmesini göster
+        if (typeof switchTasksTab === 'function') {
+            switchTasksTab('daily');
+        }
         
         // Modal'ı göster (null check ile)
         const modal = document.getElementById('dailyTasksModal');
@@ -7063,11 +7606,9 @@ function updateTasksDisplay() {
     if (tasksBadge) {
         if (incompleteCount > 0 && !dailyTasks.rewardsClaimed) {
             tasksBadge.style.display = 'flex';
-            // 12 veya daha fazla ise "9+" göster, değilse tam sayıyı göster
-            // (11 görev olduğu için, kullanıcı tam sayıyı görebilsin)
-            const badgeText = incompleteCount >= 12 ? '9+' : incompleteCount.toString();
-            tasksBadge.textContent = badgeText;
-            log.debug('🏷️ Badge güncellendi:', { incompleteCount, badgeText });
+            // Tam sayıyı göster (9+ limiti kaldırıldı)
+            tasksBadge.textContent = incompleteCount.toString();
+            log.debug('🏷️ Badge güncellendi:', { incompleteCount, badgeText: incompleteCount.toString() });
         } else {
             tasksBadge.style.display = 'none';
             log.debug('🏷️ Badge gizlendi:', { incompleteCount, rewardsClaimed: dailyTasks.rewardsClaimed });
@@ -7164,6 +7705,154 @@ function updateTasksDisplay() {
             rewardsSection.style.display = 'none';
         }
     }
+    
+    // Haftalık görevleri göster
+    updateWeeklyTasksDisplay();
+}
+
+function updateWeeklyTasksDisplay() {
+    // Haftalık görevler yoksa oluştur (sadece bir kez, sonsuz döngü olmaz)
+    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+        if (typeof checkWeeklyTasks === 'function') {
+            checkWeeklyTasks();
+        }
+    }
+    
+    // Haftalık görevler listesi
+    const weeklyList = document.getElementById('weeklyTasksList');
+    const weeklyPeriod = document.getElementById('weeklyTasksPeriod');
+    const weeklyCompletedCount = document.getElementById('weeklyCompletedCount');
+    const weeklyTotalCount = document.getElementById('weeklyTotalCount');
+    const weeklyRewardsSection = document.getElementById('weeklyRewardsSection');
+    
+    if (!weeklyList || !weeklyPeriod || !weeklyCompletedCount || !weeklyTotalCount) {
+        log.debug('⚠️ Haftalık görevler elementi bulunamadı, atlanıyor...');
+        return;
+    }
+    
+    // Hafta bilgisi
+    if (weeklyTasks.weekStart && weeklyTasks.weekEnd) {
+        const startDate = new Date(weeklyTasks.weekStart);
+        const endDate = new Date(weeklyTasks.weekEnd);
+        const startStr = startDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+        const endStr = endDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+        weeklyPeriod.textContent = `${startStr} - ${endStr}`;
+    } else {
+        weeklyPeriod.textContent = 'Yükleniyor...';
+    }
+    
+    // Haftalık görevleri göster (günlük görevler gibi)
+    weeklyList.innerHTML = '';
+    
+    if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
+        weeklyTasks.tasks.forEach(task => {
+            // Günlük görevler gibi aynı stili kullan
+            const taskElement = createWeeklyTaskElement(task);
+            weeklyList.appendChild(taskElement);
+        });
+        
+        // Tamamlanan görev sayısı
+        const completedWeekly = weeklyTasks.completedTasks.length;
+        const totalWeekly = weeklyTasks.tasks.length;
+        weeklyCompletedCount.textContent = completedWeekly;
+        weeklyTotalCount.textContent = totalWeekly;
+        
+        // Ödül bölümü
+        if (weeklyRewardsSection) {
+            if (completedWeekly === totalWeekly && totalWeekly > 0 && !weeklyTasks.rewardsClaimed) {
+                weeklyRewardsSection.style.display = 'block';
+            } else {
+                weeklyRewardsSection.style.display = 'none';
+            }
+        }
+    } else {
+        weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
+    }
+}
+
+function createWeeklyTaskElement(task) {
+    const isCompleted = weeklyTasks.completedTasks.includes(task.id);
+    const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
+    
+    // Haftalık görev icon mapping
+    const weeklyTaskIcons = {
+        'week_hasene5000': '💰',
+        'week_correct200': '⭐',
+        'week_days5': '📅',
+        'week_perfect3': '🔥',
+        'week_allmodes': '🎮',
+        'week_review50': '🔄',
+        'week_combo30': '⚡',
+        'week_streak7': '🔥'
+    };
+    
+    const taskIcon = weeklyTaskIcons[task.id] || '📋';
+    
+    // Günlük görevlerle aynı yapıyı kullan
+    const div = document.createElement('div');
+    div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
+    
+    // Tıklama event'lerini durdur
+    div.onclick = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    };
+    div.addEventListener('touchstart', function(e) {
+        e.stopPropagation();
+    }, { passive: true });
+    
+    // Hover efekti
+    div.onmouseover = function() {
+        if (!isCompleted) {
+            this.style.transform = 'translateX(4px)';
+            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        }
+    };
+    div.onmouseout = function() {
+        this.style.transform = '';
+        this.style.boxShadow = '';
+    };
+    
+    // Günlük görevlerle aynı HTML yapısı
+    const weeklyDescription = getWeeklyTaskDescription(task);
+    div.innerHTML = `
+        ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
+        <div class="daily-task-header">
+            <div class="daily-task-info">
+                <div class="daily-task-icon">${taskIcon}</div>
+                <div class="daily-task-name">${task.name}</div>
+                ${weeklyDescription && weeklyDescription !== task.name ? `<div class="daily-task-desc">${weeklyDescription}</div>` : ''}
+            </div>
+            <div class="daily-task-reward">+${task.reward * 1000} Hasene</div>
+        </div>
+        <div class="daily-task-progress">
+            <div class="daily-task-progress-bar">
+                <div class="daily-task-progress-fill" style="width: ${progressPercent}%;"></div>
+            </div>
+            <div class="daily-task-progress-text">${task.current}/${task.target}</div>
+        </div>
+    `;
+    
+    return div;
+}
+
+function getWeeklyTaskDescription(task) {
+    const descriptions = {
+        'week_hasene5000': 'Bu hafta toplam 5,000 Hasene kazan',
+        'week_correct200': 'Bu hafta 200 doğru cevap ver',
+        'week_days5': '5 gün üst üste oyun oyna',
+        'week_perfect3': '3 gün hiç yanlış yapmadan oyna',
+        'week_allmodes': 'Klasik, Dinle, Boşluk, Ayet, Dua, Hadis modlarını dene',
+        'week_review50': 'Tekrar Et modunda 50 zorlanılan kelimeyi pratik yap',
+        'week_combo30': 'Üst üste 30 doğru cevap ver',
+        'week_streak7': '7 gün üst üste günlük hedefini tamamla'
+    };
+    const description = descriptions[task.id];
+    // Eğer açıklama yoksa veya task.name ile aynıysa boş döndür
+    if (!description || description === task.name) {
+        return '';
+    }
+    return description;
 }
 
 function createTaskElement(task) {
@@ -7214,13 +7903,14 @@ function createTaskElement(task) {
         this.style.boxShadow = '';
     };
     
+    const taskDescription = getTaskDescription(task);
     div.innerHTML = `
         ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
         <div class="daily-task-header">
             <div class="daily-task-info">
                 <div class="daily-task-icon">${taskIcon}</div>
                 <div class="daily-task-name">${getTaskDisplayName(task)}</div>
-                <div class="daily-task-desc">${getTaskDescription(task)}</div>
+                ${taskDescription ? `<div class="daily-task-desc">${taskDescription}</div>` : ''}
             </div>
             <div class="daily-task-reward">+${task.reward * 100} Hasene</div>
         </div>
@@ -7252,9 +7942,26 @@ function getTaskDescription(task) {
         'puan200': 'Günlük toplam 200 Hasene kazan',
         'perfect5': 'Hiç yanlış yapmadan 5 soru çöz',
         'allDiff': '3 farklı zorluk seviyesinde oyna',
-        'combo15': '15 doğru cevap ver (muvazebet)'
+        'combo15': '15 doğru cevap ver (muvazebet)',
+        // Yeni görevler için açıklamalar
+        'review5': 'Tekrar Et modunda 5 zorlanılan kelimeyi pratik yap',
+        'combo3x': 'Üst üste 3 doğru cevap ver',
+        'accuracy80': 'Oyun sonunda %80 veya daha yüksek başarı oranı yakala',
+        'allModes': 'Klasik, Dinle, Boşluk, Ayet, Dua, Hadis modlarından en az 4\'ünü dene',
+        'streakMaintain': 'Günlük oyun hedefini tamamlayarak serini koru',
+        'puan500': 'Günlük toplam 500 Hasene kazan'
     };
-    return descriptions[task.id] || task.name;
+    const description = descriptions[task.id];
+    // Eğer açıklama yoksa veya display name ile aynıysa boş döndür
+    if (!description) {
+        return '';
+    }
+    const displayName = getTaskDisplayName(task);
+    // Eğer açıklama display name ile aynıysa boş döndür
+    if (description === displayName || description === task.name) {
+        return '';
+    }
+    return description;
 }
 
 function getTaskDisplayName(task) {
@@ -7277,7 +7984,14 @@ function getTaskDisplayName(task) {
         'puan200': '200 Puan Topla (Fazilet)',
         'perfect5': 'Mükemmel Seri (5 Sual)',
         'allDiff': '3 Farklı Zorlukta Talebe Et',
-        'combo15': '15 Doğru Cevap (Muvazebet)'
+        'combo15': '15 Doğru Cevap (Muvazebet)',
+        // Yeni görevler
+        'review5': '5 Zorlanılan Kelimeyi Tekrar Et',
+        'combo3x': '3x Combo Yap',
+        'accuracy80': '%80 Başarı Oranı Yakala',
+        'allModes': 'Tüm Oyun Modlarını Dene',
+        'streakMaintain': 'Serini Koru',
+        'puan500': '500 Puan Topla (Mega Bonus)'
     };
     
     return taskNames[task.id] || task.name;
@@ -7329,10 +8043,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function claimWeeklyRewards() {
+    const completedCount = weeklyTasks.completedTasks.length;
+    const totalCount = weeklyTasks.tasks.length;
+    
+    if (completedCount === totalCount && !weeklyTasks.rewardsClaimed) {
+        // 5000 Hasene ihsan ver
+        const bonusXP = 5000;
+        totalPoints += bonusXP;
+        
+        // Bugünkü toplam puana da ekle (istatistikler için)
+        dailyTasks.todayStats.toplamPuan += bonusXP;
+        
+        // Daily XP'ye de ekle
+        addDailyXP(bonusXP);
+        
+        // Haftalık görev ödülünü liderlik tablosuna da ekle
+        if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
+            updateLeaderboardScores(bonusXP);
+            log.game(`📊 Liderlik tablosu güncellendi (haftalık görev ödülü): +${bonusXP} Hasene`);
+        }
+        
+        weeklyTasks.rewardsClaimed = true;
+        debouncedSaveStats();
+        
+        // Başarı mesajı göster
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert(`🎉 Haftalık görevler tamamlandı! +${bonusXP} Hasene kazandın!`, 'success');
+        }
+        
+        // Görevleri güncelle
+        updateWeeklyTasksDisplay();
+    }
+}
+
+// Tab değiştirme fonksiyonu
+function switchTasksTab(tab) {
+    const dailyTabBtn = document.getElementById('dailyTabBtn');
+    const weeklyTabBtn = document.getElementById('weeklyTabBtn');
+    const dailyTab = document.getElementById('dailyTasksTab');
+    const weeklyTab = document.getElementById('weeklyTasksTab');
+    const dailyProgress = document.getElementById('dailyProgressCard');
+    const weeklyProgress = document.getElementById('weeklyProgressCard');
+    
+    if (tab === 'daily') {
+        // Günlük sekmesi aktif
+        if (dailyTabBtn) {
+            dailyTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            dailyTabBtn.style.color = 'white';
+            dailyTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+        }
+        if (weeklyTabBtn) {
+            weeklyTabBtn.style.background = '#f3f4f6';
+            weeklyTabBtn.style.color = '#6b7280';
+            weeklyTabBtn.style.boxShadow = 'none';
+        }
+        if (dailyTab) dailyTab.style.display = 'block';
+        if (weeklyTab) weeklyTab.style.display = 'none';
+        if (dailyProgress) dailyProgress.style.display = 'block';
+        if (weeklyProgress) weeklyProgress.style.display = 'none';
+    } else {
+        // Haftalık sekmesi aktif
+        if (dailyTabBtn) {
+            dailyTabBtn.style.background = '#f3f4f6';
+            dailyTabBtn.style.color = '#6b7280';
+            dailyTabBtn.style.boxShadow = 'none';
+        }
+        if (weeklyTabBtn) {
+            weeklyTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            weeklyTabBtn.style.color = 'white';
+            weeklyTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+        }
+        if (dailyTab) dailyTab.style.display = 'none';
+        if (weeklyTab) weeklyTab.style.display = 'block';
+        if (dailyProgress) dailyProgress.style.display = 'none';
+        if (weeklyProgress) weeklyProgress.style.display = 'block';
+        
+        // Haftalık görevleri güncelle
+        if (typeof updateWeeklyTasksDisplay === 'function') {
+            updateWeeklyTasksDisplay();
+        }
+    }
+}
+
 // Global fonksiyonlar
 window.showDailyTasksModal = showDailyTasksModal;
 window.closeDailyTasksModal = closeDailyTasksModal;
 window.claimDailyRewards = claimDailyRewards;
+window.claimWeeklyRewards = claimWeeklyRewards;
+window.switchTasksTab = switchTasksTab;
 
 // OYUN BİTİŞ FONKSİYONU (Oyun bitince çağrılır)
 // NOT: Puanlar zaten addSessionPoints() ile eklendi, burada sadece kontrol yapıyoruz
@@ -7925,6 +8724,57 @@ elements.backFromGameBtn.onclick = async () => {
                 } else {
                     forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
                 }
+                
+                // ============ PERFECT LESSON BONUS (TEST MODU) ============
+                // TEST: Perfect Lesson kontrolü - Tüm soruları doğru cevapladıysa bonus ver
+                const PERFECT_LESSON_TEST_MODE = true; // Test modu aktif
+                const MIN_QUESTIONS_FOR_PERFECT = 3; // En az 3 soru cevaplanmalı
+                
+                if (PERFECT_LESSON_TEST_MODE && 
+                    sessionWrong === 0 && 
+                    sessionCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
+                    sessionScore > 0) {
+                    
+                    // Perfect Lesson bonusu hesapla (%50 ekstra)
+                    const perfectBonus = Math.floor(sessionScore * 0.5);
+                    
+                    if (perfectBonus > 0) {
+                        // Bonus hasene ekle
+                        totalPoints += perfectBonus;
+                        dailyTasks.todayStats.toplamPuan += perfectBonus;
+                        addDailyXP(perfectBonus);
+                        
+                        // Liderlik tablosunu güncelle
+                        if (typeof updateLeaderboardScores === 'function') {
+                            updateLeaderboardScores(perfectBonus);
+                        }
+                        
+                        // Perfect Lesson bildirimi göster
+                        setTimeout(() => {
+                            if (typeof showSuccessMessage === 'function') {
+                                showSuccessMessage(
+                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
+                                    `Tüm soruları doğru cevapladın!\n` +
+                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
+                                    5000
+                                );
+                            }
+                            
+                            // Özel Perfect Lesson animasyonu
+                            if (typeof triggerConfetti === 'function') {
+                                triggerConfetti();
+                            }
+                            
+                            // Perfect Lesson sesi
+                            if (typeof playSound === 'function') {
+                                playSound('success');
+                            }
+                        }, 500);
+                        
+                        forceLog(`⭐ PERFECT LESSON BONUS: +${perfectBonus} Hasene (Test Modu)`);
+                    }
+                }
+                // ============ PERFECT LESSON BONUS SONU ============
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
         }
@@ -8248,6 +9098,39 @@ function selectMode(modeKey) {
 if (elements.startBtn) {
 elements.startBtn.onclick = () => {
     const mode = CONFIG.gameModes[currentMode];
+    
+    // Mode kontrolü
+    if (!mode) {
+        log.error('❌ Oyun modu bulunamadı:', currentMode);
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Oyun modu bulunamadı. Lütfen tekrar deneyin.', 'error');
+        } else {
+            alert('⚠️ Oyun modu bulunamadı. Lütfen tekrar deneyin.');
+        }
+        return;
+    }
+    
+    // Review Mode kontrolü - Zorlanılan kelime var mı?
+    if (mode.reviewMode === true) {
+        const strugglingWords = getStrugglingWords();
+        log.debug(`🔍 Review Mode kontrolü: ${strugglingWords.length} zorlanılan kelime bulundu`);
+        
+        if (strugglingWords.length === 0) {
+            // Zorlanılan kelime yoksa uyarı göster
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert(
+                    '📚 Tekrar Modu',
+                    'Henüz zorlanılan kelime yok!\n\nTekrar modu, yanlış cevapladığın veya zorlandığın kelimeleri daha sık gösterir.\n\nÖnce normal modda oynayıp bazı kelimeleri öğren, sonra tekrar modunu kullanabilirsin.',
+                    'info'
+                );
+            } else {
+                alert('⚠️ Henüz zorlanılan kelime yok! Önce normal modda oynayıp bazı kelimeleri öğren.');
+            }
+            return; // Oyunu başlatma
+        } else {
+            log.debug(`🔄 Review Mode başlatılıyor - ${strugglingWords.length} zorlanılan kelime bulundu`);
+        }
+    }
     
     // Ayarları uygula
     lives = mode.lives;

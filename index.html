@@ -640,6 +640,69 @@
         </div>
     </div>
 
+    <!-- Oyun Sonu Onay Modal - Custom Confirm -->
+    <div class="modal" id="customConfirm" role="dialog" aria-modal="true" aria-labelledby="customConfirmTitle" aria-label="Oyun sonu özeti">
+        <div class="modal-content" style="max-width: 400px; padding: 24px; border-radius: 16px; text-align: center;">
+            <h2 id="customConfirmTitle" style="margin-bottom: 20px; color: #333; font-size: 24px;">📊 Oyun Özeti</h2>
+            
+            <div style="display: flex; justify-content: space-around; margin-bottom: 24px; gap: 16px;">
+                <div style="flex: 1; padding: 16px; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); border-radius: 12px; color: white;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+                    <div style="font-size: 28px; font-weight: bold; margin-bottom: 4px;" id="confirmCorrect">0</div>
+                    <div style="font-size: 12px; opacity: 0.9;">Doğru</div>
+                </div>
+                
+                <div style="flex: 1; padding: 16px; background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); border-radius: 12px; color: white;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">❌</div>
+                    <div style="font-size: 28px; font-weight: bold; margin-bottom: 4px;" id="confirmWrong">0</div>
+                    <div style="font-size: 12px; opacity: 0.9;">Yanlış</div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; margin-bottom: 16px;">
+                <div style="font-size: 18px; margin-bottom: 8px; opacity: 0.9;">💰 Kazandığın Hasene</div>
+                <div style="font-size: 36px; font-weight: bold;" id="confirmXP">0</div>
+            </div>
+            
+            <!-- Perfect Lesson Bonus (gizli, Perfect Lesson olduğunda gösterilecek) -->
+            <div id="perfectLessonBonus" style="display: none; padding: 16px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 12px; color: #333; margin-bottom: 24px; text-align: center; animation: pulse 2s infinite;">
+                <div style="font-size: 24px; margin-bottom: 8px;">⭐ MÜKEMMEL DERS! ⭐</div>
+                <div style="font-size: 14px; margin-bottom: 8px; opacity: 0.9;">Tüm soruları doğru cevapladın!</div>
+                <div style="font-size: 20px; font-weight: bold;" id="perfectBonusAmount">+0 Bonus Hasene</div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="confirmOK" style="
+                    flex: 1;
+                    padding: 14px 24px;
+                    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    min-height: 48px;
+                " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(76, 175, 80, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">Tamam</button>
+                
+                <button id="confirmCancel" style="
+                    flex: 1;
+                    padding: 14px 24px;
+                    background: #f5f5f5;
+                    color: #666;
+                    border: 2px solid #ddd;
+                    border-radius: 12px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    min-height: 48px;
+                " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">İptal</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Muvaffakiyetler/Nişanlar Modal - Yeni Modern Tasarım -->
     <div class="modal" id="badgesModal" onclick="handleBadgesModalClick(event)" role="dialog" aria-modal="true" aria-labelledby="badgesModalTitle" aria-label="Muvaffakiyetler modalı">
         <div class="modal-content badges-container" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y;">
@@ -868,45 +931,115 @@
             <!-- Scroll Edilebilir İçerik -->
             <div id="dailyTasksScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
                 <!-- Header -->
-                <div class="daily-tasks-header" style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid #f0f0f0;">
-                    <div class="daily-tasks-title" style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05em; color: #1f2937;">
+                <div class="daily-tasks-header" style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #f0f0f0;">
+                    <div class="daily-tasks-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95em; color: #1f2937;">
                         <span>🎯</span>
-                        <span>Günlük Vazifeler</span>
+                        <span>Vazifeler</span>
                     </div>
-                    <button class="daily-tasks-close-btn modal-close-btn" onclick="event.stopPropagation(); closeDailyTasksModal();" style="flex-shrink: 0;">×</button>
+                    <button class="daily-tasks-close-btn modal-close-btn" onclick="event.stopPropagation(); closeDailyTasksModal();" style="flex-shrink: 0; width: 32px; height: 32px; font-size: 18px;">×</button>
                 </div>
 
-            <!-- Progress Card -->
-            <div class="daily-tasks-progress-card">
-                <div class="daily-tasks-progress-title">📊 Bugünkü Terakki</div>
-                <div class="daily-tasks-progress-stats">
-                    <div class="daily-tasks-progress-count" id="completedTasks">0</div>
-                    <div class="daily-tasks-progress-total">/ <span id="totalTasks">11</span> Vazife</div>
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: 6px; margin: 12px 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">
+                <button id="dailyTabBtn" onclick="switchTasksTab('daily')" style="
+                    flex: 1;
+                    padding: 8px 12px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 0.8em;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+                ">
+                    📋 Günlük
+                </button>
+                <button id="weeklyTabBtn" onclick="switchTasksTab('weekly')" style="
+                    flex: 1;
+                    padding: 8px 12px;
+                    background: #f3f4f6;
+                    color: #6b7280;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 0.8em;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                ">
+                    📅 Haftalık
+                </button>
+            </div>
+
+            <!-- Progress Card (Günlük) -->
+            <div id="dailyProgressCard" class="daily-tasks-progress-card" style="padding: 14px 16px; margin: 0 16px 12px 16px; border-radius: 12px;">
+                <div class="daily-tasks-progress-title" style="font-size: 0.7em; margin-bottom: 8px;">📊 Bugünkü Terakki</div>
+                <div class="daily-tasks-progress-stats" style="margin-bottom: 8px;">
+                    <div class="daily-tasks-progress-count" id="completedTasks" style="font-size: 1.8em;">0</div>
+                    <div class="daily-tasks-progress-total" style="font-size: 0.85em;">/ <span id="totalTasks">11</span> Vazife</div>
                 </div>
-                <div class="daily-tasks-progress-bar-container">
+                <div class="daily-tasks-progress-bar-container" style="height: 8px;">
                     <div class="daily-tasks-progress-bar" id="taskProgress" style="width: 0%;"></div>
                 </div>
             </div>
 
-            <!-- Temel Görevler -->
-            <div class="daily-tasks-section">
-                <div class="daily-tasks-section-title">
-                    <span>📋</span>
-                    <span>Temel Vazifeler</span>
+            <!-- Progress Card (Haftalık) -->
+            <div id="weeklyProgressCard" class="daily-tasks-progress-card" style="display: none; padding: 14px 16px; margin: 0 16px 12px 16px; border-radius: 12px;">
+                <div class="daily-tasks-progress-title" style="font-size: 0.7em; margin-bottom: 8px;">📅 Haftalık Terakki</div>
+                <div class="daily-tasks-progress-stats" style="margin-bottom: 8px;">
+                    <div class="daily-tasks-progress-count" id="weeklyCompletedCount" style="font-size: 1.8em;">0</div>
+                    <div class="daily-tasks-progress-total" style="font-size: 0.85em;">/ <span id="weeklyTotalCount">8</span> Vazife</div>
                 </div>
-                <div id="dailyTasksList" class="daily-tasks-list">
-                    <!-- Görevler buraya dinamik eklenecek -->
+                <div style="font-size: 0.65em; opacity: 0.8; margin-top: 4px;" id="weeklyTasksPeriod">-</div>
+            </div>
+
+            <!-- Günlük Görevler Tab -->
+            <div id="dailyTasksTab" class="tasks-tab-content">
+                <!-- Temel Görevler -->
+                <div class="daily-tasks-section">
+                    <div class="daily-tasks-section-title">
+                        <span>📋</span>
+                        <span>Temel Vazifeler</span>
+                    </div>
+                    <div id="dailyTasksList" class="daily-tasks-list">
+                        <!-- Görevler buraya dinamik eklenecek -->
+                    </div>
+                </div>
+
+                <!-- Bonus Görevler -->
+                <div class="daily-tasks-section">
+                    <div class="daily-tasks-section-title bonus">
+                        <span>⭐</span>
+                        <span>Fazilet Vazifeleri</span>
+                    </div>
+                    <div id="bonusTasksList" class="daily-tasks-list">
+                        <!-- Fazilet vazifeleri buraya dinamik eklenecek -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Bonus Görevler -->
-            <div class="daily-tasks-section">
-                <div class="daily-tasks-section-title bonus">
-                    <span>⭐</span>
-                    <span>Fazilet Vazifeleri</span>
+            <!-- Haftalık Görevler Tab -->
+            <div id="weeklyTasksTab" class="tasks-tab-content" style="display: none;">
+                <div id="weeklyTasksList" class="daily-tasks-list">
+                    <!-- Haftalık görevler buraya dinamik eklenecek -->
                 </div>
-                <div id="bonusTasksList" class="daily-tasks-list">
-                    <!-- Fazilet vazifeleri buraya dinamik eklenecek -->
+                <div id="weeklyRewardsSection" style="display: none; margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; text-align: center; color: white;">
+                    <div style="font-size: 1.2em; margin-bottom: 8px;">🎉</div>
+                    <div style="font-weight: 600; margin-bottom: 4px; color: white;">Tüm Haftalık Görevler Tamamlandı!</div>
+                    <button id="claimWeeklyRewardsBtn" onclick="claimWeeklyRewards()" style="
+                        margin-top: 8px;
+                        padding: 10px 20px;
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        +5,000 Hasene Ödül Topla 🎁
+                    </button>
                 </div>
             </div>
 
