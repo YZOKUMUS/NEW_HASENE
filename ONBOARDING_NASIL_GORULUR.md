@@ -76,3 +76,5 @@ Eğer hala görünmüyorsa:
 **Onboarding hazır ve çalışıyor!** Sadece localStorage'ı temizlemeniz gerekiyor.
 
 
+
+
