@@ -8,7 +8,7 @@ coverage/
 .nyc_output/
 
 # Documentation
-docs/
+# docs/ - Artık dokümantasyon klasörü kullanılıyor, ignore edilmemeli
 out/
 
 # IDE
