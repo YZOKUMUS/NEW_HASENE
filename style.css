@@ -1,6 +1,44 @@
 /* ================================================
-   HASENE ARAPÇA OYUNU – MODERN CLEAN STYLE V1.0
+   HASENE ARAPÇA OYUNU – MODERN CLEAN STYLE V2.0
+   Professional UI/UX Overhaul
    ================================================ */
+
+/* ================================================
+   🚀 PERFORMANCE OPTIMIZATIONS
+   ================================================ */
+
+/* GPU acceleration for animated elements */
+.game-card,
+.nav-item,
+.modal-content,
+.loading-screen-new,
+.stat-item-minimal {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Content containment for better rendering */
+.games-section,
+.hero-section-minimal,
+.modal {
+    contain: layout style;
+}
+
+/* Optimize paint for frequently updated elements */
+.progress-fill-minimal,
+.loading-progress-fill-pro {
+    will-change: width;
+}
+
+/* Hardware acceleration for transitions */
+.game-card,
+.stat-item-minimal,
+.nav-item {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+}
 
 /* Uthmani Font - KFGQPC Uthmanic Script HAFS */
 @font-face {
@@ -13,37 +51,77 @@
 
 /* ----- CSS VARIABLES ----- */
 :root {
+    /* Primary Colors */
     --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --bg-secondary: #fff;
-    --text-primary: #222;
-    --text-secondary: #666;
-    --border-color: #eee;
+    --text-primary: #1a1a2e;
+    --text-secondary: #64748b;
+    --border-color: rgba(0,0,0,0.06);
     --shadow: rgba(0,0,0,0.08);
-    --card-bg: rgba(255,255,255,0.95);
+    --card-bg: rgba(255,255,255,0.98);
+    
+    /* Accent Colors */
+    --accent-primary: #667eea;
+    --accent-secondary: #764ba2;
+    --accent-success: #10b981;
+    --accent-warning: #f59e0b;
+    --accent-error: #ef4444;
+    --accent-gold: #fbbf24;
+    
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    
+    /* Animation Timing */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
 }
 
 /* Dark Mode Variables */
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        --bg-secondary: #1e1e1e;
-        --text-primary: #ffffff;
-        --text-secondary: #b0b0b0;
-        --border-color: #333;
-        --shadow: rgba(0,0,0,0.3);
-        --card-bg: rgba(30,30,30,0.95);
+        --bg-primary: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+        --bg-secondary: #141420;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border-color: rgba(255,255,255,0.08);
+        --shadow: rgba(0,0,0,0.4);
+        --card-bg: rgba(25,25,40,0.95);
+        --glass-bg: rgba(30, 30, 50, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 }
 
 /* Dark Mode Class (for manual toggle) */
 body.dark-mode {
-    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    --bg-secondary: #1e1e1e;
-    --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --border-color: #333;
-    --shadow: rgba(0,0,0,0.3);
-    --card-bg: rgba(30,30,30,0.95);
+    --bg-primary: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    --bg-secondary: #141420;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: rgba(255,255,255,0.08);
+    --shadow: rgba(0,0,0,0.4);
+    --card-bg: rgba(25,25,40,0.95);
+    --glass-bg: rgba(30, 30, 50, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Dark Mode - Tüm elementler için override */
@@ -147,9 +225,15 @@ body.dark-mode .info-btn-minimal:hover {
     background: rgba(255,255,255,0.15) !important;
 }
 
-body.dark-mode .bottom-nav {
-    background: var(--bg-secondary) !important;
-    border-top: 1px solid var(--border-color) !important;
+body.dark-mode .bottom-nav,
+body.dark-mode #bottomNavBar {
+    background: rgba(20, 20, 32, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 
+        0 -1px 0 rgba(255, 255, 255, 0.03),
+        0 -8px 32px rgba(0, 0, 0, 0.3) !important;
 }
 
 body.dark-mode .nav-item {
@@ -173,7 +257,7 @@ body.dark-mode .main-menu {
 }
 
 body {
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Nunito', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-primary);
     min-height: 100vh;
     overflow-x: hidden; /* Prevent horizontal scrolling */
@@ -181,6 +265,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background 0.3s ease, color 0.3s ease;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1;
 }
 
 /* ----- CONTAINER ----- */
@@ -275,13 +361,34 @@ body.dark-mode .top-btn:hover {
 
 /* Minimal Kompakt Hero Section */
 .hero-section-minimal {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
-    padding: 16px 18px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    background: var(--glass-bg);
+    border-radius: var(--radius-xl);
+    padding: 18px 20px;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hero section için subtle gradient overlay */
+.hero-section-minimal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-section-minimal > * {
+    position: relative;
+    z-index: 1;
 }
 
 .hero-content-minimal {
@@ -327,22 +434,41 @@ body.dark-mode .top-btn:hover {
 
 .stat-item-minimal {
     flex: 1;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-radius: 10px;
-    padding: 8px 6px;
+    background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+    border-radius: var(--radius-md);
+    padding: 10px 8px;
     text-align: center;
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: all 0.2s;
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Stat item'lar için subtle glow effect */
+.stat-item-minimal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.stat-item-minimal:hover::before {
+    opacity: 1;
 }
 
 body.dark-mode .stat-item-minimal {
-    background: linear-gradient(135deg, rgba(30,30,30,0.8) 0%, rgba(26,26,26,0.9) 100%) !important;
-    border-color: var(--border-color) !important;
+    background: linear-gradient(145deg, rgba(40,40,60,0.6) 0%, rgba(30,30,45,0.8) 100%) !important;
+    border-color: rgba(255,255,255,0.06) !important;
 }
 
 .stat-item-minimal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .stat-value-minimal {
@@ -1053,27 +1179,50 @@ body.dark-mode .section-title {
     gap: 16px;
 }
 
-/* Oyun Kartları - Modern Beyaz Tasarım - TÜM EKRANLAR İÇİN ZORUNLU */
+/* Oyun Kartları - Modern Premium Tasarım */
 .games-grid .game-card,
 .main-menu .game-card,
 #mainMenu .game-card,
 .game-card {
-    background: white !important;
-    border-radius: 20px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%) !important;
+    border-radius: var(--radius-lg);
     padding: 24px 20px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border: none !important;
+    transition: all var(--transition-normal);
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.07),
+        0 2px 4px -2px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
     position: relative;
     overflow: hidden;
-    /* Eski glass effect'i override et - TÜM EKRANLAR İÇİN */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    /* Eski rgba stillerini override et */
-    background-color: white !important;
-    background-image: none !important;
+    transform: translateY(0) scale(1);
+    will-change: transform, box-shadow;
+}
+
+/* Oyun kartları için shimmer efekti */
+.game-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transition: left 0.6s ease;
+    pointer-events: none;
+}
+
+.game-card:hover::after {
+    left: 100%;
 }
 
 /* Dark Mode için oyun kartları */
@@ -1081,10 +1230,21 @@ body.dark-mode .games-grid .game-card,
 body.dark-mode .main-menu .game-card,
 body.dark-mode #mainMenu .game-card,
 body.dark-mode .game-card {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    background-color: #2a2a3e !important;
-    background-image: none !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    background: linear-gradient(145deg, #252538 0%, #1c1c2e 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px -2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .game-card::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
 }
 
 /* ============ DARK MODE - ANA MENÜ KARTLARI (Analytics Cards) ============ */
@@ -1219,16 +1379,25 @@ body.dark-mode #mainMenu div[style*="background: #f8f9fa"][style*="color: #666"]
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     transform: scaleX(0);
-    transition: transform 0.3s;
+    transform-origin: left;
+    transition: transform var(--transition-normal);
 }
 
 .game-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    border-color: #667eea;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.2) !important;
+}
+
+.game-card:active {
+    transform: translateY(-2px) scale(0.98);
+    transition: transform 0.1s ease;
 }
 
 /* Aydınlık modda hover durumunda border'ları daha belirgin yap */
@@ -2009,14 +2178,18 @@ body.dark-mode .bosluk-mode .feedback {
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    background: white !important;
-    background-color: white !important;
-    background-image: none !important;
-    padding: 12px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    padding: 10px 12px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
     display: flex !important;
     justify-content: space-around !important;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important;
+    box-shadow: 
+        0 -1px 0 rgba(0, 0, 0, 0.05),
+        0 -8px 32px rgba(0, 0, 0, 0.08) !important;
     z-index: 1000 !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
     /* Eski flutter stillerini override et - TÜM EKRANLAR İÇİN */
     height: auto !important;
     max-width: none !important;
@@ -6345,18 +6518,18 @@ body.dark-mode .bosluk-mode .duolingo-stats-bar {
    ===================================== */
 
 .loading-screen-new {
-    position: fixed; /* Keep fixed for overlay */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height - modern cihazlar için */
+    height: 100dvh;
     min-height: 100vh;
-    min-height: -webkit-fill-available; /* iOS Safari için */
+    min-height: -webkit-fill-available;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Changed from space-between to center for professional design */
+    justify-content: center;
     padding: 20px;
     padding-bottom: 20px;
     text-align: center;
@@ -6364,11 +6537,14 @@ body.dark-mode .bosluk-mode .duolingo-stats-bar {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+    /* Premium gradient background */
+    background: 
+        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 70%),
+        linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4c1d95 60%, #581c87 100%);
+    background-size: 100% 100%;
     box-sizing: border-box;
-    /* Use ::before for animated background pattern */
 }
 
 /* Animated Background Pattern for Professional Design */
@@ -7629,6 +7805,32 @@ body.dark-mode .bosluk-mode .duolingo-stats-bar {
     color: #555;
     opacity: 0.8;
 }
+
+/* ===========================
+   ONBOARDING / MINI TUR MODAL
+   =========================== */
+.onboarding-content {
+    border-radius: 18px !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+}
+
+body.dark-mode #onboardingModal .onboarding-content {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #onboardingModal #onboardingTitle {
+    color: #f9fafb !important;
+}
+
+body.dark-mode #onboardingModal #onboardingDescription {
+    color: #d1d5db !important;
+}
+
+body.dark-mode #onboardingModal #onboardingStepIndicator {
+    color: #9ca3af !important;
+}
+
 /* ===========================
    PREMIUM TOP STATS PANEL
    =========================== */
@@ -10518,4 +10720,252 @@ body.dark-mode .trend-label {
     .trend-bar {
         max-width: 30px;
     }
+}
+
+/* ================================================
+   🎬 PROFESSIONAL MICRO-ANIMATIONS & EFFECTS
+   ================================================ */
+
+/* Stagger animation for lists and grids */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5), 0 0 30px rgba(118, 75, 162, 0.3);
+    }
+}
+
+/* Apply stagger animation to game cards */
+.games-grid .game-card {
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.games-grid .game-card:nth-child(1) { animation-delay: 0.05s; }
+.games-grid .game-card:nth-child(2) { animation-delay: 0.1s; }
+.games-grid .game-card:nth-child(3) { animation-delay: 0.15s; }
+.games-grid .game-card:nth-child(4) { animation-delay: 0.2s; }
+.games-grid .game-card:nth-child(5) { animation-delay: 0.25s; }
+.games-grid .game-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* Stat items animation */
+.stat-item-minimal {
+    animation: fadeInScale 0.4s ease-out backwards;
+}
+
+.stat-item-minimal:nth-child(1) { animation-delay: 0.1s; }
+.stat-item-minimal:nth-child(2) { animation-delay: 0.15s; }
+.stat-item-minimal:nth-child(3) { animation-delay: 0.2s; }
+
+/* Hero section entrance */
+.hero-section-minimal {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Games section entrance */
+.games-section {
+    animation: fadeInUp 0.6s ease-out 0.2s backwards;
+}
+
+/* Button press effect */
+.game-card:active,
+.nav-item:active,
+.diff-btn:active,
+.info-btn-minimal:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* Ripple effect for buttons */
+.game-card,
+.nav-item,
+.diff-btn,
+.info-btn-minimal {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Success state glow */
+.game-card.success {
+    animation: glow 1s ease-in-out;
+}
+
+/* Loading shimmer effect */
+.skeleton-loading {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Smooth page transitions */
+.main-menu,
+.game-screen,
+.ayet-mode,
+.dua-mode,
+.hadis-mode {
+    animation: fadeInScale 0.3s ease-out;
+}
+
+/* Modal entrance animations */
+.modal-content {
+    animation: fadeInScale 0.25s ease-out;
+}
+
+/* Nav item hover glow */
+.nav-item:hover {
+    background: rgba(102, 126, 234, 0.08) !important;
+}
+
+.nav-item.active {
+    background: rgba(102, 126, 234, 0.12) !important;
+}
+
+/* Score counter animation */
+@keyframes countUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.stat-value-minimal {
+    animation: countUp 0.4s ease-out;
+}
+
+/* Floating animation for icons */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.game-icon {
+    transition: transform 0.3s ease;
+}
+
+.game-card:hover .game-icon {
+    animation: float 1s ease-in-out infinite;
+}
+
+/* Progress bar shine effect */
+.progress-fill-minimal {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill-minimal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus visible states for accessibility */
+:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* Interactive element transitions */
+button,
+.game-card,
+.nav-item,
+.stat-item-minimal {
+    transition: all var(--transition-normal);
+}
+
+/* Enhanced shadow on focus */
+button:focus-visible,
+.game-card:focus-visible {
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.15);
 }

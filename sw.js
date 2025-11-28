@@ -9,7 +9,7 @@ const BASE = self.location.pathname.includes("NEW_HASENE")
 
 // Cache adı - Versiyon artırıldı (eski cache'leri temizlemek için)
 // Her güncellemede bu versiyonu artırın: v3 -> v4 -> v5...
-const CACHE_VERSION = "safe-v3";
+const CACHE_VERSION = "safe-v4";
 const CACHE_NAME = `hasene-safe-${CACHE_VERSION}`;
 
 // Minimum app shell (TAM YOL KULLANILIYOR)

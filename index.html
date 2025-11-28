@@ -91,6 +91,7 @@
     <script src="js/social-share.js"></script>
     <script src="js/detailed-stats.js"></script>
     <script src="js/accessibility.js"></script>
+    <script src="js/onboarding.js"></script>
     
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
@@ -186,58 +187,6 @@
 
 
 
-    <!-- Onboarding/Tutorial Modal - Yeni Oyuncular İçin -->
-    <div class="modal onboarding-modal" id="onboardingModal" style="display: none;">
-        <div class="onboarding-container">
-            <div class="onboarding-progress">
-                <div class="progress-bar" id="onboardingProgressBar"></div>
-                <div class="progress-text" id="onboardingProgressText">1 / 6</div>
-            </div>
-            <div class="onboarding-slides" id="onboardingSlides">
-                <div class="onboarding-slide active" data-slide="1">
-                    <div class="slide-icon">👋</div>
-                    <h2 class="slide-title">Ehlen ve Sehlen!</h2>
-                    <p class="slide-description">Kur'an-ı Kerim kelimelerini öğrenmek için hazır mısın?<br>Bu kısa turda sana dersi tanıtacağız.</p>
-                </div>
-                <div class="onboarding-slide" data-slide="2">
-                    <div class="slide-icon">🎮</div>
-                    <h2 class="slide-title">6 Farklı Ders Türü</h2>
-                    <div class="slide-features">
-                        <div class="feature-item">📚 <strong>Kelime Çevir</strong> - Kelimeleri öğren</div>
-                        <div class="feature-item">🎧 <strong>Dinle & Bul</strong> - Dinleyerek bul</div>
-                        <div class="feature-item">📝 <strong>Boşluk Doldur</strong> - Ayetleri tamamla</div>
-                        <div class="feature-item">📖 <strong>Ayet Oku</strong> - Ayetleri oku</div>
-                        <div class="feature-item">🤲 <strong>Dua Öğren</strong> - Duaları öğren</div>
-                        <div class="feature-item">📜 <strong>Hadis Oku</strong> - Hadisleri oku</div>
-                    </div>
-                </div>
-                <div class="onboarding-slide" data-slide="3">
-                    <div class="slide-icon">📿</div>
-                    <h2 class="slide-title">Hasene Sistemi</h2>
-                    <p class="slide-description">Her doğru cevap ile <strong>Hasene</strong> kazanırsın!<br><br><span style="font-size: 0.9em; color: #666;">• 100 Hasene = 1 ⭐ Yıldız<br>• Her 3 doğru = +5 Hasene İhsan<br>• Günlük virdi tamamla = +1,000 Hasene</span></p>
-                </div>
-                <div class="onboarding-slide" data-slide="4">
-                    <div class="slide-icon">🎯</div>
-                    <h2 class="slide-title">Günlük Vazifeler</h2>
-                    <p class="slide-description">Her gün yeni vazifeler seni bekliyor!<br><br><span style="font-size: 0.9em; color: #666;">• 8 temel vazife + 3 fazilet vazifesi<br>• Tüm vazifeleri tamamla = +2,500 Hasene<br>• Her gün sıfırlanır</span></p>
-                </div>
-                <div class="onboarding-slide" data-slide="5">
-                    <div class="slide-icon">🔥</div>
-                    <h2 class="slide-title">Muvazebet (Streak)</h2>
-                    <p class="slide-description">Her gün talebe et, serini bozma!<br><br><span style="font-size: 0.9em; color: #666;">• Her gün talebe ederek serini artır<br>• Günlük virdi tamamla = +1 gün<br>• En uzun serini kırma!</span></p>
-                </div>
-                <div class="onboarding-slide" data-slide="6">
-                    <div class="slide-icon">🚀</div>
-                    <h2 class="slide-title">Hazırsın!</h2>
-                    <p class="slide-description">Artık derslere başlayabilirsin!<br><br><span style="font-size: 0.9em; color: #666;">Hayırlı talebe ve muvaffakiyetler!<br>Her gün biraz daha terakki et! 📈</span></p>
-                </div>
-            </div>
-            <div class="onboarding-buttons">
-                <button class="onboarding-btn skip-btn" id="onboardingSkipBtn" onclick="event.stopPropagation(); skipOnboarding();" style="display: block !important; visibility: visible !important; opacity: 1 !important;">Atla</button>
-                <button class="onboarding-btn next-btn" id="onboardingNextBtn" onclick="event.stopPropagation(); nextOnboardingSlide();" style="display: block !important; visibility: visible !important; opacity: 1 !important;">İleri →</button>
-            </div>
-        </div>
-    </div>
 
         <!-- Ana Menü -->
         <div class="main-menu" id="mainMenu">
@@ -254,8 +203,8 @@
                         <button id="darkModeToggle" onclick="toggleDarkMode()" aria-label="Karanlık modu aç/kapat" role="button" title="Karanlık Mod" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.3s; z-index: 10; flex-shrink: 0; font-size: 14px;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
                             <span id="darkModeIcon" aria-hidden="true">🌙</span>
                         </button>
-                        <!-- TEST: Reset Butonu - Sağ Üst Köşe (Test Amaçlı) -->
-                        <button onclick="confirmResetStats()" class="reset-stats-btn" aria-label="Test: Tüm İstatistikleri Sıfırla" role="button" style="background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7; flex-shrink: 0;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="Test: Tüm İstatistikleri Sıfırla">
+                        <!-- DEV: Reset Butonu - Sadece geliştirme modunda görünür (localStorage: hasene_dev_mode = "1") -->
+                        <button id="devResetBtn" onclick="confirmResetStats()" class="reset-stats-btn dev-only-btn" aria-label="Geliştirici: Tüm İstatistikleri Sıfırla" role="button" style="display: none; background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7; flex-shrink: 0;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="DEV: Tüm İstatistikleri Sıfırla">
                             <span style="font-size: 14px;" aria-hidden="true">🔄</span>
                         </button>
                     </div>
@@ -461,6 +410,30 @@
                 <div class="navigation-btns">
                     <button class="nav-btn" id="prevHadisBtn">← Önceki</button>
                     <button class="nav-btn" id="nextHadisBtn">Sonraki →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding / Mini Tur Modal -->
+        <div class="modal" id="onboardingModal" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle" aria-describedby="onboardingDescription">
+            <div class="modal-content onboarding-content" style="max-width: 420px; padding: 20px 20px 16px 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 id="onboardingTitle" style="margin: 0; font-size: 1.1em; font-weight: 700; color: #1f2937;">
+                        Hoş geldin! 👋
+                    </h3>
+                    <button id="onboardingSkipBtn" class="modal-close-btn" type="button" aria-label="Turu atla ve kapat">×</button>
+                </div>
+                <div id="onboardingDescription" style="font-size: 0.9em; line-height: 1.6; color: #4b5563; white-space: pre-line; margin-bottom: 16px;">
+                    Kısa bir turla başlayalım.
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                    <div id="onboardingStepIndicator" style="font-size: 0.8em; color: #6b7280;">
+                        1 / 3
+                    </div>
+                    <button id="onboardingNextBtn" type="button" class="primary-btn" style="padding: 8px 16px; border-radius: 999px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 0.85em; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        Devam Et
+                        <span aria-hidden="true">→</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1568,6 +1541,21 @@
                             <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
                                 Tüm günlük görevleri tamamla:<br>
                                 <strong style="color: #d97706; font-size: 13px;">+2,500 Hasene İhsan!</strong>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div style="font-weight: 700; color: #8b5cf6; margin-bottom: 4px; font-size: 13px;">📅 Haftalık Görevler</div>
+                            <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                Tüm haftalık görevleri tamamla:<br>
+                                <strong style="color: #8b5cf6; font-size: 13px;">+5,000 Hasene İhsan!</strong>
+                            </div>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                            <div style="font-weight: 700; color: #f59e0b; margin-bottom: 4px; font-size: 13px;">⭐ Perfect Lesson Bonusu</div>
+                            <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                Tüm soruları doğru cevapla:<br>
+                                <strong style="color: #f59e0b; font-size: 13px;">+%50 Ekstra Hasene Bonusu!</strong><br>
+                                <span style="color: #888; font-size: 10px;">Kelime Çevir, Dinle Bul, Boşluk Doldur</span>
                             </div>
                         </div>
                 </div>

@@ -2548,6 +2548,28 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('DOMContentLoaded', function() {
     // (commented) DOM yüklendi log removed during cleanup
     
+    // 🔧 DEV MODE: Geliştirici araçlarını göster/gizle
+    // Konsola "enableDevMode()" yazarak aktifleştirilebilir
+    const isDevMode = localStorage.getItem('hasene_dev_mode') === '1';
+    const devResetBtn = document.getElementById('devResetBtn');
+    if (devResetBtn && isDevMode) {
+        devResetBtn.style.display = 'flex';
+    }
+    
+    // Global dev mode toggle fonksiyonu
+    window.enableDevMode = function() {
+        localStorage.setItem('hasene_dev_mode', '1');
+        const btn = document.getElementById('devResetBtn');
+        if (btn) btn.style.display = 'flex';
+        console.log('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
+    };
+    window.disableDevMode = function() {
+        localStorage.removeItem('hasene_dev_mode');
+        const btn = document.getElementById('devResetBtn');
+        if (btn) btn.style.display = 'none';
+        console.log('🔧 Geliştirici modu kapatıldı.');
+    };
+    
     // 🧹 Otomatik storage temizliği (başlangıçta)
     storage.autoCleanup();
     
