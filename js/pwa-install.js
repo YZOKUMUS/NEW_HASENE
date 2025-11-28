@@ -1,125 +1,82 @@
 /**
- * PWA Install Handler
- * Progressive Web App yükleme işlemlerini yönetir
+ * Progressive Web App install helper.
+ * Keeps the install prompt non-blocking while preventing repeat spam.
  */
+(function initPWAInstall() {
+    const INSTALL_SHOWN_KEY = 'pwaInstallShown';
+    const INSTALL_DONE_KEY = 'pwaInstalled';
 
-let deferredPrompt = null;
-let pwaInstallBtn = null;
+    let deferredPrompt = null;
+    let pwaInstallBtn = null;
+    let initialized = false;
 
-// DOM yüklendiğinde butonu bul ve event listener'ları ekle
-function initPWAInstallButton() {
-    if (!pwaInstallBtn) {
-        pwaInstallBtn = document.getElementById('pwaInstallBtn');
-    }
-    
-    if (!pwaInstallBtn) return;
-    
-    // Click event listener ekle
-    pwaInstallBtn.addEventListener('click', () => {
-        triggerPWAInstall();
-    });
-    
-    // Hover efektleri
-    pwaInstallBtn.addEventListener('mouseenter', () => {
-        pwaInstallBtn.style.transform = 'translateY(-2px)';
-        pwaInstallBtn.style.boxShadow = '0 8px 24px rgba(255, 215, 0, 0.6)';
-    });
-    
-    pwaInstallBtn.addEventListener('mouseleave', () => {
-        pwaInstallBtn.style.transform = 'translateY(0)';
-        pwaInstallBtn.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.5)';
-    });
-}
+    const device = {
+        isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+        isAndroid: /Android/.test(navigator.userAgent),
+        isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+        isChrome: /Chrome/.test(navigator.userAgent)
+    };
 
-// DOM yüklendiğinde başlat
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initPWAInstallButton);
-} else {
-    initPWAInstallButton();
-}
-
-// PWA install prompt'u yakala
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Eğer daha önce yükleme yapıldıysa, event'i ignore et
-    if (typeof hasPWAInstallBeenShown === 'function' && hasPWAInstallBeenShown()) {
-        if (typeof log !== 'undefined' && log.debug) {
-            log.debug('📱 PWA install daha önce gösterildi, event ignore ediliyor');
+    const logDebug = (message) => {
+        if (typeof log !== 'undefined' && typeof log.debug === 'function') {
+            log.debug(message);
         }
-        return;
-    }
-    
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // PWA install butonunu göster
-    if (!pwaInstallBtn) {
-        pwaInstallBtn = document.getElementById('pwaInstallBtn');
-    }
-    
-    if (pwaInstallBtn) {
-        // Mobil cihaz kontrolü
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        if (isMobile) {
-            pwaInstallBtn.style.display = 'block';
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('📲 PWA install butonu görünür (mobil cihaz, beforeinstallprompt)');
-            }
-        } else {
-            // Masaüstünde de göster (talimatlar için)
-            pwaInstallBtn.style.display = 'block';
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('💻 PWA install butonu görünür (masaüstü, talimatlar için)');
-            }
-        }
-    }
-});
+    };
 
-// PWA yüklendiğinde
-window.addEventListener('appinstalled', () => {
-    if (!pwaInstallBtn) {
-        pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    function hasPWAInstallBeenShown() {
+        return localStorage.getItem(INSTALL_SHOWN_KEY) === 'true' || localStorage.getItem(INSTALL_DONE_KEY) === 'true';
     }
-    
-    if (pwaInstallBtn) {
+
+    function markPWAInstallShown() {
+        localStorage.setItem(INSTALL_SHOWN_KEY, 'true');
+    }
+
+    function markPWAInstalled() {
+        localStorage.setItem(INSTALL_DONE_KEY, 'true');
+        localStorage.setItem(INSTALL_SHOWN_KEY, 'true');
+    }
+
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function getInstallButton() {
+        if (pwaInstallBtn) return pwaInstallBtn;
+        pwaInstallBtn = document.getElementById('pwaInstallBtn');
+        if (!pwaInstallBtn) return null;
+
         pwaInstallBtn.style.display = 'none';
+        pwaInstallBtn.addEventListener('click', triggerPWAInstall);
+        pwaInstallBtn.addEventListener('mouseenter', () => {
+            pwaInstallBtn.style.transform = 'translateY(-2px)';
+            pwaInstallBtn.style.boxShadow = '0 8px 24px rgba(255, 215, 0, 0.6)';
+        });
+        pwaInstallBtn.addEventListener('mouseleave', () => {
+            pwaInstallBtn.style.transform = 'translateY(0)';
+            pwaInstallBtn.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.5)';
+        });
+        return pwaInstallBtn;
     }
-    deferredPrompt = null;
-    
-    if (typeof markPWAInstalled === 'function') {
-        markPWAInstalled();
-    }
-    
-    if (typeof log !== 'undefined' && log.debug) {
-        log.debug('✅ PWA başarıyla yüklendi');
-    }
-});
 
-/**
- * PWA yükleme işlemini başlatır
- * @returns {Promise<void>}
- */
-async function triggerPWAInstall() {
-    if (!pwaInstallBtn) {
-        pwaInstallBtn = document.getElementById('pwaInstallBtn');
-    }
-    
-    if (!deferredPrompt) {
-        // Mobil cihazlarda prompt yoksa manuel talimat ver
-        if (typeof log !== 'undefined' && log.debug) {
-            log.debug('⚠️ PWA install prompt mevcut değil (mobil cihaz)');
+    function hideButton() {
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'none';
         }
-        
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isAndroid = /Android/.test(navigator.userAgent);
-        const isChrome = /Chrome/.test(navigator.userAgent);
-        
+    }
+
+    function showButton() {
+        const button = getInstallButton();
+        if (!button) return;
+        button.style.display = 'block';
+    }
+
+    function provideManualInstructions() {
         let instructions = '📲 Uygulamayı ana ekrana eklemek için:\n\n';
-        
-        if (isIOS) {
+
+        if (device.isIOS) {
             instructions += '• Safari: Paylaş butonu (□↑) > "Ana Ekrana Ekle"\n';
-        } else if (isAndroid) {
-            if (isChrome) {
+        } else if (device.isAndroid) {
+            if (device.isChrome) {
                 instructions += '• Chrome: Menü (⋮) > "Uygulamayı yükle" veya "Ana ekrana ekle"\n';
             } else {
                 instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" seçeneğini bulun\n';
@@ -127,48 +84,97 @@ async function triggerPWAInstall() {
         } else {
             instructions += '• Tarayıcı menüsünden "Ana ekrana ekle" seçeneğini bulun\n';
         }
-        
+
         if (typeof showCustomAlert === 'function') {
             showCustomAlert(instructions, 'info', '📲 Uygulamayı Yükle');
         } else {
             alert(instructions);
         }
-        return;
     }
-    
-    // Prompt'u göster
-    deferredPrompt.prompt();
-    
-    // Kullanıcının seçimini bekle
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-        if (typeof log !== 'undefined' && log.debug) {
-            log.debug('✅ Kullanıcı PWA yüklemeyi kabul etti');
-        }
-        if (typeof markPWAInstalled === 'function') {
-            markPWAInstalled();
-        }
-    } else {
-        if (typeof log !== 'undefined' && log.debug) {
-            log.debug('❌ Kullanıcı PWA yüklemeyi reddetti');
-        }
-        if (typeof markPWAInstallShown === 'function') {
-            markPWAInstallShown(); // Reddettiğinde de gösterildi olarak işaretle, tekrar çıkmasın
-        }
-    }
-    
-    // Prompt'u temizle
-    deferredPrompt = null;
-    
-    // Butonu gizle
-    if (pwaInstallBtn) {
-        pwaInstallBtn.style.display = 'none';
-    }
-}
 
-// Global erişim için
-window.triggerPWAInstall = triggerPWAInstall;
+    async function triggerPWAInstall() {
+        if (!deferredPrompt) {
+            logDebug('⚠️ PWA install prompt mevcut değil, manuel talimat gösteriliyor');
+            provideManualInstructions();
+            return;
+        }
+
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+
+        if (outcome === 'accepted') {
+            logDebug('✅ Kullanıcı PWA yüklemeyi kabul etti');
+            markPWAInstalled();
+        } else {
+            logDebug('❌ Kullanıcı PWA yüklemeyi reddetti');
+            markPWAInstallShown();
+        }
+
+        deferredPrompt = null;
+        hideButton();
+    }
+
+    function evaluateInitialState() {
+        const button = getInstallButton();
+        if (!button) return;
+
+        if (isStandalone()) {
+            hideButton();
+            markPWAInstalled();
+            logDebug('📱 Uygulama standalone modda (zaten yüklü)');
+            return;
+        }
+
+        if (hasPWAInstallBeenShown()) {
+            hideButton();
+            logDebug('📱 PWA install daha önce gösterildi, tekrar gösterilmiyor');
+        }
+    }
+
+    function handleBeforeInstallPrompt(event) {
+        if (hasPWAInstallBeenShown() || isStandalone()) {
+            logDebug('📱 PWA install daha önce gösterildi veya standalone modda, event ignore edildi');
+            return;
+        }
+
+        event.preventDefault();
+        deferredPrompt = event;
+        showButton();
+        logDebug(device.isMobile ? '📲 PWA install butonu görünür (mobil)' : '💻 PWA install butonu görünür (masaüstü)');
+    }
+
+    function handleAppInstalled() {
+        hideButton();
+        deferredPrompt = null;
+        markPWAInstalled();
+        logDebug('✅ PWA başarıyla yüklendi');
+    }
+
+    function attachLifecycleListeners() {
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
+    }
+
+    function init() {
+        if (initialized) return;
+        initialized = true;
+
+        getInstallButton();
+        evaluateInitialState();
+        attachLifecycleListeners();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // Global API (useful for tests/manual triggers)
+    window.triggerPWAInstall = triggerPWAInstall;
+    window.hasPWAInstallBeenShown = hasPWAInstallBeenShown;
+    window.markPWAInstalled = markPWAInstalled;
+})();
 
 
 

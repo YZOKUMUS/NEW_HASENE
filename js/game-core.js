@@ -83,33 +83,66 @@ function updateArabicTextColoring() {
     // Hata önleme için
 }
 
-// 🌙 DARK MODE TOGGLE
-function toggleDarkMode() {
+// 🌙 DARK MODE HELPERS
+function updateDarkModeUI(isDark, persistPreference = true) {
     const body = document.body;
-    const isDark = body.classList.toggle('dark-mode');
+    if (!body) return;
+
+    body.classList.toggle('dark-mode', isDark);
+
     const darkModeIcon = document.getElementById('darkModeIcon');
-    
-    // Debug
-    log.debug('Dark mode toggled:', isDark);
-    log.debug('Body classes:', body.className);
-    
-    // LocalStorage'a kaydet
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    
-    // Icon güncelle
     if (darkModeIcon) {
         darkModeIcon.textContent = isDark ? '☀️' : '🌙';
     }
-    
-    // Buton stilini güncelle
+
     const darkModeBtn = document.getElementById('darkModeToggle');
     if (darkModeBtn) {
-        if (isDark) {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
-        } else {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        darkModeBtn.style.background = isDark
+            ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    }
+
+    if (persistPreference) {
+        localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    }
+
+    if (typeof log !== 'undefined' && typeof log.debug === 'function') {
+        log.debug('Dark mode state set:', { isDark });
+    }
+}
+
+function toggleDarkMode() {
+    const nextState = !document.body.classList.contains('dark-mode');
+    updateDarkModeUI(nextState, true);
+}
+
+function initDarkModePreference() {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldEnable = savedDarkMode === 'enabled' || (savedDarkMode === null && prefersDark);
+
+    updateDarkModeUI(shouldEnable, Boolean(savedDarkMode));
+
+    if (!savedDarkMode && window.matchMedia) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (event) => {
+            if (!localStorage.getItem('darkMode')) {
+                updateDarkModeUI(event.matches, false);
+            }
+        };
+
+        if (typeof mediaQuery.addEventListener === 'function') {
+            mediaQuery.addEventListener('change', handleChange);
+        } else if (typeof mediaQuery.addListener === 'function') {
+            mediaQuery.addListener(handleChange);
         }
     }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDarkModePreference, { once: true });
+} else {
+    initDarkModePreference();
 }
 
 // Global erişim için (inline onclick handlers için gerekli)
@@ -8321,6 +8354,7 @@ elements.dinleBulBtn.onclick = async () => {
     dinleCorrect = 0;
     dinleWrong = 0;
     dinleQuestionCount = 0;
+    isDinleGameActive = true;
     log.game(`✅ Yeni değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
     log.game(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
     
@@ -8386,92 +8420,33 @@ elements.dinleBulBtn.onclick = async () => {
     
     // Next butonu event handler'ını buraya taşıdık
     if (elements.dinleNextBtn) {
-        // Masaüstü için onclick
-        elements.dinleNextBtn.onclick = () => {
+        const handleDinleNext = (event) => {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            if (!isDinleGameActive) {
+                log.debug('Next butonu tıklandı fakat Dinle modu aktif değil');
+                return;
+            }
+
             log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
             log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
             
-            // 10 soru kontrolü - butona tıklamadan önce kontrol et
             if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-                log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
-                log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-                
-                // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-                // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-                // updateTaskProgress('dinleBul', sessionCorrect);
-                
-                // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
-                
-                // Direkt ana menüye dön
-                elements.dinleMode.style.display = 'none';
-                elements.mainMenu.style.display = 'block';
-                
-                // Navigasyon bar'ı göster
-                showBottomNavBar();
-                
-                // Oyun değişkenlerini temizle
-                dinleScore = 0;
-                dinleCorrect = 0;
-                dinleWrong = 0;
-                dinleQuestionCount = 0;
-                updateDinleUI();
-                log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                endDinleGame('next-button-limit');
                 return;
             }
             
             log.debug(`🎯 Bir sonraki soru yükleniyor...`);
-            // Butonu hemen gizle
-            if (elements.dinleNextBtn) {
-                elements.dinleNextBtn.style.display = 'none';
-                elements.dinleNextBtn.classList.remove("next-appear");
-            }
+            elements.dinleNextBtn.style.display = 'none';
+            elements.dinleNextBtn.classList.remove("next-appear");
             loadDinleQuestion();
         };
-        // Mobil için touchend
-        elements.dinleNextBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
-            log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
-            
-            // 10 soru kontrolü - butona tıklamadan önce kontrol et
-            if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-                log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
-                log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-                
-                // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-                // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-                // updateTaskProgress('dinleBul', sessionCorrect);
-                
-                // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
-                
-                // Direkt ana menüye dön
-                elements.dinleMode.style.display = 'none';
-                elements.mainMenu.style.display = 'block';
-                
-                // Navigasyon bar'ı göster
-                showBottomNavBar();
-                
-                // Oyun değişkenlerini temizle
-                dinleScore = 0;
-                dinleCorrect = 0;
-                dinleWrong = 0;
-                dinleQuestionCount = 0;
-                updateDinleUI();
-                log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
-                return;
-            }
-            
-            log.debug(`🎯 Bir sonraki soru yükleniyor...`);
-            // Butonu hemen gizle
-            if (elements.dinleNextBtn) {
-                elements.dinleNextBtn.style.display = 'none';
-                elements.dinleNextBtn.classList.remove("next-appear");
-            }
-            loadDinleQuestion();
-        }, { passive: false });
+
+        elements.dinleNextBtn.onclick = handleDinleNext;
+        elements.dinleNextBtn.addEventListener('touchend', handleDinleNext, { passive: false });
     }
     
         updateDinleUI();
@@ -9992,6 +9967,7 @@ elements.modalBtn.onclick = () => {
 let currentDinleQuestion = null;
 let dinleQuestionCount = 0;
 let speechAttemptCount = 0; // Ses tanıma deneme sayacı (her soru için max 2)
+let isDinleGameActive = false; // Çift tetiklemeyi engellemek için oyun durumu
 const DINLE_MAX_QUESTIONS = 10;
 
 // ============ SES TANIMA SİSTEMİ ============
@@ -11017,9 +10993,48 @@ function matchSpeechToAnswer(spokenText) {
     }
 }
 
+function endDinleGame(reason = 'manual') {
+    if (!isDinleGameActive) {
+        log.debug(`Dinle modu zaten kapalı, endDinleGame atlandı (${reason})`);
+        return;
+    }
+
+    log.game(`🏁 === DİNLE MODU BİTİŞ (${reason}) ===`);
+    isDinleGameActive = false;
+    stopCurrentAudio();
+    if (typeof window.stopSpeechRecognition === 'function') {
+        window.stopSpeechRecognition();
+    }
+
+    log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore}`);
+    addToGlobalPoints(sessionScore, sessionCorrect);
+
+    if (elements.dinleMode) elements.dinleMode.style.display = 'none';
+    if (elements.mainMenu) elements.mainMenu.style.display = 'block';
+    showBottomNavBar();
+    if (elements.dinleNextBtn) {
+        elements.dinleNextBtn.style.display = 'none';
+        elements.dinleNextBtn.classList.remove('next-appear');
+    }
+
+    dinleScore = 0;
+    dinleCorrect = 0;
+    dinleWrong = 0;
+    dinleQuestionCount = 0;
+    currentDinleQuestion = null;
+
+    updateDinleUI();
+    log.game('✅ Dinle modu başarıyla sonlandırıldı ve ana menüye dönüldü');
+}
+
 function loadDinleQuestion() {
     // Önceki ses varsa durdur
     stopCurrentAudio();
+    
+    if (!isDinleGameActive) {
+        log.debug('Dinle sorusu yüklenemedi: oyun aktif değil');
+        return;
+    }
     
     // Ses tanıma deneme sayacını sıfırla (her yeni soru için)
     speechAttemptCount = 0;
@@ -11044,31 +11059,7 @@ function loadDinleQuestion() {
         log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
         log.game(`📊 Final oyun skorları: dinleScore=${dinleScore}, dinleCorrect=${dinleCorrect}, dinleWrong=${dinleWrong}`);
         log.game(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-        
-        // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-        // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-        // updateTaskProgress('dinleBul', sessionCorrect);
-        
-        log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
-        // Session puanlarını global'e aktar
-        addToGlobalPoints(sessionScore, sessionCorrect);
-        
-        log.debug(`🔄 Ana menüye dönülüyor...`);
-        // Direkt ana menüye dön
-        elements.dinleMode.style.display = 'none';
-        elements.mainMenu.style.display = 'block';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-        
-        log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
-        // Sıfırla
-        dinleScore = 0;
-        dinleCorrect = 0;
-        dinleWrong = 0;
-        dinleQuestionCount = 0;
-        updateDinleUI();
-        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+        endDinleGame('question-limit');
         return;
     }
 
