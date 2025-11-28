@@ -8031,8 +8031,8 @@ function claimDailyRewards() {
         // Bugünkü toplam puana da ekle (istatistikler için)
         dailyTasks.todayStats.toplamPuan += bonusXP;
         
-        // Daily XP'ye de ekle
-        addDailyXP(bonusXP);
+        // NOT: Bonus hasene günlük vird'e (dailyHasene) eklenmez
+        // Çünkü vird hedefi "aktif oyun oynama" ölçütüdür, bonuslar ise "başarı ödülü"
         
         // Günlük görev ödülünü liderlik tablosuna da ekle
         if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
