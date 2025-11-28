@@ -9,7 +9,12 @@
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
     "docs": "jsdoc -c jsdoc.config.json",
-    "docs:serve": "jsdoc -c jsdoc.config.json && npx serve out"
+    "docs:serve": "jsdoc -c jsdoc.config.json && npx serve out",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,json,html,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,html,css,md}\"",
+    "code:check": "npm run lint && npm run format:check"
   },
   "keywords": [
     "arapça",
@@ -22,15 +27,10 @@
   "license": "ISC",
   "devDependencies": {
     "@vitest/ui": "^1.0.0",
+    "eslint": "^8.57.1",
     "jsdoc": "^4.0.2",
+    "prettier": "^3.7.1",
     "vitest": "^1.0.0",
     "vm2": "^3.10.0"
   }
 }
-
-
-
-
-
-
-

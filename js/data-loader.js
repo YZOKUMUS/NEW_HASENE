@@ -116,8 +116,27 @@ async function loadKelimeData() {
     
     try {
         dataLoadStatus.kelimeBul.loading = true;
+        
+        // Önce IndexedDB cache'den kontrol et
+        if (typeof getCachedJSON === 'function') {
+            const cached = await getCachedJSON('data/kelimebul.json');
+            if (cached) {
+                kelimeBulData = cached;
+                dataLoadStatus.kelimeBul.loaded = true;
+                dataLoadStatus.kelimeBul.loading = false;
+                log.debug('✅ Kelime verileri IndexedDB cache\'den yüklendi');
+                return kelimeBulData;
+            }
+        }
+        
         showLoading('Kelime verileri yükleniyor...');
         kelimeBulData = await fetchWithRetry('data/kelimebul.json');
+        
+        // IndexedDB'ye cache'le
+        if (typeof setCachedJSON === 'function' && kelimeBulData) {
+            await setCachedJSON('data/kelimebul.json', kelimeBulData);
+        }
+        
         dataLoadStatus.kelimeBul.loaded = true;
         setTimeout(() => hideLoading(), 300);
         return kelimeBulData;
@@ -146,8 +165,27 @@ async function loadAyetData() {
     
     try {
         dataLoadStatus.ayetOku.loading = true;
+        
+        // Önce IndexedDB cache'den kontrol et
+        if (typeof getCachedJSON === 'function') {
+            const cached = await getCachedJSON('data/ayetoku.json');
+            if (cached) {
+                ayetOkuData = cached;
+                dataLoadStatus.ayetOku.loaded = true;
+                dataLoadStatus.ayetOku.loading = false;
+                log.debug('✅ Ayet verileri IndexedDB cache\'den yüklendi');
+                return ayetOkuData;
+            }
+        }
+        
         showLoading('Ayet verileri yükleniyor...');
         ayetOkuData = await fetchWithRetry('data/ayetoku.json');
+        
+        // IndexedDB'ye cache'le
+        if (typeof setCachedJSON === 'function' && ayetOkuData) {
+            await setCachedJSON('data/ayetoku.json', ayetOkuData);
+        }
+        
         dataLoadStatus.ayetOku.loaded = true;
         setTimeout(() => hideLoading(), 300);
         return ayetOkuData;
@@ -176,8 +214,27 @@ async function loadDuaData() {
     
     try {
         dataLoadStatus.dua.loading = true;
+        
+        // Önce IndexedDB cache'den kontrol et
+        if (typeof getCachedJSON === 'function') {
+            const cached = await getCachedJSON('data/duaet.json');
+            if (cached) {
+                duaData = cached;
+                dataLoadStatus.dua.loaded = true;
+                dataLoadStatus.dua.loading = false;
+                log.debug('✅ Dua verileri IndexedDB cache\'den yüklendi');
+                return duaData;
+            }
+        }
+        
         showLoading('Dua verileri yükleniyor...');
         duaData = await fetchWithRetry('data/duaet.json');
+        
+        // IndexedDB'ye cache'le
+        if (typeof setCachedJSON === 'function' && duaData) {
+            await setCachedJSON('data/duaet.json', duaData);
+        }
+        
         dataLoadStatus.dua.loaded = true;
         setTimeout(() => hideLoading(), 300);
         return duaData;
@@ -206,9 +263,28 @@ async function loadHadisData() {
     
     try {
         dataLoadStatus.hadis.loading = true;
+        
+        // Önce IndexedDB cache'den kontrol et
+        if (typeof getCachedJSON === 'function') {
+            const cached = await getCachedJSON('data/hadisoku.json');
+            if (cached) {
+                hadisData = cached;
+                dataLoadStatus.hadis.loaded = true;
+                dataLoadStatus.hadis.loading = false;
+                log.debug('✅ Hadis verileri IndexedDB cache\'den yüklendi');
+                return hadisData;
+            }
+        }
+        
         showLoading('Hadis verileri yükleniyor...');
         // hadisoku.json çok büyük (3.97 MB), Web Worker kullan
         hadisData = await fetchWithRetry('data/hadisoku.json', 3, 1000, true);
+        
+        // IndexedDB'ye cache'le
+        if (typeof setCachedJSON === 'function' && hadisData) {
+            await setCachedJSON('data/hadisoku.json', hadisData);
+        }
+        
         dataLoadStatus.hadis.loaded = true;
         setTimeout(() => hideLoading(), 300);
         return hadisData;

@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+docs/
+out/
+*.min.js
+dist/
+build/
+sw.js
+tests/setup.js
+

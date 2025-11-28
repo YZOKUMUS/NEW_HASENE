@@ -79,6 +79,7 @@
     <script src="js/safety-checks.js"></script>
     <script src="js/event-handler.js"></script>
     <!-- <script src="js/event-manager.js"></script> --> <!-- REMOVED: Duplicate eventManager - Using EventListenerManager in main script instead -->
+    <script src="js/indexeddb-cache.js"></script>
     <script src="js/data-loader.js"></script>
     <script src="js/favorites.js"></script>
     <script src="js/feedback-animations.js"></script>
@@ -89,6 +90,7 @@
     <script src="js/leaderboard.js"></script>
     <script src="js/social-share.js"></script>
     <script src="js/detailed-stats.js"></script>
+    <script src="js/accessibility.js"></script>
     
     <!-- Structured Data (JSON-LD) for SEO -->
     <script type="application/ld+json">
@@ -144,8 +146,10 @@
             </div>
         </div>
         
-        <!-- App Title -->
-        <h1 class="loading-app-title loading-app-title-pro">HASENE</h1>
+        <!-- App Title - Hasene Hat Logo -->
+        <div class="loading-app-title loading-app-title-pro">
+            <img src="assets/images/hasene_hat.png" alt="HASENE" class="loading-hasene-logo">
+        </div>
 
         <!-- Hadith Container - Modern Card Design -->
         <div class="loading-hadith-container loading-hadith-container-pro" id="hadisBox">
@@ -472,7 +476,6 @@
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="boslukQuestionNumber">Sual 1 / 10</div>
-                <div class="question-icon">✏️</div>
                 <div class="arabic" id="boslukAyetText" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
                 <div class="duolingo-question-hint" id="boslukQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Eksik kelimeyi seç</div>
                 <div class="sure-info" id="boslukSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
@@ -521,7 +524,6 @@
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="dinleQuestionNumber">Sual 1 / 10</div>
-                <div class="question-icon">🎧</div>
                 <div class="duolingo-question-hint" id="dinleQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç</div>
                 <div class="sure-info" id="dinleSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
                 
@@ -573,7 +575,6 @@
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
                 <div class="duolingo-question-number" id="duolingoQuestionNumber">Sual 1 / 10</div>
-                <div class="question-icon">🔄</div>
                 <div class="arabic-text arabic-large" id="arabicWord" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(28px, 6vw, 42px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.6;">
                     فَكُبْكِبُوا۟
                 </div>

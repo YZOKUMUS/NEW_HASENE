@@ -6686,8 +6686,8 @@ function generateWeeklyStreakDisplay() {
                 boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
             }
         } else if (isInStreak && hasPlayed) {
-            // Streak günü - altın/yeşil (Duolingo style)
-            boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700;';
+            // Streak günü - alev rengi (kırmızı/turuncu gradient)
+            boxStyle += ' background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: 2px solid #ff6b35;';
         } else if (hasPlayed) {
             // Oynandı ama streak dışında - yeşil
             const playedBg = isDarkMode ? '#4db300' : '#58cc02';
@@ -6827,8 +6827,8 @@ function generateMonthlyCalendar() {
                 boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
             }
         } else if (isInStreak && hasPlayed) {
-            // Streak günü - altın (Duolingo style)
-            boxStyle += ' background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; border: 2px solid #ffd700; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);';
+            // Streak günü - alev rengi (kırmızı/turuncu gradient)
+            boxStyle += ' background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: 2px solid #ff6b35; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);';
         } else if (hasPlayed) {
             // Oynandı ama streak dışında - yeşil
             const playedBg = isDarkMode ? '#4db300' : '#58cc02';
@@ -8403,20 +8403,72 @@ elements.dinleBulBtn.onclick = async () => {
                 // Session puanlarını global'e aktar
                 addToGlobalPoints(sessionScore, sessionCorrect);
                 
-                // Direkt ana menüye dön
-                elements.dinleMode.style.display = 'none';
-                elements.mainMenu.style.display = 'block';
+                // ============ PERFECT LESSON BONUS (DINLE BUL) ============
+                const PERFECT_LESSON_TEST_MODE = true;
+                const MIN_QUESTIONS_FOR_PERFECT = 3;
                 
-                // Navigasyon bar'ı göster
-                showBottomNavBar();
+                if (PERFECT_LESSON_TEST_MODE && 
+                    dinleWrong === 0 && 
+                    dinleCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
+                    dinleScore > 0) {
+                    
+                    const perfectBonus = Math.floor(dinleScore * 0.5);
+                    
+                    if (perfectBonus > 0) {
+                        totalPoints += perfectBonus;
+                        dailyTasks.todayStats.toplamPuan += perfectBonus;
+                        addDailyXP(perfectBonus);
+                        
+                        if (typeof updateLeaderboardScores === 'function') {
+                            updateLeaderboardScores(perfectBonus);
+                        }
+                        
+                        setTimeout(() => {
+                            if (typeof showSuccessMessage === 'function') {
+                                showSuccessMessage(
+                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
+                                    `Tüm soruları doğru cevapladın!\n` +
+                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
+                                    5000
+                                );
+                            }
+                            
+                            if (typeof triggerConfetti === 'function') {
+                                triggerConfetti();
+                            }
+                            
+                            if (typeof playSound === 'function') {
+                                playSound('success');
+                            }
+                        }, 500);
+                        
+                        log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
+                    }
+                }
+                // ============ PERFECT LESSON BONUS SONU ============
                 
-                // Oyun değişkenlerini temizle
-                dinleScore = 0;
-                dinleCorrect = 0;
-                dinleWrong = 0;
-                dinleQuestionCount = 0;
-                updateDinleUI();
-                log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                // Oyun sonu modal'ını göster
+                log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
+                showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
+                    if (!confirmed) {
+                        log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
+                    }
+                    
+                    // Modal kapandıktan sonra ana menüye dön
+                    elements.dinleMode.style.display = 'none';
+                    elements.mainMenu.style.display = 'block';
+                    
+                    // Navigasyon bar'ı göster
+                    showBottomNavBar();
+                    
+                    // Oyun değişkenlerini temizle
+                    dinleScore = 0;
+                    dinleCorrect = 0;
+                    dinleWrong = 0;
+                    dinleQuestionCount = 0;
+                    updateDinleUI();
+                    log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                });
                 return;
             }
             
@@ -8447,20 +8499,72 @@ elements.dinleBulBtn.onclick = async () => {
                 // Session puanlarını global'e aktar
                 addToGlobalPoints(sessionScore, sessionCorrect);
                 
-                // Direkt ana menüye dön
-                elements.dinleMode.style.display = 'none';
-                elements.mainMenu.style.display = 'block';
+                // ============ PERFECT LESSON BONUS (DINLE BUL) ============
+                const PERFECT_LESSON_TEST_MODE = true;
+                const MIN_QUESTIONS_FOR_PERFECT = 3;
                 
-                // Navigasyon bar'ı göster
-                showBottomNavBar();
+                if (PERFECT_LESSON_TEST_MODE && 
+                    dinleWrong === 0 && 
+                    dinleCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
+                    dinleScore > 0) {
+                    
+                    const perfectBonus = Math.floor(dinleScore * 0.5);
+                    
+                    if (perfectBonus > 0) {
+                        totalPoints += perfectBonus;
+                        dailyTasks.todayStats.toplamPuan += perfectBonus;
+                        addDailyXP(perfectBonus);
+                        
+                        if (typeof updateLeaderboardScores === 'function') {
+                            updateLeaderboardScores(perfectBonus);
+                        }
+                        
+                        setTimeout(() => {
+                            if (typeof showSuccessMessage === 'function') {
+                                showSuccessMessage(
+                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
+                                    `Tüm soruları doğru cevapladın!\n` +
+                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
+                                    5000
+                                );
+                            }
+                            
+                            if (typeof triggerConfetti === 'function') {
+                                triggerConfetti();
+                            }
+                            
+                            if (typeof playSound === 'function') {
+                                playSound('success');
+                            }
+                        }, 500);
+                        
+                        log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
+                    }
+                }
+                // ============ PERFECT LESSON BONUS SONU ============
                 
-                // Oyun değişkenlerini temizle
-                dinleScore = 0;
-                dinleCorrect = 0;
-                dinleWrong = 0;
-                dinleQuestionCount = 0;
-                updateDinleUI();
-                log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                // Oyun sonu modal'ını göster
+                log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
+                showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
+                    if (!confirmed) {
+                        log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
+                    }
+                    
+                    // Modal kapandıktan sonra ana menüye dön
+                    elements.dinleMode.style.display = 'none';
+                    elements.mainMenu.style.display = 'block';
+                    
+                    // Navigasyon bar'ı göster
+                    showBottomNavBar();
+                    
+                    // Oyun değişkenlerini temizle
+                    dinleScore = 0;
+                    dinleCorrect = 0;
+                    dinleWrong = 0;
+                    dinleQuestionCount = 0;
+                    updateDinleUI();
+                    log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+                });
                 return;
             }
             
@@ -9263,16 +9367,24 @@ function loadQuestion() {
         log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
         addToGlobalPoints(sessionScore, sessionCorrect);
         
-        // Direkt ana menüye dön (popup yok)
-        log.debug(`🔄 Ana menüye dönülüyor...`);
-        elements.gameScreen.style.display = 'none';
-        elements.modeSelector.style.display = 'none';
-        elements.mainMenu.style.display = 'block';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-        
-        log.game(`✅ Kelime Çevir oyunu bitti ve ana menüye dönüldü!`);
+        // Oyun sonu modal'ını göster
+        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
+        showCustomConfirm(sessionCorrect, sessionWrong, sessionScore).then((confirmed) => {
+            if (!confirmed) {
+                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
+            }
+            
+            // Modal kapandıktan sonra ana menüye dön
+            log.debug(`🔄 Ana menüye dönülüyor...`);
+            elements.gameScreen.style.display = 'none';
+            elements.modeSelector.style.display = 'none';
+            elements.mainMenu.style.display = 'block';
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
+            
+            log.game(`✅ Kelime Çevir oyunu bitti ve ana menüye dönüldü!`);
+        });
         return;
     }
 
@@ -11369,19 +11481,27 @@ function checkDinleAnswer(button, isCorrect) {
         // Session puanlarını global'e aktar
         addToGlobalPoints(sessionScore, sessionCorrect);
 
-        // Ana menüye dön
-        if (elements.dinleMode) elements.dinleMode.style.display = 'none';
-        if (elements.mainMenu) elements.mainMenu.style.display = 'block';
-        showBottomNavBar();
+        // Oyun sonu modal'ını göster
+        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
+        showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
+            if (!confirmed) {
+                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
+            }
+            
+            // Modal kapandıktan sonra ana menüye dön
+            if (elements.dinleMode) elements.dinleMode.style.display = 'none';
+            if (elements.mainMenu) elements.mainMenu.style.display = 'block';
+            showBottomNavBar();
 
-        // Oyun değişkenlerini sıfırla
-        dinleScore = 0;
-        dinleCorrect = 0;
-        dinleWrong = 0;
-        dinleQuestionCount = 0;
-        updateDinleUI();
+            // Oyun değişkenlerini sıfırla
+            dinleScore = 0;
+            dinleCorrect = 0;
+            dinleWrong = 0;
+            dinleQuestionCount = 0;
+            updateDinleUI();
 
-        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+            log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
+        });
         return;
     }
 
@@ -11431,22 +11551,74 @@ function loadBoslukQuestion() {
         // Session puanlarını global'e aktar
         addToGlobalPoints(sessionScore, sessionCorrect);
         
-        log.debug(`🔄 Ana menüye dönülüyor...`);
-        // Direkt ana menüye dön
-        elements.boslukMode.style.display = 'none';
-        elements.mainMenu.style.display = 'block';
+        // ============ PERFECT LESSON BONUS (BOŞLUK DOLDUR) ============
+        const PERFECT_LESSON_TEST_MODE = true;
+        const MIN_QUESTIONS_FOR_PERFECT = 3;
         
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-        
-        log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
-        // Sıfırla
-        boslukScore = 0;
-        boslukCorrect = 0;
-        boslukWrong = 0;
-        boslukQuestionCount = 0;
-        updateBoslukUI();
-        log.game(`✅ Boşluk Doldur oyunu bitti ve ana menüye dönüldü!`);
+        if (PERFECT_LESSON_TEST_MODE && 
+            boslukWrong === 0 && 
+            boslukCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
+            boslukScore > 0) {
+            
+            const perfectBonus = Math.floor(boslukScore * 0.5);
+            
+            if (perfectBonus > 0) {
+                totalPoints += perfectBonus;
+                dailyTasks.todayStats.toplamPuan += perfectBonus;
+                addDailyXP(perfectBonus);
+                
+                if (typeof updateLeaderboardScores === 'function') {
+                    updateLeaderboardScores(perfectBonus);
+                }
+                
+                setTimeout(() => {
+                    if (typeof showSuccessMessage === 'function') {
+                        showSuccessMessage(
+                            `⭐ MÜKEMMEL DERS! ⭐\n` +
+                            `Tüm soruları doğru cevapladın!\n` +
+                            `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
+                            5000
+                        );
+                    }
+                    
+                    if (typeof triggerConfetti === 'function') {
+                        triggerConfetti();
+                    }
+                    
+                    if (typeof playSound === 'function') {
+                        playSound('success');
+                    }
+                }, 500);
+                
+                log.game(`⭐ PERFECT LESSON BONUS (Boşluk Doldur): +${perfectBonus} Hasene`);
+            }
+        }
+        // ============ PERFECT LESSON BONUS SONU ============
+
+        // Oyun sonu modal'ını göster
+        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
+        showCustomConfirm(boslukCorrect, boslukWrong, boslukScore).then((confirmed) => {
+            if (!confirmed) {
+                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
+            }
+            
+            // Modal kapandıktan sonra ana menüye dön
+            log.debug(`🔄 Ana menüye dönülüyor...`);
+            elements.boslukMode.style.display = 'none';
+            elements.mainMenu.style.display = 'block';
+            
+            // Navigasyon bar'ı göster (ana ekrana dönünce)
+            showBottomNavBar();
+            
+            log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
+            // Sıfırla
+            boslukScore = 0;
+            boslukCorrect = 0;
+            boslukWrong = 0;
+            boslukQuestionCount = 0;
+            updateBoslukUI();
+            log.game(`✅ Boşluk Doldur oyunu bitti ve ana menüye dönüldü!`);
+        });
         return;
     }
 

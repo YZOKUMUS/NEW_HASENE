@@ -1,0 +1,47 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "globals": {
+    "CONFIG": "readonly",
+    "log": "readonly",
+    "StorageManager": "readonly",
+    "EventListenerManager": "readonly",
+    "getLocalDateString": "readonly",
+    "hapticFeedback": "readonly",
+    "initSwipeGestures": "readonly",
+    "sanitizeHTML": "readonly",
+    "safeSetHTML": "readonly",
+    "showLoading": "readonly",
+    "hideLoading": "readonly",
+    "encryptData": "readonly",
+    "decryptData": "readonly",
+    "secureSetItem": "readonly",
+    "secureGetItem": "readonly",
+    "showCustomAlert": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_"
+    }],
+    "no-console": "off",
+    "no-debugger": "warn",
+    "no-alert": "warn",
+    "prefer-const": "warn",
+    "no-var": "error",
+    "eqeqeq": ["warn", "always"],
+    "curly": ["warn", "all"],
+    "no-eval": "warn",
+    "no-implied-eval": "error",
+    "no-script-url": "error"
+  }
+}
+

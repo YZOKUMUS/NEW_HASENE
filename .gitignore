@@ -29,3 +29,9 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettierignore
