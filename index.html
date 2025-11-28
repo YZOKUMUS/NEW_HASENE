@@ -194,15 +194,7 @@
             <div class="hero-section hero-section-minimal">
                 <div class="hero-content hero-content-minimal">
                     <!-- Compact Header -->
-                    <div class="hero-header-minimal" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                        <div class="welcome-minimal" style="flex: 1;">
-                            <div class="welcome-title-minimal">Ehlen ve Sehlen! 👋</div>
-                            <div class="welcome-subtitle-minimal">Bugün hangi dersi çalışmak istersin?</div>
-                        </div>
-                        <!-- Dark Mode Toggle Butonu - Sağ Üst Köşe -->
-                        <button id="darkModeToggle" onclick="toggleDarkMode()" aria-label="Karanlık modu aç/kapat" role="button" title="Karanlık Mod" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.3s; z-index: 10; flex-shrink: 0; font-size: 14px;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.3)'">
-                            <span id="darkModeIcon" aria-hidden="true">🌙</span>
-                        </button>
+                    <div class="hero-header-minimal" style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
                         <!-- DEV: Reset Butonu - Sadece geliştirme modunda görünür (localStorage: hasene_dev_mode = "1") -->
                         <button id="devResetBtn" onclick="confirmResetStats()" class="reset-stats-btn dev-only-btn" aria-label="Geliştirici: Tüm İstatistikleri Sıfırla" role="button" style="display: none; background: rgba(231, 76, 60, 0.9); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; width: 28px; height: 28px; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3); transition: all 0.3s; z-index: 10; opacity: 0.7; flex-shrink: 0;" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.boxShadow='0 4px 12px rgba(231, 76, 60, 0.5)'" onmouseout="this.style.opacity='0.7'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.3)'" title="DEV: Tüm İstatistikleri Sıfırla">
                             <span style="font-size: 14px;" aria-hidden="true">🔄</span>
