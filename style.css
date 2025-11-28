@@ -94,67 +94,11 @@
     --radius-full: 9999px;
 }
 
-/* Dark Mode Variables */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-        --bg-secondary: #141420;
-        --text-primary: #f1f5f9;
-        --text-secondary: #94a3b8;
-        --border-color: rgba(255,255,255,0.08);
-        --shadow: rgba(0,0,0,0.4);
-        --card-bg: rgba(25,25,40,0.95);
-        --glass-bg: rgba(30, 30, 50, 0.85);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-}
 
-/* Dark Mode Class (for manual toggle) */
-body.dark-mode {
-    --bg-primary: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-    --bg-secondary: #141420;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border-color: rgba(255,255,255,0.08);
-    --shadow: rgba(0,0,0,0.4);
-    --card-bg: rgba(25,25,40,0.95);
-    --glass-bg: rgba(30, 30, 50, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
 
-/* Dark Mode - Tüm elementler için override */
-body.dark-mode .hero-section-minimal,
-body.dark-mode .hero-section {
-    background: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-}
 
-body.dark-mode .welcome-title-minimal,
-body.dark-mode .welcome-subtitle-minimal {
-    color: var(--text-primary) !important;
-}
 
-body.dark-mode .stat-item-minimal,
-body.dark-mode .stat-value-minimal,
-body.dark-mode .stat-label-minimal {
-    color: var(--text-primary) !important;
-}
 
-body.dark-mode .daily-goal-minimal,
-body.dark-mode .goal-title-minimal {
-    color: var(--text-primary) !important;
-}
-
-body.dark-mode .difficulty-minimal {
-    background: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-}
-
-body.dark-mode .difficulty-title-minimal {
-    color: var(--text-secondary) !important;
-}
 
 .difficulty-minimal {
     background: white;
@@ -162,91 +106,22 @@ body.dark-mode .difficulty-title-minimal {
 }
 
 /* Aydınlık modda oyun butonlarına renkli border */
-body:not(.dark-mode) #kelimeCevirBtn {
-    border: 3px solid #ff6b6b !important;
-}
 
-body:not(.dark-mode) #dinleBulBtn {
-    border: 3px solid #4ecdc4 !important;
-}
 
-body:not(.dark-mode) #boslukDoldurBtn {
-    border: 3px solid #45b7d1 !important;
-}
 
-body:not(.dark-mode) #duaEtBtn {
-    border: 3px solid #96ceb4 !important;
-}
 
-body:not(.dark-mode) #ayetOkuBtn {
-    border: 3px solid #feca57 !important;
-}
 
-body:not(.dark-mode) #hadisOkuBtn {
-    border: 3px solid #ff9ff3 !important;
-}
 
-body.dark-mode .game-card {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    background-color: #2a2a3e !important;
-    color: #ffffff !important;
-    border-color: rgba(102, 126, 234, 0.3) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
-}
 
-body.dark-mode .game-card:hover {
-    background: linear-gradient(135deg, #33334e 0%, #252535 100%) !important;
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3) !important;
-    border-color: rgba(102, 126, 234, 0.5) !important;
-}
 
-body.dark-mode .game-title {
-    color: #ffffff !important;
-    font-weight: 700 !important;
-}
 
-body.dark-mode .game-desc {
-    color: #b0b0b0 !important;
-    opacity: 1 !important;
-}
 
-body.dark-mode .game-icon {
-    opacity: 1 !important;
-    filter: brightness(1.1);
-}
 
-body.dark-mode .info-btn-minimal {
-    background: rgba(255,255,255,0.1) !important;
-    border-color: var(--border-color) !important;
-    color: var(--text-primary) !important;
-}
 
-body.dark-mode .info-btn-minimal:hover {
-    background: rgba(255,255,255,0.15) !important;
-}
 
-body.dark-mode .bottom-nav,
-body.dark-mode #bottomNavBar {
-    background: rgba(20, 20, 32, 0.95) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
-    box-shadow: 
-        0 -1px 0 rgba(255, 255, 255, 0.03),
-        0 -8px 32px rgba(0, 0, 0, 0.3) !important;
-}
 
-body.dark-mode .nav-item {
-    color: var(--text-secondary) !important;
-}
 
-body.dark-mode .nav-item.active {
-    color: #667eea !important;
-}
 
-body.dark-mode .main-menu {
-    background: transparent !important;
-}
 
 /* ----- GLOBAL RESET ----- */
 * {
@@ -280,10 +155,6 @@ body {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.dark-mode .container {
-    background: var(--bg-secondary);
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
-}
 
 /* ----- HEADER ----- */
 .header {
@@ -308,9 +179,6 @@ body.dark-mode .container {
     transition: color 0.3s ease;
 }
 
-body.dark-mode .header h1 {
-    color: #ffffff;
-}
 
 /* ----- TOP NAV SHORTCUT BUTTONS ----- */
 .top-btn {
@@ -326,16 +194,7 @@ body.dark-mode .header h1 {
     background: #fafafa;
 }
 
-body.dark-mode .top-btn {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    border-color: rgba(102, 126, 234, 0.3);
-    color: #ffffff;
-}
 
-body.dark-mode .top-btn:hover {
-    background: linear-gradient(135deg, #33334e 0%, #252535 100%);
-    border-color: rgba(102, 126, 234, 0.5);
-}
 
 /* ----- MAIN MENU - YENİ MODERN TASARIM ----- */
 .main-menu {
@@ -461,10 +320,6 @@ body.dark-mode .top-btn:hover {
     opacity: 1;
 }
 
-body.dark-mode .stat-item-minimal {
-    background: linear-gradient(145deg, rgba(40,40,60,0.6) 0%, rgba(30,30,45,0.8) 100%) !important;
-    border-color: rgba(255,255,255,0.06) !important;
-}
 
 .stat-item-minimal:hover {
     transform: translateY(-3px);
@@ -658,64 +513,15 @@ body.dark-mode .stat-item-minimal {
 }
 
 /* Dark Mode Toggle Button - Özel Stil (Sağ Üst Köşe) */
-#darkModeToggle {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: white !important;
-    border: 2px solid rgba(255,255,255,0.3) !important;
-    box-shadow: 0 2px 8px rgba(102,126,234,0.3) !important;
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 50% !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 18px !important;
-    cursor: pointer !important;
-    transition: all 0.3s !important;
-    z-index: 10 !important;
-    flex-shrink: 0 !important;
-}
 
-#darkModeToggle:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
-    transform: scale(1.1) !important;
-    box-shadow: 0 4px 12px rgba(102,126,234,0.5) !important;
-}
 
-body.dark-mode #darkModeToggle {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
-    border: 2px solid rgba(255,255,255,0.3) !important;
-    box-shadow: 0 2px 8px rgba(251,191,36,0.3) !important;
-}
 
-body.dark-mode #darkModeToggle:hover {
-    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
-    box-shadow: 0 4px 12px rgba(251,191,36,0.5) !important;
-}
 
-#darkModeToggle span {
-    display: inline-block !important;
-    line-height: 1 !important;
-}
 
 /* Dark Mode Toggle - Mobil Optimizasyonu */
 @media (max-width: 600px) {
-    #darkModeToggle {
-        width: 32px !important; /* Minimum touch target size */
-        height: 32px !important;
-        min-width: 32px !important;
-        min-height: 32px !important;
-        touch-action: manipulation !important;
-        -webkit-tap-highlight-color: transparent !important;
-    }
     
     /* Mobilde hover efektlerini kaldır, touch için optimize et */
-    #darkModeToggle:active {
-        transform: scale(0.95) !important;
-        transition: transform 0.1s !important;
-    }
 }
 
 .info-btn-minimal:hover {
@@ -736,10 +542,6 @@ body.dark-mode #darkModeToggle:hover {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.dark-mode .difficulty-minimal {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-}
 
 .difficulty-title-minimal {
     font-size: 11px;
@@ -820,29 +622,9 @@ body.dark-mode .difficulty-minimal {
 }
 
 /* Dark mode için aktif olmayan butonlar */
-body.dark-mode .diff-btn-minimal.kolay:not(.active) {
-    background: rgba(76, 175, 80, 0.15);
-    border-color: rgba(76, 175, 80, 0.4);
-    color: #81C784;
-}
 
-body.dark-mode .diff-btn-minimal.orta:not(.active) {
-    background: rgba(102, 126, 234, 0.15);
-    border-color: rgba(102, 126, 234, 0.4);
-    color: #9FA8DA;
-}
 
-body.dark-mode .diff-btn-minimal.zor:not(.active) {
-    background: rgba(244, 67, 54, 0.15);
-    border-color: rgba(244, 67, 54, 0.4);
-    color: #EF5350;
-}
 
-body.dark-mode .diff-btn-minimal {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #b0b0b0;
-}
 
 .hero-section::before {
     content: '';
@@ -900,21 +682,8 @@ body.dark-mode .diff-btn-minimal {
     border: 2px solid transparent;
 }
 
-body.dark-mode .stat-card {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    border-color: rgba(102, 126, 234, 0.2);
-}
 
-body.dark-mode .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-    border-color: rgba(102, 126, 234, 0.4);
-}
 
-body.dark-mode .stat-label {
-    color: #b0b0b0 !important;
-}
 
 .stat-card:hover {
     transform: translateY(-4px);
@@ -1038,14 +807,7 @@ body.dark-mode .stat-label {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.dark-mode .difficulty-section {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
 
-body.dark-mode .difficulty-title {
-    color: #b0b0b0 !important;
-}
 
 .difficulty-title {
     font-size: 12px;
@@ -1126,23 +888,8 @@ body.dark-mode .difficulty-title {
 }
 
 /* Dark mode için normal diff-btn butonları */
-body.dark-mode .diff-btn.kolay:not(.active) {
-    background: rgba(76, 175, 80, 0.15);
-    border-color: rgba(76, 175, 80, 0.4);
-    color: #81C784;
-}
 
-body.dark-mode .diff-btn.orta:not(.active) {
-    background: rgba(255, 152, 0, 0.15);
-    border-color: rgba(255, 152, 0, 0.4);
-    color: #FFB74D;
-}
 
-body.dark-mode .diff-btn.zor:not(.active) {
-    background: rgba(244, 67, 54, 0.15);
-    border-color: rgba(244, 67, 54, 0.4);
-    color: #EF5350;
-}
 
 /* Games Section */
 .games-section {
@@ -1155,10 +902,6 @@ body.dark-mode .diff-btn.zor:not(.active) {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.dark-mode .games-section {
-    background: var(--card-bg) !important;
-    box-shadow: 0 8px 30px var(--shadow) !important;
-}
 
 .section-title {
     font-size: 18px;
@@ -1169,9 +912,6 @@ body.dark-mode .games-section {
     transition: color 0.3s ease;
 }
 
-body.dark-mode .section-title {
-    color: var(--text-primary) !important;
-}
 
 .games-grid {
     display: grid;
@@ -1226,152 +966,45 @@ body.dark-mode .section-title {
 }
 
 /* Dark Mode için oyun kartları */
-body.dark-mode .games-grid .game-card,
-body.dark-mode .main-menu .game-card,
-body.dark-mode #mainMenu .game-card,
-body.dark-mode .game-card {
-    background: linear-gradient(145deg, #252538 0%, #1c1c2e 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.06) !important;
-    box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.3),
-        0 2px 4px -2px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
 
-body.dark-mode .game-card::after {
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent
-    );
-}
 
 /* ============ DARK MODE - ANA MENÜ KARTLARI (Analytics Cards) ============ */
 
 /* Günlük Hedef Durumu - Sarı gradient kart */
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] {
-    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
-    color: #1a1a1a !important;
-}
 
 /* Override lighter helper text to ensure readability */
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #666"],
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"],
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #666"],
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #555"] {
-    color: #1a1a1a !important;
-}
 
 /* Kelime Ameli - Gri kart */
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] {
-    background: #1f2937 !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #333"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #666"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #27ae60"] {
-    color: #27ae60 !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] div[style*="color: #e74c3c"] {
-    color: #e74c3c !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] span {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"] * {
-    color: #1a1a1a !important;
-}
 
 /* Öğrenme Haritası - Mavi-pembe gradient kart */
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] {
-    background: linear-gradient(135deg, #1e3a5f 0%, #2d1f3d 100%) !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #27ae60"] {
-    color: #27ae60 !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
-    color: #f39c12 !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #e74c3c"] {
-    color: #e74c3c !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#a8edea"][style*="#fed6e3"] * {
-    color: #1a1a1a !important;
-}
 
 /* Liderlik Tablosu - Sarı gradient kart */
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] {
-    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] span {
-    color: #1a1a1a !important;
-}
 
-body.dark-mode #mainMenu div[style*="background: linear-gradient"][style*="#ffd700"][style*="#ffed4e"] * {
-    color: #1a1a1a !important;
-}
 
 /* Liderlik Tablosu başlığı */
-body.dark-mode #mainMenu h4[style*="color: #667eea"] {
-    color: #818cf8 !important;
-}
 
 /* Liderlik listesi boş mesaj */
-body.dark-mode #mainMenu div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Liderlik tablosu notu (gri kutu) */
-body.dark-mode #mainMenu div[style*="background: #f8f9fa"][style*="color: #666"] {
-    background: #1f2937 !important;
-    color: #d1d5db !important;
-}
 
 .game-card::before {
     content: '';
@@ -1401,35 +1034,11 @@ body.dark-mode #mainMenu div[style*="background: #f8f9fa"][style*="color: #666"]
 }
 
 /* Aydınlık modda hover durumunda border'ları daha belirgin yap */
-body:not(.dark-mode) #kelimeCevirBtn:hover {
-    border-color: #ff5252 !important;
-    box-shadow: 0 8px 30px rgba(255, 107, 107, 0.3) !important;
-}
 
-body:not(.dark-mode) #dinleBulBtn:hover {
-    border-color: #26a69a !important;
-    box-shadow: 0 8px 30px rgba(78, 205, 196, 0.3) !important;
-}
 
-body:not(.dark-mode) #boslukDoldurBtn:hover {
-    border-color: #29b6f6 !important;
-    box-shadow: 0 8px 30px rgba(69, 183, 209, 0.3) !important;
-}
 
-body:not(.dark-mode) #duaEtBtn:hover {
-    border-color: #66bb6a !important;
-    box-shadow: 0 8px 30px rgba(150, 206, 180, 0.3) !important;
-}
 
-body:not(.dark-mode) #ayetOkuBtn:hover {
-    border-color: #ffca28 !important;
-    box-shadow: 0 8px 30px rgba(254, 202, 87, 0.3) !important;
-}
 
-body:not(.dark-mode) #hadisOkuBtn:hover {
-    border-color: #f48fb1 !important;
-    box-shadow: 0 8px 30px rgba(255, 159, 243, 0.3) !important;
-}
 
 .game-card:hover::before {
     transform: scaleX(1);
@@ -1888,23 +1497,9 @@ body:not(.dark-mode) #hadisOkuBtn:hover {
     transition: 0.25s;
 }
 
-body.dark-mode .menu-item {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
 
-body.dark-mode .menu-item:hover {
-    background: linear-gradient(135deg, #33334e 0%, #252535 100%);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
-}
 
-body.dark-mode .menu-title {
-    color: #ffffff !important;
-}
 
-body.dark-mode .menu-desc {
-    color: #b0b0b0 !important;
-}
 
 .menu-item:hover {
     transform: translateY(-3px);
@@ -1933,31 +1528,9 @@ body.dark-mode .menu-desc {
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.dark-mode .mode-selector {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
 
-body.dark-mode .mode-btn,
-body.dark-mode .diff-btn {
-    background: #1e1e2e !important;
-    border-color: rgba(102, 126, 234, 0.3) !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .mode-btn:hover:not(.active),
-body.dark-mode .diff-btn:hover:not(.active) {
-    background: #2a2a3e !important;
-    border-color: rgba(102, 126, 234, 0.5) !important;
-}
 
-body.dark-mode .mode-btn.active,
-body.dark-mode .diff-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    border-color: #667eea !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
-}
 
 .mode-btn,
 .diff-btn {
@@ -1989,15 +1562,7 @@ body.dark-mode .diff-btn.active {
     transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
 }
 
-body.dark-mode .game-info {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
-    color: #ffffff;
-}
 
-body.dark-mode .game-info div {
-    color: #ffffff !important;
-}
 
 .game-info div {
     font-weight: 600;
@@ -2015,54 +1580,18 @@ body.dark-mode .game-info div {
     transition: color 0.3s ease;
 }
 
-body.dark-mode .arabic,
-body.dark-mode .arabic-text {
-    color: #ffffff !important;
-}
 
 /* Kelime Çevir oyunu için Arapça kelime - dark mode */
-body.dark-mode #arabicWord,
-body.dark-mode .arabic-large,
-body.dark-mode #arabicWord.arabic-text,
-body.dark-mode #arabicWord.arabic-large {
-    color: #ffffff !important;
-}
 
 /* Boşluk Doldur oyunu için Arapça metin - dark mode */
-body.dark-mode #boslukAyetText,
-body.dark-mode #boslukAyetText.arabic,
-body.dark-mode .bosluk-mode #boslukAyetText,
-body.dark-mode .bosluk-mode #boslukAyetText.arabic {
-    color: #ffffff !important;
-}
 
 /* Ayet Oku oyunu için Arapça metin - dark mode */
-body.dark-mode #ayetArabic,
-body.dark-mode #ayetArabic.arabic {
-    color: #ffffff !important;
-}
 
 /* Dua Et oyunu için Arapça metin - dark mode */
-body.dark-mode #duaArabic,
-body.dark-mode #duaArabic.arabic {
-    color: #ffffff !important;
-}
 
-body.dark-mode .duolingo-question-hint {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #sureInfo {
-    color: #b0b0b0 !important;
-}
 
 /* Inline style'ları override etmek için daha spesifik kurallar */
-body.dark-mode div[id="arabicWord"][style*="color"],
-body.dark-mode div[id="boslukAyetText"][style*="color"],
-body.dark-mode div[id="ayetArabic"][style*="color"],
-body.dark-mode div[id="duaArabic"][style*="color"] {
-    color: #ffffff !important;
-}
 
 /* ----- AUDIO & HINT BUTTONS ----- */
 .audio-btn,
@@ -2095,11 +1624,6 @@ body.dark-mode div[id="duaArabic"][style*="color"] {
     transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
 }
 
-body.dark-mode .game-box {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    color: #ffffff;
-}
 
 /* ----- OPTIONS ----- */
 .options {
@@ -2125,16 +1649,7 @@ body.dark-mode .game-box {
     background: #f2f2f2;
 }
 
-body.dark-mode .option {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
-    border-color: rgba(102, 126, 234, 0.3);
-    color: #ffffff;
-}
 
-body.dark-mode .option:hover {
-    background: linear-gradient(135deg, #33334e 0%, #252535 100%);
-    border-color: rgba(102, 126, 234, 0.5);
-}
 
 .option.correct {
     background: #4CAF50 !important;
@@ -2157,15 +1672,7 @@ body.dark-mode .option:hover {
     transition: color 0.3s ease;
 }
 
-body.dark-mode .feedback {
-    color: #ffffff;
-}
 
-body.dark-mode .game-screen .feedback,
-body.dark-mode .dinle-mode .feedback,
-body.dark-mode .bosluk-mode .feedback {
-    color: #ffffff !important;
-}
 
 
 
@@ -2993,26 +2500,10 @@ body.dark-mode .bosluk-mode .feedback {
 }
 
 /* ===== DARK MODE - STATS MODAL ===== */
-body.dark-mode .stats-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .stats-content h3 {
-    color: #667eea !important;
-}
 
-body.dark-mode .stats-content::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
 
-body.dark-mode .stats-content::-webkit-scrollbar-thumb {
-    background: #667eea;
-}
 
-body.dark-mode .stats-content::-webkit-scrollbar-thumb:hover {
-    background: #7d8fff;
-}
 
 /* Badges Modal - Özel Stil */
 .badges-content {
@@ -3040,103 +2531,28 @@ body.dark-mode .stats-content::-webkit-scrollbar-thumb:hover {
 }
 
 /* ===== DARK MODE - BADGES MODAL ===== */
-body.dark-mode .badges-container {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .badges-header {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
-    border-bottom-color: #444 !important;
-}
 
-body.dark-mode .badges-header h2 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .stats-summary {
-    background: #2a2a2a !important;
-}
 
-body.dark-mode .stat-item {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .stat-value {
-    color: #ffffff !important;
-}
 
-body.dark-mode .stat-label {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .category-tabs {
-    background: #2a2a2a !important;
-    border-bottom-color: #444 !important;
-}
 
-body.dark-mode .category-tab {
-    color: #b0b0b0 !important;
-    background: transparent !important;
-}
 
-body.dark-mode .category-tab.active {
-    color: #667eea !important;
-    border-bottom-color: #667eea !important;
-}
 
-body.dark-mode #badgesScrollableContent::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
 
-body.dark-mode #badgesScrollableContent::-webkit-scrollbar-thumb {
-    background: #667eea;
-}
 
 /* Badges Modal - Dark Mode Complete Support */
-body.dark-mode #badgesModal .badges-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #badgesModal .badges-header-new {
-    background: linear-gradient(135deg, #4a5eb0 0%, #5a3d76 100%) !important;
-}
 
-body.dark-mode #badgesModal h3,
-body.dark-mode #badgesModal h4 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #badgesModal .badge-name {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #badgesModal .badge-desc {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .badge-card {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
-body.dark-mode .badge-card.unlocked {
-    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
-    border-color: #4db300 !important;
-}
 
-body.dark-mode .badge-title {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .badge-desc {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .badge-status {
-    color: #b0b0b0 !important;
-}
 
 /* Badges Modal - Yeni Duolingo Tarzı Tasarım */
 #badgesScrollableContent {
@@ -3309,1079 +2725,308 @@ body.dark-mode .badge-status {
 }
 
 /* Aydınlık mod için explicit kurallar (override dark mode rules) */
-body:not(.dark-mode) .calendar-content {
-    background: #ffffff !important;
-    color: #222 !important;
-}
 
-body:not(.dark-mode) #calendarMonth {
-    color: #1a1a1a !important;
-    border-bottom-color: #e0e0e0 !important;
-}
 
-body:not(.dark-mode) #weeklyStreakDisplay {
-    background: linear-gradient(135deg, #f7f7f7 0%, #e9ecef 100%) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
-}
 
 /* ===== DARK MODE - DAILY TASKS MODAL ===== */
-body.dark-mode .daily-tasks-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .daily-tasks-header {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
-    border-bottom-color: #444 !important;
-}
 
-body.dark-mode .daily-tasks-title {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .daily-tasks-progress-card {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
-body.dark-mode .daily-tasks-progress-title {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .daily-tasks-progress-count {
-    color: #ffffff !important;
-}
 
-body.dark-mode .daily-tasks-progress-total {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .daily-tasks-progress-bar-container {
-    background: #1a1a1a !important;
-}
 
-body.dark-mode .daily-tasks-progress-bar {
-    background: linear-gradient(90deg, #4db300 0%, #58cc02 100%) !important;
-}
 
-body.dark-mode .daily-tasks-section {
-    background: transparent !important;
-}
 
-body.dark-mode .daily-tasks-section-title {
-    color: #e0e0e0 !important;
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
-body.dark-mode .daily-tasks-section-title.bonus {
-    background: linear-gradient(135deg, #3a3a00 0%, #2a2a00 100%) !important;
-}
 
-body.dark-mode .task-card {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
-body.dark-mode .task-card.completed {
-    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
-    border-color: #4db300 !important;
-}
 
-body.dark-mode .task-name {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .task-desc {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .task-progress {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .daily-tasks-reward-section {
-    background: linear-gradient(135deg, #2a2a00 0%, #1e1e00 100%) !important;
-    border-color: #ffd700 !important;
-}
 
-body.dark-mode .daily-tasks-reward-title {
-    color: #ffffff !important;
-}
 
-body.dark-mode .daily-tasks-reward-desc {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .daily-tasks-reward-btn {
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
-    color: #1a1a1a !important;
-}
 
 /* ===== DARK MODE - DAILY GOAL MODAL ===== */
-body.dark-mode #dailyGoalModal .modal-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #dailyGoalModal h3 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #dailyGoalModal p {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .goal-option {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .goal-option:hover {
-    background: #333 !important;
-    border-color: #58cc02 !important;
-}
 
-body.dark-mode .goal-option.selected {
-    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
-    border-color: #58cc02 !important;
-}
 
 /* ===== DARK MODE - XP INFO MODAL ===== */
-body.dark-mode #xpInfoModal .modal-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #xpInfoModal h3 {
-    color: #667eea !important;
-}
 
-body.dark-mode #xpInfoModal h4 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #xpInfoModal p,
-body.dark-mode #xpInfoModal li {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #xpInfoModal strong {
-    color: #ffffff !important;
-}
 
-body.dark-mode #xpInfoModal .xp-info-item {
-    background: #2a2a2a !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #xpInfoModal .xp-info-item div {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #xpInfoModal span {
-    color: #e0e0e0 !important;
-}
 
 /* ============ DARK MODE - HASENE BİLGİ SİSTEMİ KOMPLE OVERRIDE ============ */
 
 /* Ana scroll container */
-body.dark-mode #xpInfoScrollableContent {
-    background: transparent !important;
-}
 
 /* Gradient override'lar - inline style'ları ezip dark mode gradient'leri */
-body.dark-mode #xpInfoModal div[style*="linear-gradient"][style*="#667eea"][style*="#764ba2"] {
-    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] {
-    background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
-    border-left: 4px solid #fbbf24 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] {
-    background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%) !important;
-    border-left: 4px solid #3b82f6 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="linear-gradient"][style*="#fff7e6"][style*="#ffe6d9"] {
-    background: linear-gradient(135deg, #3a2817 0%, #292524 100%) !important;
-    border-left: 4px solid #f97316 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="linear-gradient"][style*="#f8f9fa"][style*="#e9ecef"] {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
-    border-left: 4px solid #667eea !important;
-}
 
 /* Tüm beyaz kutuları dark yap */
-body.dark-mode #xpInfoModal div[style*="background: white"],
-body.dark-mode #xpInfoModal div[style*="background: #fff"] {
-    background: #2d3748 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
-}
 
 /* Sarı uyarı kutusu (background: #fff3cd) */
-body.dark-mode #xpInfoModal div[style*="background: #fff3cd"] {
-    background: #3a2817 !important;
-    border-left: 3px solid #fbbf24 !important;
-}
 
 /* Text renkleri */
-body.dark-mode #xpInfoModal div[style*="color: #555"],
-body.dark-mode #xpInfoModal div[style*="color: #666"],
-body.dark-mode #xpInfoModal div[style*="color: #888"],
-body.dark-mode #xpInfoModal div[style*="color: #aaa"] {
-    color: #d1d5db !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #856404"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #333"] {
-    color: #e5e7eb !important;
-}
 
 /* Strong ve bold text'ler */
-body.dark-mode #xpInfoScrollableContent strong,
-body.dark-mode #xpInfoScrollableContent div[style*="font-weight: 700"],
-body.dark-mode #xpInfoScrollableContent div[style*="font-weight: bold"] {
-    color: #ffffff !important;
-}
 
 /* Başlıklar (h4) */
-body.dark-mode #xpInfoModal h4 {
-    color: #e5e7eb !important;
-}
 
 /* Renkli başlıklar için özel override */
-body.dark-mode #xpInfoModal div[style*="color: #f59e0b"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #667eea"] {
-    color: #818cf8 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #f97316"] {
-    color: #fb923c !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #3b82f6"] {
-    color: #60a5fa !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #d97706"] {
-    color: #fbbf24 !important;
-}
 
 /* Mertebe kartları içindeki renkli text'ler */
-body.dark-mode #xpInfoModal div[style*="color: #cd7f32"] {
-    color: #f59e0b !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #c0c0c0"] {
-    color: #d1d5db !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #ffd700"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #xpInfoModal div[style*="color: #00d9ff"] {
-    color: #06b6d4 !important;
-}
 
-body.dark-mode .xp-info-section {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
 /* ===== DARK MODE - CUSTOM ALERT MODAL ===== */
-body.dark-mode #customAlertModal .modal-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #customAlertTitle {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #customAlertMessage {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #customAlertOKBtn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #customAlertOKBtn:hover {
-    background: linear-gradient(135deg, #7d8fff 0%, #8d5bb2 100%) !important;
-}
 
-body.dark-mode .custom-confirm .modal-content {
-    background: #1e1e1e !important;
-}
 
 /* ===== DARK MODE - DAILY TASKS MODAL ===== */
-body.dark-mode #dailyTasksModal .modal-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #dailyTasksModal h3 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-card {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-card.completed {
-    background: linear-gradient(135deg, #2a4a2a 0%, #1e3a1e 100%) !important;
-    border-color: #4caf50 !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-name {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-desc {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-reward {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode #dailyTasksModal .daily-task-progress-bar {
-    background: #1a1a1a !important;
-}
 
-body.dark-mode #dailyTasksModal #dailyTasksScrollableContent::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
 
-body.dark-mode #dailyTasksModal #dailyTasksScrollableContent::-webkit-scrollbar-thumb {
-    background: #667eea;
-}
 
 /* ===== DARK MODE - STATS MODAL ===== */
-body.dark-mode #statsModal .modal-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #statsModal h3 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #statsModal h4 {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #statsModal .stat-value {
-    color: #ffffff !important;
-}
 
-body.dark-mode #statsModal .stat-label {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #statsModal #statsScrollableContent::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
 
-body.dark-mode #statsModal #statsScrollableContent::-webkit-scrollbar-thumb {
-    background: #667eea;
-}
 
 /* ============ DARK MODE - İSTATİSTİKLER MODAL KOMPLE OVERRIDE ============ */
 
 /* Gradient background'ları dark mode versiyonlarına çevir */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#667eea"][style*="#764ba2"] {
-    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] {
-    background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%) !important;
-    border-left: 4px solid #3b82f6 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff7e6"][style*="#ffe6d9"] {
-    background: linear-gradient(135deg, #3a2817 0%, #292524 100%) !important;
-    border-left: 4px solid #f97316 !important;
-}
 
 /* Tüm beyaz kutuları dark yap */
-body.dark-mode #statsModal div[style*="background: white"],
-body.dark-mode #statsModal div[style*="background: #fff"] {
-    background: #2d3748 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
-}
 
 /* Text renkleri */
-body.dark-mode #statsModal div[style*="color: #555"],
-body.dark-mode #statsModal div[style*="color: #666"],
-body.dark-mode #statsModal div[style*="color: #888"],
-body.dark-mode #statsModal div[style*="color: #aaa"] {
-    color: #d1d5db !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #333"] {
-    color: #e5e7eb !important;
-}
 
 /* Başlıklar */
-body.dark-mode #statsModal h3[style*="color: #667eea"] {
-    color: #818cf8 !important;
-}
 
-body.dark-mode #statsModal h4[style*="color: #2980b9"] {
-    color: #60a5fa !important;
-}
 
-body.dark-mode #statsModal h4[style*="color: #d68910"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #statsModal h4[style*="color: white"] {
-    color: #ffffff !important;
-}
 
 /* Rozet kartları içindeki renkli text'ler */
-body.dark-mode #statsModal div[style*="color: #cd7f32"] {
-    color: #f59e0b !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #c0c0c0"] {
-    color: #d1d5db !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #ffd700"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #00d9ff"] {
-    color: #06b6d4 !important;
-}
 
 /* Muvaffakiyet Analizi kartları içindeki renkli text'ler */
-body.dark-mode #statsModal div[style*="color: #27ae60"] {
-    color: #34d399 !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #3498db"] {
-    color: #60a5fa !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #e67e22"] {
-    color: #fb923c !important;
-}
 
-body.dark-mode #statsModal div[style*="color: #9b59b6"] {
-    color: #a78bfa !important;
-}
 
 /* Oyun Türü İstatistikleri section - tüm açık arka planlı kartlar */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"],
-body.dark-mode #statsModal div[style*="background: #e9ecef"],
-body.dark-mode #statsModal div[style*="background: #e8f4f8"],
-body.dark-mode #statsModal div[style*="background: #e8f2ff"],
-body.dark-mode #statsModal div[style*="background: #f0e6ff"],
-body.dark-mode #statsModal div[style*="background: #fff8e6"],  /* Favoriler */
-body.dark-mode #statsModal div[style*="background: #d5f4e6"] {  /* Öğrenildi */
-    background: #111827 !important;
-    color: #e5e7eb !important;
-}
 
 /* Oyun Türü İstatistikleri section (yeşil gradient) */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] {
-    background: linear-gradient(135deg, #1a3a1a 0%, #0f2a0f 100%) !important;
-    border-left: 4px solid #34d399 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] h4[style*="color: #27ae60"] {
-    color: #34d399 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] span[style*="color: #333"] {
-    color: #e5e7eb !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0fff4"][style*="#e6ffe6"] strong[style*="color: #27ae60"] {
-    color: #34d399 !important;
-}
 
 /* Bugünkü Amel section (sarı-turuncu gradient) */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] {
-    background: linear-gradient(135deg, #3a2817 0%, #2d1f0f 100%) !important;
-    border-left: 4px solid #fbbf24 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] h4[style*="color: #b7950b"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fef9e7"][style*="#ffe6d9"] div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Kelime İstatistikleri section (mor-mavi gradient) */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#845EC2"][style*="#4E8397"] {
-    background: linear-gradient(135deg, #2d1f3d 0%, #1e3a5f 100%) !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#845EC2"][style*="#4E8397"] div[style*="opacity: 0.9"] {
-    color: rgba(255,255,255,0.9) !important;
-}
 
 /* Tüm #333 renkli text'ler için genel override (en güçlü) */
-body.dark-mode #statsModal *[style*="color: #333"],
-body.dark-mode #statsModal div[style*="color: #333"],
-body.dark-mode #statsModal span[style*="color: #333"],
-body.dark-mode #statsModal strong[style*="color: #333"] {
-    color: #ffffff !important;
-}
 
 /* Tüm #666 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #666"],
-body.dark-mode #statsModal div[style*="color: #666"],
-body.dark-mode #statsModal span[style*="color: #666"],
-body.dark-mode #statsModal strong[style*="color: #666"] {
-    color: #e5e7eb !important;
-}
 
 /* Tüm #555 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #555"],
-body.dark-mode #statsModal div[style*="color: #555"],
-body.dark-mode #statsModal span[style*="color: #555"],
-body.dark-mode #statsModal strong[style*="color: #555"] {
-    color: #e5e7eb !important;
-}
 
 /* Tüm #888 renkli text'ler için genel override */
-body.dark-mode #statsModal *[style*="color: #888"],
-body.dark-mode #statsModal div[style*="color: #888"],
-body.dark-mode #statsModal span[style*="color: #888"],
-body.dark-mode #statsModal strong[style*="color: #888"] {
-    color: #d1d5db !important;
-}
 
 /* Tüm #999 renkli yardımcı metinler için genel override */
-body.dark-mode #statsModal *[style*="color: #999"],
-body.dark-mode #statsModal div[style*="color: #999"],
-body.dark-mode #statsModal span[style*="color: #999"],
-body.dark-mode #statsModal strong[style*="color: #999"] {
-    color: #d1d5db !important;
-}
 
 /* Öğrenme Haritası sayıları - en yüksek öncelik (sadece modal içinde) */
-body.dark-mode #statsModal #analyticsLearnedCount,
-body.dark-mode #statsModal #analyticsPracticeCount,
-body.dark-mode #statsModal #analyticsStrugglingCount {
-    color: #111827 !important; /* Açık gradientte koyu ve okunaklı */
-    font-weight: 700 !important;
-}
 
 /* Span elementleri için genel override - daha güçlü */
-body.dark-mode #statsModal span {
-    color: #e5e7eb !important;
-}
 
-body.dark-mode #statsModal span[style*="color: #333"] {
-    color: #ffffff !important;
-}
 
-body.dark-mode #statsModal span[style*="color: #666"] {
-    color: #e5e7eb !important;
-}
 
 /* Strong elementleri için genel override - daha güçlü */
-body.dark-mode #statsModal strong {
-    color: #ffffff !important;
-}
 
-body.dark-mode #statsModal strong[style*="color: #333"] {
-    color: #ffffff !important;
-}
 
 /* Div elementleri için genel override */
-body.dark-mode #statsModal div {
-    color: #e5e7eb !important;
-}
 
 /* Font-weight: 500 ve 600 olan text'ler için daha belirgin */
-body.dark-mode #statsModal div[style*="font-weight: 500"],
-body.dark-mode #statsModal div[style*="font-weight: 600"],
-body.dark-mode #statsModal span[style*="font-weight: 500"],
-body.dark-mode #statsModal span[style*="font-weight: 600"] {
-    color: #ffffff !important;
-}
 
 /* Detaylı buton */
-body.dark-mode #statsModal button[style*="linear-gradient"][style*="#667eea"] {
-    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
-}
 
-body.dark-mode #statsModal button[style*="color: white"] {
-    color: #ffffff !important;
-}
 
 /* ============ EK DARK MODE OVERRIDE'LAR - İSTATİSTİKLER PANELİ ============ */
 
 /* #2c3e50 (dark blue-gray) renkli text'ler için */
-body.dark-mode #statsModal *[style*="color: #2c3e50"],
-body.dark-mode #statsModal div[style*="color: #2c3e50"],
-body.dark-mode #statsModal span[style*="color: #2c3e50"],
-body.dark-mode #statsModal strong[style*="color: #2c3e50"] {
-    color: #e5e7eb !important;
-}
 
 /* #856404 (dark brown) renkli text'ler için */
-body.dark-mode #statsModal *[style*="color: #856404"],
-body.dark-mode #statsModal div[style*="color: #856404"],
-body.dark-mode #statsModal span[style*="color: #856404"] {
-    color: #fbbf24 !important;
-}
 
 /* #999 (light gray) renkli text'ler için */
-body.dark-mode #statsModal *[style*="color: #999"],
-body.dark-mode #statsModal div[style*="color: #999"],
-body.dark-mode #statsModal span[style*="color: #999"],
-body.dark-mode #statsModal small[style*="color: #999"] {
-    color: #d1d5db !important;
-}
 
 /* Beyaz arka planlı kutular içindeki TÜM text'ler için genel override */
-body.dark-mode #statsModal div[style*="background: white"] *,
-body.dark-mode #statsModal div[style*="background: #fff"] * {
-    color: inherit !important;
-}
 
 /* Oyun Türü İstatistikleri section - beyaz kutular içindeki text'ler */
-body.dark-mode #statsModal div[style*="background: white"] span[style*="color: #333"],
-body.dark-mode #statsModal div[style*="background: #fff"] span[style*="color: #333"],
-body.dark-mode #statsModal div[style*="background: white"] div[style*="color: #333"],
-body.dark-mode #statsModal div[style*="background: #fff"] div[style*="color: #333"] {
-    color: #1f2937 !important;
-}
 
 /* Detaylı Analitik bölümü - #f8f9fa arka planlı kutular (genel metinler) */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] {
-    background: #111827 !important;
-}
 
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #333"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #666"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] span[style*="color: #999"] {
-    color: #e5e7eb !important;
-}
 
 /* Detaylı Analitik - Bugünkü Aktiflik: sayısal değerler ve açıklama */
-body.dark-mode #statsModal #analyticsTodayTime,
-body.dark-mode #statsModal #analyticsQuestionPerHour {
-    color: #f9fafb !important; /* Tam beyaz, koyu zeminde çok net */
-    font-weight: 700;
-}
 
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="font-size: 0.7em"] {
-    color: #d1d5db !important; /* Açık gri açıklama metni */
-}
 
 /* Öğrenme İpuçları kutusu */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] * {
-    color: #e5e7eb !important;
-}
 
-body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] div[style*="color: #856404"] {
-    color: #fbbf24 !important;
-}
 
-body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="border-left: 4px solid #f39c12"] div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Border-top ile ayrılan bölümler */
-body.dark-mode #statsModal div[style*="border-top: 2px solid #e0e0e0"] {
-    border-top-color: #4b5563 !important;
-}
 
 /* Hedef Tahmini bölümü - gradient içindeki text'ler */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] * {
-    color: #1f2937 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] span[style*="color: #666"] {
-    color: #374151 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffeaa7"][style*="#fdcb6e"] div[style*="color: #555"] {
-    color: #4b5563 !important;
-}
 
 /* Öğrenme Haritası gradient içindeki text'ler (dark mode'da daha aydınlık) */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"],
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #555"] {
-    color: #e5e7eb !important; /* Açık gri - koyu mavi/pembe zeminde okunaklı */
-}
 
 /* Liderlik tablosu - sarı gradient içindeki text'ler */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] * {
-    color: #1f2937 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #333"],
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #555"],
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#ffd700"][style*="#ffed4e"] div[style*="color: #8b4513"] {
-    color: #1f2937 !important;
-}
 
 /* Liderlik listesi - boş mesaj */
-body.dark-mode #statsModal #leaderboardList div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Liderlik tablosu notu */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"][style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Filtre butonları - aktif olmayanlar */
-body.dark-mode #statsModal button.filter-btn:not(.active) {
-    background: #4b5563 !important;
-    color: #e5e7eb !important;
-}
 
-body.dark-mode #statsModal button.filter-btn.active {
-    background: #2980b9 !important;
-    color: white !important;
-}
 
 /* Kelime İstatistikleri Listesi - boş mesaj */
-body.dark-mode #statsModal #wordStatsList div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Zaman Analizi bölümü içindeki text'ler */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Kelime Performans Özeti içindeki text'ler */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Genel text override - tüm inline color'lar için fallback */
-body.dark-mode #statsModal [style*="color"] {
-    /* Bu genel bir kural, ama daha spesifik kurallar üstün gelecek */
-}
 
 /* Small tag'ler için */
-body.dark-mode #statsModal small[style*="color: #666"],
-body.dark-mode #statsModal small[style*="color: #999"] {
-    color: #d1d5db !important;
-}
 
 /* Code tag'ler için */
-body.dark-mode #statsModal code {
-    background: #374151 !important;
-    color: #fbbf24 !important;
-    padding: 2px 4px;
-    border-radius: 4px;
-}
 
 /* Liderlik tablosu - dinamik oluşturulan liste öğeleri için */
-body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] {
-    background: #1f2937 !important;
-    border-color: #4b5563 !important;
-}
 
-body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"][style*="#667eea"] {
-    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%) !important;
-    border-color: #667eea !important;
-}
 
 /* Kelime istatistikleri listesi için genel kurallar */
-body.dark-mode #statsModal #wordStatsList div[style*="background: white"],
-body.dark-mode #statsModal #wordStatsList div[style*="background: #fff"] {
-    background: #2d3748 !important;
-    border-color: #4b5563 !important;
-}
 
-body.dark-mode #statsModal #wordStatsList div[style*="color: #333"],
-body.dark-mode #statsModal #wordStatsList div[style*="color: #666"],
-body.dark-mode #statsModal #wordStatsList div[style*="color: #555"] {
-    color: #e5e7eb !important;
-}
 
 /* Kelime istatistikleri - tekrar nedeni mesajları */
-body.dark-mode #statsModal #wordStatsList div[style*="background: #ffe6e6"] {
-    background: #3a1f1f !important;
-    border-color: #e74c3c !important;
-}
 
-body.dark-mode #statsModal #wordStatsList div[style*="background: #ffe6e6"] div[style*="color: #e74c3c"] {
-    color: #fca5a5 !important;
-}
 
 /* #aaa renkli text'ler için */
-body.dark-mode #statsModal *[style*="color: #aaa"],
-body.dark-mode #statsModal div[style*="color: #aaa"],
-body.dark-mode #statsModal span[style*="color: #aaa"] {
-    color: #9ca3af !important;
-}
 
 /* Mertebe sistemi section - gradient içindeki beyaz kutular */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="background: white"] {
-    background: #2d3748 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="color: #888"],
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#f0f8ff"][style*="#e6f3ff"] div[style*="color: #aaa"] {
-    color: #d1d5db !important;
-}
 
 /* Yıldız sistemi section - gradient içindeki beyaz kutular */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="background: white"] {
-    background: #2d3748 !important;
-}
 
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="color: #555"],
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#fff9e6"][style*="#ffe6f0"] div[style*="color: #666"] {
-    color: #d1d5db !important;
-}
 
 /* Hasene Info Modal için dark mode (eğer varsa) */
-body.dark-mode #xpInfoModal .stats-content {
-    background: #1a1a1a !important;
-    color: #e5e7eb !important;
-}
 
 /* Liderlik tablosu - dinamik oluşturulan liste öğeleri için detaylı kurallar */
-body.dark-mode #statsModal #leaderboardList > div[style*="display: flex"] {
-    /* Dinamik oluşturulan liderlik öğeleri için */
-}
 
-body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] span,
-body.dark-mode #statsModal #leaderboardList > div[style*="background: #f8f9fa"] div {
-    color: #1f2937 !important;
-}
 
-body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"] span,
-body.dark-mode #statsModal #leaderboardList > div[style*="background: linear-gradient"] div {
-    color: white !important;
-}
 
 /* ============ ANALİTİK BÖLÜMÜ - ÖZEL RENK DÜZENLEMELERİ ============ */
 
 /* analyticsAvgSuccess - yeşil renk dark mode'da daha açık olmalı */
-body.dark-mode #statsModal #analyticsAvgSuccess,
-body.dark-mode #statsModal div[id="analyticsAvgSuccess"][style*="color: #27ae60"] {
-    color: #34d399 !important; /* Daha açık yeşil */
-}
 
 /* analyticsHardestWord - kırmızı renk dark mode'da daha açık olmalı */
-body.dark-mode #statsModal #analyticsHardestWord,
-body.dark-mode #statsModal div[id="analyticsHardestWord"][style*="color: #e74c3c"] {
-    color: #f87171 !important; /* Daha açık kırmızı/pembe */
-}
 
 /* Öğrenme Haritası bölümü - strong tag'leri dark mode'da daha açık olmalı */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
-    color: #f9fafb !important; /* Başlık kısımları için daha parlak beyaz */
-}
 
 /* Öğrenme Haritası bölümü - yeşil nokta ve text */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #27ae60"] {
-    color: #10b981 !important; /* Daha açık yeşil */
-}
 
 /* Öğrenme Haritası bölümü - turuncu nokta ve text */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #f39c12"] {
-    color: #fbbf24 !important; /* Daha açık turuncu/sarı */
-}
 
 /* Öğrenme Haritası bölümü - sayısal değerler (0 vb.) dark mode'da Koyu metin */
-body.dark-mode #statsModal #analyticsLearnedCount,
-body.dark-mode #statsModal #analyticsPracticeCount,
-body.dark-mode #statsModal #analyticsStrugglingCount {
-    color: #111827 !important; /* Koyu lacivert, açık gradientte net görünür */
-    font-weight: 700 !important;
-}
 
 /* Öğrenme Haritası bölümü - kırmızı nokta ve text */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] span[style*="color: #e74c3c"] {
-    color: #f87171 !important; /* Daha açık kırmızı/pembe */
-}
 
 /* Kelime Performans Özeti bölümü - yeşil başarı oranı */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsAvgSuccess"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsAvgSuccess"][style*="color: #27ae60"] {
-    color: #34d399 !important; /* Daha açık yeşil */
-}
 
 /* Kelime Performans Özeti bölümü - kırmızı zor kelime */
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsHardestWord"],
-body.dark-mode #statsModal div[style*="background: #f8f9fa"] div[id="analyticsHardestWord"][style*="color: #e74c3c"] {
-    color: #f87171 !important; /* Daha açık kırmızı/pembe */
-}
 
 /* Genel olarak #27ae60 renkli tüm elementler için dark mode */
-body.dark-mode #statsModal *[style*="color: #27ae60"],
-body.dark-mode #statsModal div[style*="color: #27ae60"],
-body.dark-mode #statsModal span[style*="color: #27ae60"],
-body.dark-mode #statsModal strong[style*="color: #27ae60"] {
-    color: #34d399 !important; /* Daha açık yeşil */
-}
 
 /* Genel olarak #e74c3c renkli tüm elementler için dark mode */
-body.dark-mode #statsModal *[style*="color: #e74c3c"],
-body.dark-mode #statsModal div[style*="color: #e74c3c"],
-body.dark-mode #statsModal span[style*="color: #e74c3c"],
-body.dark-mode #statsModal strong[style*="color: #e74c3c"] {
-    color: #f87171 !important; /* Daha açık kırmızı/pembe */
-}
 
 /* Öğrenme Haritası bölümündeki tüm text'ler için genel override */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] {
-    /* Gradient zaten dark mode için ayarlanmış */
-}
 
 /* Öğrenme Haritası bölümü - tüm strong tag'leri için */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div strong,
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] strong {
-    color: #1f2937 !important; /* Koyu ama gradient arka planda okunabilir */
-    font-weight: 700 !important;
-}
 
 /* Öğrenme Haritası bölümü - başlık için */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] div[style*="color: #333"] {
-    color: #1f2937 !important;
-}
 
 /* Öğrenme Haritası bölümü - genel text için (0 kelime dahil) */
-body.dark-mode #statsModal div[style*="linear-gradient"][style*="#a8edea"][style*="#fed6e3"] > div[style*="font-size: 0.85em"] {
-    color: #e5e7eb !important; /* Satırların tamamı açık gri */
-}
 
 /* Satır içindeki özel renkli noktalar korunur (yeşil/turuncu/kırmızı) – üstte tanımlı */
 
 /* ===== DARK MODE - ONBOARDING MODAL ===== */
-body.dark-mode #onboardingModal .onboarding-modal {
-    background: rgba(26, 26, 26, 0.98) !important;
-}
 
-body.dark-mode #onboardingModal .modal-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #onboardingModal h2 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #onboardingModal p {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #onboardingModal button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: #ffffff !important;
-}
 
 /* ===== DARK MODE - GAME OVER MODAL ===== */
-body.dark-mode #gameOverModal {
-    background: rgba(26, 26, 26, 0.95) !important;
-}
 
-body.dark-mode #gameOverModal .modal-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #gameOverModal h3 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #gameOverModal button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-    color: #ffffff !important;
-}
 
 /* ===== DARK MODE - GENEL MODAL ===== */
-body.dark-mode #modal {
-    background: rgba(26, 26, 26, 0.95) !important;
-}
 
-body.dark-mode #modal .modal-content {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #modal h3,
-body.dark-mode #modal h2 {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode #modal p {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .custom-confirm-title {
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .custom-confirm-message {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode .custom-confirm-btn {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-    color: #e0e0e0 !important;
-}
 
-body.dark-mode .custom-confirm-btn:hover {
-    background: #333 !important;
-}
 
-body.dark-mode .custom-confirm-btn.confirm {
-    background: linear-gradient(135deg, #4db300 0%, #58cc02 100%) !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .custom-confirm-btn.cancel {
-    background: linear-gradient(135deg, #d32f2f 0%, #e74c3c 100%) !important;
-    color: #ffffff !important;
-}
 
 /* ===== DARK MODE - CALENDAR MODAL ===== */
-/* Only apply dark mode when body has .dark-mode class */
-body.dark-mode .calendar-content {
-    background: #1e1e1e !important;
-    color: #ffffff !important;
-}
 
-body.dark-mode .calendar-content::-webkit-scrollbar-track {
-    background: #2a2a2a;
-}
 
-body.dark-mode .calendar-content::-webkit-scrollbar-thumb {
-    background: #4db300;
-}
 
-body.dark-mode .calendar-content::-webkit-scrollbar-thumb:hover {
-    background: #58cc02;
-}
 
 .modal-btn {
     width:100%;
@@ -4394,72 +3039,18 @@ body.dark-mode .calendar-content::-webkit-scrollbar-thumb:hover {
 }
 
 /* ===== DARK MODE - CALENDAR MODAL SPECIFIC ELEMENTS ===== */
-body.dark-mode #calendarModal .calendar-content {
-    background: #1e1e1e !important;
-}
 
-body.dark-mode #calendarModal > .modal-content > div:first-child > h3 {
-    color: #58cc02 !important;
-}
 
-body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] {
-    background: linear-gradient(135deg, #4db300 0%, #3a9000 100%) !important;
-    box-shadow: 0 4px 12px rgba(77, 179, 0, 0.4) !important;
-}
 
-body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] h3,
-body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #58cc02"] > div {
-    color: white !important;
-    opacity: 1 !important;
-}
 
-body.dark-mode #calendarMonth {
-    color: #e0e0e0 !important;
-    border-bottom-color: #444 !important;
-}
 
-body.dark-mode #weeklyStreakDisplay {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-}
 
-body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #fff"] {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-}
 
-body.dark-mode #calendarScrollableContent > div[style*="background: linear-gradient(135deg, #f7f7f7"] {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-}
 
-body.dark-mode #calendarGrid > div[style*="color: #999"] {
-    color: #b0b0b0 !important;
-}
 
-body.dark-mode #calendarGrid > div[style*="background: #58cc02"],
-body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #58cc02"] {
-    background: #4db300 !important;
-}
 
-body.dark-mode #calendarGrid > div[style*="background: #e5e5e5"],
-body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5e5e5"] {
-    background: #2a2a2a !important;
-    border-color: #2a2a2a !important;
-    color: #666 !important;
-}
 
-body.dark-mode #calendarGrid > div[style*="background: #f7f7f7"] {
-    background: #1a1a1a !important;
-    border-color: #1a1a1a !important;
-    color: #555 !important;
-}
 
-body.dark-mode #calendarGrid > div[style*="background: #e5f4e3"],
-body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e3"] {
-    background: #1e3a1e !important;
-    border-color: #58cc02 !important;
-}
 
 /* ----- RESPONSIVE ----- */
 @media(max-width:480px){
@@ -4834,12 +3425,6 @@ body.dark-mode #weeklyStreakDisplay > div > div > div[style*="background: #e5f4e
 }
 
 /* Dark mode - Ayet, Dua, Hadis mode containers */
-body.dark-mode .ayet-mode,
-body.dark-mode .dua-mode,
-body.dark-mode .hadis-mode {
-    background: #1a1a2e !important;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6) !important;
-}
 
 /* Card container styles */
 .ayet-card,
@@ -4858,13 +3443,6 @@ body.dark-mode .hadis-mode {
 }
 
 /* Dark mode - Ayet, Dua, Hadis card containers */
-body.dark-mode .ayet-card,
-body.dark-mode .dua-card,
-body.dark-mode .hadis-card {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(102, 126, 234, 0.2);
-}
 
 /* Sure/Ayet info styles */
 .sure-info {
@@ -4880,10 +3458,6 @@ body.dark-mode .hadis-card {
 }
 
 /* Dark mode - Sure info */
-body.dark-mode .sure-info {
-    color: #D4A574 !important;
-    background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.08)) !important;
-}
 
 /* Arabic text styles - responsive */
 .arabic {
@@ -4920,10 +3494,6 @@ body.dark-mode .sure-info {
 }
 
 /* Dark mode - Translation text (Ayet Oku ve Dua Et modları) */
-body.dark-mode .translation {
-    color: #e0e0e0 !important;
-    background: rgba(45, 45, 60, 0.8) !important;
-}
 
 /* Audio button - centered and larger */
 .ayet-card .audio-btn,
@@ -5093,9 +3663,6 @@ body.dark-mode .translation {
     transition: background 0.3s ease;
 }
 
-body.dark-mode .game-screen {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-}
 
 /* Modern Game Header - Yeni Tasarım */
 .game-screen .duolingo-header {
@@ -5185,9 +3752,6 @@ body.dark-mode .game-screen {
     transition: background 0.3s ease;
 }
 
-body.dark-mode .game-screen .duolingo-question-area {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-}
 
 .game-screen .duolingo-question-number {
     position: absolute;
@@ -5202,10 +3766,6 @@ body.dark-mode .game-screen .duolingo-question-area {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-body.dark-mode .game-screen .duolingo-question-number {
-    background: rgba(102, 126, 234, 0.2) !important;
-    color: #ffffff !important;
-}
 
 /* Ayet, Dua, Hadis modları için soru sayısı gösterimi */
 .ayet-mode .duolingo-question-number,
@@ -5366,10 +3926,6 @@ body.dark-mode .game-screen .duolingo-question-number {
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-body.dark-mode .game-screen .duolingo-stats-bar {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    border-top-color: rgba(102, 126, 234, 0.3) !important;
-}
 
 .game-screen .duolingo-stat-item {
     text-align: center;
@@ -5472,9 +4028,6 @@ body.dark-mode .game-screen .duolingo-stats-bar {
     transition: background 0.3s ease;
 }
 
-body.dark-mode .dinle-mode {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-}
 
 /* Dinle Mode için Duolingo Tarzı Stiller */
 .dinle-mode .duolingo-header {
@@ -5677,10 +4230,6 @@ body.dark-mode .dinle-mode {
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-body.dark-mode .dinle-mode .duolingo-stats-bar {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    border-top-color: rgba(102, 126, 234, 0.3) !important;
-}
 
 .dinle-mode .duolingo-stat-item {
     text-align: center;
@@ -5756,9 +4305,6 @@ body.dark-mode .dinle-mode .duolingo-stats-bar {
     transition: background 0.3s ease;
 }
 
-body.dark-mode .bosluk-mode {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
-}
 
 /* Boşluk Mode için Duolingo Tarzı Stiller */
 .bosluk-mode .duolingo-header {
@@ -5833,9 +4379,6 @@ body.dark-mode .bosluk-mode {
     position: relative;
 }
 
-body.dark-mode .bosluk-mode .duolingo-question-area {
-    background: transparent !important;
-}
 
 .bosluk-mode .duolingo-question-number {
     position: absolute;
@@ -5981,10 +4524,6 @@ body.dark-mode .bosluk-mode .duolingo-question-area {
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-body.dark-mode .bosluk-mode .duolingo-stats-bar {
-    background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-    border-top-color: rgba(102, 126, 234, 0.3) !important;
-}
 
 .bosluk-mode .duolingo-stat-item {
     text-align: center;
@@ -7814,22 +6353,9 @@ body.dark-mode .bosluk-mode .duolingo-stats-bar {
     box-shadow: 0 18px 45px rgba(0,0,0,0.18);
 }
 
-body.dark-mode #onboardingModal .onboarding-content {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
-    color: #e5e7eb !important;
-}
 
-body.dark-mode #onboardingModal #onboardingTitle {
-    color: #f9fafb !important;
-}
 
-body.dark-mode #onboardingModal #onboardingDescription {
-    color: #d1d5db !important;
-}
 
-body.dark-mode #onboardingModal #onboardingStepIndicator {
-    color: #9ca3af !important;
-}
 
 /* ===========================
    PREMIUM TOP STATS PANEL
@@ -8645,47 +7171,14 @@ body.dark-mode #onboardingModal #onboardingStepIndicator {
 }
 
 /* Dark Mode Support */
-body.dark-mode .game-tutorial-container {
-    background: #1e1e1e;
-    color: #ffffff;
-}
 
-body.dark-mode .tutorial-title,
-body.dark-mode .tutorial-slide-title {
-    color: #ffffff;
-}
 
-body.dark-mode .tutorial-slide-description {
-    color: #b0b0b0;
-}
 
-body.dark-mode .tutorial-close-btn {
-    background: #333;
-    color: #b0b0b0;
-}
 
-body.dark-mode .tutorial-close-btn:hover {
-    background: #444;
-}
 
-body.dark-mode .tutorial-prev-btn,
-body.dark-mode .tutorial-skip-btn {
-    background: #333;
-    color: #b0b0b0;
-}
 
-body.dark-mode .tutorial-prev-btn:hover,
-body.dark-mode .tutorial-skip-btn:hover {
-    background: #444;
-}
 
-body.dark-mode .tutorial-progress {
-    background: #333;
-}
 
-body.dark-mode .tutorial-buttons {
-    border-top-color: #333;
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -9956,25 +8449,10 @@ body.dark-mode .tutorial-buttons {
 }
 
 /* Dark Mode Support */
-body.dark-mode .in-app-notification {
-    background: #1e1e1e;
-}
 
-body.dark-mode .in-app-notification-title {
-    color: #ffffff;
-}
 
-body.dark-mode .in-app-notification-body {
-    color: #b0b0b0;
-}
 
-body.dark-mode .in-app-notification-close {
-    color: #b0b0b0;
-}
 
-body.dark-mode .in-app-notification-close:hover {
-    color: #ffffff;
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -10201,46 +8679,15 @@ body.dark-mode .in-app-notification-close:hover {
 }
 
 /* Dark Mode Support */
-body.dark-mode .leaderboard-container {
-    background: #1e1e1e;
-}
 
-body.dark-mode .leaderboard-title,
-body.dark-mode .leaderboard-period {
-    color: #ffffff;
-}
 
-body.dark-mode .leaderboard-score {
-    color: #b0b0b0;
-}
 
-body.dark-mode .leaderboard-item {
-    background: #2a2a2a;
-}
 
-body.dark-mode .leaderboard-item:hover {
-    background: #333;
-}
 
-body.dark-mode .leaderboard-item.current {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-}
 
-body.dark-mode .leaderboard-tabs {
-    border-bottom-color: #333;
-}
 
-body.dark-mode .leaderboard-tab {
-    color: #b0b0b0;
-}
 
-body.dark-mode .leaderboard-tab.active {
-    color: #667eea;
-}
 
-body.dark-mode .leaderboard-footer {
-    border-top-color: #333;
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -10675,30 +9122,11 @@ body.dark-mode .leaderboard-footer {
 }
 
 /* Dark Mode Support */
-body.dark-mode .detailed-stats-container {
-    background: #1e1e1e;
-}
 
-body.dark-mode .detailed-stats-title,
-body.dark-mode .stats-section-title {
-    color: #ffffff;
-}
 
-body.dark-mode .stats-card {
-    background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
-}
 
-body.dark-mode .stats-card-label {
-    color: #b0b0b0;
-}
 
-body.dark-mode .trend-chart {
-    background: #2a2a2a;
-}
 
-body.dark-mode .trend-label {
-    color: #b0b0b0;
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
