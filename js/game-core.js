@@ -2662,32 +2662,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // OYUN MODLARI
     gameModes: {
         klasik: {
-            name: '📚 Klasik',
-            description: 'Normal oyun modu',
+            name: '📚 Klasik Mod',
+            description: 'Rahatça öğren • 10 soru • Süre yok • İpucu var',
             questionsPerLevel: 10,
             timeLimit: 0,  // 0 = süre yok
             lives: 0,      // 0 = sınırsız can
             showHint: true
         },
         hizli: {
-            name: '⚡ Hızlı',
-            description: '30 saniye süre',
+            name: '⚡ Hızlı Mod',
+            description: 'Hızlı düşün • 15 soru • 30 saniye/soru • Zorlu',
             questionsPerLevel: 15,
             timeLimit: 30,
             lives: 0,
             showHint: false
         },
         hayat: {
-            name: '❤️ 3 Can',
-            description: '3 hak, yanlış = -1 can',
+            name: '❤️ 3 Can Modu',
+            description: 'Dikkatli oyna • 20 soru • 3 can hakkın var • İpucu var',
             questionsPerLevel: 20,
             timeLimit: 0,
             lives: 3,
             showHint: true
         },
         zorluk: {
-            name: '🔥 Zorluk',
-            description: 'Sadece zor kelimeler',
+            name: '🔥 Zorluk Modu',
+            description: 'Sadece zor kelimeler • 10 soru • 20 saniye/soru • 3 can',
             questionsPerLevel: 10,
             timeLimit: 20,
             lives: 3,
@@ -2695,8 +2695,8 @@ document.addEventListener('DOMContentLoaded', function() {
             minDifficulty: 7  // 7-10 arası zorluk
         },
         tekrar: {
-            name: '🔄 Tekrar Et',
-            description: 'Zorlandığın kelimeleri tekrar et',
+            name: '🔄 Tekrar Modu',
+            description: 'Zorlandığın kelimeleri pekiştir • 15 soru • Süre yok • İpucu var',
             questionsPerLevel: 15,
             timeLimit: 0,
             lives: 0,
@@ -4027,6 +4027,25 @@ function resetAllStats() {
     sessionCorrect = 0;
     sessionWrong = 0;
     comboCount = 0;
+    
+    // =========================================
+    // 🔥 GERİYE UYUMLULUK DEĞİŞKENLERİ (ESKİ SİSTEM)
+    // =========================================
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    questionCount = 0;
+    lives = 0;
+    
+    // =========================================
+    // 🔥 TIMER DEĞİŞKENLERİ SIFIRLA
+    // =========================================
+    if (timer) {
+        clearInterval(timer);
+        clearTimeout(timer);
+    }
+    timer = null;
+    timeLeft = 0;
 
     // Rozetleri sıfırla
     badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
@@ -4418,6 +4437,55 @@ keysToRemove.forEach(key => {
 });
     } catch(e) {
 log.error('localStorage temizleme hatası:', e);
+    }
+
+    // =========================================
+    // 🔥 KULLANICI TERCİHLERİ VE AYARLAR SIFIRLA
+    // =========================================
+    try {
+        // Favoriler sıfırla
+        localStorage.removeItem('hasene_favorites');
+        if (typeof window !== 'undefined' && window.favoriteWords) {
+            window.favoriteWords = [];
+        }
+        
+        // Onboarding durumu sıfırla (tekrar gösterilsin)
+        localStorage.removeItem('hasSeenOnboarding');
+        
+        // PWA install durumu sıfırla
+        localStorage.removeItem('pwaInstallShown');
+        localStorage.removeItem('pwaInstalled');
+        
+        // Dark mode sıfırla (varsayılan tema)
+        localStorage.removeItem('darkMode');
+        // Dark mode class'ını kaldır
+        if (document.body) {
+            document.body.classList.remove('dark-mode');
+        }
+        
+        // Ses ayarları sıfırla
+        localStorage.removeItem('soundSettings');
+        
+        // IndexedDB cache temizle (json_cache store)
+        if (db) {
+            try {
+                const cacheTransaction = db.transaction(['json_cache'], 'readwrite');
+                const cacheStore = cacheTransaction.objectStore('json_cache');
+                cacheStore.clear();
+                log.debug('🗑️ IndexedDB json_cache temizlendi');
+            } catch(e) {
+                log.error('IndexedDB json_cache temizleme hatası:', e);
+            }
+        }
+        
+        // clearAllCache fonksiyonu varsa çağır
+        if (typeof clearAllCache === 'function') {
+            clearAllCache();
+        }
+        
+        log.debug('✅ Kullanıcı tercihleri ve ayarlar sıfırlandı');
+    } catch(e) {
+        log.error('Kullanıcı tercihleri sıfırlama hatası:', e);
     }
 
     showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");
@@ -6017,7 +6085,7 @@ function handleStatsModalClick(event) {
 }
 
 function confirmResetStats() {
-    const confirmed = confirm('🚨 DİKKAT!\n\nTüm ders verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm nişanlar (silinir)\n• Tüm muvaffakiyetler (sıfırlanır)\n• Muvaffakiyet terakki barları (0%\'a döner)\n• Mertebe nişanları (Mütebahhir, Mütecaviz, Müterakki, Mübtedi - sıfırlanır)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük vazifeler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• İstatistikler paneli tüm alanları (sıfırlanır)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK VİRD XP (0\'a döner)\n• Muvaffakiyetler modal istatistikleri (sıfırlanır)\n• Takvim modal streak bilgisi (sıfırlanır)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
+    const confirmed = confirm('🚨 DİKKAT!\n\nTüm ders verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm nişanlar (silinir)\n• Tüm muvaffakiyetler (sıfırlanır)\n• Muvaffakiyet terakki barları (0%\'a döner)\n• Mertebe nişanları (Mütebahhir, Mütecaviz, Müterakki, Mübtedi - sıfırlanır)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük vazifeler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• İstatistikler paneli tüm alanları (sıfırlanır)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK VİRD XP (0\'a döner)\n• Muvaffakiyetler modal istatistikleri (sıfırlanır)\n• Takvim modal streak bilgisi (sıfırlanır)\n• Favoriler (silinir)\n• Onboarding durumu (tekrar gösterilir)\n• PWA install durumu (sıfırlanır)\n• Dark mode ayarı (varsayılan temaya döner)\n• Ses ayarları (varsayılan ayarlara döner)\n• IndexedDB cache verileri (temizlenir)\n• Timer ve oyun değişkenleri (sıfırlanır)\n• Liderlik tablosu verileri (sıfırlanır)\n• Detaylı istatistikler (90 günlük veriler dahil sıfırlanır)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
     
     if (confirmed) {
         // İkinci onay
@@ -9579,7 +9647,12 @@ function initModeSelector() {
         const btn = document.createElement('button');
         btn.className = 'mode-btn';
         if (modeKey === currentMode) btn.classList.add('active');
-        btn.innerHTML = `<strong>${mode.name}</strong><small>${mode.description}</small>`;
+        btn.innerHTML = `
+            <div class="mode-btn-content">
+                <div class="mode-btn-title">${mode.name}</div>
+                <div class="mode-btn-desc">${mode.description}</div>
+            </div>
+        `;
         btn.onclick = () => selectMode(modeKey);
         elements.modeButtons.appendChild(btn);
     });
