@@ -1255,7 +1255,7 @@ function addDailyXP(xp) {
     const currentXP = parseInt(storage.get('dailyHasene', '0')) || 0;
     const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
     const goalXP = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-    const newXP = currentXP + xp;
+    const newXP = Math.max(0, currentXP + xp); // Negatif değerlere izin verme
     
     storage.set('dailyHasene', newXP.toString());
     
@@ -9998,12 +9998,29 @@ function checkAnswer(button, isCorrect) {
         
         const wrongPenalty = window.CONSTANTS?.POINTS?.WRONG_PENALTY || CONFIG.wrongAnswerPenalty || 5; // Fallback: 5
         log.game(`💸 Puan cezası uygulanıyor: ${wrongPenalty} puan`);
-        log.game(`📊 Eski sessionScore: ${sessionScore}`);
+        log.game(`📊 Eski sessionScore: ${sessionScore}, totalPoints: ${totalPoints}`);
         // Puan cezası - sessionScore'dan düş (UI'da görünür olması için)
         sessionScore = Math.max(0, sessionScore - wrongPenalty);
         // Geriye uyumluluk için eski score değişkenini de güncelle
         score = sessionScore;
-        log.game(`📊 Yeni sessionScore: ${sessionScore}`);
+        
+        // Puan cezası - totalPoints'ten de düş (kalıcı puan)
+        totalPoints = Math.max(0, totalPoints - wrongPenalty);
+        
+        // Puan cezası - dailyHasene'den de düş (günlük hedef)
+        addDailyXP(-wrongPenalty);
+        
+        // Puan cezası - dailyTasks.todayStats.toplamPuan'dan düş
+        if (dailyTasks && dailyTasks.todayStats) {
+            dailyTasks.todayStats.toplamPuan = Math.max(0, (dailyTasks.todayStats.toplamPuan || 0) - wrongPenalty);
+        }
+        
+        log.game(`📊 Yeni sessionScore: ${sessionScore}, totalPoints: ${totalPoints}`);
+        
+        // UI güncelle
+        updateUI();
+        updateStatsBar();
+        debouncedSaveStats();
         
         // Can kaybı
         if (mode.lives > 0) {
@@ -10221,6 +10238,14 @@ if (elements.hintBtn) {
             const hintPenalty = 10;
             sessionScore = Math.max(0, sessionScore - hintPenalty);
             totalPoints = Math.max(0, totalPoints - hintPenalty);
+            
+            // İpucu maliyeti - dailyHasene'den de düş (günlük hedef)
+            addDailyXP(-hintPenalty);
+            
+            // İpucu maliyeti - dailyTasks.todayStats.toplamPuan'dan düş
+            if (dailyTasks && dailyTasks.todayStats) {
+                dailyTasks.todayStats.toplamPuan = Math.max(0, (dailyTasks.todayStats.toplamPuan || 0) - hintPenalty);
+            }
             
             log.game(`💡 İpucu kullanıldı! -${hintPenalty} Hasene`);
             log.game(`📊 Yeni puanlar: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
