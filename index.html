@@ -234,24 +234,11 @@
                         </div>
                     </div>
 
-                    <!-- Quick Info Buttons -->
-                    <div class="quick-info-minimal">
-                        <button id="xpInfoBtn" class="info-btn-minimal" aria-label="Hasene puan sistemi hakkında bilgi göster" role="button">
-                            <span aria-hidden="true">📿</span> Hasene Bilgi
-                        </button>
-                        <button onclick="showStatsModal()" class="info-btn-minimal" aria-label="İstatistikler modalını aç" role="button">
-                            <span aria-hidden="true">📊</span> İstatistikler
-                        </button>
-                        <button onclick="showLeaderboard('weekly')" class="info-btn-minimal" aria-label="Liderlik tablosunu aç" role="button">
-                            <span aria-hidden="true">🏆</span> Liderlik
-                        </button>
-                    </div>
                 </div>
             </div>
 
             <!-- Zorluk Seçici - Kompakt -->
             <div class="difficulty-section difficulty-minimal" role="group" aria-label="Zorluk seviyesi seçimi">
-                <div class="difficulty-title-minimal">Zorluk Mertebesi</div>
                 <div class="difficulty-buttons difficulty-buttons-minimal" role="radiogroup" aria-label="Zorluk seviyesi">
                     <button class="diff-btn kolay diff-btn-minimal" id="mainDiffKolay" aria-label="Kolay zorluk seviyesini seç" role="radio" aria-checked="false"><span aria-hidden="true">🌱</span> Kolay</button>
                     <button class="diff-btn orta active diff-btn-minimal" id="mainDiffOrta" aria-label="Orta zorluk seviyesini seç" role="radio" aria-checked="true"><span aria-hidden="true">⚖️</span> Orta</button>
@@ -261,7 +248,6 @@
 
             <!-- Ders Türleri - Modern Grid -->
             <div class="games-section">
-                <div class="section-title">📚 Ders Türleri</div>
                 <div class="games-grid">
 
                     <button class="game-card" id="kelimeCevirBtn" aria-label="Kelime Çevir oyununu başlat - Arapça kelimelerin Türkçe Meâl karşılığını bul" role="button" tabindex="0">
@@ -353,11 +339,8 @@
 
         <!-- Ayet Okuma Modu -->
         <div class="ayet-mode" id="ayetMode" style="display: none;">
-            <!-- Modern Header -->
-            <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromAyetBtn">←</button>
-            </div>
             <div class="ayet-card">
+                <button class="duolingo-back-btn" id="backFromAyetBtn" style="position: absolute; top: 10px; left: 10px; z-index: 10;">←</button>
                 <div class="sure-info" id="ayetSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="ayetArabic">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
                 <div class="translation" id="ayetTranslation">Yükleniyor...</div>
@@ -371,11 +354,8 @@
 
         <!-- Dua Modu -->
         <div class="dua-mode" id="duaMode" style="display: none;">
-            <!-- Modern Header -->
-            <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromDuaBtn">←</button>
-            </div>
             <div class="dua-card">
+                <button class="duolingo-back-btn" id="backFromDuaBtn" style="position: absolute; top: 10px; left: 10px; z-index: 10;">←</button>
                 <div class="sure-info" id="duaSureInfo">Yükleniyor...</div>
                 <div class="arabic" id="duaArabic">Arapça Metin</div>
                 <div class="translation" id="duaTranslation">Anlamı</div>
@@ -389,11 +369,8 @@
 
         <!-- Hadis Oku Modu -->
         <div class="hadis-mode" id="hadisMode" style="display: none;">
-            <!-- Modern Header -->
-            <div class="duolingo-header">
-                <button class="duolingo-back-btn" id="backFromHadisBtn">←</button>
-            </div>
             <div class="hadis-card">
+                <button class="duolingo-back-btn" id="backFromHadisBtn" style="position: absolute; top: 10px; left: 10px; z-index: 10;">←</button>
                 <div class="hadis-category" id="hadisCategory">Kategori</div>
                 <div class="hadis-title" id="hadisTitle">Başlık</div>
                 <div class="hadis-header" id="hadisHeader">Ravi</div>
@@ -435,12 +412,12 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromBoslukBtn">←</button>
-                <div class="score-display" id="boslukHeaderScore" style="margin-left: auto;">⭐ 0</div>
+                <div class="duolingo-question-number" id="boslukQuestionNumber">Sual 1 / 10</div>
+                <div class="score-display" id="boslukHeaderScore">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
-                <div class="duolingo-question-number" id="boslukQuestionNumber">Sual 1 / 10</div>
                 <div class="arabic" id="boslukAyetText" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(24px, 5vw, 36px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.8;">Ayet metni yükleniyor...</div>
                 <div class="duolingo-question-hint" id="boslukQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Eksik kelimeyi seç</div>
                 <div class="sure-info" id="boslukSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
@@ -483,12 +460,12 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromDinleBtn">←</button>
-                <div class="score-display" id="dinleHeaderScore" style="margin-left: auto;">⭐ 0</div>
+                <div class="duolingo-question-number" id="dinleQuestionNumber">Sual 1 / 10</div>
+                <div class="score-display" id="dinleHeaderScore">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
-                <div class="duolingo-question-number" id="dinleQuestionNumber">Sual 1 / 10</div>
                 <div class="duolingo-question-hint" id="dinleQuestionHint" style="color: #999; font-size: 13px; margin-top: 10px; font-style: italic;">Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç</div>
                 <div class="sure-info" id="dinleSureInfo" style="font-size: 12px; color: #999; margin-top: 8px; display: none;">ID: 0</div>
                 
@@ -534,12 +511,12 @@
             <!-- Modern Header -->
             <div class="duolingo-header">
                 <button class="duolingo-back-btn" id="backFromGameBtn">←</button>
-                <div class="score-display" id="headerScore" style="margin-left: auto;">⭐ 0</div>
+                <div class="duolingo-question-number" id="duolingoQuestionNumber">Sual 1 / 10</div>
+                <div class="score-display" id="headerScore">⭐ 0</div>
             </div>
 
             <!-- Modern Question Area -->
             <div class="duolingo-question-area">
-                <div class="duolingo-question-number" id="duolingoQuestionNumber">Sual 1 / 10</div>
                 <div class="arabic-text arabic-large" id="arabicWord" style="color: #1a1a1a; margin: 20px 0; font-size: clamp(28px, 6vw, 42px); text-align: center; word-break: break-word; overflow-wrap: break-word; max-width: 100%; box-sizing: border-box; direction: rtl; line-height: 1.6;">
                     فَكُبْكِبُوا۟
                 </div>
@@ -1025,13 +1002,16 @@
 
     <!-- İstatistikler Modal -->
     <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)" role="dialog" aria-modal="true" aria-labelledby="statsModalTitle" aria-label="İstatistikler modalı">
-        <div class="modal-content stats-content" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 16px; touch-action: pan-y; box-sizing: border-box;">
+        <div class="modal-content stats-content" onclick="event.stopPropagation();" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 16px; touch-action: pan-y; box-sizing: border-box;">
             <!-- Başlık ve Kapat Butonu -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0;">
                 <h3 style="margin: 0; font-size: 1.1em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button id="detailedStatsBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 10;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Detaylı İstatistikler">
                         📈 Detaylı
+                    </button>
+                    <button id="haseneInfoBtn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 10;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Hasene Bilgi">
+                        📿 Hasene Bilgi
                     </button>
                     <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
                 </div>
@@ -1040,6 +1020,8 @@
             <!-- Scroll Edilebilir İçerik -->
             <div id="statsScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
                 
+                <!-- İstatistikler İçeriği -->
+                <div id="statsTabContent">
                 <!-- Mertebe Terakki Barı - Modern -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
                 <h3 style="font-size: 14px; margin-bottom: 12px; opacity: 0.9; font-weight: 600;">📈 Mertebe Terakkisi</h3>
@@ -1386,6 +1368,150 @@
                 </div>
             </div>
             <!-- Liderlik Tablosu Bölümü Sonu -->
+                </div>
+                <!-- İstatistikler Sekmesi Sonu -->
+
+                <!-- Hasene Bilgi Sekmesi -->
+                <div id="haseneInfoTabContent" style="display: none;">
+                    <!-- Özet Bilgi - Modern Tasarım -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
+                        <div style="font-size: 12px; margin-bottom: 6px; opacity: 0.9; font-weight: 500;">⏱️ Hızlı çalışarak</div>
+                        <div style="font-size: 14px; font-weight: 600; opacity: 0.95;">1 Saat Amel = ~8,500 Hasene</div>
+                    </div>
+                    
+                    <!-- Yıldız Sistemi - Modern Tasarım -->
+                    <div style="background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%); padding: 14px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid #ffc107; box-shadow: 0 2px 8px rgba(255,193,7,0.2);">
+                        <h4 style="margin: 0 0 10px 0; color: #f59e0b; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 1.1em;">⭐</span> Yıldız Sistemi
+                        </h4>
+                        <div style="font-size: 12px; color: #555; line-height: 1.6;">
+                            <div style="background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <strong style="color: #f59e0b; font-size: 14px;">100 Hasene = 1 Yıldız</strong>
+                            </div>
+                            <div style="color: #666; font-size: 11px; font-weight: 500;">
+                                Her sahih cevabın mükâfatı. Sürekli ilerleme görürsün! 📈
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mertebe Sistemi - Modern Tasarım -->
+                    <div style="background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); padding: 14px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.2);">
+                        <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 1.1em;">🏆</span> Mertebe Sistemi
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                            <div style="background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 1.5em; margin-bottom: 4px;">🥉</div>
+                                <div style="font-weight: 700; color: #cd7f32; margin-bottom: 4px; font-size: 12px;">2,000 Hasene</div>
+                                <div style="font-size: 11px; color: #888; font-weight: 500;">Mübtedi</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">~15 dk</div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 1.5em; margin-bottom: 4px;">🥈</div>
+                                <div style="font-weight: 700; color: #c0c0c0; margin-bottom: 4px; font-size: 12px;">8,500 Hasene</div>
+                                <div style="font-size: 11px; color: #888; font-weight: 500;">Müterakki</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">~1 saat</div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 1.5em; margin-bottom: 4px;">🥇</div>
+                                <div style="font-weight: 700; color: #ffd700; margin-bottom: 4px; font-size: 12px;">25,500 Hasene</div>
+                                <div style="font-size: 11px; color: #888; font-weight: 500;">Mütecaviz</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">~3 gün</div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                <div style="font-size: 1.5em; margin-bottom: 4px;">💎</div>
+                                <div style="font-weight: 700; color: #00d9ff; margin-bottom: 4px; font-size: 12px;">85,000 Hasene</div>
+                                <div style="font-size: 11px; color: #888; font-weight: 500;">Mütebahhir</div>
+                                <div style="font-size: 10px; color: #aaa; margin-top: 2px;">~10 gün</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bonuslar - Modern Tasarım -->
+                    <div style="background: linear-gradient(135deg, #fff7e6 0%, #ffe6d9 100%); padding: 14px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid #f97316; box-shadow: 0 2px 8px rgba(249,115,22,0.2);">
+                        <h4 style="margin: 0 0 10px 0; color: #f97316; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 1.1em;">🎁</span> İhsan Sistemleri
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="font-weight: 700; color: #f97316; margin-bottom: 4px; font-size: 13px;">🔥 Silsile Bonusu</div>
+                                <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                    <strong>Her 3 sahih cevap = +5 Hasene bonus!</strong><br>
+                                    <span style="color: #888; font-size: 10px;">Tevali yap, ilave mükâfat kazan!</span>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="font-weight: 700; color: #3b82f6; margin-bottom: 4px; font-size: 13px;">🎯 Günlük Vird Bonusu</div>
+                                <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                    Günlük virdini tamamla:<br>
+                                    <strong style="color: #3b82f6; font-size: 13px;">+1,000 Hasene Müjdesi!</strong>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="font-weight: 700; color: #d97706; margin-bottom: 4px; font-size: 13px;">📋 Günlük Görevler</div>
+                                <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                    Tüm günlük görevleri tamamla:<br>
+                                    <strong style="color: #d97706; font-size: 13px;">+2,500 Hasene İhsan!</strong>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="font-weight: 700; color: #8b5cf6; margin-bottom: 4px; font-size: 13px;">📅 Haftalık Görevler</div>
+                                <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                    Tüm haftalık görevleri tamamla:<br>
+                                    <strong style="color: #8b5cf6; font-size: 13px;">+5,000 Hasene İhsan!</strong>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s;" onmouseover="this.style.transform='translateX(2px)'" onmouseout="this.style.transform='translateX(0)'">
+                                <div style="font-weight: 700; color: #f59e0b; margin-bottom: 4px; font-size: 13px;">⭐ Perfect Lesson Bonusu</div>
+                                <div style="font-size: 11px; color: #555; line-height: 1.5; font-weight: 500;">
+                                    Tüm soruları doğru cevapla:<br>
+                                    <strong style="color: #f59e0b; font-size: 13px;">+%50 Ekstra Hasene Bonusu!</strong><br>
+                                    <span style="color: #888; font-size: 10px;">Kelime Çevir, Dinle Bul, Boşluk Doldur</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Oyun Modlarına Göre Puan - Modern Tasarım -->
+                    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 14px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid #667eea; box-shadow: 0 2px 8px rgba(102,126,234,0.2);">
+                        <h4 style="margin: 0 0 10px 0; color: #667eea; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 1.1em;">📚</span> Ders Türlerine Göre Puan
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.85em;">
+                            <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <div style="font-weight: 700; color: #667eea; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                                    <span>🔤</span> Kelime Çevir
+                                </div>
+                                <div style="color: #555; line-height: 1.5; font-size: 11px;">
+                                    <strong>Kelime Zorluğu × 2 Hasene</strong><br>
+                                    <span style="font-size: 10px; color: #888;">Kolay: 10-18 | Orta: 20-22 | Zor: 24-42</span>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <div style="font-weight: 700; color: #667eea; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                                    <span>🎵</span> Dinle ve Bul
+                                </div>
+                                <div style="color: #555; line-height: 1.5; font-size: 11px;">
+                                    <strong>Kelime Zorluğu × 2 Hasene</strong>
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <div style="font-weight: 700; color: #667eea; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                                    <span>📝</span> Boşluk Doldur
+                                </div>
+                                <div style="color: #555; line-height: 1.5; font-size: 11px;">
+                                    <strong>Sabit 10 Hasene</strong>
+                                </div>
+                            </div>
+                            <div style="background: #fff3cd; padding: 8px; border-radius: 8px; margin-top: 6px; border-left: 3px solid #ffc107;">
+                                <div style="font-size: 10px; color: #856404; line-height: 1.4;">
+                                    <strong>ℹ️ Not:</strong> 📖 Ayet Oku, 🤲 Dua Öğren, 📚 Hadis Oku modlarında puan kazanılmaz (sadece günlük görev ilerlemesi)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hasene Bilgi Sekmesi Sonu -->
             
             </div>
             <!-- Scroll Edilebilir İçerik Sonu -->

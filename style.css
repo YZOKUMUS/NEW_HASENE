@@ -1091,6 +1091,67 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
+    /* Body ve HTML - Kenar boşluklarını kaldır */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    html {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Ana Menü - Ekran kenarlarına tam otur */
+    .main-menu {
+        padding: 0 !important;
+        padding-bottom: 100px !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100vw !important;
+        min-width: 100vw !important;
+    }
+    
+    /* Ana Menü Container - ekran genişliğine tam otur */
+    #mainMenu {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-bottom: 100px !important;
+    }
+    
+    /* Hero Section - Ekran kenarlarına tam otur */
+    .hero-section-minimal {
+        padding: 12px 16px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
+    /* Games Section - Ekran kenarlarına tam otur */
+    .games-section {
+        padding: 0 16px !important;
+        margin: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
+    /* Difficulty Section - Ekran kenarlarına tam otur */
+    .difficulty-section {
+        padding: 12px 16px !important;
+        margin: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
+    /* Tüm ana ekran container'ları - ekran genişliğine tam otur */
+    #mainMenu > * {
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+    
     /* Ana Sayfa - Mobil */
     .hero-section {
         padding: 20px 16px !important;
@@ -1146,7 +1207,7 @@ body {
     }
     
     .games-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
     }
     
@@ -3199,16 +3260,20 @@ body {
     .ayet-mode,
     .dua-mode,
     .hadis-mode {
-        margin: 70px auto 80px auto !important;
-        padding: 12px !important;
-        padding-bottom: 85px !important; /* Alt nav bar için boşluk (mobilde 70px) */
-        min-height: calc(100vh - 150px) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        padding-bottom: 90px !important; /* Alt nav bar için boşluk */
+        min-height: 100vh !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
     }
     
     .ayet-card,
     .dua-card,
     .hadis-card {
-        padding: 15px !important;
+        padding: 50px 16px 20px 16px !important;
+        border-radius: 0 !important;
+        min-height: 100vh !important;
         gap: 12px !important;
         max-height: calc(100vh - 220px) !important;
     }
@@ -3412,16 +3477,17 @@ body {
 .ayet-mode,
 .dua-mode,
 .hadis-mode {
-    max-width: 600px;
-    margin: 75px auto 90px auto;
+    max-width: 100%;
+    margin: 0;
     background: #fff;
-    border-radius: 20px;
-    padding: 15px;
+    border-radius: 0;
+    padding: 0;
     padding-bottom: 90px; /* Alt nav bar için boşluk */
-    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-    min-height: calc(100vh - 200px);
+    box-shadow: none;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100vw;
 }
 
 /* Dark mode - Ayet, Dua, Hadis mode containers */
@@ -3431,15 +3497,18 @@ body {
 .dua-card,
 .hadis-card {
     background: #fff;
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    border-radius: 0;
+    padding: 60px 20px 20px 20px;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     gap: 15px;
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 250px);
+    min-height: 100vh;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Dark mode - Ayet, Dua, Hadis card containers */
@@ -3665,9 +3734,25 @@ body {
 
 
 /* Modern Game Header - Yeni Tasarım */
+/* Genel Duolingo Header - Tüm oyun ekranları için */
+.duolingo-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 10px 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+    min-height: 50px;
+}
+
 .game-screen .duolingo-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -3676,15 +3761,49 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+    min-height: 50px;
+}
+
+/* Genel Duolingo Back Button - Tüm oyun ekranları için */
+.duolingo-back-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Ayet, Dua, Hadis modları için geri butonu - beyaz arka plan üzerinde */
+.ayet-mode .duolingo-back-btn,
+.dua-mode .duolingo-back-btn,
+.hadis-mode .duolingo-back-btn {
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.ayet-mode .duolingo-back-btn:hover,
+.dua-mode .duolingo-back-btn:hover,
+.hadis-mode .duolingo-back-btn:hover {
+    background: rgba(102, 126, 234, 1);
+    transform: scale(1.05);
 }
 
 .game-screen .duolingo-back-btn {
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     font-size: 20px;
     cursor: pointer;
     transition: all 0.3s;
@@ -3727,12 +3846,25 @@ body {
     transition: width 0.3s ease;
 }
 
+/* Genel Score Display - Tüm oyun ekranları için */
+.score-display {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-self: end;
+}
+
 .game-screen .score-display {
     background: rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     color: white;
 }
 
@@ -3753,17 +3885,29 @@ body {
 }
 
 
-.game-screen .duolingo-question-number {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: #f0f0f0;
+/* Question Number - Header içinde ortalanmış */
+.duolingo-question-number {
+    background: rgba(255,255,255,0.2);
     padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 600;
-    color: #666;
+    color: white;
+    text-align: center;
+    justify-self: center;
     transition: background 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+.game-screen .duolingo-question-number {
+    background: rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    justify-self: center;
 }
 
 
@@ -4032,7 +4176,7 @@ body {
 /* Dinle Mode için Duolingo Tarzı Stiller */
 .dinle-mode .duolingo-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -4041,15 +4185,16 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+    min-height: 50px;
 }
 
 .dinle-mode .duolingo-back-btn {
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     font-size: 20px;
     cursor: pointer;
     transition: all 0.3s;
@@ -4065,10 +4210,10 @@ body {
 
 .dinle-mode .score-display {
     background: rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     color: white;
 }
 
@@ -4103,16 +4248,15 @@ body {
 }
 
 .dinle-mode .duolingo-question-number {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: #f0f0f0;
+    background: rgba(255,255,255,0.2);
     padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 600;
-    color: #666;
-    margin-bottom: 0;
+    color: white;
+    text-align: center;
+    justify-self: center;
+    white-space: nowrap;
 }
 
 .dinle-mode .duolingo-question-hint {
@@ -4309,7 +4453,7 @@ body {
 /* Boşluk Mode için Duolingo Tarzı Stiller */
 .bosluk-mode .duolingo-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    padding: 10px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -4318,15 +4462,16 @@ body {
     top: 0;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(102,126,234,0.3);
+    min-height: 50px;
 }
 
 .bosluk-mode .duolingo-back-btn {
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     font-size: 20px;
     cursor: pointer;
     transition: all 0.3s;
@@ -4342,10 +4487,10 @@ body {
 
 .bosluk-mode .score-display {
     background: rgba(255,255,255,0.2);
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 10px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     color: white;
 }
 
@@ -4381,16 +4526,15 @@ body {
 
 
 .bosluk-mode .duolingo-question-number {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: #f0f0f0;
+    background: rgba(255,255,255,0.2);
     padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
+    border-radius: 10px;
+    font-size: 12px;
     font-weight: 600;
-    color: #666;
-    margin-bottom: 0;
+    color: white;
+    text-align: center;
+    justify-self: center;
+    white-space: nowrap;
 }
 
 .bosluk-mode .duolingo-question-hint {
@@ -9363,6 +9507,16 @@ body {
 /* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    max-width: 100vw; /* Prevent overflow */
+}
+
+/* Prevent horizontal overflow on all elements */
+body, .container, .main-menu, .hero-section, .hero-section-minimal,
+.games-section, .modal-content, .games-grid {
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* Reduced motion preference */
