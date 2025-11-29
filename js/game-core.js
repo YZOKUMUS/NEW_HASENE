@@ -8337,10 +8337,155 @@ function showStatsModal2() {
             switchStats2Tab('detailed');
         }
         
-        // İstatistikleri güncelle (mevcut showStatsModal fonksiyonundaki gibi)
-        if (typeof updateStatsDisplay === 'function') {
-            updateStatsDisplay();
-        }
+        // İstatistikleri güncelle - showStatsModal içindeki mantığı kullan
+        // İçerik kopyalandıktan sonra, aynı ID'ler olduğu için aynı güncelleme mantığı çalışacak
+        requestAnimationFrame(() => {
+            // dailyTasks değerlerini localStorage'dan tekrar yükle (güncel değerler için)
+            try {
+                const savedTasks = localStorage.getItem('hasene_dailyTasks');
+                if (savedTasks) {
+                    const parsedTasks = JSON.parse(savedTasks);
+                    if (parsedTasks && parsedTasks.todayStats) {
+                        dailyTasks.todayStats = {
+                            ...dailyTasks.todayStats,
+                            ...parsedTasks.todayStats
+                        };
+                        if (parsedTasks.todayStats.farklıZorluk) {
+                            dailyTasks.todayStats.farklıZorluk = new Set(parsedTasks.todayStats.farklıZorluk || []);
+                        }
+                    }
+                }
+            } catch (e) {
+                log.error('❌ dailyTasks yükleme hatası:', e);
+            }
+            
+            // Seviye, rozet, streak ve diğer istatistikleri güncelle
+            // (showStatsModal içindeki mantığı burada da kullan)
+            const currentLevelStart = level === 1 ? 0 : (level <= 10 ? [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000][level - 1] : 58000 + ((level - 11) * 15000));
+            const nextLevelStart = level === 1 ? 1000 : (level <= 10 ? ([0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000][level] || (58000 + ((level - 10) * 15000))) : 58000 + ((level - 10) * 15000));
+            const nextLevel = level + 1;
+            const currentLevelPoints = totalPoints - currentLevelStart;
+            const levelRequiredPoints = nextLevelStart - currentLevelStart;
+            const progressPercentage = levelRequiredPoints > 0 ? Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100)) : 100;
+            const pointsNeeded = Math.max(0, nextLevelStart - totalPoints);
+            
+            // Seviye bilgilerini güncelle
+            const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
+            const statsNextLevelEl = document.getElementById('statsNextLevel');
+            const statsLevelProgressEl = document.getElementById('statsLevelProgress');
+            const statsLevelPointsNeededEl = document.getElementById('statsLevelPointsNeeded');
+            if (statsCurrentLevelEl) statsCurrentLevelEl.textContent = level;
+            if (statsNextLevelEl) statsNextLevelEl.textContent = nextLevel;
+            if (statsLevelProgressEl) {
+                statsLevelProgressEl.style.width = progressPercentage + '%';
+                statsLevelProgressEl.setAttribute('aria-valuenow', Math.round(progressPercentage));
+            }
+            if (statsLevelPointsNeededEl) statsLevelPointsNeededEl.textContent = pointsNeeded.toLocaleString();
+            
+            // Rozet sayılarını güncelle
+            if (!badges) badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
+            const statsBronzeEl = document.getElementById('statsBronze');
+            const statsSilverEl = document.getElementById('statsSilver');
+            const statsGoldEl = document.getElementById('statsGold');
+            const statsDiamondEl = document.getElementById('statsDiamond');
+            if (statsBronzeEl) statsBronzeEl.textContent = badges.bronze || 0;
+            if (statsSilverEl) statsSilverEl.textContent = badges.silver || 0;
+            if (statsGoldEl) statsGoldEl.textContent = badges.gold || 0;
+            if (statsDiamondEl) statsDiamondEl.textContent = badges.diamond || 0;
+            
+            // dailyTasks ve streakData kontrolü
+            if (!dailyTasks || !dailyTasks.todayStats) {
+                if (!dailyTasks) dailyTasks = {};
+                if (!dailyTasks.todayStats) {
+                    dailyTasks.todayStats = {
+                        kelimeCevir: 0, dinleBul: 0, boslukDoldur: 0,
+                        ayetOku: 0, duaOgre: 0, hadisOku: 0,
+                        toplamDogru: 0, toplamYanlis: 0, toplamPuan: 0,
+                        perfectStreak: 0, farklıZorluk: new Set()
+                    };
+                }
+            }
+            if (!streakData) {
+                streakData = {
+                    currentStreak: 0, bestStreak: 0, totalPlayDays: 0,
+                    todayProgress: 0, dailyGoal: 5
+                };
+            }
+            
+            // Başarı analizi
+            const totalAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
+            const successRate = totalAttempts > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalAttempts) * 100) : 0;
+            const avgPointsPerDay = streakData.totalPlayDays > 0 ? Math.round(totalPoints / streakData.totalPlayDays) : totalPoints;
+            const playConsistency = typeof getDaysFromFirstPlay === 'function' 
+                ? Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100)
+                : 0;
+            const levelProgressPercent = Math.round(progressPercentage);
+            
+            const statsSuccessRateEl = document.getElementById('statsSuccessRate');
+            const statsAvgPointsPerDayEl = document.getElementById('statsAvgPointsPerDay');
+            const statsPlayConsistencyEl = document.getElementById('statsPlayConsistency');
+            const statsLevelProgressTextEl = document.getElementById('statsLevelProgressText');
+            if (statsSuccessRateEl) statsSuccessRateEl.textContent = successRate + '%';
+            if (statsAvgPointsPerDayEl) statsAvgPointsPerDayEl.textContent = avgPointsPerDay.toLocaleString();
+            if (statsPlayConsistencyEl) statsPlayConsistencyEl.textContent = Math.min(100, playConsistency) + '%';
+            if (statsLevelProgressTextEl) statsLevelProgressTextEl.textContent = levelProgressPercent + '%';
+            
+            // Streak bilgilerini güncelle
+            const statsCurrentStreakEl = document.getElementById('statsCurrentStreak');
+            const statsBestStreakEl = document.getElementById('statsBestStreak');
+            const statsTotalDaysEl = document.getElementById('statsTotalDays');
+            const statsTodayProgressEl = document.getElementById('statsTodayProgress');
+            if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak || 0;
+            if (statsBestStreakEl) statsBestStreakEl.textContent = streakData.bestStreak || 0;
+            if (statsTotalDaysEl) statsTotalDaysEl.textContent = streakData.totalPlayDays || 0;
+            if (statsTodayProgressEl) {
+                const todayProgress = streakData.todayProgress || 0;
+                const dailyGoal = streakData.dailyGoal || 5;
+                statsTodayProgressEl.textContent = Math.min(todayProgress, dailyGoal) + '/' + dailyGoal;
+            }
+            
+            // Bugünkü oyun türü istatistikleri
+            const statsKelimeCevirEl = document.getElementById('statsKelimeCevir');
+            const statsDinleBulEl = document.getElementById('statsDinleBul');
+            const statsBoslukDoldurEl = document.getElementById('statsBoslukDoldur');
+            const statsAyetOkuEl = document.getElementById('statsAyetOku');
+            const statsDuaOgreEl = document.getElementById('statsDuaOgre');
+            const statsHadisOkuEl = document.getElementById('statsHadisOku');
+            if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = dailyTasks.todayStats.kelimeCevir || 0;
+            if (statsDinleBulEl) statsDinleBulEl.textContent = dailyTasks.todayStats.dinleBul || 0;
+            if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = dailyTasks.todayStats.boslukDoldur || 0;
+            if (statsAyetOkuEl) statsAyetOkuEl.textContent = dailyTasks.todayStats.ayetOku || 0;
+            if (statsDuaOgreEl) statsDuaOgreEl.textContent = dailyTasks.todayStats.duaOgre || 0;
+            if (statsHadisOkuEl) statsHadisOkuEl.textContent = dailyTasks.todayStats.hadisOku || 0;
+            
+            // Bugünkü performans
+            const statsTodayCorrectEl = document.getElementById('statsTodayCorrect');
+            const statsTodayPointsEl = document.getElementById('statsTodayPoints');
+            const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
+            const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
+            if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = dailyTasks.todayStats.toplamDogru || 0;
+            if (statsTodayPointsEl) statsTodayPointsEl.textContent = dailyTasks.todayStats.toplamPuan || 0;
+            if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak || 0;
+            if (statsDifficultyCountEl) {
+                const farkliZorluk = dailyTasks.todayStats.farklıZorluk;
+                if (farkliZorluk && typeof farkliZorluk.size === 'number') {
+                    statsDifficultyCountEl.textContent = farkliZorluk.size;
+                } else {
+                    statsDifficultyCountEl.textContent = 0;
+                }
+            }
+            
+            // Diğer istatistik güncellemeleri
+            if (typeof updateWordStatistics === 'function') {
+                updateWordStatistics();
+            }
+            if (typeof updateAnalyticsData === 'function') {
+                updateAnalyticsData();
+            }
+            if (typeof updateLeaderboard === 'function') {
+                updateLeaderboard();
+            }
+        });
         
         log.debug('📊 İstatistikler Modal 2 açıldı');
     });

@@ -2,21 +2,71 @@
 
 /**
  * Mini Onboarding / Tur Modülü
- * İlk açılışta ana ekranda 3 adımlı kısa bir rehber gösterir.
+ * İlk açılışta ana ekranda 6 oyun modu + puanlama sistemini tanıtan rehber gösterir.
  */
 
-const ONBOARDING_STORAGE_KEY = 'hasene_onboarding_seen_v1';
+const ONBOARDING_STORAGE_KEY = 'hasene_onboarding_seen_v2';
 
 const onboardingSteps = [
     {
-        id: 'games',
-        title: '📚 Ders Türleri',
+        id: 'kelime-cevir',
+        title: '🔄 Kelime Çevir',
         description:
-            'Buradan 3 ana oyuna ulaşabilirsin:\n\n' +
-            '• Kelime Çevir: Arapça kelimenin Türkçe meâlini bul\n' +
-            '• Dinle ve Bul: Kelimeyi dinle, sahih olanı seç\n' +
-            '• Boşluk Doldur: Ayetteki eksik kelimeyi tamamla',
-        highlightSelector: '.games-section',
+            'Arapça kelimelerin Türkçe meâl karşılığını bul!\n\n' +
+            '• Kuran\'da geçen Arapça kelimeler gösterilir\n' +
+            '• Doğru Türkçe meâli seçerek Hasene kazan\n' +
+            '• Kelime hazineni genişlet',
+        highlightSelector: '#kelimeCevirBtn',
+    },
+    {
+        id: 'dinle-bul',
+        title: '🎧 Dinle ve Bul',
+        description:
+            'Kelimeyi dinle, sahih olanı seç!\n\n' +
+            '• Arapça kelimeyi dinle\n' +
+            '• Doğru seçeneği bul\n' +
+            '• Telaffuzunu geliştir',
+        highlightSelector: '#dinleBulBtn',
+    },
+    {
+        id: 'bosluk-doldur',
+        title: '✏️ Boşluk Doldur',
+        description:
+            'Ayetteki eksik kelimeyi tamamla!\n\n' +
+            '• Ayet metninde boş bırakılan kelimeyi bul\n' +
+            '• Doğru kelimeyi seçerek tamamla\n' +
+            '• Ayetleri daha iyi öğren',
+        highlightSelector: '#boslukDoldurBtn',
+    },
+    {
+        id: 'dua-et',
+        title: '🤲 Dua Et',
+        description:
+            'Kuran\'da geçen duaları dinle ve öğren!\n\n' +
+            '• Kuran\'daki duaları dinle\n' +
+            '• Arapça metni ve meâlini öğren\n' +
+            '• Duaları ezberle ve istifade et',
+        highlightSelector: '#duaEtBtn',
+    },
+    {
+        id: 'ayet-oku',
+        title: '📖 Ayet Oku',
+        description:
+            'Ayetin Arapça\'sını oku, dinle ve meâli idrak et!\n\n' +
+            '• Kuran ayetlerini Arapça oku\n' +
+            '• Telaffuzunu dinle\n' +
+            '• Meâlini öğrenerek anlayışını derinleştir',
+        highlightSelector: '#ayetOkuBtn',
+    },
+    {
+        id: 'hadis-oku',
+        title: '📚 Hadis Oku',
+        description:
+            'Hadis-i şerifleri oku ve istifade et!\n\n' +
+            '• Hadis-i şerifleri oku\n' +
+            '• Anlamını öğren\n' +
+            '• Peygamber (s.a.v.) sözlerinden ilham al',
+        highlightSelector: '#hadisOkuBtn',
     },
     {
         id: 'hasene',
@@ -25,7 +75,8 @@ const onboardingSteps = [
             'Üst taraftaki bölümde Hasene, Yıldız ve Mertebeni takip edebilirsin.\n\n' +
             '• Her sahih cevap Hasene kazandırır\n' +
             '• 100 Hasene = 1 ⭐ Yıldız\n' +
-            '• Hasene biriktikçe merteben yükselir',
+            '• Hasene biriktikçe merteben yükselir\n' +
+            '• Bonus ve combo ile daha fazla kazan',
         highlightSelector: '.premium-stats-panel, .stats-row-minimal',
     },
     {
@@ -34,7 +85,8 @@ const onboardingSteps = [
         description:
             'Alt menüden Takvim ve Vazifeler ekranlarına gidebilirsin:\n\n' +
             '• Takvim: Günlük serini ve oynadığın günleri gör\n' +
-            '• Vazifeler: Günlük ve haftalık görevlerini takip et',
+            '• Vazifeler: Günlük ve haftalık görevlerini takip et\n' +
+            '• Görevleri tamamlayarak ekstra Hasene kazan',
         highlightSelector: '#bottomNavBar',
     },
 ];

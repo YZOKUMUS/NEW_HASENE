@@ -4064,7 +4064,7 @@ body {
 .game-screen .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 15px 30px;
+    padding: 6px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -4076,23 +4076,26 @@ body {
 }
 
 .game-screen .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     color: #667eea;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    line-height: 1.2;
 }
 
 .game-screen .duolingo-stat-label {
-    font-size: 11px;
+    font-size: 9px;
     color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
 }
 
 .game-screen .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    line-height: 1.2;
 }
 
 .game-screen .duolingo-stat-value.hasene {
@@ -4108,11 +4111,12 @@ body {
 }
 
 .game-screen .duolingo-stat-label {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
 }
 
 /* Animasyonlar */
@@ -4368,7 +4372,7 @@ body {
 .dinle-mode .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 16px 20px;
+    padding: 6px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -4380,9 +4384,10 @@ body {
 }
 
 .dinle-mode .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    line-height: 1.2;
 }
 
 .dinle-mode .duolingo-stat-value.hasene {
@@ -4398,11 +4403,12 @@ body {
 }
 
 .dinle-mode .duolingo-stat-label {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
 }
 
 .dinle-mode .duolingo-question-area {
@@ -4662,7 +4668,7 @@ body {
 .bosluk-mode .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 16px 20px;
+    padding: 6px 20px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -4674,9 +4680,10 @@ body {
 }
 
 .bosluk-mode .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
+    line-height: 1.2;
 }
 
 .bosluk-mode .duolingo-stat-value.hasene {
@@ -4692,11 +4699,12 @@ body {
 }
 
 .bosluk-mode .duolingo-stat-label {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
 }
 
 .bosluk-mode .duolingo-question-area {
