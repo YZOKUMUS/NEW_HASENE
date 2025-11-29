@@ -4584,6 +4584,12 @@ function addSessionPoints(points) {
     // Bugünkü toplam doğru cevap sayısını güncelle
     dailyTasks.todayStats.toplamDogru++;
     
+    // Haftalık görevleri güncelle (totalHasene ve totalCorrect için)
+    if (typeof updateWeeklyTaskProgress === 'function') {
+        updateWeeklyTaskProgress('totalHasene', points);
+        updateWeeklyTaskProgress('totalCorrect', 1);
+    }
+    
     // Daily correct sayısını storage'a kaydet (detaylı istatistikler için)
     const currentDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
     storage.set('dailyCorrect', (currentDailyCorrect + 1).toString());
@@ -4621,6 +4627,12 @@ function addSessionPoints(points) {
         
         // COMBO BONUSUNU DAILY XP'YE DE EKLE
         addDailyXP(comboBonus);
+        
+        // Haftalık görevleri güncelle (combo bonusu için)
+        if (typeof updateWeeklyTaskProgress === 'function') {
+            updateWeeklyTaskProgress('totalHasene', comboBonus);
+            updateWeeklyTaskProgress('comboCount', 1);
+        }
         
         // COMBO BONUSUNU LİDERLİK TABLOSUNA DA EKLE
         if (typeof updateLeaderboardScores === 'function' && comboBonus > 0) {
