@@ -8157,8 +8157,9 @@ function claimWeeklyRewards() {
         // Bugünkü toplam puana da ekle (istatistikler için)
         dailyTasks.todayStats.toplamPuan += bonusXP;
         
-        // Daily XP'ye de ekle
-        addDailyXP(bonusXP);
+        // NOT: Bonus hasene günlük vird'e (dailyHasene) eklenmez
+        // Çünkü vird hedefi "aktif oyun oynama" ölçütüdür, bonuslar ise "başarı ödülü"
+        // Haftalık görev ödülü de günlük görev ödülü gibi başarı ödülüdür, oyun oynama değil
         
         // Haftalık görev ödülünü liderlik tablosuna da ekle
         if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
@@ -8167,6 +8168,9 @@ function claimWeeklyRewards() {
         }
         
         weeklyTasks.rewardsClaimed = true;
+        
+        // Stats bar'ı güncelle (anında görünmesi için)
+        updateStatsBar();
         debouncedSaveStats();
         
         // Başarı mesajı göster
@@ -8234,6 +8238,131 @@ window.closeDailyTasksModal = closeDailyTasksModal;
 window.claimDailyRewards = claimDailyRewards;
 window.claimWeeklyRewards = claimWeeklyRewards;
 window.switchTasksTab = switchTasksTab;
+
+// İstatistikler Modal 2 - Sekme Değiştirme Fonksiyonu (Vazifeler Panelindeki Mantıkla Aynı)
+function switchStats2Tab(tab) {
+    const detailedTabBtn = document.getElementById('detailedStats2TabBtn');
+    const haseneTabBtn = document.getElementById('haseneInfo2TabBtn');
+    const detailedTab = document.getElementById('detailedStats2Tab');
+    const haseneTab = document.getElementById('haseneInfo2Tab');
+    
+    if (tab === 'detailed') {
+        // Detaylı sekmesi aktif
+        if (detailedTabBtn) {
+            detailedTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            detailedTabBtn.style.color = 'white';
+            detailedTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+        }
+        if (haseneTabBtn) {
+            haseneTabBtn.style.background = '#f3f4f6';
+            haseneTabBtn.style.color = '#6b7280';
+            haseneTabBtn.style.boxShadow = 'none';
+        }
+        if (detailedTab) detailedTab.style.display = 'block';
+        if (haseneTab) haseneTab.style.display = 'none';
+    } else {
+        // Hasene Bilgi sekmesi aktif
+        if (detailedTabBtn) {
+            detailedTabBtn.style.background = '#f3f4f6';
+            detailedTabBtn.style.color = '#6b7280';
+            detailedTabBtn.style.boxShadow = 'none';
+        }
+        if (haseneTabBtn) {
+            haseneTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            haseneTabBtn.style.color = 'white';
+            haseneTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
+        }
+        if (detailedTab) detailedTab.style.display = 'none';
+        if (haseneTab) haseneTab.style.display = 'block';
+    }
+}
+
+// İstatistikler Modal 2 - Açma Fonksiyonu
+function showStatsModal2() {
+    // Önce tüm modalları ve oyun ekranlarını kapat
+    closeAllModals();
+    if (typeof hideAllGameScreens === 'function') {
+        hideAllGameScreens();
+    }
+    if (typeof hideAllModes === 'function') {
+        hideAllModes();
+    }
+    
+    // Synchronization: Wait for DOM updates before opening new modal
+    requestAnimationFrame(() => {
+        // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
+        if (typeof hideBottomNavBar === 'function') {
+            hideBottomNavBar();
+        }
+        
+        // Body scroll'u engelle
+        document.body.style.overflow = 'hidden';
+        
+        // Modal'ı göster
+        const modal = document.getElementById('statsModal2');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.style.zIndex = '10000';
+            // Force reflow to ensure modal is visible
+            modal.offsetHeight;
+        }
+        
+        // Mevcut statsTabContent ve haseneInfoTabContent içeriklerini yeni modala kopyala
+        const oldDetailedContent = document.getElementById('statsTabContent');
+        const oldHaseneContent = document.getElementById('haseneInfoTabContent');
+        const newDetailedContent = document.getElementById('detailedStats2Content');
+        const newHaseneContent = document.getElementById('haseneInfo2Content');
+        
+        if (oldDetailedContent && newDetailedContent) {
+            newDetailedContent.innerHTML = oldDetailedContent.innerHTML;
+        }
+        if (oldHaseneContent && newHaseneContent) {
+            newHaseneContent.innerHTML = oldHaseneContent.innerHTML;
+        }
+        
+        // Varsayılan olarak Detaylı sekmesini aktif et
+        if (typeof switchStats2Tab === 'function') {
+            switchStats2Tab('detailed');
+        }
+        
+        // İstatistikleri güncelle (mevcut showStatsModal fonksiyonundaki gibi)
+        if (typeof updateStatsDisplay === 'function') {
+            updateStatsDisplay();
+        }
+        
+        log.debug('📊 İstatistikler Modal 2 açıldı');
+    });
+}
+
+// İstatistikler Modal 2 - Kapatma Fonksiyonu
+function closeStatsModal2() {
+    const modal = document.getElementById('statsModal2');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.style.zIndex = '';
+    }
+    // Body scroll'u tekrar aktif et
+    document.body.style.overflow = '';
+    
+    // Bottom nav bar'ı tekrar göster (modal kapandığında)
+    if (typeof showBottomNavBar === 'function') {
+        showBottomNavBar();
+    }
+}
+
+// İstatistikler Modal 2 - Click Handler
+function handleStatsModal2Click(event) {
+    const modal = document.getElementById('statsModal2');
+    if (modal && event.target === modal) {
+        closeStatsModal2();
+    }
+}
+
+// Global fonksiyonlar
+window.switchStats2Tab = switchStats2Tab;
+window.showStatsModal2 = showStatsModal2;
+window.closeStatsModal2 = closeStatsModal2;
+window.handleStatsModal2Click = handleStatsModal2Click;
 
 // OYUN BİTİŞ FONKSİYONU (Oyun bitince çağrılır)
 // NOT: Puanlar zaten addSessionPoints() ile eklendi, burada sadece kontrol yapıyoruz
@@ -8545,6 +8674,10 @@ elements.dinleBulBtn.onclick = async () => {
                         }, 500);
                         
                         log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
+                        
+                        // Stats bar'ı güncelle (anında görünmesi için)
+                        updateStatsBar();
+                        debouncedSaveStats();
                     }
                 }
                 // ============ PERFECT LESSON BONUS SONU ============
@@ -8641,6 +8774,10 @@ elements.dinleBulBtn.onclick = async () => {
                         }, 500);
                         
                         log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
+                        
+                        // Stats bar'ı güncelle (anında görünmesi için)
+                        updateStatsBar();
+                        debouncedSaveStats();
                     }
                 }
                 // ============ PERFECT LESSON BONUS SONU ============
@@ -8978,6 +9115,10 @@ elements.backFromGameBtn.onclick = async () => {
                         }, 500);
                         
                         forceLog(`⭐ PERFECT LESSON BONUS: +${perfectBonus} Hasene (Test Modu)`);
+                        
+                        // Stats bar'ı güncelle (anında görünmesi için)
+                        updateStatsBar();
+                        debouncedSaveStats();
                     }
                 }
                 // ============ PERFECT LESSON BONUS SONU ============
@@ -11693,6 +11834,10 @@ function loadBoslukQuestion() {
                 }, 500);
                 
                 log.game(`⭐ PERFECT LESSON BONUS (Boşluk Doldur): +${perfectBonus} Hasene`);
+                
+                // Stats bar'ı güncelle (anında görünmesi için)
+                updateStatsBar();
+                debouncedSaveStats();
             }
         }
         // ============ PERFECT LESSON BONUS SONU ============

@@ -306,9 +306,9 @@
                 <span class="nav-icon" aria-hidden="true">🏠</span>
                 <span class="nav-label">Ana Menü</span>
             </button>
-            <button class="nav-item" onclick="showStatsModal()" title="İstatistikler" aria-label="İstatistikler modalını aç" role="button" tabindex="0">
+            <button class="nav-item" onclick="showStatsModal2()" title="İstatistik ve Bilgilendirme" aria-label="İstatistik ve Bilgilendirme modalını aç" role="button" tabindex="0">
                 <span class="nav-icon" aria-hidden="true">📊</span>
-                <span class="nav-label">İstatistikler</span>
+                <span class="nav-label">İstatistik</span>
             </button>
             <button class="nav-item" onclick="showBadgesModal()" title="Muvaffakiyetler" aria-label="Muvaffakiyetler modalını aç" role="button" tabindex="0">
                 <span class="nav-icon" aria-hidden="true">🏆</span>
@@ -1518,6 +1518,73 @@
 
         </div>
     </div>
+
+    <!-- İstatistikler Modal 2 (Sekmeli) -->
+    <div class="modal" id="statsModal2" onclick="handleStatsModal2Click(event)" role="dialog" aria-modal="true" aria-labelledby="statsModal2Title" aria-label="İstatistikler 2 modalı">
+        <div class="modal-content daily-tasks-content" style="max-width: 500px; max-height: 95vh; height: auto; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
+            <!-- Scroll Edilebilir İçerik -->
+            <div id="stats2ScrollableContent" class="daily-tasks-content-scrollable" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
+                <!-- Header -->
+                <div class="daily-tasks-header" style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #f0f0f0;">
+                    <div class="daily-tasks-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95em; color: #1f2937;">
+                        <span>📊</span>
+                        <span>İstatistik ve Bilgilendirme</span>
+                    </div>
+                    <button class="daily-tasks-close-btn modal-close-btn" onclick="event.stopPropagation(); closeStatsModal2();" style="flex-shrink: 0; width: 32px; height: 32px; font-size: 18px;">×</button>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div style="display: flex; gap: 6px; margin: 12px 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">
+                    <button id="detailedStats2TabBtn" onclick="switchStats2Tab('detailed')" style="
+                        flex: 1;
+                        padding: 8px 12px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        font-size: 0.8em;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+                    ">
+                        📈 Detaylı
+                    </button>
+                    <button id="haseneInfo2TabBtn" onclick="switchStats2Tab('hasene')" style="
+                        flex: 1;
+                        padding: 8px 12px;
+                        background: #f3f4f6;
+                        color: #6b7280;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        font-size: 0.8em;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    ">
+                        📿 Hasene Bilgi
+                    </button>
+                </div>
+
+                <!-- Detaylı İstatistikler Tab -->
+                <div id="detailedStats2Tab" class="stats2-tab-content" style="padding: 0 16px;">
+                    <div id="detailedStats2Content">
+                        <!-- İçerik mevcut statsTabContent'ten kopyalanacak -->
+                    </div>
+                </div>
+
+                <!-- Hasene Bilgi Tab -->
+                <div id="haseneInfo2Tab" class="stats2-tab-content" style="display: none; padding: 0 16px;">
+                    <div id="haseneInfo2Content">
+                        <!-- İçerik mevcut haseneInfoTabContent'ten kopyalanacak -->
+                    </div>
+                </div>
+
+            </div>
+            <!-- Scroll Edilebilir İçerik Sonu -->
+        </div>
+    </div>
+    <!-- İstatistikler Modal 2 Sonu -->
 
     <!-- Daily Goal Settings Modal -->
     <div class="modal" id="dailyGoalModal" onclick="handleDailyGoalModalClick(event)" role="dialog" aria-modal="true" aria-labelledby="dailyGoalModalTitle" aria-label="Günlük vird ayarları modalı">
