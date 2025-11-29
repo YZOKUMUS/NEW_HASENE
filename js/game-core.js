@@ -5169,12 +5169,8 @@ function handleBadgesModalClick(event) {
 }
 
 function showXPInfoModal() {
-    const modal = document.getElementById('xpInfoModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        // Touch event'leri başlat
-        initXPInfoModalTouchEvents();
-    }
+    // Artık İstatistikler modalı içindeki Hasene Bilgi sekmesini kullan
+    showStatsModalWithTab('hasene');
 }
 
 function closeXPInfoModal() {
@@ -5531,6 +5527,12 @@ function showStatsModal() {
         
         // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
         updateLeaderboard();
+        
+        // Varsayılan olarak İstatistikler içeriğini göster
+        const statsTabContent = document.getElementById('statsTabContent');
+        const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
+        if (statsTabContent) statsTabContent.style.display = 'block';
+        if (haseneInfoTabContent) haseneInfoTabContent.style.display = 'none';
         
         log.debug('📊 İstatistikler modalı açıldı');
     });
@@ -5956,6 +5958,19 @@ function handleStatsModalClick(event) {
         return;
     }
     
+    // Hasene Bilgi butonuna tıklanırsa modalı kapatma
+    if (target && (
+        target.id === 'haseneInfoBtn' ||
+        target.closest('#haseneInfoBtn')
+    )) {
+        return;
+    }
+    
+    // Herhangi bir butona tıklanırsa modalı kapatma
+    if (target && (target.tagName === 'BUTTON' || target.closest('button'))) {
+        return;
+    }
+    
     // Filtre butonlarına tıklanırsa paneli kapatma
     if (target && (
         target.id === 'filterAll' || 
@@ -5983,7 +5998,10 @@ function handleStatsModalClick(event) {
     }
     
     // Sadece modal overlay'e (arka plana) tıklanırsa kapat
-    closeStatsModal();
+    // Modal içeriğine tıklanırsa zaten return edildi, buraya gelmemeli
+    if (target && target.id === 'statsModal') {
+        closeStatsModal();
+    }
 }
 
 function confirmResetStats() {
@@ -6000,9 +6018,71 @@ function confirmResetStats() {
     }
 }
 
+// Hasene Bilgi içeriğini göster/gizle
+function toggleHaseneInfo(event) {
+    try {
+        // Event varsa propagation'ı durdur
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
+        const statsTabContent = document.getElementById('statsTabContent');
+        const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
+        const haseneInfoBtn = document.getElementById('haseneInfoBtn');
+        
+        if (!statsTabContent || !haseneInfoTabContent) {
+            console.warn('⚠️ toggleHaseneInfo: İçerik elementleri bulunamadı', {
+                statsTabContent: !!statsTabContent,
+                haseneInfoTabContent: !!haseneInfoTabContent
+            });
+            return false;
+        }
+        
+        // Computed style ile kontrol et (inline style yoksa)
+        const computedStyle = window.getComputedStyle(haseneInfoTabContent);
+        const isHaseneVisible = haseneInfoTabContent.style.display !== 'none' && 
+                                computedStyle.display !== 'none';
+        
+        if (isHaseneVisible) {
+            // Hasene Bilgi görünüyor, İstatistikler göster
+            statsTabContent.style.display = 'block';
+            haseneInfoTabContent.style.display = 'none';
+            if (haseneInfoBtn) {
+                haseneInfoBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            }
+        } else {
+            // İstatistikler görünüyor, Hasene Bilgi göster
+            statsTabContent.style.display = 'none';
+            haseneInfoTabContent.style.display = 'block';
+            if (haseneInfoBtn) {
+                haseneInfoBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }
+        }
+        
+        return false; // Event propagation'ı durdur
+    } catch (error) {
+        console.error('❌ toggleHaseneInfo hatası:', error);
+        return false;
+    }
+}
+
+// İstatistikler modalını belirtilen içerik ile aç (geriye dönük uyumluluk için)
+function showStatsModalWithTab(tabName) {
+    showStatsModal();
+    // Modal açılana kadar bekle
+    setTimeout(() => {
+        if (tabName === 'hasene') {
+            toggleHaseneInfo();
+        }
+    }, 100);
+}
+
 // Global fonksiyonlar (window'a ekle)
 window.showStatsModal = showStatsModal;
 window.closeStatsModal = closeStatsModal;
+window.toggleHaseneInfo = toggleHaseneInfo;
+window.showStatsModalWithTab = showStatsModalWithTab;
 window.handleStatsModalClick = handleStatsModalClick;
 window.handleCalendarModalClick = handleCalendarModalClick;
 window.handleBadgesModalClick = handleBadgesModalClick;
@@ -12708,6 +12788,47 @@ setTimeout(async () => {
     if (statsBtn) statsBtn.onclick = showStatsModal;
     if (calendarBtn) calendarBtn.onclick = showCalendarModal;
     if (xpInfoBtn) xpInfoBtn.onclick = showXPInfoModal;
+    
+    // Hasene Bilgi butonuna event listener ekle (Detaylı butonu gibi)
+    setTimeout(() => {
+        const haseneInfoBtn = document.getElementById('haseneInfoBtn');
+        if (haseneInfoBtn) {
+            const handleHaseneInfoClick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                log.debug('📿 Hasene Bilgi butonu tıklandı');
+                
+                if (typeof window.toggleHaseneInfo === 'function') {
+                    log.debug('✅ toggleHaseneInfo fonksiyonu bulundu, çağrılıyor...');
+                    window.toggleHaseneInfo(e);
+                } else if (typeof toggleHaseneInfo === 'function') {
+                    log.debug('✅ toggleHaseneInfo fonksiyonu bulundu (global değil), çağrılıyor...');
+                    toggleHaseneInfo(e);
+                } else {
+                    log.error('❌ toggleHaseneInfo fonksiyonu bulunamadı!', typeof window.toggleHaseneInfo, typeof toggleHaseneInfo);
+                }
+                
+                return false;
+            };
+            
+            // Click event
+            haseneInfoBtn.addEventListener('click', handleHaseneInfoClick, { capture: true, passive: false });
+            
+            // Touch event (mobil için)
+            haseneInfoBtn.addEventListener('touchend', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                handleHaseneInfoClick(e);
+                return false;
+            }, { capture: true, passive: false });
+            
+            log.debug('✅ Hasene Bilgi butonu event listener eklendi');
+        } else {
+            log.warn('⚠️ haseneInfoBtn elementi bulunamadı!');
+        }
+    }, 100);
     
     // Modal kapatma butonları
     const closeBadgesBtn = document.getElementById('closeBadgesBtn');
