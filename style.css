@@ -3812,7 +3812,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
     transition: background 0.3s ease;
 }
 
@@ -3962,10 +3962,14 @@ body {
 .game-screen .duolingo-question-area {
     padding: 40px 30px;
     text-align: center;
-    background: #fff;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%);
     flex: 1;
     position: relative;
     transition: background 0.3s ease;
+    border-radius: 24px 24px 0 0;
+    margin: 8px 8px 0 8px;
+    box-shadow: 0 -4px 20px rgba(102, 126, 234, 0.12);
+    border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 
@@ -4083,8 +4087,8 @@ body {
     width: 100%;
     padding: 18px 20px;
     margin-bottom: 12px;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+    border: 2px solid #d4dcff;
     border-radius: 16px;
     font-size: 16px;
     font-weight: 600;
@@ -4103,6 +4107,7 @@ body {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
 }
 
 .game-screen .duolingo-option::before {
@@ -4118,9 +4123,10 @@ body {
 }
 
 .game-screen .duolingo-option:hover:not(.disabled) {
-    background: #f0f0f0;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
     border-color: #667eea;
     transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .game-screen .duolingo-option:hover:not(.disabled)::before {
@@ -4149,9 +4155,10 @@ body {
     display: flex;
     justify-content: space-around;
     padding: 6px 20px;
-    background: #f8f9fa;
-    border-top: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+    border-top: 2px solid #d4dcff;
     transition: background 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 -2px 15px rgba(102, 126, 234, 0.1);
 }
 
 
