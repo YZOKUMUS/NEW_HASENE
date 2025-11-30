@@ -63,8 +63,8 @@ const GAME_MODE_CONFIG = {
         lives: null,
     },
     TIMED: {
-        name: '⚡ Hızlı',
-        description: '30 saniye süre',
+        name: '📖 30.cüz Ayetlerinin Kelimeleri',
+        description: '78-114. sureler (30.cüz)',
         questionsPerLevel: 10,
         timeLimit: 30,  // saniye
     },

@@ -45,7 +45,7 @@ const onboardingSteps = [
         description:
             'Her oyunda farklı zorluk modları deneyebilirsin:\n\n' +
             '• 📚 Klasik: Normal oyun, ipucu var\n' +
-            '• ⚡ Hızlı: 30 saniye süre, hızlı düşün\n' +
+            '• 📖 30.cüz Ayetlerinin Kelimeleri: 78-114. sureler (30.cüz)\n' +
             '• ❤️ 3 Can: 3 hak, yanlış = -1 can\n' +
             '• 🔥 Zorluk: Sadece zor kelimeler\n\n' +
             '💡 İpucu butonunu kullanarak kelimeyi dinleyebilirsin!',

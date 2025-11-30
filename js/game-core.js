@@ -1273,6 +1273,11 @@ function addDailyXP(xp) {
             // Bugünkü toplam puana da ekle (istatistikler için)
             dailyTasks.todayStats.toplamPuan += dailyGoalBonus;
             
+            // Günlük ve haftalık görevleri güncelle (günlük vird bonusu için)
+            if (typeof updateTaskProgress === 'function') {
+                updateTaskProgress('toplamPuan', dailyGoalBonus);
+            }
+            
             // Günlük vird bonusunu liderlik tablosuna da ekle
             if (typeof updateLeaderboardScores === 'function' && dailyGoalBonus > 0) {
                 updateLeaderboardScores(dailyGoalBonus);
@@ -2677,15 +2682,15 @@ document.addEventListener('DOMContentLoaded', function() {
     gameModes: {
         klasik: {
             name: '📚 Klasik',
-            description: 'Normal oyun modu',
+            description: 'Normal oyun • İpucu var • 10 soru',
             questionsPerLevel: 10,
             timeLimit: 0,  // 0 = süre yok
             lives: 0,      // 0 = sınırsız can
             showHint: true
         },
         hizli: {
-            name: '⚡ Hızlı',
-            description: '30 saniye süre',
+            name: '📖 30.cüz',
+            description: '78-114. sureler • 15 soru • 30 sn',
             questionsPerLevel: 15,
             timeLimit: 30,
             lives: 0,
@@ -2693,7 +2698,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         hayat: {
             name: '❤️ 3 Can',
-            description: '3 hak, yanlış = -1 can',
+            description: '3 hak • Yanlış = -1 can • 20 soru',
             questionsPerLevel: 20,
             timeLimit: 0,
             lives: 3,
@@ -2701,7 +2706,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         zorluk: {
             name: '🔥 Zorluk',
-            description: 'Sadece zor kelimeler',
+            description: 'Sadece zor kelimeler • 10 soru • 20 sn • 3 can',
             questionsPerLevel: 10,
             timeLimit: 20,
             lives: 3,
@@ -2710,7 +2715,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         tekrar: {
             name: '🔄 Tekrar Et',
-            description: 'Zorlandığın kelimeleri tekrar et',
+            description: 'Zorlandığın kelimeler • 15 soru • İpucu var',
             questionsPerLevel: 15,
             timeLimit: 0,
             lives: 0,
@@ -3865,8 +3870,45 @@ async function loadStats() {
     if (savedTasks) {
         dailyTasks = { ...dailyTasks, ...JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks)) };
         window.dailyTasks = dailyTasks; // Global erişim için güncelle
-        // Set nesnelerini yeniden oluştur
-        dailyTasks.todayStats.farklıZorluk = new Set(dailyTasks.todayStats.farklıZorluk || []);
+        // Set nesnelerini yeniden oluştur (güvenli şekilde)
+        if (dailyTasks.todayStats) {
+            const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
+            if (Array.isArray(farkliZorlukValue)) {
+                dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
+            } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
+                dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
+            } else {
+                dailyTasks.todayStats.farklıZorluk = new Set([]);
+            }
+            
+            const allGameModesValue = dailyTasks.todayStats.allGameModes;
+            if (Array.isArray(allGameModesValue)) {
+                dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
+            } else if (allGameModesValue && typeof allGameModesValue === 'object') {
+                dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
+            } else {
+                dailyTasks.todayStats.allGameModes = new Set([]);
+            }
+        }
+    }
+    
+    // Haftalık görevler yükle (IndexedDB öncelikli)
+    const savedWeeklyTasksIndexedDB = await loadFromIndexedDB('hasene_weeklyTasks');
+    const savedWeeklyTasks = savedWeeklyTasksIndexedDB || localStorage.getItem('hasene_weeklyTasks');
+    if (savedWeeklyTasks) {
+        weeklyTasks = { ...weeklyTasks, ...JSON.parse(typeof savedWeeklyTasks === 'string' ? savedWeeklyTasks : JSON.stringify(savedWeeklyTasks)) };
+        window.weeklyTasks = weeklyTasks; // Global erişim için güncelle
+        // Set nesnelerini yeniden oluştur (güvenli şekilde)
+        if (weeklyTasks.weekStats) {
+            const allModesValue = weeklyTasks.weekStats.allModesPlayed;
+            if (Array.isArray(allModesValue)) {
+                weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
+            } else if (allModesValue && typeof allModesValue === 'object') {
+                weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
+            } else {
+                weeklyTasks.weekStats.allModesPlayed = new Set([]);
+            }
+        }
     }
     
     // Oyun ayarları yükle (currentMode ve currentDifficulty) - ÇOOK ÖNEMLİ!
@@ -3979,10 +4021,21 @@ async function saveStats() {
                 ...dailyTasks, 
                 todayStats: {
                     ...dailyTasks.todayStats,
-                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk)
+                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk || []),
+                    allGameModes: Array.from(dailyTasks.todayStats.allGameModes || [])
                 }
             };
             saveToIndexedDB('hasene_dailyTasks', JSON.stringify(tasksToSave));
+            
+            // Haftalık görevler kaydet
+            const weeklyTasksToSave = {
+                ...weeklyTasks,
+                weekStats: {
+                    ...weeklyTasks.weekStats,
+                    allModesPlayed: Array.from(weeklyTasks.weekStats.allModesPlayed || [])
+                }
+            };
+            saveToIndexedDB('hasene_weeklyTasks', JSON.stringify(weeklyTasksToSave));
             
             // Oyun ayarları da kaydet (currentMode & currentDifficulty) - KRİTİK!
             saveToIndexedDB('hasene_currentMode', currentMode);
@@ -4000,10 +4053,21 @@ async function saveStats() {
                 ...dailyTasks, 
                 todayStats: {
                     ...dailyTasks.todayStats,
-                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk)
+                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk || []),
+                    allGameModes: Array.from(dailyTasks.todayStats.allGameModes || [])
                 }
             };
             localStorage.setItem('hasene_dailyTasks', JSON.stringify(tasksToSave));
+            
+            // HAFTALIK GÖREVLER de localStorage'a kaydet
+            const weeklyTasksToSave = {
+                ...weeklyTasks,
+                weekStats: {
+                    ...weeklyTasks.weekStats,
+                    allModesPlayed: Array.from(weeklyTasks.weekStats.allModesPlayed || [])
+                }
+            };
+            localStorage.setItem('hasene_weeklyTasks', JSON.stringify(weeklyTasksToSave));
             
             // Oyun ayarları da localStorage'a kaydet - KRİTİK!
             localStorage.setItem('hasene_currentMode', currentMode);
@@ -4603,6 +4667,12 @@ function addSessionPoints(points) {
     const currentDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
     storage.set('dailyCorrect', (currentDailyCorrect + 1).toString());
     
+    // Günlük ve haftalık görevleri güncelle
+    if (typeof updateTaskProgress === 'function') {
+        updateTaskProgress('toplamPuan', points);
+        updateTaskProgress('toplamDogru', 1);
+    }
+    
     // Daily XP ekle
     addDailyXP(points);
     
@@ -4633,6 +4703,11 @@ function addSessionPoints(points) {
         sessionScore += comboBonus; // Session skoruna da ekle (oyun sonunda gösterilecek)
         totalPoints += comboBonus;
         dailyTasks.todayStats.toplamPuan += comboBonus; // Bugünkü puana da ekle!
+        
+        // Günlük ve haftalık görevleri güncelle (combo bonusu için)
+        if (typeof updateTaskProgress === 'function') {
+            updateTaskProgress('toplamPuan', comboBonus);
+        }
         
         // COMBO BONUSUNU DAILY XP'YE DE EKLE
         addDailyXP(comboBonus);
@@ -5362,9 +5437,26 @@ function showStatsModal() {
                     ...dailyTasks.todayStats,
                     ...parsedTasks.todayStats
                 };
-                // Set nesnelerini yeniden oluştur
+                // Set nesnelerini yeniden oluştur (güvenli şekilde)
                 if (parsedTasks.todayStats.farklıZorluk) {
-                    dailyTasks.todayStats.farklıZorluk = new Set(parsedTasks.todayStats.farklıZorluk || []);
+                    const farkliZorlukValue = parsedTasks.todayStats.farklıZorluk;
+                    if (Array.isArray(farkliZorlukValue)) {
+                        dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
+                    } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
+                        dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
+                    } else {
+                        dailyTasks.todayStats.farklıZorluk = new Set([]);
+                    }
+                }
+                if (parsedTasks.todayStats.allGameModes) {
+                    const allGameModesValue = parsedTasks.todayStats.allGameModes;
+                    if (Array.isArray(allGameModesValue)) {
+                        dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
+                    } else if (allGameModesValue && typeof allGameModesValue === 'object') {
+                        dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
+                    } else {
+                        dailyTasks.todayStats.allGameModes = new Set([]);
+                    }
                 }
                 log.debug('📊 dailyTasks.todayStats localStorage\'dan yüklendi:', dailyTasks.todayStats);
             }
@@ -7495,6 +7587,22 @@ function generateWeeklyTasks(weekStart) {
 function updateWeeklyTaskProgress(statType, amount = 1) {
     log.debug(`📋 updateWeeklyTaskProgress çağrıldı: ${statType} +${amount}`);
     
+    // Güvenlik kontrolü: weeklyTasks.weekStats'ın varlığını kontrol et
+    if (!weeklyTasks.weekStats) {
+        log.warn('⚠️ weeklyTasks.weekStats bulunamadı, başlatılıyor...');
+        weeklyTasks.weekStats = {
+            totalHasene: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            daysPlayed: 0,
+            perfectDays: 0,
+            streakDays: 0,
+            allModesPlayed: new Set(),
+            reviewWordsCount: 0,
+            comboCount: 0
+        };
+    }
+    
     // Haftalık istatistikleri güncelle
     if (weeklyTasks.weekStats[statType] !== undefined) {
         if (statType === 'allModesPlayed' && weeklyTasks.weekStats[statType] instanceof Set) {
@@ -7504,19 +7612,33 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
             }
         } else {
             const eskiDeger = weeklyTasks.weekStats[statType];
-            weeklyTasks.weekStats[statType] += amount;
+            weeklyTasks.weekStats[statType] = (weeklyTasks.weekStats[statType] || 0) + amount;
             log.debug(`📊 Haftalık ${statType}: ${eskiDeger} → ${weeklyTasks.weekStats[statType]}`);
         }
+    } else {
+        log.warn(`⚠️ weeklyTasks.weekStats[${statType}] tanımlı değil!`);
     }
     
     // Haftalık görevleri kontrol et ve güncelle
+    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+        log.warn('⚠️ weeklyTasks.tasks boş, haftalık görevler oluşturuluyor...');
+        if (typeof checkWeeklyTasks === 'function') {
+            checkWeeklyTasks();
+        }
+    }
+    
+    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+        log.warn('⚠️ Haftalık görevler oluşturulamadı, güncelleme atlanıyor');
+        return;
+    }
+    
     weeklyTasks.tasks.forEach(task => {
         const eskiCurrent = task.current;
         
         // Görev tipine göre ilerlemeyi güncelle
         if (task.type === statType) {
             if (task.type === 'allModesPlayed') {
-                task.current = weeklyTasks.weekStats.allModesPlayed.size;
+                task.current = weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0;
             } else if (task.type === 'daysPlayed') {
                 // Günlük oynama: Bugün oynandıysa 1 gün ekle
                 const today = getLocalDateString();
@@ -7528,6 +7650,8 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
                         date >= weekStart && date <= weekEnd
                     );
                     task.current = Math.min(task.target, weekDays.length);
+                } else {
+                    task.current = 0;
                 }
             } else if (task.type === 'perfectDays') {
                 // Perfect günler: Hiç yanlış yapmadan oynanan günler
@@ -7537,11 +7661,16 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
                 // Seri günler: Mevcut streak'i kullan
                 task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
             } else {
+                // totalHasene, totalCorrect, reviewWordsCount, comboCount için
                 task.current = Math.min(task.target, weeklyTasks.weekStats[statType] || 0);
             }
         } else {
-            // Diğer görev tipleri için de kontrol et
-            if (task.type === 'daysPlayed') {
+            // Diğer görev tipleri için de kontrol et (statType değişmese bile)
+            if (task.type === 'totalHasene') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.totalHasene || 0);
+            } else if (task.type === 'totalCorrect') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.totalCorrect || 0);
+            } else if (task.type === 'daysPlayed') {
                 const today = getLocalDateString();
                 const weekStart = getWeekStartDate();
                 const weekEnd = getWeekEndDate();
@@ -7550,11 +7679,17 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
                         date >= weekStart && date <= weekEnd
                     );
                     task.current = Math.min(task.target, weekDays.length);
+                } else {
+                    task.current = 0;
                 }
             } else if (task.type === 'streakDays') {
                 task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
             } else if (task.type === 'allModesPlayed') {
-                task.current = weeklyTasks.weekStats.allModesPlayed.size;
+                task.current = weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0;
+            } else if (task.type === 'reviewWordsCount') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.reviewWordsCount || 0);
+            } else if (task.type === 'comboCount') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.comboCount || 0);
             }
         }
         
@@ -7570,6 +7705,20 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
     });
     
     debouncedSaveStats(); // Debounced kaydetme
+    
+    // UI'ı güncelle (eğer modal açıksa ve haftalık sekme aktifse)
+    if (typeof updateWeeklyTasksDisplay === 'function') {
+        // Modal açık mı kontrol et
+        const dailyTasksModal = document.getElementById('dailyTasksModal');
+        if (dailyTasksModal && dailyTasksModal.style.display === 'flex') {
+            // Haftalık sekme aktif mi kontrol et
+            const weeklyTab = document.getElementById('weeklyTasksTab');
+            if (weeklyTab && weeklyTab.style.display === 'block') {
+                // Haftalık sekme aktifse UI'ı anında güncelle
+                updateWeeklyTasksDisplay();
+            }
+        }
+    }
 }
 
 function updateTaskProgress(gameType, amount = 1) {
@@ -7629,11 +7778,11 @@ function updateTaskProgress(gameType, amount = 1) {
         // Görev tipine göre ilerlemeyi güncelle
         if (task.type === gameType) {
             if (task.type === 'allGameModes') {
-                task.current = dailyTasks.todayStats.allGameModes.size;
+                task.current = dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0;
             } else if (task.type === 'farklıZorluk') {
-                task.current = dailyTasks.todayStats.farklıZorluk.size;
+                task.current = dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0;
             } else if (task.type === 'accuracy') {
-                task.current = dailyTasks.todayStats.accuracy;
+                task.current = dailyTasks.todayStats.accuracy || 0;
             } else if (task.type === 'comboCount') {
                 // Combo görevleri: En yüksek combo sayısını kullan
                 task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
@@ -7662,9 +7811,9 @@ function updateTaskProgress(gameType, amount = 1) {
                 const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
                 task.current = dailyHasene >= goalHasene ? 1 : 0;
             } else if (task.type === 'allGameModes') {
-                task.current = dailyTasks.todayStats.allGameModes.size;
+                task.current = dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0;
             } else if (task.type === 'farklıZorluk') {
-                task.current = dailyTasks.todayStats.farklıZorluk.size;
+                task.current = dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0;
             }
         }
 
@@ -7703,8 +7852,24 @@ function updateTaskProgress(gameType, amount = 1) {
     log.debug(`📋 Toplam tamamlanan görev: ${dailyTasks.completedTasks.length}`);
     debouncedSaveStats(); // Debounced kaydetme
     
-    // Badge'i güncelle
-    updateTasksDisplay();
+    // Badge'i güncelle (modal açıksa UI'ı da güncelle)
+    const dailyTasksModal = document.getElementById('dailyTasksModal');
+    if (dailyTasksModal && dailyTasksModal.style.display === 'flex') {
+        // Modal açıksa UI'ı anında güncelle
+        updateTasksDisplay();
+    } else {
+        // Modal kapalıysa sadece badge'i güncelle (performans için)
+        const tasksBadge = document.getElementById('tasksBadge');
+        if (tasksBadge) {
+            const incompleteCount = (dailyTasks.tasks.length + dailyTasks.bonusTasks.length) - dailyTasks.completedTasks.length;
+            if (incompleteCount > 0 && !dailyTasks.rewardsClaimed) {
+                tasksBadge.style.display = 'flex';
+                tasksBadge.textContent = incompleteCount.toString();
+            } else {
+                tasksBadge.style.display = 'none';
+            }
+        }
+    }
 }
 
 function showDailyTasksModal() {
@@ -7750,6 +7915,11 @@ function showDailyTasksModal() {
         
         // Görev verilerini güncelle
         updateTasksDisplay();
+        
+        // Haftalık görevleri de güncelle (modal açıldığında)
+        if (typeof updateWeeklyTasksDisplay === 'function') {
+            updateWeeklyTasksDisplay();
+        }
         
         // Varsayılan olarak günlük sekmesini göster
         if (typeof switchTasksTab === 'function') {
@@ -7835,6 +8005,96 @@ function handleDailyTasksModalClick(event) {
 }
 
 function updateTasksDisplay() {
+    // Güvenlik kontrolü: dailyTasks.todayStats'ın varlığını kontrol et ve başlat
+    if (!dailyTasks.todayStats) {
+        log.warn('⚠️ dailyTasks.todayStats bulunamadı, başlatılıyor...');
+        dailyTasks.todayStats = {
+            kelimeCevir: 0,
+            dinleBul: 0,
+            boslukDoldur: 0,
+            ayetOku: 0,
+            duaOgre: 0,
+            hadisOku: 0,
+            toplamDogru: 0,
+            toplamYanlis: 0,
+            toplamPuan: 0,
+            perfectStreak: 0,
+            farklıZorluk: new Set(),
+            allGameModes: new Set(),
+            reviewWords: 0,
+            comboCount: 0,
+            accuracy: 0,
+            totalPlayTime: 0
+        };
+    }
+    
+    // Set nesnelerini kontrol et ve yeniden oluştur (JSON.parse sonrası Set'ler array'e dönüşür)
+    if (!(dailyTasks.todayStats.farklıZorluk instanceof Set)) {
+        // Array kontrolü: Eğer array değilse, boş array kullan veya array'e çevir
+        const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
+        if (Array.isArray(farkliZorlukValue)) {
+            dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
+        } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
+            // Eğer object ise, Object.values() ile array'e çevir
+            dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
+        } else {
+            dailyTasks.todayStats.farklıZorluk = new Set([]);
+        }
+    }
+    if (!(dailyTasks.todayStats.allGameModes instanceof Set)) {
+        // Array kontrolü: Eğer array değilse, boş array kullan veya array'e çevir
+        const allGameModesValue = dailyTasks.todayStats.allGameModes;
+        if (Array.isArray(allGameModesValue)) {
+            dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
+        } else if (allGameModesValue && typeof allGameModesValue === 'object') {
+            // Eğer object ise, Object.values() ile array'e çevir
+            dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
+        } else {
+            dailyTasks.todayStats.allGameModes = new Set([]);
+        }
+    }
+    
+    // localStorage'dan en güncel todayStats değerlerini yükle ve birleştir
+    // ÖNEMLİ: Mevcut değerleri koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
+    try {
+        const savedTasks = localStorage.getItem('hasene_dailyTasks');
+        if (savedTasks) {
+            const parsedTasks = JSON.parse(savedTasks);
+            if (parsedTasks && parsedTasks.todayStats) {
+                // Mevcut todayStats değerlerini koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
+                // Ancak sayısal değerler için localStorage'daki değerler daha güncel olabilir, bu yüzden birleştirme yapıyoruz
+                const currentStats = { ...dailyTasks.todayStats };
+                dailyTasks.todayStats = {
+                    ...parsedTasks.todayStats,
+                    ...currentStats // Mevcut değerler öncelikli (en güncel)
+                };
+                // Set nesnelerini yeniden oluştur (güvenli şekilde)
+                if (parsedTasks.todayStats.farklıZorluk) {
+                    const farkliZorlukValue = parsedTasks.todayStats.farklıZorluk;
+                    if (Array.isArray(farkliZorlukValue)) {
+                        dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
+                    } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
+                        dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
+                    } else {
+                        dailyTasks.todayStats.farklıZorluk = new Set([]);
+                    }
+                }
+                if (parsedTasks.todayStats.allGameModes) {
+                    const allGameModesValue = parsedTasks.todayStats.allGameModes;
+                    if (Array.isArray(allGameModesValue)) {
+                        dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
+                    } else if (allGameModesValue && typeof allGameModesValue === 'object') {
+                        dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
+                    } else {
+                        dailyTasks.todayStats.allGameModes = new Set([]);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        log.error('❌ updateTasksDisplay içinde dailyTasks yükleme hatası:', e);
+    }
+    
     // Güvenlik kontrolü: Eğer görevler boşsa, yeniden oluştur
     if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
         log.debug('⚠️ Tasks boş, yeniden oluşturuluyor...');
@@ -7896,7 +8156,12 @@ function updateTasksDisplay() {
 
     // Görevlerin current değerlerini güncelle (dailyTasks.todayStats'tan)
     const allTasks = [...dailyTasks.tasks, ...dailyTasks.bonusTasks];
+    log.debug('📊 updateTasksDisplay - Görevler güncelleniyor:', {
+        todayStats: dailyTasks.todayStats,
+        tasksCount: allTasks.length
+    });
     allTasks.forEach(task => {
+        const oldCurrent = task.current;
         if (task.type === 'toplamPuan') {
             task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
         } else if (task.type === 'toplamDogru') {
@@ -7917,12 +8182,31 @@ function updateTasksDisplay() {
             task.current = Math.min(task.target, dailyTasks.todayStats.perfectStreak || 0);
         } else if (task.type === 'farklıZorluk') {
             task.current = Math.min(task.target, dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0);
+        } else if (task.type === 'reviewWords') {
+            task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
+        } else if (task.type === 'comboCount') {
+            task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
+        } else if (task.type === 'accuracy') {
+            task.current = Math.min(task.target, dailyTasks.todayStats.accuracy || 0);
+        } else if (task.type === 'allGameModes') {
+            task.current = Math.min(task.target, dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0);
+        } else if (task.type === 'streakMaintain') {
+            // Seri koruma: Günlük hedef tamamlandıysa 1
+            const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
+            const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
+            task.current = dailyHasene >= goalHasene ? 1 : 0;
         }
         
         // Görev tamamlandı mı?
         if (task.current >= task.target && !dailyTasks.completedTasks.includes(task.id)) {
             dailyTasks.completedTasks.push(task.id);
             log.debug(`✅ Görev tamamlandı: ${task.id} (${task.name})`);
+        }
+        
+        // Debug: Görev güncellemesi
+        if (oldCurrent !== task.current) {
+            log.debug(`🔄 Görev güncellendi: ${task.id} (${task.name}) - ${oldCurrent}/${task.target} → ${task.current}/${task.target}`);
         }
     });
     
@@ -7995,6 +8279,65 @@ function updateWeeklyTasksDisplay() {
         }
     }
     
+    // Güvenlik kontrolü: weeklyTasks.weekStats'ın varlığını kontrol et ve başlat
+    if (!weeklyTasks.weekStats) {
+        log.warn('⚠️ weeklyTasks.weekStats bulunamadı, başlatılıyor...');
+        weeklyTasks.weekStats = {
+            totalHasene: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            daysPlayed: 0,
+            perfectDays: 0,
+            streakDays: 0,
+            allModesPlayed: new Set(),
+            reviewWordsCount: 0,
+            comboCount: 0
+        };
+    }
+    
+    // Set nesnelerini kontrol et ve yeniden oluştur (JSON.parse sonrası Set'ler array'e dönüşür)
+    if (!(weeklyTasks.weekStats.allModesPlayed instanceof Set)) {
+        const allModesValue = weeklyTasks.weekStats.allModesPlayed;
+        if (Array.isArray(allModesValue)) {
+            weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
+        } else if (allModesValue && typeof allModesValue === 'object') {
+            weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
+        } else {
+            weeklyTasks.weekStats.allModesPlayed = new Set([]);
+        }
+    }
+    
+    // localStorage'dan en güncel weeklyTasks değerlerini yükle ve birleştir
+    // ÖNEMLİ: Mevcut değerleri koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
+    try {
+        const savedWeeklyTasks = localStorage.getItem('hasene_weeklyTasks');
+        if (savedWeeklyTasks) {
+            const parsedWeeklyTasks = JSON.parse(savedWeeklyTasks);
+            if (parsedWeeklyTasks && parsedWeeklyTasks.weekStats) {
+                // Mevcut weekStats değerlerini koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
+                // Ancak sayısal değerler için localStorage'daki değerler daha güncel olabilir, bu yüzden birleştirme yapıyoruz
+                const currentWeekStats = { ...weeklyTasks.weekStats };
+                weeklyTasks.weekStats = {
+                    ...parsedWeeklyTasks.weekStats,
+                    ...currentWeekStats // Mevcut değerler öncelikli (en güncel)
+                };
+                // Set nesnelerini yeniden oluştur
+                if (parsedWeeklyTasks.weekStats.allModesPlayed) {
+                    const allModesValue = parsedWeeklyTasks.weekStats.allModesPlayed;
+                    if (Array.isArray(allModesValue)) {
+                        weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
+                    } else if (allModesValue && typeof allModesValue === 'object') {
+                        weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
+                    } else {
+                        weeklyTasks.weekStats.allModesPlayed = new Set([]);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        log.error('❌ updateWeeklyTasksDisplay içinde weeklyTasks yükleme hatası:', e);
+    }
+    
     // Haftalık görevler listesi
     const weeklyList = document.getElementById('weeklyTasksList');
     const weeklyPeriod = document.getElementById('weeklyTasksPeriod');
@@ -8016,6 +8359,52 @@ function updateWeeklyTasksDisplay() {
         weeklyPeriod.textContent = `${startStr} - ${endStr}`;
     } else {
         weeklyPeriod.textContent = 'Yükleniyor...';
+    }
+    
+    // Görevlerin current değerlerini güncelle (weeklyTasks.weekStats'tan)
+    if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
+        weeklyTasks.tasks.forEach(task => {
+            const oldCurrent = task.current;
+            
+            if (task.type === 'totalHasene') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.totalHasene || 0);
+            } else if (task.type === 'totalCorrect') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.totalCorrect || 0);
+            } else if (task.type === 'daysPlayed') {
+                // Bu hafta içinde oynanan günleri say
+                const weekStart = getWeekStartDate();
+                const weekEnd = getWeekEndDate();
+                if (streakData && streakData.playDates) {
+                    const weekDays = streakData.playDates.filter(date => 
+                        date >= weekStart && date <= weekEnd
+                    );
+                    task.current = Math.min(task.target, weekDays.length);
+                } else {
+                    task.current = 0;
+                }
+            } else if (task.type === 'perfectDays') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.perfectDays || 0);
+            } else if (task.type === 'streakDays') {
+                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
+            } else if (task.type === 'allModesPlayed') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0);
+            } else if (task.type === 'reviewWordsCount') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.reviewWordsCount || 0);
+            } else if (task.type === 'comboCount') {
+                task.current = Math.min(task.target, weeklyTasks.weekStats.comboCount || 0);
+            }
+            
+            // Görev tamamlandı mı?
+            if (task.current >= task.target && !weeklyTasks.completedTasks.includes(task.id)) {
+                weeklyTasks.completedTasks.push(task.id);
+                log.debug(`✅ Haftalık görev tamamlandı: ${task.id} (${task.name})`);
+            }
+            
+            // Debug: Görev güncellemesi
+            if (oldCurrent !== task.current) {
+                log.debug(`🔄 Haftalık görev güncellendi: ${task.id} (${task.name}) - ${oldCurrent}/${task.target} → ${task.current}/${task.target}`);
+            }
+        });
     }
     
     // Haftalık görevleri göster (günlük görevler gibi)
@@ -8049,7 +8438,17 @@ function updateWeeklyTasksDisplay() {
 
 function createWeeklyTaskElement(task) {
     const isCompleted = weeklyTasks.completedTasks.includes(task.id);
+    // task.current değerinin tanımlı olduğundan emin ol
+    if (typeof task.current === 'undefined' || task.current === null) {
+        task.current = 0;
+    }
+    // Sıfıra bölünme kontrolü
     const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
+    
+    // Debug: İlerleme çubuğu için log
+    if (task.type === 'totalHasene') {
+        log.debug(`📊 Haftalık görev ilerleme çubuğu: ${task.id} - current: ${task.current}, target: ${task.target}, percent: ${progressPercent}%`);
+    }
     
     // Haftalık görev icon mapping
     const weeklyTaskIcons = {
@@ -8134,6 +8533,10 @@ function getWeeklyTaskDescription(task) {
 
 function createTaskElement(task) {
     const isCompleted = dailyTasks.completedTasks.includes(task.id);
+    // task.current değerinin tanımlı olduğundan emin ol
+    if (typeof task.current === 'undefined' || task.current === null) {
+        task.current = 0;
+    }
     // Sıfıra bölünme kontrolü
     const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
     
@@ -9514,7 +9917,7 @@ function initModeSelector() {
         const btn = document.createElement('button');
         btn.className = 'mode-btn';
         if (modeKey === currentMode) btn.classList.add('active');
-        btn.innerHTML = `<strong>${mode.name}</strong><small>${mode.description}</small>`;
+        btn.innerHTML = `<strong>${mode.name}</strong> <small>${mode.description}</small>`;
         btn.onclick = () => selectMode(modeKey);
         elements.modeButtons.appendChild(btn);
     });
@@ -9747,6 +10150,30 @@ function loadQuestion() {
         w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
     );
     log.debug(`✅ Zorluk filtresi sonrası: ${filteredData.length} kelime`);
+
+    // Hızlı mod için özel sure filtreleme (78-114. sureler)
+    if (currentMode === 'hizli') {
+        log.debug(`⚡ Hızlı mod aktif - Sure filtreleme: 78-114`);
+        const beforeCount = filteredData.length;
+        filteredData = filteredData.filter(w => {
+            if (!w.id) return false;
+            // ID formatı: "78:12:3" (sure:ayet:kelime)
+            const idParts = w.id.split(':');
+            if (idParts.length < 1) return false;
+            const sureNum = parseInt(idParts[0], 10);
+            // 78 <= sure <= 114 kontrolü
+            return !isNaN(sureNum) && sureNum >= 78 && sureNum <= 114;
+        });
+        log.debug(`✅ Hızlı mod sure filtresi sonrası: ${beforeCount} -> ${filteredData.length} kelime`);
+        
+        // Eğer filtreleme sonrası kelime kalmadıysa, uyarı ver
+        if (filteredData.length === 0) {
+            log.warn('⚠️ Hızlı mod için 78-114. sureler arasında kelime bulunamadı! Tüm kelimeler kullanılacak.');
+            filteredData = kelimeBulData.filter(w => 
+                w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
+            );
+        }
+    }
 
     // Mod özel zorluk kontrolü
     if (mode.minDifficulty) {
@@ -13399,7 +13826,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (progressSteps.length > 0) {
                     setTimeout(updateLoadingProgress, 500);
                 } else {
-    setTimeout(() => {
+                    setTimeout(() => {
                         // Loading screen kapanırken tüm harfleri temizle
                         clearAllFlyingLetters();
                         if (animationInterval) {
@@ -13416,23 +13843,23 @@ window.addEventListener('DOMContentLoaded', () => {
                             }, 500);
                         }
                         
-                const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-                if (!hasSeenOnboarding) {
-                    setTimeout(() => {
-                        if (typeof showOnboarding === 'function') {
-                            showOnboarding();
+                        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+                        if (!hasSeenOnboarding) {
+                            setTimeout(() => {
+                                if (typeof showOnboarding === 'function') {
+                                    showOnboarding();
+                                } else {
+                                    if (mainContainer) mainContainer.style.display = 'block';
+                                }
+                            }, 100);
                         } else {
-        if (mainContainer) mainContainer.style.display = 'block';
+                            if (mainContainer) mainContainer.style.display = 'block';
                         }
-                    }, 100);
-                } else {
-                    if (mainContainer) mainContainer.style.display = 'block';
-                }
                     }, 1000);
                 }
             }
             
-        if (progressBar) {
+            if (progressBar) {
                 progressBar.style.width = progress + '%';
             }
         }, 30);
@@ -13446,6 +13873,3 @@ window.addEventListener('DOMContentLoaded', () => {
         updateLoadingProgress();
     }, 500);
 });
-
-
-
