@@ -2627,6 +2627,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 log.debug('📊 Detaylı buton tıklandı');
                 
+                // İstatistikler sekmesini göster, Hasene Bilgi sekmesini gizle
+                const statsTabContent = document.getElementById('statsTabContent');
+                const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
+                
+                if (statsTabContent) {
+                    statsTabContent.style.display = 'block';
+                }
+                if (haseneInfoTabContent) {
+                    haseneInfoTabContent.style.display = 'none';
+                }
+                
                 if (typeof window.showDetailedStats === 'function') {
                     log.debug('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
                     window.showDetailedStats();
@@ -2654,6 +2665,46 @@ document.addEventListener('DOMContentLoaded', function() {
             log.debug('✅ Detaylı istatistikler butonu event listener eklendi');
         } else {
             log.warn('⚠️ detailedStatsBtn elementi bulunamadı!');
+        }
+        
+        // Hasene Bilgi butonuna event listener ekle
+        const haseneInfoBtn = document.getElementById('haseneInfoBtn');
+        if (haseneInfoBtn) {
+            const handleHaseneInfoClick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                log.debug('📿 Hasene Bilgi buton tıklandı');
+                
+                // İstatistikler sekmesini gizle
+                const statsTabContent = document.getElementById('statsTabContent');
+                const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
+                
+                if (statsTabContent) {
+                    statsTabContent.style.display = 'none';
+                }
+                if (haseneInfoTabContent) {
+                    haseneInfoTabContent.style.display = 'block';
+                }
+                
+                return false;
+            };
+            
+            // Click event
+            haseneInfoBtn.addEventListener('click', handleHaseneInfoClick, { capture: true, passive: false });
+            
+            // Touch event (mobil için)
+            haseneInfoBtn.addEventListener('touchend', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                handleHaseneInfoClick(e);
+                return false;
+            }, { capture: true, passive: false });
+            
+            log.debug('✅ Hasene Bilgi butonu event listener eklendi');
+        } else {
+            log.warn('⚠️ haseneInfoBtn elementi bulunamadı!');
         }
     }, 100); // 100ms gecikme ile detailed-stats.js yüklensin
     
