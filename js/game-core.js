@@ -5373,6 +5373,19 @@ function showStatsModal() {
         log.error('❌ dailyTasks yükleme hatası:', e);
     }
     
+    // totalPoints değerini güncelle (güncel değer için - localStorage'dan senkron yükle)
+    try {
+        const localPoints = localStorage.getItem('hasene_totalPoints');
+        if (localPoints !== null && localPoints !== undefined) {
+            const parsedPoints = parseInt(localPoints);
+            if (!isNaN(parsedPoints) && parsedPoints >= 0) {
+                totalPoints = parsedPoints;
+            }
+        }
+    } catch (e) {
+        log.error('❌ totalPoints yükleme hatası:', e);
+    }
+    
     // Synchronization: Wait for DOM updates before opening new modal
     requestAnimationFrame(() => {
         // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
