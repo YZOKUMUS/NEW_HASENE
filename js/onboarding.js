@@ -5,36 +5,73 @@
  * İlk açılışta ana ekranda 3 adımlı kısa bir rehber gösterir.
  */
 
-const ONBOARDING_STORAGE_KEY = 'hasene_onboarding_seen_v1';
+const ONBOARDING_STORAGE_KEY = 'hasene_onboarding_seen_v2';
 
 const onboardingSteps = [
     {
-        id: 'games',
-        title: '📚 Ders Türleri',
+        id: 'welcome',
+        title: '🕌 Hoş Geldin!',
         description:
-            'Buradan 3 ana oyuna ulaşabilirsin:\n\n' +
-            '• Kelime Çevir: Arapça kelimenin Türkçe meâlini bul\n' +
-            '• Dinle ve Bul: Kelimeyi dinle, sahih olanı seç\n' +
-            '• Boşluk Doldur: Ayetteki eksik kelimeyi tamamla',
+            'Bu uygulama, Kuran-ı Kerim\'den kelimeleri çalışarak ayetleri daha iyi anlamana yardımcı olmak için hazırlandı.\n\n' +
+            'Arapça kelimeleri öğrenerek, ayetlerin meâlini daha derinlemesine kavrayabilirsin.\n\n' +
+            '💡 Her gün düzenli çalışarak ilerlemeni takip edebilirsin!',
         highlightSelector: '.games-section',
     },
     {
-        id: 'hasene',
-        title: '💰 Hasene ve İlerleme',
+        id: 'games',
+        title: '🎮 3 Ana Oyun Modu',
         description:
-            'Üst taraftaki bölümde Hasene, Yıldız ve Mertebeni takip edebilirsin.\n\n' +
-            '• Her sahih cevap Hasene kazandırır\n' +
-            '• 100 Hasene = 1 ⭐ Yıldız\n' +
-            '• Hasene biriktikçe merteben yükselir',
+            'Ana ekranda 3 farklı oyun modu bulunuyor:\n\n' +
+            '• 🔤 Kelime Çevir: Arapça kelimenin Türkçe meâlini bul\n' +
+            '• 🎵 Dinle ve Bul: Kelimeyi dinle, sahih olanı seç\n' +
+            '• 📝 Boşluk Doldur: Ayetteki eksik kelimeyi tamamla\n\n' +
+            '💡 Her oyun türünde zorluk seviyesi (Kolay/Orta/Zor) otomatik ayarlanır.',
+        highlightSelector: '.games-section',
+    },
+    {
+        id: 'reading',
+        title: '📖 Okuma ve Öğrenme Modları',
+        description:
+            '3 ayrı okuma modu ile bilgini pekiştirebilirsin:\n\n' +
+            '• 📖 Ayet Oku: Kuran ayetlerini oku, dinle ve meâlini idrak et\n' +
+            '• 🤲 Dua Öğren: Günlük duaları öğren ve ezberle\n' +
+            '• 📚 Hadis Oku: Hadis-i şerifleri oku ve istifade et\n\n' +
+            '💡 Bu modlarda puan kazanılmaz, sadece günlük görev ilerlemesi sayılır.',
+        highlightSelector: '.games-section',
+    },
+    {
+        id: 'gameplay',
+        title: '⚙️ Oyun İçi Modlar',
+        description:
+            'Her oyunda farklı zorluk modları deneyebilirsin:\n\n' +
+            '• 📚 Klasik: Normal oyun, ipucu var\n' +
+            '• ⚡ Hızlı: 30 saniye süre, hızlı düşün\n' +
+            '• ❤️ 3 Can: 3 hak, yanlış = -1 can\n' +
+            '• 🔥 Zorluk: Sadece zor kelimeler\n\n' +
+            '💡 İpucu butonunu kullanarak kelimeyi dinleyebilirsin!',
+        highlightSelector: '.games-section',
+    },
+    {
+        id: 'stats',
+        title: '📊 İstatistikler ve Takip',
+        description:
+            'İstatistikler panelinden ilerlemeni takip edebilirsin:\n\n' +
+            '• Kelime istatistikleri: Hangi kelimeleri öğrendin?\n' +
+            '• Performans analizi: Başarı oranın, serilerin\n' +
+            '• Öğrenme haritası: Öğrenilmiş, pratik, zorlanılan kelimeler\n\n' +
+            '💡 Zorlandığın kelimeler otomatik olarak daha sık sorulur.',
         highlightSelector: '.premium-stats-panel, .stats-row-minimal',
     },
     {
         id: 'calendar',
         title: '📅 Takvim ve Günlük Vazifeler',
         description:
-            'Alt menüden Takvim ve Vazifeler ekranlarına gidebilirsin:\n\n' +
-            '• Takvim: Günlük serini ve oynadığın günleri gör\n' +
-            '• Vazifeler: Günlük ve haftalık görevlerini takip et',
+            'Alt menüden tüm özelliklere ulaşabilirsin:\n\n' +
+            '• 📅 Takvim: Günlük serini ve oynadığın günleri gör\n' +
+            '• 📋 Vazifeler: Günlük ve haftalık görevlerini tamamla\n' +
+            '• 📊 İstatistikler: Detaylı performans analizi\n' +
+            '• 📚 Kelimeler: Kelime istatistiklerini incele\n\n' +
+            '💡 Günlük serini koruyarak bonus kazanabilirsin!',
         highlightSelector: '#bottomNavBar',
     },
 ];
