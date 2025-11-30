@@ -2113,11 +2113,11 @@ function filterWordStats(filterType) {
                         <div style="color: #666;">Başarı</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                        <div style="font-weight: bold; color: #3498db;">${item.attempts}</div>
+                        <div style="font-weight: bold; color: #3498db;">${(item.attempts || 0) || ((item.correct || 0) + (item.wrong || 0))}</div>
                         <div style="color: #666;">Deneme</div>
                     </div>
                     <div style="text-align: center; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                        <div style="font-weight: bold; color: #f39c12;">${Math.round(item.priority * 100) / 100}</div>
+                        <div style="font-weight: bold; color: #f39c12;">${Math.round((item.priority || 1.0) * 100) / 100}</div>
                         <div style="color: #666;">Öncelik</div>
                     </div>
                 </div>
@@ -5386,6 +5386,11 @@ function showStatsModal() {
         // Body scroll'u engelle
         document.body.style.overflow = 'hidden';
         
+        // Seviye değerini güncelle (totalPoints değişmiş olabilir)
+        if (typeof calculateLevel === 'function') {
+            level = calculateLevel(totalPoints);
+        }
+        
         // Seviye ilerleme barını hesapla
     let currentLevelStart, nextLevelStart;
     const nextLevel = level + 1;
@@ -5777,14 +5782,30 @@ function updateAnalyticsData() {
             })
             .filter(s => (s.attempts || 0) > 0 || ((s.correct || 0) + (s.wrong || 0)) > 0);
         
+        // En zor kelime: En düşük başarı oranı + en fazla yanlış cevap
+        // Minimum 3 deneme şartı (yeterli veri için)
+        const MIN_ATTEMPTS_FOR_HARDEST = 3;
         const hardestWord = wordStatsWithId.length > 0
-            ? wordStatsWithId.sort((a, b) => {
-                const attemptsA = (a.attempts || 0) || ((a.correct || 0) + (a.wrong || 0));
-                const attemptsB = (b.attempts || 0) || ((b.correct || 0) + (b.wrong || 0));
-                const scoreA = (a.successRate || 0) * attemptsA;
-                const scoreB = (b.successRate || 0) * attemptsB;
-                return scoreA - scoreB; // En düşük skor en zor
-            })[0]
+            ? wordStatsWithId
+                .filter(s => {
+                    const attempts = (s.attempts || 0) || ((s.correct || 0) + (s.wrong || 0));
+                    return attempts >= MIN_ATTEMPTS_FOR_HARDEST;
+                })
+                .sort((a, b) => {
+                    const attemptsA = (a.attempts || 0) || ((a.correct || 0) + (a.wrong || 0));
+                    const attemptsB = (b.attempts || 0) || ((b.correct || 0) + (b.wrong || 0));
+                    const wrongA = (a.wrong || 0);
+                    const wrongB = (b.wrong || 0);
+                    const successRateA = a.successRate || 0;
+                    const successRateB = b.successRate || 0;
+                    
+                    // Önce başarı oranına göre sırala (düşük = zor)
+                    if (Math.abs(successRateA - successRateB) > 0.1) {
+                        return successRateA - successRateB;
+                    }
+                    // Başarı oranları yakınsa, yanlış cevap sayısına göre sırala (fazla = zor)
+                    return wrongB - wrongA;
+                })[0] || wordStatsWithId[0] // Eğer minimum attempts şartını sağlayan yoksa, ilk kelimeyi al
             : null;
         
         const analyticsAvgSuccess = document.getElementById('analyticsAvgSuccess');
