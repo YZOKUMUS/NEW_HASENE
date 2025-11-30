@@ -1442,10 +1442,25 @@ function updateWordStatistics() {
     const wordStats = loadWordStats();
     log.stats('📦 wordStats yüklendi:', wordStats);
     
-    // Genel istatistikleri hesapla
+    // Genel istatistikleri hesapla - successRate ve masteryLevel değerlerini normalize et
     const totalWords = Object.keys(wordStats).length;
-    const masteredWords = Object.values(wordStats).filter(stat => stat.masteryLevel >= 3.0 && stat.successRate >= 0.6).length;
-    const strugglingWords = Object.values(wordStats).filter(stat => stat.successRate < 0.6 || stat.masteryLevel < 1.0).length;
+    const normalizedStats = Object.values(wordStats).map(stat => {
+        // successRate yoksa hesapla
+        let successRate = stat.successRate;
+        if (typeof successRate === 'undefined' || successRate === null) {
+            const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
+            successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
+        }
+        // masteryLevel yoksa 0 kabul et
+        const masteryLevel = (typeof stat.masteryLevel !== 'undefined' && stat.masteryLevel !== null) 
+            ? parseFloat(stat.masteryLevel) || 0 
+            : 0;
+        
+        return { ...stat, successRate, masteryLevel };
+    });
+    
+    const masteredWords = normalizedStats.filter(stat => stat.masteryLevel >= 3.0 && stat.successRate >= 0.6).length;
+    const strugglingWords = normalizedStats.filter(stat => stat.successRate < 0.6 || stat.masteryLevel < 1.0).length;
     
         // Genel özet güncelle (null kontrolü ile)
         const wordStatsTotalEl = document.getElementById('wordStatsTotal');
@@ -3185,7 +3200,8 @@ let dailyTasks = {
         comboCount: 0,      // Yeni: Combo sayısı
         accuracy: 0,        // Yeni: Başarı oranı (%)
         allGameModes: new Set(), // Yeni: Oynanan oyun modları
-        streakMaintain: 0   // Yeni: Seri koruma
+        streakMaintain: 0,   // Yeni: Seri koruma
+        totalPlayTime: 0    // Yeni: Toplam oyun süresi (milisaniye)
     }
 };
 
@@ -5446,16 +5462,88 @@ function showStatsModal() {
         };
     }
     
-    // Toplam deneme sayısı = Doğru + Yanlış
-    const totalAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
+    // Başarı oranı hesaplama: Tüm zamanların genel başarı oranı
+    // Önce kelime istatistiklerinden genel başarı oranını hesapla
+    let totalCorrect = 0;
+    let totalWrong = 0;
     
-    // Başarı oranı: Bugünkü toplam doğru cevap / Bugünkü toplam deneme sayısı
-    const successRate = totalAttempts > 0 ? Math.round((dailyTasks.todayStats.toplamDogru / totalAttempts) * 100) : 0;
-    const avgPointsPerDay = streakData.totalPlayDays > 0 ? Math.round(totalPoints / streakData.totalPlayDays) : totalPoints;
-    const playConsistency = typeof getDaysFromFirstPlay === 'function' 
-        ? Math.round((streakData.totalPlayDays / Math.max(1, getDaysFromFirstPlay())) * 100)
+    try {
+        const wordStats = typeof loadWordStats === 'function' ? loadWordStats() : {};
+        if (wordStats && typeof wordStats === 'object') {
+            Object.values(wordStats).forEach(stat => {
+                if (stat && typeof stat === 'object') {
+                    totalCorrect += (stat.correct || 0);
+                    totalWrong += (stat.wrong || 0);
+                }
+            });
+        }
+    } catch (e) {
+        log.error('❌ wordStats yükleme hatası:', e);
+    }
+    
+    // Eğer kelime istatistikleri yoksa veya yetersizse, bugünkü istatistikleri kullan
+    const todayAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
+    if (totalCorrect === 0 && totalWrong === 0 && todayAttempts > 0) {
+        totalCorrect = dailyTasks.todayStats.toplamDogru || 0;
+        totalWrong = dailyTasks.todayStats.toplamYanlis || 0;
+    }
+    
+    // Genel başarı oranı: Tüm zamanların toplam doğru / Tüm zamanların toplam deneme
+    const totalAttempts = totalCorrect + totalWrong;
+    const successRate = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+    
+    // Günlük Ort. Hasene hesaplama: Toplam Hasene / Oyun oynanan gün sayısı
+    // playDates.length kullan (totalPlayDays sadece hedefi tamamladığı günleri sayar)
+    const playDatesCount = (streakData.playDates && Array.isArray(streakData.playDates)) 
+        ? streakData.playDates.length 
+        : streakData.totalPlayDays || 0;
+    
+    // Eğer hiç oyun oynanmamışsa ama bugün oyun oynanmışsa, 1 gün say
+    const today = getLocalDateString();
+    const hasPlayedToday = dailyTasks.todayStats.toplamPuan > 0 || 
+                          (dailyTasks.todayStats.toplamDogru > 0 || dailyTasks.todayStats.toplamYanlis > 0);
+    const effectivePlayDays = playDatesCount > 0 
+        ? playDatesCount 
+        : (hasPlayedToday ? 1 : 0);
+    
+    const avgPointsPerDay = effectivePlayDays > 0 
+        ? Math.round(totalPoints / effectivePlayDays) 
         : 0;
-    const levelProgressPercent = Math.round(progressPercentage);
+    // Talim Tutarlılığı: Oyun oynanan gün sayısı / İlk oyundan bugüne kadar geçen gün sayısı
+    // playDates.length kullan (totalPlayDays sadece hedefi tamamlanan günleri sayar)
+    const daysPlayed = playDatesCount > 0 ? playDatesCount : (hasPlayedToday ? 1 : 0);
+    const daysSinceFirstPlay = typeof getDaysFromFirstPlay === 'function' 
+        ? getDaysFromFirstPlay() 
+        : (daysPlayed > 0 ? 1 : 0);
+    const playConsistency = daysSinceFirstPlay > 0 
+        ? Math.round((daysPlayed / daysSinceFirstPlay) * 100) 
+        : 0;
+    
+    // Mertebe ilerleme yüzdesini hesapla (statsLevelProgressText için)
+    // progressPercentage değişkeni showStatsModal içinde hesaplanıyor, burada yeniden hesaplıyoruz
+    const statsCurrentLevel = calculateLevel(totalPoints);
+    let statsLevelStart = 0;
+    let statsNextLevelStart = 0;
+    
+    if (statsCurrentLevel === 1) {
+        statsLevelStart = 0;
+        statsNextLevelStart = 1000;
+    } else if (statsCurrentLevel <= 10) {
+        const thresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
+        statsLevelStart = thresholds[statsCurrentLevel - 1];
+        statsNextLevelStart = thresholds[statsCurrentLevel] || (58000 + ((statsCurrentLevel - 10) * 15000));
+    } else {
+        // Level 10'dan sonra
+        statsLevelStart = 58000 + ((statsCurrentLevel - 11) * 15000);
+        statsNextLevelStart = 58000 + ((statsCurrentLevel - 10) * 15000);
+    }
+    
+    const statsLevelPoints = totalPoints - statsLevelStart;
+    const statsLevelRequired = statsNextLevelStart - statsLevelStart;
+    const levelProgressPercentage = statsLevelRequired > 0 
+        ? Math.max(0, Math.min((statsLevelPoints / statsLevelRequired) * 100, 100)) 
+        : 100;
+    const levelProgressPercent = Math.round(levelProgressPercentage);
     
     // Başarı analizi güncelle (null check ile)
     const statsSuccessRateEl = document.getElementById('statsSuccessRate');
@@ -5468,17 +5556,69 @@ function showStatsModal() {
     if (statsLevelProgressTextEl) statsLevelProgressTextEl.textContent = levelProgressPercent + '%';
     
     // Streak bilgilerini güncelle (null check ile)
+    // Önce streak doğruluğunu kontrol et ve gerekirse düzelt
+    const todayDate = getLocalDateString();
+    if (typeof validateCurrentStreak === 'function') {
+        const streakValidation = validateCurrentStreak(todayDate);
+        if (!streakValidation.isValid) {
+            log.debug(`🔴 Streak tutarsızlığı düzeltiliyor: ${streakData.currentStreak} → ${streakValidation.correctStreak}`);
+            streakData.currentStreak = streakValidation.correctStreak;
+        }
+    }
+    
+    // En iyi streak'i playDates'ten hesapla (tüm zamanların en uzun ardışık gün serisi)
+    let calculatedBestStreak = streakData.bestStreak || 0;
+    if (streakData.playDates && Array.isArray(streakData.playDates) && streakData.playDates.length > 0) {
+        const sortedDates = [...streakData.playDates].sort();
+        let maxStreak = 1; // En az 1 gün
+        let currentStreak = 1;
+        
+        for (let i = 1; i < sortedDates.length; i++) {
+            const prevDateStr = sortedDates[i - 1];
+            const currentDateStr = sortedDates[i];
+            
+            // Önceki tarih + 1 gün = mevcut tarih mi kontrol et
+            const prevDate = new Date(prevDateStr + 'T00:00:00');
+            prevDate.setDate(prevDate.getDate() + 1);
+            const nextDayStr = getLocalDateString(prevDate);
+            
+            if (currentDateStr === nextDayStr) {
+                // Ardışık gün, streak devam ediyor
+                currentStreak++;
+            } else {
+                // Streak kırıldı, maksimum streak'i güncelle
+                maxStreak = Math.max(maxStreak, currentStreak);
+                currentStreak = 1;
+            }
+        }
+        // Son streak'i de kontrol et
+        maxStreak = Math.max(maxStreak, currentStreak);
+        calculatedBestStreak = maxStreak;
+        
+        // Eğer hesaplanan değer kayıtlı değerden büyükse güncelle
+        if (calculatedBestStreak > (streakData.bestStreak || 0)) {
+            streakData.bestStreak = calculatedBestStreak;
+            log.debug(`🏆 En iyi streak güncellendi: ${calculatedBestStreak} gün`);
+        }
+    }
+    
+    // Toplam Amel Günü: playDates.length kullan (totalPlayDays sadece hedefi tamamlanan günleri sayar)
+    const totalPlayDaysCount = (streakData.playDates && Array.isArray(streakData.playDates)) 
+        ? streakData.playDates.length 
+        : (streakData.totalPlayDays || 0);
+    
     const statsCurrentStreakEl = document.getElementById('statsCurrentStreak');
     const statsBestStreakEl = document.getElementById('statsBestStreak');
     const statsTotalDaysEl = document.getElementById('statsTotalDays');
     const statsTodayProgressEl = document.getElementById('statsTodayProgress');
     if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak || 0;
-    if (statsBestStreakEl) statsBestStreakEl.textContent = streakData.bestStreak || 0;
-    if (statsTotalDaysEl) statsTotalDaysEl.textContent = streakData.totalPlayDays || 0;
+    if (statsBestStreakEl) statsBestStreakEl.textContent = calculatedBestStreak;
+    if (statsTotalDaysEl) statsTotalDaysEl.textContent = totalPlayDaysCount;
     if (statsTodayProgressEl) {
         const todayProgress = streakData.todayProgress || 0;
         const dailyGoal = streakData.dailyGoal || 5;
-        statsTodayProgressEl.textContent = Math.min(todayProgress, dailyGoal) + '/' + dailyGoal;
+        // Gerçek ilerlemeyi göster (hedefi aşsa bile)
+        statsTodayProgressEl.textContent = todayProgress + '/' + dailyGoal;
     }
     
     // Bugünkü oyun türü istatistikleri (null check ile)
@@ -5542,9 +5682,21 @@ function showStatsModal() {
 function updateAnalyticsData() {
     // Zaman analizi
     const todayTotalQuestions = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
-    // Ortalama bir soru ~10 saniye sürer (kelime çevir için)
-    const todayMinutes = Math.round((todayTotalQuestions * 10) / 60);
-    const questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions / todayMinutes) * 60) : 0;
+    
+    // Gerçek oyun süresini kullan (milisaniye cinsinden)
+    const totalPlayTimeMs = dailyTasks.todayStats.totalPlayTime || 0;
+    let todayMinutes = 0;
+    let questionsPerHour = 0;
+    
+    if (totalPlayTimeMs > 0) {
+        // Gerçek süre varsa kullan
+        todayMinutes = Math.round(totalPlayTimeMs / (1000 * 60)); // Milisaniyeyi dakikaya çevir
+        questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions * 60) / todayMinutes) : 0;
+    } else if (todayTotalQuestions > 0) {
+        // Gerçek süre yoksa tahmini kullan (ortalama 10 saniye/soru)
+        todayMinutes = Math.round((todayTotalQuestions * 10) / 60);
+        questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions * 60) / todayMinutes) : 0;
+    }
     
     const analyticsTodayTime = document.getElementById('analyticsTodayTime');
     const analyticsQuestionPerHour = document.getElementById('analyticsQuestionPerHour');
@@ -5573,11 +5725,14 @@ function updateAnalyticsData() {
         const remainingPoints = Math.max(0, dailyGoalHasene - todayProgress);
         if (remainingPoints === 0) {
             analyticsTimeToGoal.textContent = '🎉 Hedef tamamlandı!';
-        } else if (questionsPerHour > 0 && todayProgress > 0) {
+        } else if (questionsPerHour > 0 && todayProgress > 0 && todayTotalQuestions > 0) {
             // Ortalama puan/soru: bugünkü puan / bugünkü soru sayısı
-            const avgPointsPerQuestion = todayTotalQuestions > 0 ? todayProgress / todayTotalQuestions : 20;
+            const avgPointsPerQuestion = todayProgress / todayTotalQuestions;
             const remainingQuestions = Math.ceil(remainingPoints / avgPointsPerQuestion);
-            const estimatedMinutes = Math.ceil((remainingQuestions * 10) / 60);
+            
+            // Gerçek soru/saat hızını kullan (questionsPerHour zaten hesaplandı)
+            // Kalan soru sayısı / saatte çözülen soru sayısı * 60 = dakika
+            const estimatedMinutes = Math.ceil((remainingQuestions / questionsPerHour) * 60);
             
             if (estimatedMinutes < 60) {
                 analyticsTimeToGoal.textContent = `Tahmini: ${estimatedMinutes} dakika kaldı`;
@@ -5596,29 +5751,59 @@ function updateAnalyticsData() {
     const wordStatsArray = Object.values(wordStats);
     
     if (wordStatsArray.length > 0) {
-        // Ortalama başarı oranı
-        const totalSuccessRate = wordStatsArray.reduce((sum, stat) => sum + (stat.successRate || 0), 0);
+        // Ortalama başarı oranı - tüm kelimelerin successRate ortalaması
+        const totalSuccessRate = wordStatsArray.reduce((sum, stat) => {
+            // Eğer successRate yoksa, hesapla
+            let successRate = stat.successRate;
+            if (typeof successRate === 'undefined' || successRate === null) {
+                const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
+                successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
+            }
+            return sum + successRate;
+        }, 0);
         const avgSuccessRate = wordStatsArray.length > 0 ? Math.round((totalSuccessRate / wordStatsArray.length) * 100) : 0;
         
         // En zor kelime (en düşük başarı oranı ve en çok deneme)
-        const hardestWord = wordStatsArray
-            .filter(s => s.attempts > 0)
-            .sort((a, b) => {
-                const scoreA = (a.successRate || 0) * (a.attempts || 1);
-                const scoreB = (b.successRate || 0) * (b.attempts || 1);
+        // Object.entries kullanarak wordId'yi de al
+        const wordStatsWithId = Object.entries(wordStats)
+            .map(([wordId, stat]) => {
+                // successRate yoksa hesapla
+                let successRate = stat.successRate;
+                if (typeof successRate === 'undefined' || successRate === null) {
+                    const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
+                    successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
+                }
+                return { wordId, ...stat, successRate };
+            })
+            .filter(s => (s.attempts || 0) > 0 || ((s.correct || 0) + (s.wrong || 0)) > 0);
+        
+        const hardestWord = wordStatsWithId.length > 0
+            ? wordStatsWithId.sort((a, b) => {
+                const attemptsA = (a.attempts || 0) || ((a.correct || 0) + (a.wrong || 0));
+                const attemptsB = (b.attempts || 0) || ((b.correct || 0) + (b.wrong || 0));
+                const scoreA = (a.successRate || 0) * attemptsA;
+                const scoreB = (b.successRate || 0) * attemptsB;
                 return scoreA - scoreB; // En düşük skor en zor
-            })[0];
+            })[0]
+            : null;
         
         const analyticsAvgSuccess = document.getElementById('analyticsAvgSuccess');
         const analyticsHardestWord = document.getElementById('analyticsHardestWord');
         
         if (analyticsAvgSuccess) analyticsAvgSuccess.textContent = '%' + avgSuccessRate;
-        if (analyticsHardestWord && hardestWord) {
-            // Kelime verisini bul (null kontrolü ile)
-            if (kelimeBulData && Array.isArray(kelimeBulData)) {
-                const wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
-                if (wordData) {
-                    analyticsHardestWord.textContent = wordData.kelime || '-';
+        if (analyticsHardestWord) {
+            if (hardestWord && hardestWord.wordId) {
+                // Kelime verisini bul (null kontrolü ile)
+                let wordData = null;
+                if (window.kelimeCevirData && Array.isArray(window.kelimeCevirData)) {
+                    wordData = window.kelimeCevirData.find(w => w.id === hardestWord.wordId);
+                }
+                // Eğer kelimeCevirData'da bulunamazsa, kelimeBulData'da ara
+                if (!wordData && typeof kelimeBulData !== 'undefined' && Array.isArray(kelimeBulData)) {
+                    wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
+                }
+                if (wordData && wordData.kelime) {
+                    analyticsHardestWord.textContent = wordData.kelime;
                 } else {
                     analyticsHardestWord.textContent = '-';
                 }
@@ -5628,10 +5813,34 @@ function updateAnalyticsData() {
         }
     }
     
-    // Öğrenme haritası
-    const masteredWords = wordStatsArray.filter(s => s.masteryLevel >= 3.0 && s.successRate >= 0.6).length;
-    const practiceWords = wordStatsArray.filter(s => s.masteryLevel >= 1.5 && s.masteryLevel < 3.0 && s.successRate >= 0.5).length;
-    const strugglingWords = wordStatsArray.filter(s => s.successRate < 0.6 || s.masteryLevel < 1.0).length;
+    // Öğrenme haritası - successRate ve masteryLevel değerlerini normalize et
+    const normalizedWordStats = wordStatsArray.map(stat => {
+        // successRate yoksa hesapla
+        let successRate = stat.successRate;
+        if (typeof successRate === 'undefined' || successRate === null) {
+            const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
+            successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
+        }
+        // masteryLevel yoksa 0 kabul et
+        const masteryLevel = (typeof stat.masteryLevel !== 'undefined' && stat.masteryLevel !== null) 
+            ? parseFloat(stat.masteryLevel) || 0 
+            : 0;
+        
+        return { ...stat, successRate, masteryLevel };
+    });
+    
+    // Öğrenilmiş kelimeler: masteryLevel >= 3.0 VE successRate >= 0.6
+    const masteredWords = normalizedWordStats.filter(s => s.masteryLevel >= 3.0 && s.successRate >= 0.6).length;
+    
+    // Pratik yapılan kelimeler: masteryLevel 1.5-3.0 arası VE successRate >= 0.5
+    const practiceWords = normalizedWordStats.filter(s => 
+        s.masteryLevel >= 1.5 && s.masteryLevel < 3.0 && s.successRate >= 0.5
+    ).length;
+    
+    // Zorlanılan kelimeler: successRate < 0.6 VEYA masteryLevel < 1.0
+    const strugglingWords = normalizedWordStats.filter(s => 
+        s.successRate < 0.6 || s.masteryLevel < 1.0
+    ).length;
     
     const analyticsLearnedCount = document.getElementById('analyticsLearnedCount');
     const analyticsPracticeCount = document.getElementById('analyticsPracticeCount');
@@ -5776,12 +5985,22 @@ function updateLeaderboard() {
 }
 
 function getDaysFromFirstPlay() {
-    if (streakData.playDates.length === 0) return 1;
+    if (!streakData || !streakData.playDates || streakData.playDates.length === 0) {
+        // Eğer hiç oyun oynanmamışsa, bugünü say (1 gün)
+        return 1;
+    }
     
-    const firstPlayDate = new Date(streakData.playDates[0]);
+    // İlk oyun tarihi (YYYY-MM-DD formatında)
+    const firstPlayDateStr = streakData.playDates[0];
+    const firstPlayDate = new Date(firstPlayDateStr + 'T00:00:00');
     const today = new Date();
-    const diffTime = Math.abs(today - firstPlayDate);
+    today.setHours(0, 0, 0, 0);
+    
+    // Bugün - İlk oyun tarihi (gün cinsinden)
+    const diffTime = today - firstPlayDate;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // En az 1 gün (bugün oyun oynanmışsa)
     return Math.max(1, diffDays);
 }
 
@@ -8218,6 +8437,25 @@ function addToGlobalPoints(points, correctAnswers = 0) {
         // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
         // updateTaskProgress('toplamDogru', correctAnswers);
         // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
+        
+        // Perfect streak kontrolü - Oyun bitiminde: hiç yanlış yapılmamışsa ve yeterli soru cevaplandıysa
+        // Oyun başına 1 perfect streak (her doğru cevap için değil)
+        if (sessionWrong === 0 && sessionCorrect >= 3 && correctAnswers >= 3) {
+            // Bu oyun için perfect streak yoksa artır
+            dailyTasks.todayStats.perfectStreak = (dailyTasks.todayStats.perfectStreak || 0) + 1;
+            log.game(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
+        }
+        
+        // Oyun süresi takibi - gameState.session.startTime varsa süreyi hesapla ve ekle
+        if (gameState && gameState.session && gameState.session.startTime) {
+            const sessionDuration = Date.now() - gameState.session.startTime;
+            if (sessionDuration > 0) {
+                dailyTasks.todayStats.totalPlayTime = (dailyTasks.todayStats.totalPlayTime || 0) + sessionDuration;
+                log.game(`⏱️ Oyun süresi eklendi: ${Math.round(sessionDuration / 1000)} saniye`);
+            }
+            // Oyun bitince startTime'ı sıfırla
+            gameState.session.startTime = null;
+        }
     }
     
     // NOT: Liderlik tablosu artık addSessionPoints içinde her puan eklendiğinde güncelleniyor
@@ -9352,6 +9590,11 @@ elements.startBtn.onclick = () => {
     comboCount = 0;
     questionCount = 0;
     
+    // Oyun başlangıç zamanını kaydet (gerçek süre takibi için)
+    if (gameState && gameState.session) {
+        gameState.session.startTime = Date.now();
+    }
+    
     // Combo indicator'ı gizle
     hideCombo();
     
@@ -9790,11 +10033,8 @@ function checkAnswer(button, isCorrect) {
         // Daily task progress - her doğru cevap için
         updateTaskProgress('kelimeCevir', 1);
         
-        // Perfect streak kontrolü - hiç yanlış yapmamışsak perfect streak artır
-        if (sessionWrong === 0) {
-            updateTaskProgress('perfectStreak', 1);
-            log.game(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
-        }
+        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
+        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
         
         log.game(`✅ Doğru cevap işlemi tamamlandı!`);
         
@@ -11487,11 +11727,8 @@ function checkDinleAnswer(button, isCorrect) {
         // Daily task progress - her doğru cevap için
         updateTaskProgress('dinleBul', 1);
         
-        // Perfect streak kontrolü - hiç yanlış yapmamışsak perfect streak artır
-        if (sessionWrong === 0) {
-            updateTaskProgress('perfectStreak', 1);
-            log.debug(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
-        }
+        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
+        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
         
         log.debug(`✅ Doğru cevap işlemi tamamlandı!`);
         log.debug(`📊 Sonra - session score: ${sessionScore}, session correct: ${sessionCorrect}`);
@@ -11963,11 +12200,8 @@ function checkBoslukAnswer(button, isCorrect) {
         // Daily task progress - her doğru cevap için
         updateTaskProgress('boslukDoldur', 1);
         
-        // Perfect streak kontrolü - hiç yanlış yapmamışsak perfect streak artır
-        if (sessionWrong === 0) {
-            updateTaskProgress('perfectStreak', 1);
-            log.debug(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
-        }
+        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
+        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
         
         log.debug(`✅ Doğru cevap işlemi tamamlandı!`);
 
