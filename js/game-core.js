@@ -2618,6 +2618,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Detaylı istatistikler butonuna event listener ekle (detailed-stats.js yüklendikten sonra)
     setTimeout(() => {
+        // Detaylı istatistikler modal butonu (eski buton - hala çalışıyor olabilir)
         const detailedStatsBtn = document.getElementById('detailedStatsBtn');
         if (detailedStatsBtn) {
             const handleDetailedStatsClick = function(e) {
@@ -2625,18 +2626,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 
-                log.debug('📊 Detaylı buton tıklandı');
-                
-                // İstatistikler sekmesini göster, Hasene Bilgi sekmesini gizle
-                const statsTabContent = document.getElementById('statsTabContent');
-                const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
-                
-                if (statsTabContent) {
-                    statsTabContent.style.display = 'block';
-                }
-                if (haseneInfoTabContent) {
-                    haseneInfoTabContent.style.display = 'none';
-                }
+                log.debug('📊 Detaylı istatistikler modal butonu tıklandı');
                 
                 if (typeof window.showDetailedStats === 'function') {
                     log.debug('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
@@ -2662,49 +2652,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }, { capture: true, passive: false });
             
-            log.debug('✅ Detaylı istatistikler butonu event listener eklendi');
-        } else {
-            log.warn('⚠️ detailedStatsBtn elementi bulunamadı!');
-        }
-        
-        // Hasene Bilgi butonuna event listener ekle
-        const haseneInfoBtn = document.getElementById('haseneInfoBtn');
-        if (haseneInfoBtn) {
-            const handleHaseneInfoClick = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                
-                log.debug('📿 Hasene Bilgi buton tıklandı');
-                
-                // İstatistikler sekmesini gizle
-                const statsTabContent = document.getElementById('statsTabContent');
-                const haseneInfoTabContent = document.getElementById('haseneInfoTabContent');
-                
-                if (statsTabContent) {
-                    statsTabContent.style.display = 'none';
-                }
-                if (haseneInfoTabContent) {
-                    haseneInfoTabContent.style.display = 'block';
-                }
-                
-                return false;
-            };
-            
-            // Click event
-            haseneInfoBtn.addEventListener('click', handleHaseneInfoClick, { capture: true, passive: false });
-            
-            // Touch event (mobil için)
-            haseneInfoBtn.addEventListener('touchend', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                handleHaseneInfoClick(e);
-                return false;
-            }, { capture: true, passive: false });
-            
-            log.debug('✅ Hasene Bilgi butonu event listener eklendi');
-        } else {
-            log.warn('⚠️ haseneInfoBtn elementi bulunamadı!');
+            log.debug('✅ Detaylı istatistikler modal butonu event listener eklendi');
         }
     }, 100); // 100ms gecikme ile detailed-stats.js yüklensin
     
@@ -5583,6 +5531,9 @@ function showStatsModal() {
         // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
         updateLeaderboard();
         
+        // Varsayılan olarak Detaylı sekmesini aktif et
+        switchStatsTab('detailed');
+        
         log.debug('📊 İstatistikler modalı açıldı');
     });
 }
@@ -8199,12 +8150,51 @@ function switchTasksTab(tab) {
     }
 }
 
+// İstatistikler sekme değiştirme fonksiyonu (Vazifeler paneli gibi)
+function switchStatsTab(tab) {
+    const detailedTabBtn = document.getElementById('detailedStatsTabBtn');
+    const haseneInfoTabBtn = document.getElementById('haseneInfoTabBtn');
+    const detailedTab = document.getElementById('statsTabContent');
+    const haseneInfoTab = document.getElementById('haseneInfoTabContent');
+    
+    if (tab === 'detailed') {
+        // Detaylı sekmesi aktif
+        if (detailedTabBtn) {
+            detailedTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            detailedTabBtn.style.color = 'white';
+            detailedTabBtn.style.boxShadow = '0 2px 6px rgba(102, 126, 234, 0.3)';
+        }
+        if (haseneInfoTabBtn) {
+            haseneInfoTabBtn.style.background = '#f3f4f6';
+            haseneInfoTabBtn.style.color = '#6b7280';
+            haseneInfoTabBtn.style.boxShadow = 'none';
+        }
+        if (detailedTab) detailedTab.style.display = 'block';
+        if (haseneInfoTab) haseneInfoTab.style.display = 'none';
+    } else {
+        // Hasene Bilgi sekmesi aktif
+        if (detailedTabBtn) {
+            detailedTabBtn.style.background = '#f3f4f6';
+            detailedTabBtn.style.color = '#6b7280';
+            detailedTabBtn.style.boxShadow = 'none';
+        }
+        if (haseneInfoTabBtn) {
+            haseneInfoTabBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            haseneInfoTabBtn.style.color = 'white';
+            haseneInfoTabBtn.style.boxShadow = '0 2px 6px rgba(245, 158, 11, 0.3)';
+        }
+        if (detailedTab) detailedTab.style.display = 'none';
+        if (haseneInfoTab) haseneInfoTab.style.display = 'block';
+    }
+}
+
 // Global fonksiyonlar
 window.showDailyTasksModal = showDailyTasksModal;
 window.closeDailyTasksModal = closeDailyTasksModal;
 window.claimDailyRewards = claimDailyRewards;
 window.claimWeeklyRewards = claimWeeklyRewards;
 window.switchTasksTab = switchTasksTab;
+window.switchStatsTab = switchStatsTab;
 
 // OYUN BİTİŞ FONKSİYONU (Oyun bitince çağrılır)
 // NOT: Puanlar zaten addSessionPoints() ile eklendi, burada sadece kontrol yapıyoruz

@@ -1002,26 +1002,50 @@
 
     <!-- İstatistikler Modal -->
     <div class="modal" id="statsModal" onclick="handleStatsModalClick(event)" role="dialog" aria-modal="true" aria-labelledby="statsModalTitle" aria-label="İstatistikler modalı">
-        <div class="modal-content stats-content" onclick="event.stopPropagation();" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 16px; touch-action: pan-y; box-sizing: border-box;">
-            <!-- Başlık ve Kapat Butonu -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0;">
-                <h3 style="margin: 0; font-size: 1.1em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="detailedStatsBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 10;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Detaylı İstatistikler">
-                        📈 Detaylı
-                    </button>
-                    <button id="haseneInfoBtn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; z-index: 10;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" title="Hasene Bilgi">
-                        📿 Hasene Bilgi
-                    </button>
-                    <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();">×</button>
-                </div>
-            </div>
-
+        <div class="modal-content stats-content" onclick="event.stopPropagation();" style="max-width: 500px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; padding: 0; touch-action: pan-y; box-sizing: border-box; border-radius: 24px;">
             <!-- Scroll Edilebilir İçerik -->
             <div id="statsScrollableContent" style="flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; min-height: 0; max-height: 100%; padding-right: 4px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
+                <!-- Header -->
+                <div style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%); display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #f0f0f0;">
+                    <h3 style="margin: 0; font-size: 1.1em; font-weight: 700; color: #667eea;">📊 İstatistikler</h3>
+                    <button id="closeStatsBtn" class="modal-close-btn" onclick="event.stopPropagation(); closeStatsModal();" style="flex-shrink: 0; width: 32px; height: 32px; font-size: 18px;">×</button>
+                </div>
+                
+                <!-- Tab Navigation -->
+                <div style="display: flex; gap: 6px; margin: 12px 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">
+                    <button id="detailedStatsTabBtn" onclick="switchStatsTab('detailed')" style="
+                        flex: 1;
+                        padding: 8px 12px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        font-size: 0.8em;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+                    ">
+                        📈 Detaylı
+                    </button>
+                    <button id="haseneInfoTabBtn" onclick="switchStatsTab('haseneInfo')" style="
+                        flex: 1;
+                        padding: 8px 12px;
+                        background: #f3f4f6;
+                        color: #6b7280;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        font-size: 0.8em;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    ">
+                        📿 Hasene Bilgi
+                    </button>
+                </div>
                 
                 <!-- İstatistikler İçeriği -->
-                <div id="statsTabContent">
+                <div id="statsTabContent" style="padding: 0 16px;">
                 <!-- Mertebe Terakki Barı - Modern -->
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
                 <h3 style="font-size: 14px; margin-bottom: 12px; opacity: 0.9; font-weight: 600;">📈 Mertebe Terakkisi</h3>
@@ -1372,7 +1396,7 @@
                 <!-- İstatistikler Sekmesi Sonu -->
 
                 <!-- Hasene Bilgi Sekmesi -->
-                <div id="haseneInfoTabContent" style="display: none;">
+                <div id="haseneInfoTabContent" class="stats-tab-content" style="display: none; padding: 0 16px;">
                     <!-- Özet Bilgi - Modern Tasarım -->
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px; text-align: center; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
                         <div style="font-size: 12px; margin-bottom: 6px; opacity: 0.9; font-weight: 500;">⏱️ Hızlı çalışarak</div>
