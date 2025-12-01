@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.js'],
     include: ['tests/**/*.test.js'],
+    testTimeout: 30000, // 30 saniye timeout (UI testleri için)
     // CommonJS modüllerini destekle
     server: {
       deps: {

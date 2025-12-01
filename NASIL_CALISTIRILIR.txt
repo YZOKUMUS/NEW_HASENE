@@ -1,0 +1,51 @@
+╔═══════════════════════════════════════════════════════════╗
+║          TESTLERI NASIL ÇALIŞTIRILIR?                     ║
+╚═══════════════════════════════════════════════════════════╝
+
+1. TERMİNAL AÇIN
+   - VS Code: Ctrl + ` (backtick tuşu)
+   - Windows: Win + R → powershell yazın
+
+2. PROJE KLASÖRÜNE GİDİN (gerekirse)
+   cd C:\Users\ziyao\Desktop\NEW_HASENE
+
+3. TESTLERİ ÇALIŞTIRIN
+   npm test tests/ui.test.js
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DİĞER KOMUTLAR:
+
+✅ Tüm testleri çalıştır:
+   npm test
+
+✅ Watch mode (otomatik test):
+   npm run test:watch
+
+✅ Test coverage:
+   npm run test:coverage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BEKLENEN SONUÇ:
+
+✓ UI - Kullanıcı Arayüzü Testleri (67)
+  ✓ DOM Element Varlığı (10)
+  ✓ Modal Elementleri (4)
+  ...
+
+Test Files  1 passed (1)
+     Tests  67 passed (67)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SORUN YAŞARSANIZ:
+
+❌ "npm" bulunamadı → Node.js yüklü mü kontrol edin
+❌ Paketler eksik → npm install çalıştırın
+❌ Testler yavaş → Memory limiti artırın
+
+═══════════════════════════════════════════════════════════
+
+🎉 BAŞARILAR!
+
