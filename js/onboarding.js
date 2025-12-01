@@ -179,11 +179,9 @@ function initOnboarding() {
     if (els.skipBtn) {
         els.skipBtn.onclick = () => skipOnboarding();
     }
-
-    // İlk yüklemede küçük bir gecikmeyle göster (ana ekran otursun)
-    window.setTimeout(() => {
-        showOnboarding(false);
-    }, 800);
+    // NOT: Artık burada otomatik açmıyoruz.
+    // Yükleme ekranı kapandıktan sonra index.html içindeki script
+    // window.showOnboarding(false) çağırarak hoş geldin turunu başlatacak.
 }
 
 window.addEventListener('DOMContentLoaded', () => {

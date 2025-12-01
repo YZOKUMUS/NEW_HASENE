@@ -138,39 +138,51 @@
     
 </head>
 <body>
-    <!-- Loading Sayfası - Kapak2 Görseli + Özel Progress Çubuğu -->
-    <div class="loading-screen-new loading-screen-pro hasene-cover-loading" id="loadingScreen">
-        <div class="hasene-cover-bg"></div>
 
-        <!-- Yüklenme metni / aşama (JS: loadingProgressLabel) -->
-        <div class="hasene-cover-progress" aria-live="polite">
-            <div class="hasene-cover-progress-text" id="loadingProgressLabel">Yükleniyor...</div>
-            <div class="hasene-cover-progress-track">
-                <div class="hasene-cover-progress-fill" id="loadingProgressBar"></div>
+    <!-- Basit KAPAK2 tam sayfa loading ekranı (test için) -->
+    <div id="loadingScreen" class="kapak-loading">
+        <div class="kapak-loading-image-wrap">
+            <!-- Besmele-i Şerif (resmin çerçevesi ÜZERİNDE, üst kısımda) -->
+            <div class="kapak-loading-besmele">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
-            <div class="hasene-cover-copy">© YZOKUMUS - 2025</div>
+            
+            <img src="assets/images/kapak5.png"
+                 alt="HASENE Kapak"
+                 class="kapak-loading-image">
+            
+            <!-- Hadis kutusu (resmin çerçevesi İÇİNDE, alt çerçeveye yapışık) -->
+            <div class="kapak-loading-hadith">
+                <div class="kapak-loading-hadith-ar">
+                    مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
+                </div>
+                <div class="kapak-loading-hadith-tr">
+                    “Kim Allah'ın kitabından bir harf okursa ona bir hasene verilir; her hasene on katıyla yazılır.”
+                </div>
+                <div class="kapak-loading-hadith-src">
+                    (Tirmizî, Sevâbü'l-Kur'ân, 16)
+                </div>
+            </div>
+            
+            <!-- Loading bar + metin (resmin çerçevesi İÇİNDE, alt kısımda) -->
+            <div class="kapak-loading-progress">
+                <div class="kapak-loading-progress-text" id="kapakLoadingLabel">
+                    Kelime verileri yükleniyor...
+                </div>
+                <div class="kapak-loading-progress-track">
+                    <div class="kapak-loading-progress-fill" id="kapakLoadingBar"></div>
+                </div>
+            </div>
         </div>
-
-        <!-- Küçük HASENE hadisi -->
-        <div class="hasene-cover-hadith" aria-label="Hasene ile ilgili hadis">
-            <div class="hasene-cover-hadith-arabic">
-                مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
-            </div>
-            <div class="hasene-cover-hadith-tr">
-                “Kim Allah'ın kitabından bir harf okursa ona bir hasene verilir; her hasene on katıyla yazılır.”
-            </div>
-            <div class="hasene-cover-hadith-src">
-                (Tirmizî, Sevâbü'l-Kur'ân, 16)
-            </div>
+        
+        <!-- Copyright -->
+        <div class="kapak-loading-copyright">
+            YZOKUMUS-2025
         </div>
-
-        <!-- Harf animasyonu için görünmez hedef (bagIcon id'si JS tarafından kullanılıyor) -->
-        <div id="bagIcon" style="position:absolute; bottom:24px; right:24px; width:40px; height:40px; opacity:0;"></div>
     </div>
 
-
-        <!-- Ana Menü -->
-        <div class="main-menu" id="mainMenu">
+    <!-- Ana Menü -->
+    <div class="main-menu" id="mainMenu">
             <!-- Hero Section - Minimal Kompakt Tasarım -->
             <div class="hero-section hero-section-minimal">
                 <div class="hero-content hero-content-minimal">
@@ -2306,6 +2318,59 @@
     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 215, 0, 0.5)'">
     📲 Uygulamayı Yükle
 </button>
+
+<!-- Kapak2 loading ekranı: bar + hadis ile yavaş yükleme -->
+<script>
+    window.addEventListener('load', function () {
+        var loader = document.getElementById('loadingScreen');
+        var bar = document.getElementById('kapakLoadingBar');
+        var label = document.getElementById('kapakLoadingLabel');
+        if (!loader || !bar || !label) return;
+
+        var steps = [
+            { percent: 40, text: 'Kelime verileri yükleniyor...', duration: 2000 },
+            { percent: 75, text: 'Ayetler hazırlanıyor...',       duration: 2000 },
+            { percent: 100, text: 'Haydi Bismillah...',           duration: 2000 }
+        ];
+
+        var progress = 0;
+
+        function runStep() {
+            if (steps.length === 0) {
+                // Bitti, fade-out
+                setTimeout(function () {
+                    loader.classList.add('kapak-loading-hide');
+                    // Loading tamamen bittikten KISA BİR SÜRE sonra hoş geldin turunu aç
+                    if (window.showOnboarding) {
+                        setTimeout(function () {
+                            window.showOnboarding(false);
+                        }, 400);
+                    }
+                }, 700);
+                return;
+            }
+
+            var step = steps.shift();
+            var target = step.percent;
+            label.textContent = step.text;
+
+            var increment = (target - progress) / (step.duration / 50);
+            var interval = setInterval(function () {
+                progress += increment;
+                if (progress >= target) {
+                    progress = target;
+                    clearInterval(interval);
+                    bar.style.width = progress + '%';
+                    setTimeout(runStep, 400);
+                } else {
+                    bar.style.width = progress + '%';
+                }
+            }, 50);
+        }
+
+        runStep();
+    });
+</script>
 
 </body>
 </html>
