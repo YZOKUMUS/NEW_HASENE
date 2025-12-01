@@ -2,7 +2,7 @@
 
 ## 🎨 Renk Sistemi Özeti
 
-Takvim ve haftalık takipte **Duolingo tarzı** renk sistemi kullanılıyor.
+Takvim ve haftalık takipte **modern oyun benzeri** bir renk sistemi kullanılıyor.
 
 ---
 
@@ -11,7 +11,7 @@ Takvim ve haftalık takipte **Duolingo tarzı** renk sistemi kullanılıyor.
 ### Gün Durumlarına Göre Renkler:
 
 #### 1. ✅ **Bugün - Tamamlandı**
-- **Renk**: `#58cc02` (Duolingo yeşili)
+- **Renk**: `#58cc02` (canlı yeşil)
 - **Arka Plan**: Yeşil dolu
 - **Metin**: Beyaz
 - **Kenarlık**: Yeşil
@@ -81,7 +81,7 @@ Takvim ve haftalık takipte **Duolingo tarzı** renk sistemi kullanılıyor.
 ### Gün Durumlarına Göre Renkler:
 
 #### 1. ✅ **Bugün - Tamamlandı**
-- **Renk**: `#58cc02` (Duolingo yeşili)
+- **Renk**: `#58cc02` (canlı yeşil)
 - **Arka Plan**: Yeşil dolu
 - **Metin**: Beyaz (✓ işareti)
 - **Kenarlık**: Yeşil
@@ -203,7 +203,7 @@ Tüm renkler dark mode'da otomatik olarak uyarlanıyor:
 
 ## ✅ Sonuç
 
-**Renk sistemi**: Duolingo tarzı, tutarlı ve kullanıcı dostu
+**Renk sistemi**: Modern oyun tarzı, tutarlı ve kullanıcı dostu
 
 **Ana renkler**:
 - 🟢 Yeşil (`#58cc02`) - Tamamlandı

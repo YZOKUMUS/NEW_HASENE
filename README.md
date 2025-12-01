@@ -147,6 +147,11 @@ function myFunction(param1, param2 = 0) {
 - **Vitest**: Test framework
 - **JSDoc**: API dokümantasyonu
 
+## ⚖️ Telif ve Marka Notu
+
+- Bu proje, **herhangi bir kurum veya ticari marka ile bağlantılı değildir**; tamamen bağımsız olarak geliştirilmiştir.
+- Arayüz ve renk seçimleri, genel olarak modern eğitim oyunlarından ilham alan **özgün bir tasarım**dır; belirli bir markanın kopyası veya klonu değildir.
+
 ## 🎯 Hasene Sistemi
 
 - **100 Hasene = 1 Yıldız**

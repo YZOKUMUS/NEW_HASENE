@@ -7070,7 +7070,7 @@ function generateWeeklyStreakDisplay() {
         const currentStreakDates = calculateCurrentStreakDates();
         const currentStreakSet = new Set(currentStreakDates || []);
     
-    // HTML oluştur - Duolingo Style
+    // HTML oluştur - modern oyun takvim stili
     let html = '';
     
     // Gün isimleri (üst satır)
@@ -7082,7 +7082,7 @@ function generateWeeklyStreakDisplay() {
     });
     html += '</div>';
     
-    // Günler (alt satır) - Duolingo kare stili
+    // Günler (alt satır) - kare kutu stili
     html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">';
     weekDays.forEach(day => {
         const hasPlayed = playDatesSet.has(day.dateStr);
@@ -7196,7 +7196,7 @@ function generateMonthlyCalendar() {
     // HTML string olarak oluştur
     let html = '';
     
-    // Haftanın günlerini ekle (Duolingo style - üst satır)
+    // Haftanın günlerini ekle (üst satır)
     // Pazartesi'den başlayan gün isimleri (haftalık takvim ile uyumlu)
     const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
     const dayNameColor = isDarkMode ? '#b0b0b0' : '#999';
@@ -7220,7 +7220,7 @@ function generateMonthlyCalendar() {
     // playDates array'ini Set'e çevir
     const playDatesSet = new Set(streakData.playDates);
     
-    // Ayın günlerini ekle (Duolingo kare stili)
+    // Ayın günlerini ekle (kare kutu stili)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -7228,7 +7228,7 @@ function generateMonthlyCalendar() {
         const isInStreak = currentStreakSet.has(dateStr);
         const isToday = dateStr === todayStr;
         
-        // Duolingo style kare
+        // Kare kutu görünümü
         let boxStyle = 'aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;';
         
         if (isToday) {

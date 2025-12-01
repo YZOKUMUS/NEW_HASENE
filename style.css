@@ -2615,7 +2615,7 @@ body {
 
 
 
-/* Badges Modal - Yeni Duolingo Tarzı Tasarım */
+/* Badges Modal - Modern rozet ekranı tasarımı */
 #badgesScrollableContent {
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior: contain !important;
@@ -3545,7 +3545,7 @@ body {
     hyphens: auto;
 }
 
-/* Translation text styles - Duolingo benzeri font (Ayet Oku ve Dua Et) */
+/* Translation text styles - modern okuma deneyimi (Ayet Oku ve Dua Et) */
 .translation {
     font-size: clamp(14px, 3vw, 18px);
     line-height: 1.7;
