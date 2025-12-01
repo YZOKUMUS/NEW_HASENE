@@ -4308,6 +4308,22 @@ body.no-scroll {
 .game-screen .duolingo-option:nth-child(4) { animation-delay: 0.4s; }
 
 /* Responsive */
+@media (max-width: 768px) {
+    /* Tablet ve mobil için Sonraki Soru butonunun alt navigasyon barının altında kalmaması */
+    .game-screen .duolingo-options-container,
+    .dinle-mode .duolingo-options-container,
+    .bosluk-mode .duolingo-options-container {
+        padding-bottom: 100px !important; /* Alt nav bar + ekstra boşluk */
+    }
+    
+    #nextBtn, #dinleNextBtn, #boslukNextBtn,
+    #duaNextBtn, #ayetNextBtn, #hadisNextBtn {
+        margin-bottom: 20px !important; /* Butonun altına ekstra boşluk */
+        position: relative;
+        z-index: 10; /* Alt nav bar'ın üstünde kalması için */
+    }
+}
+
 @media (max-width: 480px) {
     .game-screen .duolingo-question-area {
         padding: 30px 20px;
@@ -4320,6 +4336,20 @@ body.no-scroll {
     
     .game-screen .duolingo-question-hint {
         font-size: 16px;
+    }
+    
+    /* Sonraki Soru butonunun alt navigasyon barının altında kalmaması için - KÜÇÜK MOBİL */
+    .game-screen .duolingo-options-container,
+    .dinle-mode .duolingo-options-container,
+    .bosluk-mode .duolingo-options-container {
+        padding-bottom: 110px !important; /* Küçük ekranlarda daha fazla boşluk */
+    }
+    
+    #nextBtn, #dinleNextBtn, #boslukNextBtn,
+    #duaNextBtn, #ayetNextBtn, #hadisNextBtn {
+        margin-bottom: 25px !important; /* Küçük ekranlarda daha fazla boşluk */
+        position: relative;
+        z-index: 10; /* Alt nav bar'ın üstünde kalması için */
     }
 }
 
@@ -5159,7 +5189,21 @@ body.no-scroll {
     .dinle-mode,
     .bosluk-mode {
         padding: 4px !important;
-        padding-bottom: 85px !important; /* Alt nav bar için boşluk (mobilde 70px) */
+        padding-bottom: 100px !important; /* Alt nav bar için boşluk - artırıldı */
+    }
+    
+    /* Sonraki Soru butonunun alt navigasyon barının altında kalmaması için - TÜM OYUN MODLARI */
+    .game-screen .duolingo-options-container,
+    .dinle-mode .duolingo-options-container,
+    .bosluk-mode .duolingo-options-container {
+        padding-bottom: 100px !important; /* Alt nav bar + ekstra boşluk */
+    }
+    
+    #nextBtn, #dinleNextBtn, #boslukNextBtn,
+    #duaNextBtn, #ayetNextBtn, #hadisNextBtn {
+        margin-bottom: 20px !important; /* Butonun altına ekstra boşluk */
+        position: relative;
+        z-index: 10; /* Alt nav bar'ın üstünde kalması için */
     }
     
     /* Game Box - Extra Padding Reduction */
