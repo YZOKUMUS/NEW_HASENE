@@ -2800,7 +2800,7 @@ function showCustomConfirm(correct, wrong, xp) {
         // Hasene değerini formatlı göster (binlik ayırıcı ile)
         confirmXP.textContent = typeof xp === 'number' ? xp.toLocaleString('tr-TR') : xp;
         
-        // Perfect Lesson kontrolü - Modal'da göster
+        // Mükemmel Ders kontrolü - Modal'da göster
         const PERFECT_LESSON_TEST_MODE = true;
         const MIN_QUESTIONS_FOR_PERFECT = 3;
         const isPerfectLesson = PERFECT_LESSON_TEST_MODE && 
@@ -2812,7 +2812,7 @@ function showCustomConfirm(correct, wrong, xp) {
             const perfectBonus = Math.floor(xp * 0.5);
             perfectBonusAmount.textContent = `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene`;
             perfectLessonBonus.style.display = 'block';
-            forceLog('[MODAL] Perfect Lesson bonusu modal\'da gosteriliyor: +' + perfectBonus);
+            forceLog('[MODAL] Mükemmel Ders bonusu modal\'da gosteriliyor: +' + perfectBonus);
         } else if (perfectLessonBonus) {
             perfectLessonBonus.style.display = 'none';
         }
@@ -7457,7 +7457,7 @@ function generateDailyTasks(date) {
         { id: 'dogru20', name: '20 doğru cevap ver (bonus)', target: 20, current: 0, type: 'toplamDogru', reward: 2 },
         // Yeni çeşitli görevler
         { id: 'review5', name: '5 zorlanılan kelimeyi tekrar et', target: 5, current: 0, type: 'reviewWords', reward: 2 },
-        { id: 'combo3x', name: '3x combo yap', target: 3, current: 0, type: 'comboCount', reward: 2 },
+        { id: 'combo3x', name: '3x muvazebet yap', target: 3, current: 0, type: 'comboCount', reward: 2 },
         { id: 'accuracy80', name: '%80 başarı oranı yakala', target: 80, current: 0, type: 'accuracy', reward: 2 },
         { id: 'allModes', name: 'Tüm oyun modlarını dene', target: 4, current: 0, type: 'allGameModes', reward: 3 },
         { id: 'streakMaintain', name: 'Serini koru (günlük hedef)', target: 1, current: 0, type: 'streakMaintain', reward: 2 },
@@ -7582,7 +7582,7 @@ function generateWeeklyTasks(weekStart) {
         { id: 'week_correct200', name: '200 doğru cevap ver', target: 200, current: 0, type: 'totalCorrect', reward: 5 },
         { id: 'week_days5', name: '5 gün üst üste oyna', target: 5, current: 0, type: 'daysPlayed', reward: 5 },
         { id: 'week_allmodes', name: 'Tüm oyun modlarını oyna', target: 6, current: 0, type: 'allModesPlayed', reward: 7 },
-        { id: 'week_combo30', name: '30x combo yap', target: 30, current: 0, type: 'comboCount', reward: 5 },
+        { id: 'week_combo30', name: '30x muvazebet yap', target: 30, current: 0, type: 'comboCount', reward: 5 },
         { id: 'week_streak7', name: '7 gün seri koru', target: 7, current: 0, type: 'streakDays', reward: 8 }
     ];
     
@@ -8549,10 +8549,8 @@ function getWeeklyTaskDescription(task) {
         'week_hasene5000': 'Bu hafta toplam 5,000 Hasene kazan',
         'week_correct200': 'Bu hafta 200 doğru cevap ver',
         'week_days5': '5 gün üst üste oyun oyna',
-        'week_perfect3': '3 gün hiç yanlış yapmadan oyna',
         'week_allmodes': 'Klasik, Dinle, Boşluk, Ayet, Dua, Hadis modlarını dene',
-        'week_review50': 'Tekrar Et modunda 50 zorlanılan kelimeyi pratik yap',
-        'week_combo30': 'Üst üste 30 doğru cevap ver',
+        'week_combo30': 'Üst üste 30 sahih cevap ile muvazebet yap',
         'week_streak7': '7 gün üst üste günlük hedefini tamamla'
     };
     const description = descriptions[task.id];
@@ -8699,7 +8697,7 @@ function getTaskDisplayName(task) {
         'combo15': '15 Doğru Cevap (Muvazebet)',
         // Yeni görevler
         'review5': '5 Zorlanılan Kelimeyi Tekrar Et',
-        'combo3x': '3x Combo Yap',
+        'combo3x': '3x Muvazebet Yap',
         'accuracy80': '%80 Başarı Oranı Yakala',
         'allModes': 'Tüm Oyun Modlarını Dene',
         'streakMaintain': 'Serini Koru',
