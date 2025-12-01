@@ -138,54 +138,35 @@
     
 </head>
 <body>
-    <!-- Loading Sayfası - Profesyonel Tasarım -->
-    <div class="loading-screen-new loading-screen-pro" id="loadingScreen">
-        <!-- Logo Container with Modern Glassmorphism Design -->
-        <div class="loading-logo-wrapper loading-logo-container-pro">
-            <div class="loading-logo-circle">
-                <img src="assets/images/icon-512-v4-RED-MUSHAF.png" alt="HASENE Logo" class="loading-logo-img loading-logo-img-pro" loading="eager" fetchpriority="high" onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'color:white;font-size:60px;font-weight:bold;\'>📖</div>';">
+    <!-- Loading Sayfası - Kapak2 Görseli + Özel Progress Çubuğu -->
+    <div class="loading-screen-new loading-screen-pro hasene-cover-loading" id="loadingScreen">
+        <div class="hasene-cover-bg"></div>
+
+        <!-- Yüklenme metni / aşama (JS: loadingProgressLabel) -->
+        <div class="hasene-cover-progress" aria-live="polite">
+            <div class="hasene-cover-progress-text" id="loadingProgressLabel">Yükleniyor...</div>
+            <div class="hasene-cover-progress-track">
+                <div class="hasene-cover-progress-fill" id="loadingProgressBar"></div>
             </div>
-        </div>
-        
-        <!-- App Title - Hasene Hat Logo -->
-        <div class="loading-app-title loading-app-title-pro">
-            <img src="assets/images/hasene_hat.png" alt="HASENE" class="loading-hasene-logo">
+            <div class="hasene-cover-copy">© YZOKUMUS - 2025</div>
         </div>
 
-        <!-- Hadith Container - Modern Card Design -->
-        <div class="loading-hadith-container loading-hadith-container-pro" id="hadisBox">
-            <div class="loading-hadith-arabic-text loading-hadith-arabic-pro" id="hadisArabic">
+        <!-- Küçük HASENE hadisi -->
+        <div class="hasene-cover-hadith" aria-label="Hasene ile ilgili hadis">
+            <div class="hasene-cover-hadith-arabic">
                 مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا
             </div>
-            <div class="loading-hadith-turkish-text loading-hadith-turkish-pro" id="hadisTurkish">
-                "Kim Allah'ın kitabından bir harf okursa, ona bir sevap verilir. O sevap da on mislidir."
+            <div class="hasene-cover-hadith-tr">
+                “Kim Allah'ın kitabından bir harf okursa ona bir hasene verilir; her hasene on katıyla yazılır.”
             </div>
-            <div class="loading-hadith-source-text loading-hadith-source-pro">(Tirmizi, Sevâbü'l-Kur'ân 16)</div>
-        </div>
-
-        <!-- Loading Dots Animation -->
-        <div class="loading-dots-pro">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-        </div>
-
-        <!-- Progress Section -->
-        <div class="loading-progress-wrapper loading-progress-container-pro">
-            <div class="loading-progress-text loading-progress-label-pro" id="loadingProgressLabel">Kelime verileri yükleniyor...</div>
-            <div class="loading-progress-track loading-progress-track-pro">
-                <div class="loading-progress-fill loading-progress-fill-pro" id="loadingProgressBar"></div>
+            <div class="hasene-cover-hadith-src">
+                (Tirmizî, Sevâbü'l-Kur'ân, 16)
             </div>
         </div>
-        
-        <!-- Copyright -->
-        <div class="loading-footer-text loading-footer-pro">© YZOKUMUS 2025</div>
+
+        <!-- Harf animasyonu için görünmez hedef (bagIcon id'si JS tarafından kullanılıyor) -->
+        <div id="bagIcon" style="position:absolute; bottom:24px; right:24px; width:40px; height:40px; opacity:0;"></div>
     </div>
-
-   
-
-
-
 
 
         <!-- Ana Menü -->
