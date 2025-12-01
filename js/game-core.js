@@ -1868,11 +1868,29 @@ function filterWordStats(filterType) {
             
             log.stats('🔍 wordId:', wordId, 'wordData bulundu mu?', wordData ? 'EVET ✅' : 'HAYIR ❌');
             
-            // Bulunamazsa - ID'den parse et
+            // Bulunamazsa - önce kelimeBulData içinde ara (fallback)
+            if (!wordData) {
+                try {
+                    if (typeof kelimeBulData !== 'undefined' && Array.isArray(kelimeBulData)) {
+                        const fallbackWord = kelimeBulData.find(w => w.id === wordId);
+                        if (fallbackWord) {
+                            wordData = {
+                                kelime: fallbackWord.kelime,
+                                anlam: fallbackWord.anlam || fallbackWord.sure_adi || '',
+                                id: fallbackWord.id
+                            };
+                        }
+                    }
+                } catch (e) {
+                    log.error('⚠️ kelimeBulData fallback hatası:', e);
+                }
+            }
+            
+            // Hâlâ bulunamazsa - ID'den basit bir açıklama üret
             if (!wordData) {
                 const [sure, ayet, kelimeIndex] = wordId.split(':');
                 wordData = { 
-                    kelime: wordId, // Geçici olarak ID'yi göster
+                    kelime: wordId, // En azından ID'yi göster
                     anlam: `Sure ${sure}, Ayet ${ayet}, Kelime ${kelimeIndex}`,
                     id: wordId
                 };
@@ -2105,7 +2123,7 @@ function filterWordStats(filterType) {
             <div style="background: white; border-radius: 8px; padding: 12px; margin: 8px 0; border-left: 4px solid ${masteryColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                     <div style="flex: 1;">
-                        <div style="font-size: 1.1em; font-weight: bold; color: #2c3e50; margin-bottom: 2px;">
+                        <div class="arabic" style="font-size: 1.3em; font-weight: bold; color: #2c3e50; margin-bottom: 2px; padding: 0;">
                             ${item.wordData.kelime || item.wordId}
                             ${isFav ? ' ⭐' : ''}
                             ${needsReview ? ' 🔄' : ''}
