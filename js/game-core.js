@@ -5985,7 +5985,7 @@ function updateAnalyticsData() {
     }
     
     // Öğrenme haritası - successRate ve masteryLevel değerlerini normalize et
-    const normalizedWordStats = wordStatsArray.map(stat => {
+    const normalizedWordStats = allWordStatsArray.map(stat => {
         // successRate yoksa hesapla
         let successRate = stat.successRate;
         if (typeof successRate === 'undefined' || successRate === null) {
