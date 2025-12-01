@@ -2406,8 +2406,9 @@ body.no-scroll {
     position: fixed;
     inset: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Yukarıdan hizala - besmele üste yakın olsun */
     justify-content: center;
+    padding-top: 60px; /* Besmele'nin görünmesi için yeterli üst boşluk */
     background: #020617;
     z-index: 9999;
     opacity: 1;
@@ -2417,6 +2418,8 @@ body.no-scroll {
 .kapak-loading-image-wrap {
     position: relative;
     display: inline-block;
+    /* Besmele ile resim arasındaki boşluğu azaltmak için */
+    margin-top: 0; /* Margin'i kaldırdık - normal pozisyon */
 }
 
 .kapak-loading-image {
@@ -2435,7 +2438,7 @@ body.no-scroll {
     bottom: 100%;
     left: 0;
     right: 0;
-    transform: translateY(-8px); /* 8px yukarı boşluk */
+    transform: translateY(-2px); /* Biraz boşluk - besmele ile üst arası minimal */
     width: 100%;        /* Resim çerçevesi ile aynı genişlik - tam genişlik */
     text-align: center;
     font-family: 'Uthmani', 'Scheherazade', system-ui, serif;
@@ -2445,7 +2448,8 @@ body.no-scroll {
     font-weight: 600;
     letter-spacing: 10px; /* Harf aralarını daha da açarak resmin tam genişliğine yay */
     z-index: 2;
-    padding: 8px 0;
+    padding: 0; /* Padding'i tamamen kaldırdık */
+    margin-bottom: 0; /* Alt boşluğu kaldırdık */
     box-sizing: border-box;
     white-space: nowrap; /* Tek satırda, çerçevenin geneline yayılabilsin */
 }
@@ -2528,20 +2532,124 @@ body.no-scroll {
     transition: width 0.25s ease-out;
 }
 
-/* Mobil cihazlar için Besmele ayarları */
+/* Mobil cihazlar için Loading Ekranı Responsive Ayarları */
 @media (max-width: 768px) {
+    .kapak-loading {
+        padding-top: 30px; /* Mobilde daha az üst boşluk */
+    }
+    
     .kapak-loading-besmele {
         font-size: 22px; /* Mobilde daha küçük font */
         letter-spacing: 4px; /* Mobilde daha az harf aralığı */
-        padding: 6px 4px; /* Mobilde daha az padding */
+        padding: 0;
+        transform: translateY(0);
+    }
+    
+    .kapak-loading-hadith {
+        padding: 6px 10px; /* Mobilde daha az padding */
+        border-radius: 10px;
+        font-size: 10px;
+    }
+    
+    .kapak-loading-hadith-ar {
+        font-size: 16px; /* Mobilde daha küçük Arapça metin */
+        margin-bottom: 3px;
+    }
+    
+    .kapak-loading-hadith-tr {
+        font-size: 12px; /* Mobilde daha küçük Türkçe metin */
+    }
+    
+    .kapak-loading-hadith-src {
+        font-size: 8px; /* Mobilde daha küçük kaynak metni */
+    }
+    
+    .kapak-loading-progress {
+        width: 75%; /* Mobilde daha geniş progress bar */
+        max-width: 250px;
+    }
+    
+    .kapak-loading-progress-text {
+        font-size: 11px; /* Mobilde daha küçük progress metni */
+        margin-bottom: 5px;
+    }
+    
+    .kapak-loading-copyright {
+        font-size: 10px; /* Mobilde daha küçük copyright */
+        bottom: 12px;
+        letter-spacing: 0.5px;
     }
 }
 
 @media (max-width: 480px) {
+    .kapak-loading {
+        padding-top: 20px; /* Küçük mobilde daha da az üst boşluk */
+    }
+    
     .kapak-loading-besmele {
         font-size: 18px; /* Küçük mobilde daha da küçük */
         letter-spacing: 3px;
-        padding: 4px 2px;
+        padding: 0;
+        transform: translateY(0);
+    }
+    
+    .kapak-loading-hadith {
+        padding: 5px 8px; /* Küçük mobilde daha az padding */
+        border-radius: 8px;
+        font-size: 9px;
+    }
+    
+    .kapak-loading-hadith-ar {
+        font-size: 14px; /* Küçük mobilde daha küçük Arapça metin */
+        margin-bottom: 2px;
+    }
+    
+    .kapak-loading-hadith-tr {
+        font-size: 11px; /* Küçük mobilde daha küçük Türkçe metin */
+    }
+    
+    .kapak-loading-hadith-src {
+        font-size: 7px; /* Küçük mobilde daha küçük kaynak metni */
+    }
+    
+    .kapak-loading-progress {
+        width: 80%; /* Küçük mobilde daha geniş progress bar */
+        max-width: 200px;
+    }
+    
+    .kapak-loading-progress-text {
+        font-size: 10px; /* Küçük mobilde daha küçük progress metni */
+        margin-bottom: 4px;
+    }
+    
+    .kapak-loading-copyright {
+        font-size: 9px; /* Küçük mobilde daha küçük copyright */
+        bottom: 10px;
+        letter-spacing: 0;
+    }
+}
+
+@media (max-width: 360px) {
+    .kapak-loading {
+        padding-top: 15px; /* Çok küçük ekranlarda minimal üst boşluk */
+    }
+    
+    .kapak-loading-besmele {
+        font-size: 16px; /* Çok küçük ekranlarda daha da küçük */
+        letter-spacing: 2px;
+    }
+    
+    .kapak-loading-hadith-ar {
+        font-size: 12px;
+    }
+    
+    .kapak-loading-hadith-tr {
+        font-size: 10px;
+    }
+    
+    .kapak-loading-progress {
+        width: 85%;
+        max-width: 180px;
     }
 }
 
