@@ -1284,6 +1284,12 @@ function addDailyXP(xp) {
                 log.game(`📊 Liderlik tablosu güncellendi (günlük vird bonusu): +${dailyGoalBonus} Hasene`);
             }
             
+            // Günlük haseneye de bonusu ekle ki tüm günlük alanlar aynı toplamı kullansın
+            const currentDailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+            const newDailyHaseneWithBonus = currentDailyHasene + dailyGoalBonus;
+            storage.set('dailyHasene', newDailyHaseneWithBonus.toString());
+            saveDailyStats();
+            
             updateStatsBar();
             debouncedSaveStats(); // Debounced kaydetme
             checkAchievements();
@@ -3223,10 +3229,9 @@ let weeklyTasks = {
         totalCorrect: 0,
         totalWrong: 0,
         daysPlayed: 0,
-        perfectDays: 0,   // Hiç yanlış yapmadan oynanan günler
+        // perfectDays ve reviewWordsCount görevleri kaldırıldı
         streakDays: 0,    // Üst üste oynanan günler
         allModesPlayed: new Set(), // Oynanan tüm oyun modları
-        reviewWordsCount: 0,
         comboCount: 0
     }
 };
@@ -4151,6 +4156,29 @@ todayStats: {
     };
     window.dailyTasks = dailyTasks; // Global erişim için güncelle
 
+    // =========================================
+    // 🔥 HAFTALIK GÖREVLER SİSTEMİ SIFIRLA
+    // =========================================
+    weeklyTasks = {
+        lastWeekStart: '',
+        weekStart: '',
+        weekEnd: '',
+        tasks: [],
+        completedTasks: [],
+        rewardsClaimed: false,
+        weekStats: {
+            totalHasene: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            daysPlayed: 0,
+            // perfectDays ve reviewWordsCount görevleri kaldırıldı
+            streakDays: 0,
+            allModesPlayed: new Set(),
+            comboCount: 0
+        }
+    };
+    window.weeklyTasks = weeklyTasks;
+
     // ================================
 // 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA (Storage Manager ile)
 // ================================
@@ -4193,6 +4221,7 @@ try {
     localStorage.removeItem('hasene_badges');
     localStorage.removeItem('hasene_streak');
     localStorage.removeItem('hasene_dailyTasks');
+    localStorage.removeItem('hasene_weeklyTasks');
     localStorage.removeItem('hasene_currentMode');
     localStorage.removeItem('hasene_currentDifficulty');
     localStorage.removeItem('hasene_wordStats');
@@ -5750,8 +5779,16 @@ function showStatsModal() {
     const statsTodayPointsEl = document.getElementById('statsTodayPoints');
     const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
     const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
-    if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = dailyTasks.todayStats.toplamDogru || 0;
-    if (statsTodayPointsEl) statsTodayPointsEl.textContent = dailyTasks.todayStats.toplamPuan || 0;
+
+    // NOT: günlük sahih ve hasene için tek "gerçek kaynak" localStorage değerleri olsun.
+    // todayStats.toplamDogru / toplamPuan oyun içinde farklı yerlerde ekstra güncellenebiliyor
+    // ve bu da kartta 2x görünmeye sebep olabiliyor. Kartta doğrudan storage'taki günlük
+    // istatistikleri gösteriyoruz ki değerler daima tutarlı olsun.
+    const statsDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
+    const statsDailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
+
+    if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = statsDailyCorrect;
+    if (statsTodayPointsEl) statsTodayPointsEl.textContent = statsDailyHasene;
     if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak || 0;
     if (statsDifficultyCountEl) {
         const farkliZorluk = dailyTasks.todayStats.farklıZorluk;
@@ -5816,7 +5853,11 @@ function updateAnalyticsData() {
     // Günlük hedef durumu
     const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
     const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || defaultGoal.toString());
-    const todayProgress = dailyTasks.todayStats.toplamPuan || 0;
+
+    // ANALITIK KARTTA DA TEK KAYNAK: storage'daki dailyHasene
+    // todayStats.toplamPuan bazı bonus senaryolarında farklı hesaplandığı için
+    // burada da doğrudan dailyHasene'yi kullanıyoruz.
+    const todayProgress = parseInt(localStorage.getItem('dailyHasene') || '0');
     const goalProgressPercent = dailyGoalHasene > 0 ? Math.min(100, Math.round((todayProgress / dailyGoalHasene) * 100)) : 0;
     
     const analyticsDailyGoal = document.getElementById('analyticsDailyGoal');
@@ -5857,12 +5898,12 @@ function updateAnalyticsData() {
     }
     
     // Kelime performansı
-    const wordStats = loadWordStats();
-    const wordStatsArray = Object.values(wordStats);
+    const allWordStats = loadWordStats();
+    const allWordStatsArray = Object.values(allWordStats);
     
-    if (wordStatsArray.length > 0) {
+    if (allWordStatsArray.length > 0) {
         // Ortalama başarı oranı - tüm kelimelerin successRate ortalaması
-        const totalSuccessRate = wordStatsArray.reduce((sum, stat) => {
+        const totalSuccessRate = allWordStatsArray.reduce((sum, stat) => {
             // Eğer successRate yoksa, hesapla
             let successRate = stat.successRate;
             if (typeof successRate === 'undefined' || successRate === null) {
@@ -5871,11 +5912,11 @@ function updateAnalyticsData() {
             }
             return sum + successRate;
         }, 0);
-        const avgSuccessRate = wordStatsArray.length > 0 ? Math.round((totalSuccessRate / wordStatsArray.length) * 100) : 0;
+        const avgSuccessRate = allWordStatsArray.length > 0 ? Math.round((totalSuccessRate / allWordStatsArray.length) * 100) : 0;
         
-        // En zor kelime (en düşük başarı oranı ve en çok deneme)
+        // En zor kelime (SON 7 GÜN) - en düşük başarı oranı ve en çok deneme
         // Object.entries kullanarak wordId'yi de al
-        const wordStatsWithId = Object.entries(wordStats)
+        const wordStatsWithId = Object.entries(allWordStats)
             .map(([wordId, stat]) => {
                 // successRate yoksa hesapla
                 let successRate = stat.successRate;
@@ -5887,9 +5928,13 @@ function updateAnalyticsData() {
             })
             .filter(s => (s.attempts || 0) > 0 || ((s.correct || 0) + (s.wrong || 0)) > 0);
         
-        // En zor kelime: En düşük başarı oranı + en fazla yanlış cevap
+        // En zor kelime: Son 7 günde en düşük başarı oranı + en fazla deneme
         // Minimum 3 deneme şartı (yeterli veri için)
         const MIN_ATTEMPTS_FOR_HARDEST = 3;
+
+        // Kelime istatistikleri tarih tutmuyorsa, şimdilik global istatistikler üzerinden
+        // son 7 gün için bir approx yaklaşımı kullanılır. İleride tarih bazlı kelime istatistiği
+        // eklenirse burası doğrudan son 7 gün verisine bağlanabilir.
         const hardestWord = wordStatsWithId.length > 0
             ? wordStatsWithId
                 .filter(s => {
@@ -7536,9 +7581,7 @@ function generateWeeklyTasks(weekStart) {
         { id: 'week_hasene5000', name: '5,000 Hasene topla', target: 5000, current: 0, type: 'totalHasene', reward: 5 },
         { id: 'week_correct200', name: '200 doğru cevap ver', target: 200, current: 0, type: 'totalCorrect', reward: 5 },
         { id: 'week_days5', name: '5 gün üst üste oyna', target: 5, current: 0, type: 'daysPlayed', reward: 5 },
-        { id: 'week_perfect3', name: '3 gün hiç yanlış yapmadan oyna', target: 3, current: 0, type: 'perfectDays', reward: 6 },
         { id: 'week_allmodes', name: 'Tüm oyun modlarını oyna', target: 6, current: 0, type: 'allModesPlayed', reward: 7 },
-        { id: 'week_review50', name: '50 zorlanılan kelimeyi tekrar et', target: 50, current: 0, type: 'reviewWordsCount', reward: 6 },
         { id: 'week_combo30', name: '30x combo yap', target: 30, current: 0, type: 'comboCount', reward: 5 },
         { id: 'week_streak7', name: '7 gün seri koru', target: 7, current: 0, type: 'streakDays', reward: 8 }
     ];
@@ -7554,10 +7597,9 @@ function generateWeeklyTasks(weekStart) {
         totalCorrect: 0,
         totalWrong: 0,
         daysPlayed: 0,
-        perfectDays: 0,
+        // perfectDays ve reviewWordsCount görevleri kaldırıldı
         streakDays: 0,
         allModesPlayed: new Set(),
-        reviewWordsCount: 0,
         comboCount: 0
     };
     
@@ -7595,10 +7637,9 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
             totalCorrect: 0,
             totalWrong: 0,
             daysPlayed: 0,
-            perfectDays: 0,
+            // perfectDays ve reviewWordsCount görevleri kaldırıldı
             streakDays: 0,
             allModesPlayed: new Set(),
-            reviewWordsCount: 0,
             comboCount: 0
         };
     }
@@ -7653,10 +7694,6 @@ function updateWeeklyTaskProgress(statType, amount = 1) {
                 } else {
                     task.current = 0;
                 }
-            } else if (task.type === 'perfectDays') {
-                // Perfect günler: Hiç yanlış yapmadan oynanan günler
-                // Bu hafta için perfect gün sayısını hesapla (şimdilik basit)
-                task.current = Math.min(task.target, weeklyTasks.weekStats.perfectDays || 0);
             } else if (task.type === 'streakDays') {
                 // Seri günler: Mevcut streak'i kullan
                 task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
@@ -7835,7 +7872,6 @@ function updateTaskProgress(gameType, amount = 1) {
             'toplamPuan': 'totalHasene',
             'toplamDogru': 'totalCorrect',
             'toplamYanlis': 'totalWrong',
-            'reviewWords': 'reviewWordsCount',
             'comboCount': 'comboCount'
         };
         
@@ -8382,14 +8418,10 @@ function updateWeeklyTasksDisplay() {
                 } else {
                     task.current = 0;
                 }
-            } else if (task.type === 'perfectDays') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.perfectDays || 0);
             } else if (task.type === 'streakDays') {
                 task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
             } else if (task.type === 'allModesPlayed') {
                 task.current = Math.min(task.target, weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0);
-            } else if (task.type === 'reviewWordsCount') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.reviewWordsCount || 0);
             } else if (task.type === 'comboCount') {
                 task.current = Math.min(task.target, weeklyTasks.weekStats.comboCount || 0);
             }

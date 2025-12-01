@@ -883,10 +883,10 @@
                 </div>
 
             <!-- Tab Navigation -->
-            <div style="display: flex; gap: 6px; margin: 12px 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">
+            <div style="display: flex; gap: 4px; margin: 10px 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px;">
                 <button id="dailyTabBtn" onclick="switchTasksTab('daily')" style="
                     flex: 1;
-                    padding: 8px 12px;
+                    padding: 6px 10px;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
                     border: none;
@@ -901,7 +901,7 @@
                 </button>
                 <button id="weeklyTabBtn" onclick="switchTasksTab('weekly')" style="
                     flex: 1;
-                    padding: 8px 12px;
+                    padding: 6px 10px;
                     background: #f3f4f6;
                     color: #6b7280;
                     border: none;
@@ -971,8 +971,8 @@
                     <div style="font-size: 1.2em; margin-bottom: 8px;">🎉</div>
                     <div style="font-weight: 600; margin-bottom: 4px; color: white;">Tüm Haftalık Görevler Tamamlandı!</div>
                     <button id="claimWeeklyRewardsBtn" onclick="claimWeeklyRewards()" style="
-                        margin-top: 8px;
-                        padding: 10px 20px;
+                        margin-top: 6px;
+                        padding: 8px 16px;
                         background: white;
                         color: #667eea;
                         border: none;
@@ -2009,27 +2009,10 @@
         try {
             const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || '2700');
             
-            // dailyTasks'tan veya localStorage'dan bugünkü puanı al
-            let todayProgress = 0;
-            
-            // Önce global dailyTasks değişkenini kontrol et
-            if (typeof window.dailyTasks !== 'undefined' && window.dailyTasks && window.dailyTasks.todayStats) {
-                todayProgress = window.dailyTasks.todayStats.toplamPuan || 0;
-            } else {
-                // localStorage'dan oku
-                try {
-                    const dailyTasksStr = localStorage.getItem('hasene_dailyTasks');
-                    if (dailyTasksStr) {
-                        const dailyTasks = JSON.parse(dailyTasksStr);
-                        if (dailyTasks && dailyTasks.todayStats) {
-                            todayProgress = dailyTasks.todayStats.toplamPuan || 0;
-                        }
-                    }
-                } catch (e) {
-                    // localStorage'dan okuyamazsa, dailyHasene'yi kullan
-                    todayProgress = parseInt(localStorage.getItem('dailyHasene') || '0');
-                }
-            }
+            // Bugünkü ilerleme için TEK kaynak: dailyHasene (storage).
+            // todayStats.toplamPuan bazı yerlerde ekstra bonuslarla farklı hesaplanabildiği için
+            // hedef tamamlama kontrolünde tutarsızlıklara yol açıyordu.
+            const todayProgress = parseInt(localStorage.getItem('dailyHasene') || '0');
             
             // Hedef tamamlandıysa bildirim göster
             if (todayProgress >= dailyGoalHasene && dailyGoalHasene > 0) {
