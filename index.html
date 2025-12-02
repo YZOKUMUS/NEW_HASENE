@@ -164,13 +164,16 @@
                 </div>
             </div>
             
-            <!-- Loading bar + metin (resmin çerçevesi İÇİNDE, alt kısımda) -->
+            <!-- Loading metin + dönen circle (resmin çerçevesi İÇİNDE, alt kısımda) -->
             <div class="kapak-loading-progress">
                 <div class="kapak-loading-progress-text" id="kapakLoadingLabel">
-                    Kelime verileri yükleniyor...
+                    Kelime verileri yükleniyor
                 </div>
-                <div class="kapak-loading-progress-track">
-                    <div class="kapak-loading-progress-fill" id="kapakLoadingBar"></div>
+                <div class="kapak-loading-spinner">
+                    <svg class="kapak-loading-spinner-circle" viewBox="0 0 44 44">
+                        <circle class="kapak-loading-spinner-bg" cx="22" cy="22" r="20" fill="none" stroke="rgba(250, 204, 21, 0.2)" stroke-width="4"/>
+                        <circle class="kapak-loading-spinner-progress" id="kapakLoadingCircle" cx="22" cy="22" r="20" fill="none" stroke="#facc15" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="125.6" transform="rotate(-90 22 22)"/>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -2312,14 +2315,23 @@
 <script>
     window.addEventListener('load', function () {
         var loader = document.getElementById('loadingScreen');
-        var bar = document.getElementById('kapakLoadingBar');
         var label = document.getElementById('kapakLoadingLabel');
-        if (!loader || !bar || !label) return;
+        var circle = document.getElementById('kapakLoadingCircle');
+        if (!loader || !label || !circle) return;
+        
+        // Circle çevresi = 2 * PI * r = 2 * 3.14159 * 20 = 125.6
+        var circumference = 2 * Math.PI * 20;
 
         var steps = [
-            { percent: 40, text: 'Kelime verileri yükleniyor...', duration: 2000 },
-            { percent: 75, text: 'Ayetler hazırlanıyor...',       duration: 2000 },
-            { percent: 100, text: 'Haydi Bismillah...',           duration: 2000 }
+            { percent: 15, text: '📚 Kuran-ı Kerim kelimeleri hazırlanıyor...', duration: 700 },
+            { percent: 30, text: '🎮 3 farklı oyun modu yükleniyor...', duration: 700 },
+            { percent: 45, text: '🔤 Kelime Çevir modu hazır...', duration: 600 },
+            { percent: 55, text: '🎵 Dinle ve Bul modu hazır...', duration: 600 },
+            { percent: 65, text: '📝 Boşluk Doldur modu hazır...', duration: 600 },
+            { percent: 75, text: '📖 Ayet, Dua ve Hadis modları yükleniyor...', duration: 700 },
+            { percent: 85, text: '📊 İstatistikler ve rozetler hazırlanıyor...', duration: 700 },
+            { percent: 95, text: '✨ Her şey hazır!', duration: 600 },
+            { percent: 100, text: '🚀 Haydi Bismillah, başlayalım!', duration: 800 }
         ];
 
         var progress = 0;
@@ -2344,21 +2356,18 @@
             }
 
             var step = steps.shift();
-            var target = step.percent;
             label.textContent = step.text;
+            
+            // Circle progress: 0% = tamamen kapalı, 100% = tamamen açık
+            // stroke-dashoffset: 125.6 (kapalı) -> 0 (açık)
+            var progress = step.percent / 100;
+            var offset = circumference * (1 - progress);
+            circle.style.strokeDashoffset = offset;
 
-            var increment = (target - progress) / (step.duration / 50);
-            var interval = setInterval(function () {
-                progress += increment;
-                if (progress >= target) {
-                    progress = target;
-                    clearInterval(interval);
-                    bar.style.width = progress + '%';
-                    setTimeout(runStep, 400);
-                } else {
-                    bar.style.width = progress + '%';
-                }
-            }, 50);
+            // Metin değişimi
+            setTimeout(function() {
+                runStep();
+            }, step.duration);
         }
 
         runStep();
