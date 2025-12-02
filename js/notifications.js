@@ -32,8 +32,8 @@ function showNotification(title, options = {}) {
 
     if (Notification.permission === 'granted') {
         const notification = new Notification(title, {
-            icon: options.icon || 'assets/images/icon-192-v4-RED-MUSHAF.png',
-            badge: 'assets/images/icon-192-v4-RED-MUSHAF.png',
+            icon: options.icon || 'assets/images/yenilogo.png',
+            badge: 'assets/images/yenilogo.png',
             body: options.body || '',
             tag: options.tag || 'hasene-notification',
             requireInteraction: options.requireInteraction || false,
@@ -137,7 +137,7 @@ function checkDailyReminder() {
             const remaining = goalHasene - dailyHasene;
             showNotification('🎯 Günlük Vird Hatırlatıcı', {
                 body: `Günlük virdinizi tamamlamak için ${remaining} Hasene daha kazanmalısınız!`,
-                icon: 'assets/images/icon-192-v4-RED-MUSHAF.png',
+                icon: 'assets/images/yenilogo.png',
                 tag: 'daily-reminder',
                 onClick: () => {
                     // Ana sayfaya yönlendir
@@ -186,7 +186,7 @@ function checkStreakWarning() {
         // Streak kırılma riski var!
         showNotification('🔥 Streak Uyarısı!', {
             body: `${currentStreak} günlük seriniz kırılma riski altında! Bugün oynayarak serinizi koruyun!`,
-            icon: 'assets/images/icon-192-v4-RED-MUSHAF.png',
+            icon: 'assets/images/yenilogo.png',
             tag: 'streak-warning',
             requireInteraction: true,
             onClick: () => {
@@ -233,7 +233,7 @@ function showAchievementNotification(achievement) {
 
     showNotification(`🏆 ${achievement.name}`, {
         body: achievement.desc,
-        icon: 'assets/images/icon-192-v4-RED-MUSHAF.png',
+        icon: 'assets/images/yenilogo.png',
         tag: `achievement-${achievement.id}`,
         requireInteraction: false
     });

@@ -9,7 +9,7 @@ const BASE = self.location.pathname.includes("NEW_HASENE")
 
 // Cache adı - Versiyon artırıldı (eski cache'leri temizlemek için)
 // Her güncellemede bu versiyonu artırın: v3 -> v4 -> v5...
-const CACHE_VERSION = "safe-v4";
+const CACHE_VERSION = "safe-v5"; // Logo güncellemesi için versiyon artırıldı
 const CACHE_NAME = `hasene-safe-${CACHE_VERSION}`;
 
 // Minimum app shell (TAM YOL KULLANILIYOR)
@@ -126,8 +126,8 @@ self.addEventListener("push", (event) => {
   let notificationData = {
     title: "Hasene Arapça",
     body: "Yeni bildirim",
-    icon: `${BASE}icon-192-v4-RED-MUSHAF.png`,
-    badge: `${BASE}icon-192-v4-RED-MUSHAF.png`,
+    icon: `${BASE}assets/images/yenilogo.png`,
+    badge: `${BASE}assets/images/yenilogo.png`,
     tag: "hasene-notification",
     requireInteraction: false,
     data: {}

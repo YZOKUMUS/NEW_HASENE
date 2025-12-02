@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İkon Kırpıcı - Hasene</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            background: #f0f0ff;
+        }
+        .upload-area.dragover {
+            background: #e0e0ff;
+            border-color: #764ba2;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .preview-area {
+            position: relative;
+            margin: 20px 0;
+            text-align: center;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .crop-controls {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .crop-controls label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+            color: #555;
+        }
+        .crop-controls input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #764ba2;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a3a7a;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #555;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 İkon Kırpıcı - Hasene</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <p style="font-size: 18px; color: #667eea; margin-bottom: 10px;">📁 Resmi buraya sürükleyin veya tıklayın</p>
+            <p style="color: #999;">kapak.png dosyasını seçin</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="preview-area" id="previewArea" style="display: none;">
+            <img id="preview" alt="Önizleme">
+        </div>
+
+        <div class="crop-controls" id="cropControls" style="display: none;">
+            <label>Kırpma Genişliği (X):</label>
+            <input type="number" id="cropX" value="0" min="0">
+            
+            <label>Kırpma Yüksekliği (Y):</label>
+            <input type="number" id="cropY" value="0" min="0">
+            
+            <label>Kırpma Genişliği (Width):</label>
+            <input type="number" id="cropWidth" value="200" min="1">
+            
+            <label>Kırpma Yüksekliği (Height):</label>
+            <input type="number" id="cropHeight" value="200" min="1">
+            
+            <div class="button-group">
+                <button class="btn-primary" onclick="cropAndResize(192)">192x192 İkon Oluştur</button>
+                <button class="btn-secondary" onclick="cropAndResize(512)">512x512 İkon Oluştur</button>
+            </div>
+        </div>
+
+        <div class="info">
+            <p><strong>📝 Nasıl Kullanılır:</strong></p>
+            <p>1. kapak.png dosyasını yükleyin</p>
+            <p>2. Kırpma değerlerini ayarlayın (ortadaki mandala figürünü seçmek için)</p>
+            <p>3. "192x192 İkon Oluştur" veya "512x512 İkon Oluştur" butonuna tıklayın</p>
+            <p>4. İndirilen dosyayı <code>assets/images/</code> klasörüne kaydedin</p>
+        </div>
+
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewArea = document.getElementById('previewArea');
+        const preview = document.getElementById('preview');
+        const cropControls = document.getElementById('cropControls');
+        const canvas = document.getElementById('canvas');
+        let currentImage = null;
+
+        // Dosya yükleme
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        });
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.onload = () => {
+                    currentImage = preview;
+                    previewArea.style.display = 'block';
+                    cropControls.style.display = 'block';
+                    
+                    // Varsayılan kırpma değerlerini ayarla (resmin ortası)
+                    const img = preview;
+                    const centerX = (img.naturalWidth - 200) / 2;
+                    const centerY = (img.naturalHeight - 200) / 2;
+                    document.getElementById('cropX').value = Math.max(0, centerX);
+                    document.getElementById('cropY').value = Math.max(0, centerY);
+                    document.getElementById('cropWidth').value = Math.min(200, img.naturalWidth);
+                    document.getElementById('cropHeight').value = Math.min(200, img.naturalHeight);
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cropAndResize(size) {
+            if (!currentImage) {
+                alert('Lütfen önce bir resim yükleyin!');
+                return;
+            }
+
+            const x = parseInt(document.getElementById('cropX').value);
+            const y = parseInt(document.getElementById('cropY').value);
+            const width = parseInt(document.getElementById('cropWidth').value);
+            const height = parseInt(document.getElementById('cropHeight').value);
+
+            const img = new Image();
+            img.onload = () => {
+                // Canvas'ı ayarla
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                // Resmi kırp ve yeniden boyutlandır
+                ctx.drawImage(img, x, y, width, height, 0, 0, size, size);
+
+                // PNG olarak indir
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon-${size}-v5-kapak.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    alert(`✅ icon-${size}-v5-kapak.png dosyası indirildi!\n\nŞimdi bu dosyayı assets/images/ klasörüne kaydedin.`);
+                }, 'image/png');
+            };
+            img.src = currentImage.src;
+        }
+    </script>
+</body>
+</html>
+

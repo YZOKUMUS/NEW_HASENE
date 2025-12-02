@@ -11,13 +11,13 @@
   "lang": "tr",
   "icons": [
     {
-      "src": "assets/images/icon-192-v4-RED-MUSHAF.png",
+      "src": "assets/images/yenilogo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/images/icon-512-v4-RED-MUSHAF.png",
+      "src": "assets/images/yenilogo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -26,7 +26,7 @@
   "categories": ["education", "games"],
   "screenshots": [
     {
-      "src": "assets/images/icon-512-v4-RED-MUSHAF.png",
+      "src": "assets/images/yenilogo.png",
       "sizes": "512x512",
       "type": "image/png",
       "label": "Ana ekran"
@@ -40,7 +40,7 @@
       "url": "/NEW_HASENE/index.html?mode=kelime",
       "icons": [
         {
-          "src": "assets/images/icon-192-v4-RED-MUSHAF.png",
+          "src": "assets/images/yenilogo.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -53,7 +53,7 @@
       "url": "/NEW_HASENE/index.html?mode=tasks",
       "icons": [
         {
-          "src": "assets/images/icon-192-v4-RED-MUSHAF.png",
+          "src": "assets/images/yenilogo.png",
           "sizes": "192x192",
           "type": "image/png"
         }
