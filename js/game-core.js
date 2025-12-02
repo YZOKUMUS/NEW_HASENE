@@ -1064,9 +1064,6 @@ function initGenericModalTouchEvents(modalId, closeCallback) {
 // Eski fonksiyonlar generic fonksiyonu çağırır
 
 // Daily Goal Modal için touch event'leri
-let dailyGoalModalTouchStart = { x: 0, y: 0, time: 0 }; // DEPRECATED
-let dailyGoalModalIsScrolling = false; // DEPRECATED
-
 function initDailyGoalModalTouchEvents() {
     // Yeni generic fonksiyon kullan
     initGenericModalTouchEvents('dailyGoalModal', closeDailyGoalModal);
@@ -2088,7 +2085,6 @@ function filterWordStats(filterType) {
         `;
     }
     
-    // (commented) Kelime listesi log removed during cleanup
     listContainer.innerHTML = listHeader + filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
         // Kelime verisi yoksa veya geçersizse bu kartı gösterme
         if (!item.wordData || !item.wordData.kelime || item.wordData.kelime.includes('undefined') || item.wordData.kelime.includes('bosluk')) {
@@ -2181,7 +2177,6 @@ function loadWordStats() {
 function saveWordStats(wordStats) {
     try {
         localStorage.setItem('hasene_wordStats', JSON.stringify(wordStats));
-        // (commented) Kelime istatistikleri kaydedildi
     } catch (error) {
         log.error('📊 Kelime istatistikleri kaydedilirken hata:', error);
     }
@@ -2605,13 +2600,13 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('hasene_dev_mode', '1');
         const btn = document.getElementById('devResetBtn');
         if (btn) btn.style.display = 'flex';
-        console.log('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
+        if (typeof log !== 'undefined') log.info('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
     };
     window.disableDevMode = function() {
         localStorage.removeItem('hasene_dev_mode');
         const btn = document.getElementById('devResetBtn');
         if (btn) btn.style.display = 'none';
-        console.log('🔧 Geliştirici modu kapatıldı.');
+        if (typeof log !== 'undefined') log.info('🔧 Geliştirici modu kapatıldı.');
     };
     
     // 🧹 Otomatik storage temizliği (başlangıçta)

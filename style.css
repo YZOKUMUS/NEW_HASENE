@@ -632,42 +632,9 @@ body.no-scroll {
 
 
 
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
 .hero-content {
     position: relative;
     z-index: 1;
-}
-
-.welcome-text {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.welcome-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #667eea;
-    margin-bottom: 8px;
-}
-
-.welcome-subtitle {
-    font-size: 14px;
-    color: #666;
 }
 
 /* Stats Grid - Modern */
@@ -711,98 +678,6 @@ body.no-scroll {
     background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(186, 104, 200, 0.1) 100%);
 }
 
-.stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.stat-value.hasene { color: #FF8F00; }
-.stat-value.star { color: #FFC107; }
-.stat-value.level { color: #9C27B0; }
-
-.stat-label {
-    font-size: 11px;
-    color: #666;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Daily Goal Card */
-.daily-goal-card {
-    background: linear-gradient(135deg, #58cc02 0%, #4db300 100%);
-    border-radius: 16px;
-    padding: 20px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-}
-
-.daily-goal-card::before {
-    content: '🎯';
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 60px;
-    opacity: 0.2;
-}
-
-.goal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.goal-title {
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0.9;
-}
-
-.goal-settings-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.goal-settings-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.1);
-}
-
-.progress-bar-container {
-    background: rgba(255,255,255,0.3);
-    height: 8px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.progress-bar {
-    height: 100%;
-    background: white;
-    border-radius: 10px;
-    transition: width 0.5s;
-}
-
-.progress-text {
-    font-size: 12px;
-    opacity: 1;
-    color: white !important;
-}
-
-.progress-text span {
-    color: white !important;
-}
 
 /* Difficulty Selector */
 .difficulty-section {
@@ -1164,40 +1039,12 @@ body.no-scroll {
         border-radius: 20px !important;
     }
     
-    .welcome-title {
-        font-size: 20px !important;
-    }
-    
-    .welcome-subtitle {
-        font-size: 14px !important;
-    }
-    
     .stats-grid {
         gap: 8px !important;
     }
     
     .stat-card {
         padding: 12px 8px !important;
-    }
-    
-    .stat-value {
-        font-size: 20px !important;
-    }
-    
-    .stat-label {
-        font-size: 11px !important;
-    }
-    
-    .daily-goal-card {
-        padding: 16px !important;
-    }
-    
-    .goal-title {
-        font-size: 13px !important;
-    }
-    
-    .progress-text {
-        font-size: 11px !important;
     }
     
     .difficulty-section {
@@ -1433,7 +1280,6 @@ body.no-scroll {
         padding: 14px 16px !important;
     }
     
-    .welcome-title,
     .welcome-title-minimal {
         font-size: 15px !important;
     }
@@ -1447,7 +1293,6 @@ body.no-scroll {
         padding: 8px 5px !important;
     }
     
-    .stat-value,
     .stat-value-minimal {
         font-size: 14px !important;
     }

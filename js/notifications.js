@@ -6,7 +6,7 @@
 // Bildirim izni kontrolü
 async function requestNotificationPermission() {
     if (!('Notification' in window)) {
-        console.log('Bu tarayıcı bildirimleri desteklemiyor');
+        if (typeof log !== 'undefined') log.warn('Bu tarayıcı bildirimleri desteklemiyor');
         return false;
     }
 

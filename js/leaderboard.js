@@ -8,7 +8,7 @@ function saveWeeklyScore(score, date = new Date()) {
     const weekKey = getWeekKey(date);
     const weeklyScores = getWeeklyScores();
     
-    console.log(`📊 saveWeeklyScore çağrıldı: score=${score}, weekKey=${weekKey}`);
+    if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug(`📊 saveWeeklyScore çağrıldı: score=${score}, weekKey=${weekKey}`);
     
     if (!weeklyScores[weekKey]) {
         weeklyScores[weekKey] = {

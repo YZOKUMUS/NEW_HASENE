@@ -338,7 +338,7 @@ function showCustomAlert(message, type = 'info', title = null) {
     
     // Null check - eğer elementler yüklenmemişse console'a uyarı ver ve çık
     if (!modal || !iconEl || !titleEl || !messageEl || !okBtn) {
-        console.warn('⚠️ Custom alert modal elementi bulunamadı! Eski alert sistemine geri dönülüyor...');
+        if (typeof log !== 'undefined') log.warn('⚠️ Custom alert modal elementi bulunamadı! Eski alert sistemine geri dönülüyor...');
         // Fallback to standard alert
         alert(title ? `${title}\n\n${message}` : message);
         return;

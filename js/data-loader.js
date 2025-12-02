@@ -23,7 +23,7 @@ function getJSONWorker() {
         try {
             jsonWorker = new Worker('js/json-parser-worker.js');
         } catch (e) {
-            console.warn('Web Worker desteklenmiyor, normal parse kullanılacak:', e);
+            if (typeof log !== 'undefined') log.warn('Web Worker desteklenmiyor, normal parse kullanılacak:', e);
             return null;
         }
     }
@@ -318,13 +318,13 @@ async function loadAllData() {
         };
         
         log.debug('✅ Tüm veriler başarıyla yüklendi:', status);
-        console.log('✅ Tüm veriler başarıyla yüklendi:', status);
+        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('✅ Tüm veriler başarıyla yüklendi:', status);
         
         return status;
     } catch (error) {
         hideLoading();
         log.error('Veri yükleme hatası:', error);
-        console.error('❌ Veri yükleme hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ Veri yükleme hatası:', error);
         throw error;
     }
 }

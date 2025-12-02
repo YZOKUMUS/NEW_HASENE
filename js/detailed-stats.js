@@ -28,8 +28,6 @@ function getDailyStats() {
     
     const today = getLocalDateString();
     
-    console.log('📊 getDailyStats çağrıldı, bugün:', today);
-    
     // Önce tarih bazlı veriden oku (saveDailyStats tarih bazlı kaydediyor, bu yüzden bu daha güvenilir)
     let dailyHasene = 0;
     let dailyCorrect = 0;
@@ -61,13 +59,6 @@ function getDailyStats() {
             dailyHasene = parseInt(dayData.hasene) || 0;
             dailyCorrect = parseInt(dayData.correct) || 0;
             dailyWrong = parseInt(dayData.wrong) || 0;
-            
-            console.log('✅ Tarih bazlı veriden okundu:', {
-                dayKey,
-                dailyHasene,
-                dailyCorrect,
-                dailyWrong
-            });
         } else {
             // Bilgilendirme için debug seviyesinde log; uyarı göstermeye gerek yok
             if (window && window.DEBUG_DETAILED_STATS) {
@@ -78,15 +69,9 @@ function getDailyStats() {
             dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
             dailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
             dailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
-            
-            console.log('📊 storage değerleri (fallback):', {
-                dailyHasene,
-                dailyCorrect,
-                dailyWrong
-            });
         }
     } catch (e) {
-        console.error('❌ Tarih bazlı veri okuma hatası:', e);
+        if (typeof log !== 'undefined') log.error('❌ Tarih bazlı veri okuma hatası:', e);
         
         // Hata durumunda localStorage'dan direkt oku
         try {
@@ -94,7 +79,7 @@ function getDailyStats() {
             dailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
             dailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
         } catch (err) {
-            console.error('❌ localStorage okuma hatası:', err);
+            if (typeof log !== 'undefined') log.error('❌ localStorage okuma hatası:', err);
             dailyHasene = 0;
             dailyCorrect = 0;
             dailyWrong = 0;
@@ -105,22 +90,6 @@ function getDailyStats() {
     // Accuracy'yi sayı olarak hesapla (string değil)
     const accuracyValue = total > 0 ? (dailyCorrect / total) * 100 : 0;
     const accuracy = accuracyValue.toFixed(1); // String formatı sadece gösterim için
-    
-    console.log('📊 getDailyStats hesaplama:', {
-        dailyCorrect,
-        dailyWrong,
-        total,
-        accuracyValue,
-        accuracy
-    });
-    
-    console.log('📊 getDailyStats sonuç:', {
-        date: today,
-        hasene: dailyHasene,
-        correct: dailyCorrect,
-        wrong: dailyWrong,
-        accuracy: accuracyValue // Sayı olarak logla
-    });
     
     return {
         date: today,
@@ -178,7 +147,7 @@ function getWeeklyStats() {
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
-        console.log('📅 Haftalık istatistik:', {
+        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('📅 Haftalık istatistik:', {
             weekStart: weekStartStr,
             weekEnd: weekEndStr,
             totalHasene: totalHasene,
@@ -191,7 +160,7 @@ function getWeeklyStats() {
             days: daysPlayed
         };
     } catch (error) {
-        console.error('❌ Haftalık istatistik hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ Haftalık istatistik hatası:', error);
         return {
             week: 'error',
             hasene: 0,
@@ -248,7 +217,7 @@ function getMonthlyStats() {
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
-        console.log('📅 Aylık istatistik:', {
+        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('📅 Aylık istatistik:', {
             monthStart: monthStartStr,
             monthEnd: monthEndStr,
             totalHasene: totalHasene,
@@ -261,7 +230,7 @@ function getMonthlyStats() {
             days: daysPlayed
         };
     } catch (error) {
-        console.error('❌ Aylık istatistik hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ Aylık istatistik hatası:', error);
         return {
             month: 'error',
             hasene: 0,
@@ -319,7 +288,7 @@ function getTrendStats() {
                 dayData = storedData;
             }
         } catch (e) {
-            console.error('Trend veri parse hatası:', e, dayKey);
+            if (typeof log !== 'undefined') log.error('Trend veri parse hatası:', e, dayKey);
         }
         
         trends.push({
@@ -373,7 +342,7 @@ function getWeekPlayDays() {
             return dateStr >= weekStartStr && dateStr <= weekEndStr;
     }).length;
         
-        console.log('📅 Haftalık hesaplama:', {
+        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('📅 Haftalık hesaplama:', {
             weekStart: weekStartStr,
             weekEnd: weekEndStr,
             playDates: playDates,
@@ -382,7 +351,7 @@ function getWeekPlayDays() {
         
         return daysPlayed;
     } catch (error) {
-        console.error('❌ getWeekPlayDays hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ getWeekPlayDays hatası:', error);
         return 0;
     }
 }
@@ -409,7 +378,7 @@ function getMonthPlayDays() {
             return dateStr >= monthStartStr && dateStr <= monthEndStr;
     }).length;
         
-        console.log('📅 Aylık hesaplama:', {
+        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('📅 Aylık hesaplama:', {
             monthStart: monthStartStr,
             monthEnd: monthEndStr,
             playDates: playDates,
@@ -418,14 +387,13 @@ function getMonthPlayDays() {
         
         return daysPlayed;
     } catch (error) {
-        console.error('❌ getMonthPlayDays hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ getMonthPlayDays hatası:', error);
         return 0;
     }
 }
 
 // Detaylı istatistikler modal'ını göster
 function showDetailedStats() {
-    console.log('📊 showDetailedStats çağrıldı!');
     
     try {
         // Önce mevcut detaylı istatistikler modal'ını kapat (eğer varsa)
@@ -438,7 +406,6 @@ function showDetailedStats() {
         if (typeof closeStatsModal === 'function') {
             const statsModal = document.getElementById('statsModal');
             if (statsModal && statsModal.style.display !== 'none' && statsModal.style.display !== '') {
-                console.log('📊 İstatistikler modal\'ı kapatılıyor...');
                 closeStatsModal();
                 // Kısa bir gecikme ile detaylı istatistikleri aç (modal'ın tamamen kapanması için)
                 setTimeout(() => {
@@ -451,17 +418,15 @@ function showDetailedStats() {
         // Direkt aç
         openDetailedStatsModal();
     } catch (error) {
-        console.error('❌ showDetailedStats hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ showDetailedStats hatası:', error);
     }
 }
 
 // Detaylı istatistikler modal'ını aç
 function openDetailedStatsModal() {
-    console.log('📊 openDetailedStatsModal çağrıldı!');
     
     try {
         const stats = getDetailedStats();
-        console.log('📊 İstatistikler hazır:', stats);
         
         const modal = document.createElement('div');
         modal.className = 'modal detailed-stats-modal';
@@ -490,7 +455,6 @@ function openDetailedStatsModal() {
         `;
 
         document.body.appendChild(modal);
-        console.log('✅ Modal DOM\'a eklendi');
 
         // Body scroll'u engelle
         document.body.style.overflow = 'hidden';
@@ -523,7 +487,6 @@ function openDetailedStatsModal() {
 
         // Global fonksiyon
         window.closeDetailedStats = () => {
-            console.log('📊 closeDetailedStats çağrıldı');
             const modal = document.getElementById('detailedStatsModal');
             if (modal) {
                 modal.style.display = 'none';
@@ -538,15 +501,13 @@ function openDetailedStatsModal() {
             delete window.closeDetailedStats;
         };
         
-        console.log('✅ Detaylı istatistikler modal\'ı açıldı!');
     } catch (error) {
-        console.error('❌ openDetailedStatsModal hatası:', error);
+        if (typeof log !== 'undefined') log.error('❌ openDetailedStatsModal hatası:', error);
     }
 }
 
 // İstatistik HTML'i oluştur
 function generateStatsHTML(stats) {
-    console.log('📊 generateStatsHTML çağrıldı, stats:', stats);
     
     // Güvenli sayı dönüşümü
     const dailyHasene = parseInt(stats.daily.hasene) || 0;
@@ -564,7 +525,6 @@ function generateStatsHTML(stats) {
         }
     }
     
-    console.log('📊 Günlük istatistikler (formatlanmış):', {
         hasene: dailyHasene,
         correct: dailyCorrect,
         wrong: dailyWrong,

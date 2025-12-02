@@ -189,7 +189,6 @@ window.addEventListener('DOMContentLoaded', () => {
         initOnboarding();
     } catch (e) {
         // Onboarding kritik değil, hata olsa bile uygulama çalışmaya devam eder
-        // console.error('Onboarding init error:', e);
     }
 });
 
