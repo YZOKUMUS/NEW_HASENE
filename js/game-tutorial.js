@@ -1,19 +1,40 @@
 /**
  * Oyun Modları Tutorial Sistemi
- * Her mod için ilk kez oynanırken tutorial gösterir
+ * Tüm tutorial'lar sadece bir kez gösterilir (ilk kez herhangi bir oyun modu açıldığında)
  */
 
+const ALL_TUTORIALS_SEEN_KEY = 'hasene_all_game_tutorials_seen';
+
 // Tutorial durumlarını kontrol et
+// Artık tüm tutorial'lar için tek bir genel kontrol yapılıyor
 function hasSeenTutorial(gameType) {
-    const key = `hasene_tutorial_${gameType}`;
-    const seen = localStorage.getItem(key);
-    return seen === 'true';
+    try {
+        // Genel kontrol: Eğer herhangi bir tutorial görüldüyse, tüm tutorial'lar görüldü sayılır
+        const allSeen = localStorage.getItem(ALL_TUTORIALS_SEEN_KEY);
+        if (allSeen === '1') {
+            return true;
+        }
+        // Eski sistemle uyumluluk için: Eğer bu spesifik tutorial görüldüyse de true döndür
+        const key = `hasene_tutorial_${gameType}`;
+        const seen = localStorage.getItem(key);
+        return seen === 'true';
+    } catch (e) {
+        return false;
+    }
 }
 
 // Tutorial'ı görüldü olarak işaretle
+// Herhangi bir tutorial görüldüğünde, tüm tutorial'lar görüldü olarak işaretlenir
 function markTutorialAsSeen(gameType) {
-    const key = `hasene_tutorial_${gameType}`;
-    localStorage.setItem(key, 'true');
+    try {
+        // Genel key'i set et - artık tüm tutorial'lar görüldü
+        localStorage.setItem(ALL_TUTORIALS_SEEN_KEY, '1');
+        // Eski sistemle uyumluluk için spesifik key'i de set et
+        const key = `hasene_tutorial_${gameType}`;
+        localStorage.setItem(key, 'true');
+    } catch (e) {
+        console.warn('Tutorial kaydı yapılamadı:', e);
+    }
 }
 
 // Tutorial modal'ını göster
@@ -208,7 +229,8 @@ function showGameTutorial(gameType, onComplete) {
         return;
     }
 
-    // Eğer daha önce görüldüyse direkt devam et
+    // Eğer daha önce herhangi bir tutorial görüldüyse direkt devam et
+    // Artık tüm tutorial'lar için tek bir genel kontrol yapılıyor
     if (hasSeenTutorial(gameType)) {
         if (onComplete) onComplete();
         return;

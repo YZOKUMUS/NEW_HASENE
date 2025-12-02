@@ -12,7 +12,7 @@ Onboarding **sadece ilk açılışta** gösterilir. Eğer daha önce uygulamayı
 3. Console sekmesine gidin
 4. Şu komutu yazın ve Enter'a basın:
 ```javascript
-localStorage.removeItem('hasene_onboarding_seen_v1');
+localStorage.removeItem('hasene_onboarding_seen_v2');
 location.reload();
 ```
 5. Sayfa yenilendikten sonra onboarding otomatik görünecek!
@@ -68,7 +68,7 @@ Eğer hala görünmüyorsa:
 
 4. **LocalStorage temizlendi mi?**
    ```javascript
-   localStorage.getItem('hasene_onboarding_seen_v1')
+   localStorage.getItem('hasene_onboarding_seen_v2')
    ```
 
 ---

@@ -2330,8 +2330,12 @@
                 setTimeout(function () {
                     loader.classList.add('kapak-loading-hide');
                     // Loading tamamen bittikten KISA BİR SÜRE sonra hoş geldin turunu aç
+                    // showOnboarding fonksiyonu kendi içinde localStorage kontrolü yapıyor
+                    // Sadece ilk kez yüklendiğinde gösterilecek (daha önce görülmediyse)
                     if (window.showOnboarding) {
                         setTimeout(function () {
+                            // false parametresi ile çağırıyoruz, böylece force modu kapalı
+                            // Fonksiyon kendi içinde hasSeenOnboarding() kontrolü yapıyor
                             window.showOnboarding(false);
                         }, 400);
                     }

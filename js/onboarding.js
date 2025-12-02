@@ -95,8 +95,14 @@ function getOnboardingModalElements() {
 function setOnboardingSeen() {
     try {
         localStorage.setItem(ONBOARDING_STORAGE_KEY, '1');
+        // Debug: Kayıt yapıldığını doğrula
+        const saved = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+        if (saved !== '1') {
+            console.warn('Onboarding kaydı yapılamadı. localStorage değeri:', saved);
+        }
     } catch (e) {
         // localStorage erişilemezse sessizce devam et
+        console.warn('Onboarding kaydı yapılamadı:', e);
     }
 }
 
