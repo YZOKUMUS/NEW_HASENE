@@ -4123,8 +4123,10 @@ body.no-scroll {
     height: 24px;
 }
 
-/* Duolingo Tarzı Seçenek Butonları */
-.game-screen .duolingo-options-container {
+/* Duolingo Tarzı Seçenek Butonları - Tüm oyunlarda aynı ölçüler */
+.game-screen .duolingo-options-container,
+.dinle-mode .duolingo-options-container,
+.bosluk-mode .duolingo-options-container {
     padding: 0 20px 20px 20px;
 }
 
@@ -4138,17 +4140,17 @@ body.no-scroll {
 
 .game-screen .duolingo-option {
     width: 100%;
-    padding: 18px 20px;
+    padding: 18px 24px;
     margin-bottom: 12px;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
+    background: #fff;
+    border: 3px solid #e0e0e0;
     border-radius: 16px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: #1a1a1a;
     cursor: pointer;
-    transition: all 0.3s;
-    text-align: left;
+    transition: all 0.2s;
+    text-align: center;
     box-sizing: border-box;
     word-break: break-word;
     overflow-wrap: break-word;
@@ -4160,43 +4162,43 @@ body.no-scroll {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    /* Sabit yükseklik için - Tüm oyunlarda aynı */
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.game-screen .duolingo-option::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    transform: scaleY(0);
-    transition: transform 0.3s;
+/* Tüm oyun modlarında aynı hover efekti */
+.game-screen .duolingo-option:hover:not(.disabled),
+.dinle-mode .duolingo-option:hover:not(.disabled),
+.bosluk-mode .duolingo-option:hover:not(.disabled) {
+    border-color: #58cc02;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
 }
 
-.game-screen .duolingo-option:hover:not(.disabled) {
-    background: #f0f0f0;
-    border-color: #667eea;
-    transform: translateX(5px);
-}
-
-.game-screen .duolingo-option:hover:not(.disabled)::before {
-    transform: scaleY(1);
-}
-
-.game-screen .duolingo-option.correct {
+/* Tüm oyun modlarında aynı option stilleri */
+.game-screen .duolingo-option.correct,
+.dinle-mode .duolingo-option.correct,
+.bosluk-mode .duolingo-option.correct {
     background: #58cc02;
     border-color: #58cc02;
     color: #fff;
 }
 
-.game-screen .duolingo-option.wrong {
+.game-screen .duolingo-option.wrong,
+.dinle-mode .duolingo-option.wrong,
+.bosluk-mode .duolingo-option.wrong {
     background: #ff4444;
     border-color: #ff4444;
     color: #fff;
 }
 
-.game-screen .duolingo-option.disabled {
+.game-screen .duolingo-option.disabled,
+.dinle-mode .duolingo-option.disabled,
+.bosluk-mode .duolingo-option.disabled {
     cursor: not-allowed;
     opacity: 0.6;
 }
@@ -4205,7 +4207,7 @@ body.no-scroll {
 .game-screen .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 15px 30px;
+    padding: 6px 16px;
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -4214,26 +4216,23 @@ body.no-scroll {
 
 .game-screen .duolingo-stat-item {
     text-align: center;
+    padding: 0 4px;
 }
 
 .game-screen .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
     color: #667eea;
-    margin-bottom: 4px;
+    margin-bottom: 1px;
+    line-height: 1.1;
 }
 
 .game-screen .duolingo-stat-label {
-    font-size: 11px;
+    font-size: 9px;
     color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.game-screen .duolingo-stat-value {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 4px;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
 }
 
 .game-screen .duolingo-stat-value.hasene {
@@ -4247,11 +4246,6 @@ body.no-scroll {
 .game-screen .duolingo-stat-value.wrong {
     color: #ff4444;
 }
-
-.game-screen .duolingo-stat-label {
-    font-size: 12px;
-    color: #666;
-    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -4344,7 +4338,7 @@ body.no-scroll {
 }
 
 
-/* Dinle Mode için Duolingo Tarzı Stiller */
+/* Dinle Mode için Duolingo Tarzı Stiller - 1. oyunla aynı */
 .dinle-mode .duolingo-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 10px 16px;
@@ -4411,11 +4405,12 @@ body.no-scroll {
 }
 
 .dinle-mode .duolingo-question-area {
-    padding: 40px 24px;
+    padding: 40px 30px;
     text-align: center;
     background: #fff;
     flex: 1;
     position: relative;
+    transition: background 0.3s ease;
 }
 
 .dinle-mode .duolingo-question-number {
@@ -4472,9 +4467,6 @@ body.no-scroll {
     height: 24px;
 }
 
-.dinle-mode .duolingo-options-container {
-    padding: 0 20px 20px 20px;
-}
 
 .dinle-mode .duolingo-option {
     width: 100%;
@@ -4498,30 +4490,15 @@ body.no-scroll {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
+    /* Sabit yükseklik için - Tüm oyunlarda aynı */
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.dinle-mode .duolingo-option:hover:not(.disabled) {
-    border-color: #58cc02;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
-}
 
-.dinle-mode .duolingo-option.correct {
-    background: #58cc02;
-    border-color: #58cc02;
-    color: #fff;
-}
-
-.dinle-mode .duolingo-option.wrong {
-    background: #ff4444;
-    border-color: #ff4444;
-    color: #fff;
-}
-
-.dinle-mode .duolingo-option.disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-}
 
 /* Dinle ve Bul - Arapça seçenekler için Uthmani font (Kelime Çevir ile aynı) */
 .dinle-mode .duolingo-option.arabic-option {
@@ -4529,6 +4506,11 @@ body.no-scroll {
     font-size: clamp(24px, 5vw, 36px) !important;
     font-weight: normal !important;
     direction: rtl !important;
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .dinle-mode .duolingo-option.arabic-option span {
@@ -4539,7 +4521,7 @@ body.no-scroll {
 .dinle-mode .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 16px 20px;
+    padding: 6px 16px;
     background: #f8f9fa;
     border-top: 1px solid #e0e0e0;
     transition: background 0.3s ease, border-color 0.3s ease;
@@ -4548,12 +4530,15 @@ body.no-scroll {
 
 .dinle-mode .duolingo-stat-item {
     text-align: center;
+    padding: 0 4px;
 }
 
 .dinle-mode .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
-    margin-bottom: 4px;
+    color: #667eea;
+    margin-bottom: 1px;
+    line-height: 1.1;
 }
 
 .dinle-mode .duolingo-stat-value.hasene {
@@ -4569,11 +4554,11 @@ body.no-scroll {
 }
 
 .dinle-mode .duolingo-stat-label {
-    font-size: 12px;
-    color: #666;
-    font-weight: 600;
+    font-size: 9px;
+    color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
 }
 
 .dinle-mode .duolingo-question-area {
@@ -4621,7 +4606,7 @@ body.no-scroll {
 }
 
 
-/* Boşluk Mode için Duolingo Tarzı Stiller */
+/* Boşluk Mode için Duolingo Tarzı Stiller - 1. oyunla aynı */
 .bosluk-mode .duolingo-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 10px 16px;
@@ -4688,11 +4673,12 @@ body.no-scroll {
 }
 
 .bosluk-mode .duolingo-question-area {
-    padding: 40px 24px;
+    padding: 40px 30px;
     text-align: center;
     background: #fff;
     flex: 1;
     position: relative;
+    transition: background 0.3s ease;
 }
 
 
@@ -4750,10 +4736,6 @@ body.no-scroll {
     height: 24px;
 }
 
-.bosluk-mode .duolingo-options-container {
-    padding: 0 20px 20px 20px;
-}
-
 .bosluk-mode .duolingo-option {
     width: 100%;
     padding: 18px 24px;
@@ -4776,29 +4758,12 @@ body.no-scroll {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
-}
-
-.bosluk-mode .duolingo-option:hover:not(.disabled) {
-    border-color: #58cc02;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(88, 204, 2, 0.2);
-}
-
-.bosluk-mode .duolingo-option.correct {
-    background: #58cc02;
-    border-color: #58cc02;
-    color: #fff;
-}
-
-.bosluk-mode .duolingo-option.wrong {
-    background: #ff4444;
-    border-color: #ff4444;
-    color: #fff;
-}
-
-.bosluk-mode .duolingo-option.disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+    /* Sabit yükseklik için - Tüm oyunlarda aynı */
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Boşluk Doldur - Arapça seçenekler için Uthmani font (Kelime Çevir ile aynı) */
@@ -4807,6 +4772,11 @@ body.no-scroll {
     font-size: clamp(24px, 5vw, 36px) !important;
     font-weight: normal !important;
     direction: rtl !important;
+    min-height: 64px !important;
+    height: 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .bosluk-mode .duolingo-option.arabic-option span {
@@ -4833,21 +4803,24 @@ body.no-scroll {
 .bosluk-mode .duolingo-stats-bar {
     display: flex;
     justify-content: space-around;
-    padding: 16px 20px;
+    padding: 6px 16px;
     background: #f8f9fa;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #e9ecef;
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 
 .bosluk-mode .duolingo-stat-item {
     text-align: center;
+    padding: 0 4px;
 }
 
 .bosluk-mode .duolingo-stat-value {
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
-    margin-bottom: 4px;
+    color: #667eea;
+    margin-bottom: 1px;
+    line-height: 1.1;
 }
 
 .bosluk-mode .duolingo-stat-value.hasene {
@@ -4863,11 +4836,11 @@ body.no-scroll {
 }
 
 .bosluk-mode .duolingo-stat-label {
-    font-size: 12px;
-    color: #666;
-    font-weight: 600;
+    font-size: 9px;
+    color: #999;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
 }
 
 .bosluk-mode .duolingo-question-area {

@@ -525,13 +525,6 @@ function generateStatsHTML(stats) {
         }
     }
     
-        hasene: dailyHasene,
-        correct: dailyCorrect,
-        wrong: dailyWrong,
-        accuracy: dailyAccuracy,
-        accuracyFormatted: dailyAccuracy.toFixed(1)
-    });
-    
     const maxHasene = Math.max(...stats.trends.map(t => parseInt(t.hasene) || 0), 1);
     
     return `
