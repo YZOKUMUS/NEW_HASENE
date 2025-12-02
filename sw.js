@@ -126,8 +126,8 @@ self.addEventListener("push", (event) => {
   let notificationData = {
     title: "Hasene Arapça",
     body: "Yeni bildirim",
-    icon: `${BASE}assets/images/yenilogo.png`,
-    badge: `${BASE}assets/images/yenilogo.png`,
+    icon: `${BASE}assets/images/icon-192.png`,
+    badge: `${BASE}assets/images/icon-192.png`,
     tag: "hasene-notification",
     requireInteraction: false,
     data: {}
