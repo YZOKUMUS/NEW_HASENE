@@ -2469,21 +2469,20 @@ body.no-scroll {
 /* Mobil cihazlar için Loading Ekranı Responsive Ayarları */
 @media (max-width: 768px) {
     .kapak-loading {
-        padding-top: 30px; /* Mobilde daha az üst boşluk */
-        padding-bottom: 40px; /* Mobilde copyright için alt boşluk */
-        overflow-y: auto; /* Uzun ekranlarda hadis ve ayet kutusu taşmasın, scroll ile görülebilsin */
-        overflow-x: hidden;
+        padding-top: 24px; /* Mobilde daha az üst boşluk */
+        padding-bottom: 28px; /* Mobilde alt boşluk */
+        overflow: hidden; /* Scroll yok, içerik küçültülerek sığdırılacak */
     }
     
     .kapak-loading-image {
-        max-height: calc(100vh - 110px); /* Mobilde daha az alan gerekiyor - artırıldı */
+        max-height: calc(100vh - 170px); /* Mobilde resmi küçült - altta hadis ve spinner'a yer aç */
     }
     
     .kapak-loading-besmele {
-        font-size: clamp(24px, 4.5vw, 32px); /* Responsive - tablet/mobil için */
-        letter-spacing: clamp(5px, 1.2vw, 8px); /* Responsive harf aralığı */
+        font-size: clamp(22px, 4vw, 28px); /* Biraz daha küçük besmele */
+        letter-spacing: clamp(4px, 1vw, 7px); /* Harf aralığını daralt */
         padding: 0;
-        transform: translateY(60px); /* 60px aşağıya çekildi */
+        transform: translateY(40px); /* Daha az aşağı çek */
     }
     
     .kapak-loading-hadith {
@@ -2534,21 +2533,20 @@ body.no-scroll {
 
 @media (max-width: 480px) {
     .kapak-loading {
-        padding-top: 20px; /* Küçük mobilde daha da az üst boşluk */
-        padding-bottom: 30px; /* Küçük mobilde copyright için alt boşluk */
-        overflow-y: auto; /* Küçük ekranlarda taşmayı engelle */
-        overflow-x: hidden;
+        padding-top: 16px; /* Küçük mobilde daha da az üst boşluk */
+        padding-bottom: 22px; /* Küçük mobilde alt boşluk */
+        overflow: hidden; /* Scroll yok */
     }
     
     .kapak-loading-image {
-        max-height: calc(100vh - 90px); /* Küçük mobilde daha az alan gerekiyor - artırıldı */
+        max-height: calc(100vh - 200px); /* Küçük mobilde resmi daha da küçült */
     }
     
     .kapak-loading-besmele {
-        font-size: clamp(20px, 4vw, 26px); /* Responsive - küçük mobil için */
-        letter-spacing: clamp(4px, 1vw, 6px); /* Responsive harf aralığı */
+        font-size: clamp(18px, 3.6vw, 22px); /* Küçük mobilde biraz daha küçük */
+        letter-spacing: clamp(3px, 0.9vw, 5px); /* Harf aralığını daralt */
         padding: 0;
-        transform: translateY(60px); /* 60px aşağıya çekildi */
+        transform: translateY(30px); /* Daha az aşağı çek */
     }
     
     .kapak-loading-hadith {
@@ -2599,20 +2597,19 @@ body.no-scroll {
 
 @media (max-width: 360px) {
     .kapak-loading {
-        padding-top: 15px; /* Çok küçük ekranlarda minimal üst boşluk */
-        padding-bottom: 25px; /* Çok küçük ekranlarda copyright için alt boşluk */
-        overflow-y: auto; /* Çok küçük ekranlarda içeriğin tamamı görülsün */
-        overflow-x: hidden;
+        padding-top: 10px; /* Çok küçük ekranlarda minimal üst boşluk */
+        padding-bottom: 20px; /* Çok küçük ekranlarda alt boşluk */
+        overflow: hidden; /* Scroll yok, içerik küçültülerek sığdırılacak */
     }
     
     .kapak-loading-image {
-        max-height: calc(100vh - 80px); /* Çok küçük ekranlarda minimal alan - artırıldı */
+        max-height: calc(100vh - 220px); /* Çok küçük ekranlarda resmi daha da küçült */
     }
     
     .kapak-loading-besmele {
-        font-size: clamp(18px, 3.5vw, 22px); /* Responsive - çok küçük ekranlar için */
-        letter-spacing: clamp(3px, 0.8vw, 5px); /* Responsive harf aralığı */
-        transform: translateY(60px); /* 60px aşağıya çekildi */
+        font-size: clamp(16px, 3.2vw, 20px); /* Çok küçük ekranlarda daha küçük */
+        letter-spacing: clamp(2px, 0.7vw, 4px); /* Harf aralığı daha dar */
+        transform: translateY(24px); /* Daha az aşağı çek */
     }
     
     .kapak-loading-hadith-ar {
