@@ -8438,6 +8438,11 @@ function createWeeklyTaskElement(task) {
     
     // Günlük görevlerle aynı HTML yapısı
     const weeklyDescription = getWeeklyTaskDescription(task);
+    const taskHelp = getWeeklyTaskDetailedHelp(task);
+    
+    // Tooltip için unique ID
+    const tooltipId = 'weekly-task-tooltip-' + task.id + '-' + Date.now();
+    
     div.innerHTML = `
         ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
         <div class="daily-task-header">
@@ -8454,7 +8459,38 @@ function createWeeklyTaskElement(task) {
             </div>
             <div class="daily-task-progress-text">${task.current}/${task.target}</div>
         </div>
+        <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
+        <div class="daily-task-tooltip" id="${tooltipId}">
+            <div class="daily-task-tooltip-content">
+                <div class="daily-task-tooltip-title">${task.name}</div>
+                <div class="daily-task-tooltip-text">${taskHelp}</div>
+                <div class="daily-task-tooltip-close" onclick="this.parentElement.parentElement.classList.remove('show')">✕</div>
+            </div>
+        </div>
     `;
+    
+    // Tooltip açma/kapama
+    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
+    const tooltip = div.querySelector(`#${tooltipId}`);
+    
+    if (helpIcon && tooltip) {
+        helpIcon.onclick = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            // Diğer tooltip'leri kapat
+            document.querySelectorAll('.daily-task-tooltip.show').forEach(t => {
+                if (t !== tooltip) t.classList.remove('show');
+            });
+            tooltip.classList.toggle('show');
+        };
+        
+        // Tooltip dışına tıklanınca kapat
+        tooltip.onclick = function(e) {
+            if (e.target === tooltip) {
+                tooltip.classList.remove('show');
+            }
+        };
+    }
     
     return div;
 }
@@ -8464,8 +8500,8 @@ function getWeeklyTaskDescription(task) {
         'week_hasene5000': 'Bu hafta toplam 5,000 Hasene kazan',
         'week_correct200': 'Bu hafta 200 doğru cevap ver',
         'week_days5': '5 gün üst üste oyun oyna',
-        'week_allmodes': 'Klasik, Dinle, Boşluk, Ayet, Dua, Hadis modlarını dene',
-        'week_combo30': 'Üst üste 30 sahih cevap ile muvazebet yap',
+        'week_allmodes': '6 farklı oyun modunu oyna',
+        'week_combo30': 'Üst üste 30 doğru cevap ver',
         'week_streak7': '7 gün üst üste günlük hedefini tamamla'
     };
     const description = descriptions[task.id];
@@ -8474,6 +8510,57 @@ function getWeeklyTaskDescription(task) {
         return '';
     }
     return description;
+}
+
+// Haftalık görev için detaylı açıklama (tooltip için)
+function getWeeklyTaskDetailedHelp(task) {
+    const helpTexts = {
+        'week_hasene5000': '💰 Bu hafta toplam 5,000 Hasene puanı kazan.\n\n' +
+                          '📝 Nasıl puan kazanabilirsin:\n' +
+                          '• Oyunlarda doğru cevap vererek\n' +
+                          '• Combo bonusu alarak (her 3 doğru cevapta +5)\n' +
+                          '• Perfect lesson bonusu alarak\n' +
+                          '• Günlük ve haftalık görevleri tamamlayarak\n\n' +
+                          '💡 İpucu: Haftalık toplam puan üst barda gösterilir. Hafta başından itibaren tüm puanlar sayılır.',
+        'week_correct200': '⭐ Bu hafta toplam 200 doğru cevap ver.\n\n' +
+                          '📝 Nasıl çalışır:\n' +
+                          '• Herhangi bir oyun modunda verdiğin doğru cevaplar sayılır\n' +
+                          '• Yanlış cevaplar sayılmaz\n' +
+                          '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n\n' +
+                          '💡 İpucu: Hafta başından itibaren tüm doğru cevaplar sayılır. Günlük görevlerle birlikte ilerler.',
+        'week_days5': '📅 5 gün üst üste oyun oyna.\n\n' +
+                     '📝 Nasıl çalışır:\n' +
+                     '• Her gün en az bir oyun oynaman gerekir\n' +
+                     '• Gün atlarsan seri sıfırlanır\n' +
+                     '• 5 gün üst üste oynadığında görev tamamlanır\n\n' +
+                     '💡 İpucu: Her gün en az bir soru cevaplamak yeterli. Oyunu bitirmen gerekmez.',
+        'week_allmodes': '🎮 6 farklı oyun modunu oyna.\n\n' +
+                        '📝 Oyun modları:\n' +
+                        '1. 📚 Kelime Çevir\n' +
+                        '2. 🎧 Dinle ve Bul\n' +
+                        '3. ✏️ Boşluk Doldur\n' +
+                        '4. 📖 Ayet Oku\n' +
+                        '5. 🤲 Dua Et\n' +
+                        '6. 📚 Hadis Oku\n\n' +
+                        '💡 İpucu: Her modu en az bir kez oynaman gerekir. Aynı modu birden fazla oynaman sayılmaz.',
+        'week_combo30': '⚡ Üst üste 30 doğru cevap ver.\n\n' +
+                       '📝 Nasıl çalışır:\n' +
+                       '• Doğru cevaplar peş peşe gelmeli\n' +
+                       '• Yanlış cevap verirsen seri sıfırlanır\n' +
+                       '• Tekrar baştan başlaman gerekir\n' +
+                       '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n\n' +
+                       '✅ Örnek: 10 Kelime Çevir + 10 Dinle Bul + 10 Boşluk Doldur (hiç yanlış yok) = 30 doğru\n' +
+                       '❌ Örnek: 15 doğru → 1 yanlış → 15 doğru = Sıfırlandı (yanlış var)\n\n' +
+                       '💡 İpucu: Bu görev zor! Dikkatli oyna ve yanlış yapmamaya çalış.',
+        'week_streak7': '🔥 7 gün üst üste günlük hedefini tamamla.\n\n' +
+                       '📝 Nasıl çalışır:\n' +
+                       '• Her gün günlük hedefi tamamlaman gerekir\n' +
+                       '• Günlük hedef üst barda gösterilir\n' +
+                       '• Bir gün hedefi tamamlamazsan seri sıfırlanır\n' +
+                       '• 7 gün üst üste tamamladığında görev tamamlanır\n\n' +
+                       '💡 İpucu: Günlük hedefi tamamlamak için yeterli Hasene puanı kazanman gerekir. Her gün düzenli oyna!'
+    };
+    return helpTexts[task.id] || 'Bu görevi tamamlamak için ilgili oyun modunu oyna.';
 }
 
 function createTaskElement(task) {
@@ -8529,6 +8616,11 @@ function createTaskElement(task) {
     };
     
     const taskDescription = getTaskDescription(task);
+    const taskHelp = getTaskDetailedHelp(task);
+    
+    // Tooltip için unique ID
+    const tooltipId = 'task-tooltip-' + task.id + '-' + Date.now();
+    
     div.innerHTML = `
         ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
         <div class="daily-task-header">
@@ -8545,36 +8637,67 @@ function createTaskElement(task) {
             </div>
             <div class="daily-task-progress-text">${task.current}/${task.target}</div>
         </div>
+        <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
+        <div class="daily-task-tooltip" id="${tooltipId}">
+            <div class="daily-task-tooltip-content">
+                <div class="daily-task-tooltip-title">${getTaskDisplayName(task)}</div>
+                <div class="daily-task-tooltip-text">${taskHelp}</div>
+                <div class="daily-task-tooltip-close" onclick="this.parentElement.parentElement.classList.remove('show')">✕</div>
+            </div>
+        </div>
     `;
+    
+    // Tooltip açma/kapama
+    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
+    const tooltip = div.querySelector(`#${tooltipId}`);
+    
+    if (helpIcon && tooltip) {
+        helpIcon.onclick = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            // Diğer tooltip'leri kapat
+            document.querySelectorAll('.daily-task-tooltip.show').forEach(t => {
+                if (t !== tooltip) t.classList.remove('show');
+            });
+            tooltip.classList.toggle('show');
+        };
+        
+        // Tooltip dışına tıklanınca kapat
+        tooltip.onclick = function(e) {
+            if (e.target === tooltip) {
+                tooltip.classList.remove('show');
+            }
+        };
+    }
     
     return div;
 }
 
 function getTaskDescription(task) {
     const descriptions = {
-        'kelime5': 'Herhangi bir modda 5 kelime çevir',
-        'kelime10': 'Herhangi bir modda 10 kelime çevir',
-        'ayet3': 'Ayet Oku modunda 3 ayet oku',
-        'dua2': 'Dua Et modunda 2 dua öğren',
+        'kelime5': 'Kelime Çevir oyununda 5 kelimeyi doğru çevir',
+        'kelime10': 'Kelime Çevir oyununda 10 kelimeyi doğru çevir',
+        'ayet3': 'Ayet Oku modunda 3 farklı ayet oku',
+        'dua2': 'Dua Et modunda 2 farklı dua öğren',
         'hadis1': 'Hadis Oku modunda 1 hadis oku',
-        'dinle2': 'Dinle ve Bul modunda 2 kelime dinle',
-        'dinle5': 'Dinle ve Bul modunda 5 kelime dinle',
-        'bosluk1': 'Boşluk Doldur modunda 1 soru çöz',
-        'bosluk3': 'Boşluk Doldur modunda 3 soru çöz',
-        'dogru10': 'Herhangi bir modda 10 doğru cevap ver',
-        'dogru20': 'Herhangi bir modda 20 doğru cevap ver',
-        'puan100': 'Günlük toplam 100 Hasene kazan',
-        'puan200': 'Günlük toplam 200 Hasene kazan',
-        'perfect5': 'Hiç yanlış yapmadan 5 soru çöz',
-        'allDiff': '3 farklı zorluk seviyesinde oyna',
-        'combo15': '15 doğru cevap ver (muvazebet)',
+        'dinle2': 'Dinle ve Bul oyununda 2 kelimeyi doğru bul',
+        'dinle5': 'Dinle ve Bul oyununda 5 kelimeyi doğru bul',
+        'bosluk1': 'Boşluk Doldur oyununda 1 soruyu doğru çöz',
+        'bosluk3': 'Boşluk Doldur oyununda 3 soruyu doğru çöz',
+        'dogru10': 'Herhangi bir oyun modunda toplam 10 doğru cevap ver',
+        'dogru20': 'Herhangi bir oyun modunda toplam 20 doğru cevap ver',
+        'puan100': 'Günlük toplam 100 Hasene puanı kazan',
+        'puan200': 'Günlük toplam 200 Hasene puanı kazan',
+        'perfect5': '5 oyunda hiç yanlış yapmadan en az 3 soru çöz',
+        'allDiff': 'Kelime Çevir\'de 3 farklı zorluk seviyesinde oyna (Kolay, Orta, Zor)',
+        'combo15': 'Herhangi bir oyun modunda toplam 15 doğru cevap ver',
         // Yeni görevler için açıklamalar
-        'review5': 'Tekrar Et modunda 5 zorlanılan kelimeyi pratik yap',
-        'combo3x': 'Üst üste 3 doğru cevap ver',
-        'accuracy80': 'Oyun sonunda %80 veya daha yüksek başarı oranı yakala',
-        'allModes': 'Klasik, Dinle, Boşluk, Ayet, Dua, Hadis modlarından en az 4\'ünü dene',
+        'review5': 'İstatistikler > Tekrar Et modunda 5 zorlanılan kelimeyi pratik yap',
+        'combo3x': 'Herhangi bir oyun modunda üst üste 3 doğru cevap ver',
+        'accuracy80': 'Oyun bitiminde %80 veya daha yüksek başarı oranı yakala',
+        'allModes': '6 farklı moddan en az 4\'ünü oyna (Kelime, Dinle, Boşluk, Ayet, Dua, Hadis)',
         'streakMaintain': 'Günlük oyun hedefini tamamlayarak serini koru',
-        'puan500': 'Günlük toplam 500 Hasene kazan'
+        'puan500': 'Günlük toplam 500 Hasene puanı kazan'
     };
     const description = descriptions[task.id];
     // Eğer açıklama yoksa veya display name ile aynıysa boş döndür
@@ -8587,6 +8710,85 @@ function getTaskDescription(task) {
         return '';
     }
     return description;
+}
+
+// Görev için detaylı açıklama (tooltip için)
+function getTaskDetailedHelp(task) {
+    const helpTexts = {
+        'kelime5': '📚 Kelime Çevir oyununu oyna. Herhangi bir mod seçebilirsin (Klasik, Hızlı, 3 Can veya Zorluk). 5 kelimeyi doğru çevirerek görevi tamamla.',
+        'kelime10': '📚 Kelime Çevir oyununu oyna. Herhangi bir mod seçebilirsin (Klasik, Hızlı, 3 Can veya Zorluk). 10 kelimeyi doğru çevirerek görevi tamamla.',
+        'ayet3': '📖 Ana menüden "Ayet Oku" modunu seç. 3 farklı ayeti okuyarak görevi tamamla. Her ayet okunduğunda ilerleme sayılır.',
+        'dua2': '🤲 Ana menüden "Dua Et" modunu seç. 2 farklı duayı öğrenerek görevi tamamla. Her dua öğrenildiğinde ilerleme sayılır.',
+        'hadis1': '📚 Ana menüden "Hadis Oku" modunu seç. 1 hadisi okuyarak görevi tamamla.',
+        'dinle2': '🎧 Ana menüden "Dinle ve Bul" oyununu seç. Kelimeyi dinle ve doğru seçeneği bul. 2 kelimeyi doğru bularak görevi tamamla.',
+        'dinle5': '🎧 Ana menüden "Dinle ve Bul" oyununu seç. Kelimeyi dinle ve doğru seçeneği bul. 5 kelimeyi doğru bularak görevi tamamla.',
+        'bosluk1': '✏️ Ana menüden "Boşluk Doldur" oyununu seç. Ayetteki eksik kelimeyi tamamla. 1 soruyu doğru çözerek görevi tamamla.',
+        'bosluk3': '✏️ Ana menüden "Boşluk Doldur" oyununu seç. Ayetteki eksik kelimeyi tamamla. 3 soruyu doğru çözerek görevi tamamla.',
+        'dogru10': '⭐ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) 10 doğru cevap ver. Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır.',
+        'dogru20': '⭐ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) 20 doğru cevap ver. Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır.',
+        'puan100': '💰 Günlük toplam 100 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
+        'puan200': '💰 Günlük toplam 200 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
+        'perfect5': '🔥 Kelime Çevir, Dinle Bul veya Boşluk Doldur oyunlarında oyun içinde hiç yanlış yapmadan en az 3 soru çöz.\n\n' +
+                    '💡 Önemli: Doğru cevapların peş peşe olması gerekmez. Sadece oyun içinde hiç yanlış yapmamış olman yeterli.\n\n' +
+                    '📝 Örnek: 3 doğru, 1 yanlış, 2 doğru → Sayılmaz (yanlış var)\n' +
+                    '✅ Örnek: 3 doğru, 0 yanlış → Sayılır (hiç yanlış yok)\n\n' +
+                    '🎯 Bu şekilde 5 oyun tamamladığında görev tamamlanır. Oyunu bitirmeden çıkarsan da sayılır (geri butonuna basıp onaylarsan).',
+        'allDiff': '💎 Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna: Kolay, Orta ve Zor.\n\n' +
+                    '📝 Nasıl yapılır:\n' +
+                    '1. Ana menüden zorluk seviyesini değiştir (Kolay/Orta/Zor butonları)\n' +
+                    '2. Her zorluk seviyesinde en az bir oyun oyna\n' +
+                    '3. 3 farklı zorluk seviyesinde oynadığında görev tamamlanır\n\n' +
+                    '💡 İpucu: Aynı gün içinde farklı zorluk seviyelerinde oynayabilirsin.',
+        'combo15': '⚡ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) toplam 15 doğru cevap ver.\n\n' +
+                   '📝 Nasıl çalışır:\n' +
+                   '• Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır\n' +
+                   '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n' +
+                   '• Örnek: 5 Kelime Çevir + 5 Dinle Bul + 5 Boşluk Doldur = 15 doğru',
+        'review5': '🔄 İstatistikler bölümünden "Tekrar Et" modunu kullan.\n\n' +
+                   '📝 Nasıl yapılır:\n' +
+                   '1. Ana menüden "İstatistikler" butonuna tıkla\n' +
+                   '2. "Tekrar Et" sekmesine geç\n' +
+                   '3. Zorlanılan kelimeleri pratik yap\n' +
+                   '4. 5 zorlanılan kelimeyi tekrar ettiğinde görev tamamlanır\n\n' +
+                   '💡 İpucu: Zorlanılan kelimeler otomatik olarak listelenir.',
+        'combo3x': '⚡ Herhangi bir oyun modunda üst üste 3 doğru cevap ver.\n\n' +
+                   '📝 Nasıl çalışır:\n' +
+                   '• Doğru cevaplar peş peşe gelmeli\n' +
+                   '• Yanlış cevap verirsen seri sıfırlanır\n' +
+                   '• Tekrar baştan başlaman gerekir\n\n' +
+                   '✅ Örnek: Doğru → Doğru → Doğru = Tamamlandı\n' +
+                   '❌ Örnek: Doğru → Yanlış → Doğru → Doğru = Sıfırlandı',
+        'accuracy80': '🎯 Herhangi bir oyun modunda oyunu bitirdiğinde %80 veya daha yüksek başarı oranı yakala.\n\n' +
+                      '📝 Nasıl hesaplanır:\n' +
+                      'Başarı Oranı = (Doğru Cevap / Toplam Soru) × 100\n\n' +
+                      '✅ Örnek: 8 doğru / 10 soru = %80 → Tamamlandı\n' +
+                      '✅ Örnek: 9 doğru / 10 soru = %90 → Tamamlandı\n' +
+                      '❌ Örnek: 7 doğru / 10 soru = %70 → Tamamlanmadı\n\n' +
+                      '💡 İpucu: Oyunu bitirmen gerekir (geri butonuna basmak yeterli değil).',
+        'allModes': '🌟 6 farklı oyun modundan en az 4\'ünü oyna.\n\n' +
+                    '📝 Oyun modları:\n' +
+                    '1. 📚 Kelime Çevir\n' +
+                    '2. 🎧 Dinle ve Bul\n' +
+                    '3. ✏️ Boşluk Doldur\n' +
+                    '4. 📖 Ayet Oku\n' +
+                    '5. 🤲 Dua Et\n' +
+                    '6. 📚 Hadis Oku\n\n' +
+                    '💡 İpucu: En az 4 farklı modu oynadığında görev tamamlanır. Aynı modu birden fazla oynaman sayılmaz.',
+        'streakMaintain': '🔥 Günlük oyun hedefini tamamlayarak serini koru.\n\n' +
+                          '📝 Nasıl çalışır:\n' +
+                          '• Her gün oyun oynayarak serini devam ettir\n' +
+                          '• Günlük hedefi tamamladığında görev tamamlanır\n' +
+                          '• Günlük hedef üst barda gösterilir\n\n' +
+                          '💡 İpucu: Günlük hedefi tamamlamak için yeterli Hasene puanı kazanman gerekir.',
+        'puan500': '💰 Günlük toplam 500 Hasene puanı kazan.\n\n' +
+                   '📝 Nasıl puan kazanabilirsin:\n' +
+                   '• Oyunlarda doğru cevap vererek\n' +
+                   '• Combo bonusu alarak (her 3 doğru cevapta +5)\n' +
+                   '• Perfect lesson bonusu alarak (tüm soruları doğru cevaplarsan %50 ekstra)\n' +
+                   '• Görevleri tamamlayarak\n\n' +
+                   '💡 İpucu: Günlük toplam puan üst barda gösterilir.'
+    };
+    return helpTexts[task.id] || 'Bu görevi tamamlamak için ilgili oyun modunu oyna.';
 }
 
 function getTaskDisplayName(task) {
@@ -8846,6 +9048,11 @@ function addToGlobalPoints(points, correctAnswers = 0) {
     updateStatsBar(); // Global barı güncelle
     checkAchievements(); // Başarımları kontrol et
     debouncedSaveStats(); // Debounced kaydetme // Verileri kaydet
+    
+    // Görevleri güncelle (perfect streak gibi görevler için)
+    if (typeof updateTasksDisplay === 'function') {
+        updateTasksDisplay();
+    }
 }
 
 // ============ ZORLUK UI GÜNCELLEYICI - YENİ TASARIM ============
@@ -9562,6 +9769,9 @@ elements.backFromGameBtn.onclick = async () => {
                     }
                 }
                 // ============ PERFECT LESSON BONUS SONU ============
+                
+                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
+                addToGlobalPoints(sessionScore, sessionCorrect);
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
         }
@@ -9711,6 +9921,9 @@ elements.backFromBoslukBtn.onclick = async () => {
             // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
             // updateTaskProgress('toplamDogru', boslukCorrect);
                 }
+                
+                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
+                addToGlobalPoints(sessionScore, sessionCorrect);
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
         }
@@ -9808,6 +10021,9 @@ elements.backFromDinleBtn.onclick = async () => {
             // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
             // updateTaskProgress('toplamDogru', dinleCorrect);
                 }
+                
+                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
+                addToGlobalPoints(sessionScore, sessionCorrect);
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
         }

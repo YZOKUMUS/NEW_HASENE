@@ -153,6 +153,114 @@ function checkDailyReminder() {
     }
 }
 
+// Günlük görev hatırlatıcısı kontrolü (gece yarısından önce)
+function checkDailyTasksReminder() {
+    const settings = getNotificationSettings();
+    if (!settings.dailyReminder) {
+        return;
+    }
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // Gece yarısına kalan süreyi hesapla
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    const timeUntilMidnight = midnight - now;
+    const hoursLeft = Math.floor(timeUntilMidnight / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeUntilMidnight % (1000 * 60 * 60)) / (1000 * 60));
+    
+    // Sadece gece 22:00'ten sonra hatırlat (gece yarısına 2 saat veya daha az kaldığında)
+    // (Yani 22:00 - 23:59 arası)
+    if (hours < 22) {
+        return;
+    }
+    
+    // Bugün hatırlatıcı gösterildi mi?
+    const today = now.toDateString();
+    const lastTaskReminder = localStorage.getItem('hasene_lastTaskReminder');
+    if (lastTaskReminder === today) {
+        return;
+    }
+    
+    // Günlük görevleri kontrol et
+    try {
+        // dailyTasks global değişkeninden al
+        let dailyTasks = null;
+        if (typeof window !== 'undefined' && window.dailyTasks) {
+            dailyTasks = window.dailyTasks;
+        } else {
+            // localStorage'dan yükle
+            const savedTasks = localStorage.getItem('hasene_dailyTasks');
+            if (savedTasks) {
+                dailyTasks = JSON.parse(savedTasks);
+            }
+        }
+        
+        if (!dailyTasks || !dailyTasks.tasks || !dailyTasks.completedTasks) {
+            return;
+        }
+        
+        // Tamamlanmamış görevleri bul
+        const incompleteTasks = dailyTasks.tasks.filter(task => 
+            !dailyTasks.completedTasks.includes(task.id)
+        );
+        
+        // Bonus görevleri de kontrol et
+        const incompleteBonusTasks = (dailyTasks.bonusTasks || []).filter(task => 
+            !dailyTasks.completedTasks.includes(task.id)
+        );
+        
+        const totalIncomplete = incompleteTasks.length + incompleteBonusTasks.length;
+        
+        // Eğer tamamlanmamış görev varsa hatırlat
+        if (totalIncomplete > 0) {
+            // Kalan süreyi formatla
+            let timeLeftText = '';
+            if (hoursLeft > 0) {
+                timeLeftText = `${hoursLeft} saat ${minutesLeft} dakika`;
+            } else {
+                timeLeftText = `${minutesLeft} dakika`;
+            }
+            
+            // Görev isimlerini al (en fazla 3 tanesini göster)
+            const taskNames = [];
+            incompleteTasks.slice(0, 3).forEach(task => {
+                const taskName = task.name || task.id;
+                taskNames.push(taskName);
+            });
+            if (incompleteTasks.length > 3) {
+                taskNames.push(`ve ${incompleteTasks.length - 3} görev daha`);
+            }
+            
+            const taskList = taskNames.length > 0 ? taskNames.join(', ') : 'görevler';
+            
+            showNotification('📋 Günlük Görevler Hatırlatıcı', {
+                body: `Gece yarısına ${timeLeftText} kaldı! ${totalIncomplete} tamamlanmamış görevin var. ${taskList} tamamlamak ister misin?`,
+                icon: 'assets/images/icon-192.png',
+                tag: 'daily-tasks-reminder',
+                requireInteraction: false,
+                onClick: () => {
+                    // Vazifeler panelini aç
+                    if (typeof showDailyTasksModal === 'function') {
+                        showDailyTasksModal();
+                    } else if (typeof showMainMenu === 'function') {
+                        showMainMenu();
+                    }
+                }
+            });
+            
+            // Bugün hatırlatıcı gösterildi olarak işaretle
+            localStorage.setItem('hasene_lastTaskReminder', today);
+        }
+    } catch (e) {
+        if (typeof log !== 'undefined') {
+            log.error('Günlük görev hatırlatıcı hatası:', e);
+        }
+    }
+}
+
 // Streak uyarısı kontrolü
 function checkStreakWarning() {
     const settings = getNotificationSettings();
@@ -249,6 +357,11 @@ function initNotifications() {
         checkDailyReminder();
     }, 60 * 60 * 1000); // 1 saat
 
+    // Günlük görev hatırlatıcısı kontrolü (her 30 dakikada bir - gece 23:00'ten sonra)
+    setInterval(() => {
+        checkDailyTasksReminder();
+    }, 30 * 60 * 1000); // 30 dakika
+
     // Streak uyarısı kontrolü (her 30 dakikada bir)
     setInterval(() => {
         checkStreakWarning();
@@ -257,6 +370,7 @@ function initNotifications() {
     // İlk kontrol
     setTimeout(() => {
         checkDailyReminder();
+        checkDailyTasksReminder();
         checkStreakWarning();
     }, window.CONSTANTS?.UI?.NOTIFICATION_DURATION || 5000); // Notification duration
 }
@@ -266,6 +380,7 @@ document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
         // Sayfa görünür olduğunda kontrol et
         checkDailyReminder();
+        checkDailyTasksReminder();
         checkStreakWarning();
     }
 });
