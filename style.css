@@ -2524,9 +2524,12 @@ body.no-scroll {
         stroke-width: 3;
     }
     
+    /* Mobilde footer'ı sabit alttan çıkarıp içeriğin altına al */
     .kapak-loading-copyright {
+        position: static;
+        margin-top: 10px;
+        transform: none;
         font-size: 10px; /* Mobilde daha küçük copyright */
-        bottom: 12px;
         letter-spacing: 0.5px;
     }
 }

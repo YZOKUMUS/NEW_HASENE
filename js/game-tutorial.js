@@ -15,9 +15,9 @@ function hasSeenTutorial(gameType) {
             return true;
         }
         // Eski sistemle uyumluluk için: Eğer bu spesifik tutorial görüldüyse de true döndür
-        const key = `hasene_tutorial_${gameType}`;
-        const seen = localStorage.getItem(key);
-        return seen === 'true';
+    const key = `hasene_tutorial_${gameType}`;
+    const seen = localStorage.getItem(key);
+    return seen === 'true';
     } catch (e) {
         return false;
     }
@@ -30,8 +30,8 @@ function markTutorialAsSeen(gameType) {
         // Genel key'i set et - artık tüm tutorial'lar görüldü
         localStorage.setItem(ALL_TUTORIALS_SEEN_KEY, '1');
         // Eski sistemle uyumluluk için spesifik key'i de set et
-        const key = `hasene_tutorial_${gameType}`;
-        localStorage.setItem(key, 'true');
+    const key = `hasene_tutorial_${gameType}`;
+    localStorage.setItem(key, 'true');
     } catch (e) {
         console.warn('Tutorial kaydı yapılamadı:', e);
     }
