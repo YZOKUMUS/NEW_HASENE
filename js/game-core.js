@@ -8464,7 +8464,7 @@ function createWeeklyTaskElement(task) {
             <div class="daily-task-tooltip-content">
                 <div class="daily-task-tooltip-title">${task.name}</div>
                 <div class="daily-task-tooltip-text">${taskHelp}</div>
-                <div class="daily-task-tooltip-close" onclick="this.parentElement.parentElement.classList.remove('show')">✕</div>
+                <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
             </div>
         </div>
     `;
@@ -8472,6 +8472,7 @@ function createWeeklyTaskElement(task) {
     // Tooltip açma/kapama
     const helpIcon = div.querySelector(`#${tooltipId}-icon`);
     const tooltip = div.querySelector(`#${tooltipId}`);
+    const closeBtn = div.querySelector(`#${tooltipId}-close`);
     
     if (helpIcon && tooltip) {
         helpIcon.onclick = function(e) {
@@ -8484,12 +8485,40 @@ function createWeeklyTaskElement(task) {
             tooltip.classList.toggle('show');
         };
         
-        // Tooltip dışına tıklanınca kapat
+        // Close butonuna tıklanınca kapat
+        if (closeBtn) {
+            closeBtn.onclick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                tooltip.classList.remove('show');
+            };
+        }
+        
+        // Tooltip dışına tıklanınca kapat (sadece tooltip background'una)
         tooltip.onclick = function(e) {
             if (e.target === tooltip) {
                 tooltip.classList.remove('show');
             }
         };
+        
+        // ESC tuşu ile kapat (global listener - sadece açık tooltip varsa çalışır)
+        const handleEscKey = function(e) {
+            if (e.key === 'Escape') {
+                const openTooltip = document.querySelector('.daily-task-tooltip.show');
+                if (openTooltip) {
+                    openTooltip.classList.remove('show');
+                }
+            }
+        };
+        
+        // Tooltip açıldığında ESC listener ekle
+        helpIcon.addEventListener('click', function() {
+            setTimeout(function() {
+                if (tooltip.classList.contains('show')) {
+                    document.addEventListener('keydown', handleEscKey, { once: true });
+                }
+            }, 10);
+        });
     }
     
     return div;
@@ -8642,7 +8671,7 @@ function createTaskElement(task) {
             <div class="daily-task-tooltip-content">
                 <div class="daily-task-tooltip-title">${getTaskDisplayName(task)}</div>
                 <div class="daily-task-tooltip-text">${taskHelp}</div>
-                <div class="daily-task-tooltip-close" onclick="this.parentElement.parentElement.classList.remove('show')">✕</div>
+                <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
             </div>
         </div>
     `;
@@ -8650,6 +8679,7 @@ function createTaskElement(task) {
     // Tooltip açma/kapama
     const helpIcon = div.querySelector(`#${tooltipId}-icon`);
     const tooltip = div.querySelector(`#${tooltipId}`);
+    const closeBtn = div.querySelector(`#${tooltipId}-close`);
     
     if (helpIcon && tooltip) {
         helpIcon.onclick = function(e) {
@@ -8662,12 +8692,40 @@ function createTaskElement(task) {
             tooltip.classList.toggle('show');
         };
         
-        // Tooltip dışına tıklanınca kapat
+        // Close butonuna tıklanınca kapat
+        if (closeBtn) {
+            closeBtn.onclick = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                tooltip.classList.remove('show');
+            };
+        }
+        
+        // Tooltip dışına tıklanınca kapat (sadece tooltip background'una)
         tooltip.onclick = function(e) {
             if (e.target === tooltip) {
                 tooltip.classList.remove('show');
             }
         };
+        
+        // ESC tuşu ile kapat (global listener - sadece açık tooltip varsa çalışır)
+        const handleEscKey = function(e) {
+            if (e.key === 'Escape') {
+                const openTooltip = document.querySelector('.daily-task-tooltip.show');
+                if (openTooltip) {
+                    openTooltip.classList.remove('show');
+                }
+            }
+        };
+        
+        // Tooltip açıldığında ESC listener ekle
+        helpIcon.addEventListener('click', function() {
+            setTimeout(function() {
+                if (tooltip.classList.contains('show')) {
+                    document.addEventListener('keydown', handleEscKey, { once: true });
+                }
+            }, 10);
+        });
     }
     
     return div;
