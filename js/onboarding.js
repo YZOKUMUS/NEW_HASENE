@@ -13,6 +13,8 @@ const onboardingSteps = [
         title: '🕌 Hoş Geldin!',
         description:
             'Bu uygulama, Kuran-ı Kerim\'den kelimeleri çalışarak ayetleri daha iyi anlamana yardımcı olmak için hazırlandı.\n\n' +
+            'Hedef kitle; Kuran\'ı orijinal dilinden anlamak isteyen **ortaokul son sınıf ve üzeri** gençler, üniversite talebeleri, hafızlık yapanlar, İHL / İlahiyat öğrencileri ve Kur\'an halkalarına devam eden yetişkinlerdir.\n\n' +
+            'Uygulama öğretmen veya veli rehberliğiyle daha küçük yaş grupları tarafından da kullanılabilir.\n\n' +
             'Arapça kelimeleri öğrenerek, ayetlerin meâlini daha derinlemesine kavrayabilirsin.\n\n' +
             '💡 Her gün düzenli çalışarak ilerlemeni takip edebilirsin!',
         highlightSelector: '.games-section',

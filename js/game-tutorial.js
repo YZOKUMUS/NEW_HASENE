@@ -65,8 +65,8 @@ function showGameTutorial(gameType, onComplete) {
                 },
                 {
                     icon: '🔥',
-                    title: 'Combo Bonusu',
-                    description: 'Her 3 doğru cevapta +5 Hasene bonus kazanırsın!'
+                    title: 'Muvazebet ve Bereketli Hasene',
+                    description: 'Her 3 sahih cevapta +5 bereketli Hasene kazanırsın! Muvazebet (peş peşe doğru cevaplar), ilmin kalbe yerleşmesine vesiledir.'
                 }
             ]
         },
