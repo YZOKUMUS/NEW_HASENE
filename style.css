@@ -2471,6 +2471,8 @@ body.no-scroll {
     .kapak-loading {
         padding-top: 30px; /* Mobilde daha az üst boşluk */
         padding-bottom: 40px; /* Mobilde copyright için alt boşluk */
+        overflow-y: auto; /* Uzun ekranlarda hadis ve ayet kutusu taşmasın, scroll ile görülebilsin */
+        overflow-x: hidden;
     }
     
     .kapak-loading-image {
@@ -2534,6 +2536,8 @@ body.no-scroll {
     .kapak-loading {
         padding-top: 20px; /* Küçük mobilde daha da az üst boşluk */
         padding-bottom: 30px; /* Küçük mobilde copyright için alt boşluk */
+        overflow-y: auto; /* Küçük ekranlarda taşmayı engelle */
+        overflow-x: hidden;
     }
     
     .kapak-loading-image {
@@ -2597,6 +2601,8 @@ body.no-scroll {
     .kapak-loading {
         padding-top: 15px; /* Çok küçük ekranlarda minimal üst boşluk */
         padding-bottom: 25px; /* Çok küçük ekranlarda copyright için alt boşluk */
+        overflow-y: auto; /* Çok küçük ekranlarda içeriğin tamamı görülsün */
+        overflow-x: hidden;
     }
     
     .kapak-loading-image {
