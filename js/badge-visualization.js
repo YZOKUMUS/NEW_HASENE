@@ -9,25 +9,25 @@
     // Rozet görsel eşleştirmeleri (emoji veya SVG)
     const badgeVisuals = {
         // Günlük Başarılar
-        'achievement-first_win': { emoji: '🎯', color: '#FFD700', glow: '#FFA500' },
-        'achievement-daily_goal': { emoji: '⭐', color: '#FFD700', glow: '#FFA500' },
+        'achievement-first_win': { emoji: '📿', color: '#FFD700', glow: '#FFA500' },
+        'achievement-daily_goal': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
         
         // Özel Başarılar
-        'achievement-combo_master': { emoji: '🔥', color: '#FF6B35', glow: '#FF8C42' },
+        'achievement-combo_master': { emoji: '🤲', color: '#FF6B35', glow: '#FF8C42' },
         'achievement-xp_500': { emoji: '🌱', color: '#4CAF50', glow: '#66BB6A' },
-        'achievement-xp_2000': { emoji: '🥉', color: '#CD7F32', glow: '#D4AF37' }, // Bronz
-        'achievement-xp_8500': { emoji: '🥈', color: '#C0C0C0', glow: '#E8E8E8' }, // Gümüş
-        'achievement-xp_25500': { emoji: '🥇', color: '#FFD700', glow: '#FFA500' }, // Altın
-        'achievement-xp_85000': { emoji: '💎', color: '#B9F2FF', glow: '#E0F7FA' }, // Elmas
+        'achievement-xp_2000': { emoji: '🕌', color: '#CD7F32', glow: '#D4AF37' },
+        'achievement-xp_8500': { emoji: '🕋', color: '#C0C0C0', glow: '#E8E8E8' },
+        'achievement-xp_25500': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
+        'achievement-xp_85000': { emoji: '📿', color: '#B9F2FF', glow: '#E0F7FA' },
         'achievement-xp_1000000': { emoji: '📖', color: '#8E24AA', glow: '#E1BEE7' }, // HAFIZ
         
         // Seri Başarılar
-        'achievement-streak_7': { emoji: '🔥', color: '#FF6B35', glow: '#FF8C42' },
-        'achievement-streak_30': { emoji: '🔥', color: '#FFD700', glow: '#FFA500' },
+        'achievement-streak_7': { emoji: '📿', color: '#FF6B35', glow: '#FF8C42' },
+        'achievement-streak_30': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
         
         // Mertebe Başarılar
-        'achievement-level_5': { emoji: '🏆', color: '#FFD700', glow: '#FFA500' },
-        'achievement-level_10': { emoji: '👑', color: '#FFD700', glow: '#FFA500' },
+        'achievement-level_5': { emoji: '🕌', color: '#FFD700', glow: '#FFA500' },
+        'achievement-level_10': { emoji: '👳', color: '#FFD700', glow: '#FFA500' },
     };
 
     // Rozet kazanma animasyon stilleri

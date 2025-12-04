@@ -927,8 +927,44 @@ body.no-scroll {
 
 .game-icon {
     font-size: 48px;
-    margin-bottom: 12px;
+    margin: 0 auto 12px auto; /* Üst/alt: 0, yatay: auto (ortala), alt: 12px */
     display: block;
+    width: 64px;
+    height: 64px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Oyun butonları için PNG ikon desteği (256x256 px PNG'ler için) */
+#kelimeCevirBtn .game-icon {
+    background-image: url('assets/game-icons/kelime-cevir.png');
+    font-size: 0; /* Emoji'yi gizle */
+}
+
+#dinleBulBtn .game-icon {
+    background-image: url('assets/game-icons/dinle-bul.png');
+    font-size: 0;
+}
+
+#boslukDoldurBtn .game-icon {
+    background-image: url('assets/game-icons/bosluk-doldur.png');
+    font-size: 0;
+}
+
+#duaEtBtn .game-icon {
+    background-image: url('assets/game-icons/dua-et.png');
+    font-size: 0;
+}
+
+#ayetOkuBtn .game-icon {
+    background-image: url('assets/game-icons/ayet-oku.png');
+    font-size: 0;
+}
+
+#hadisOkuBtn .game-icon {
+    background-image: url('assets/game-icons/hadis-oku.png');
+    font-size: 0;
 }
 
 .game-title {
@@ -1077,6 +1113,7 @@ body.no-scroll {
     
     .game-icon {
         font-size: 40px !important;
+        margin: 0 auto 12px auto !important; /* Ortala */
     }
     
     .game-title {
@@ -8824,18 +8861,18 @@ body.no-scroll {
     -webkit-overflow-scrolling: touch !important;
 }
 
-/* Badges Grid - Preview Tasarım */
+/* Badges Grid - Preview Tasarım (daha kompakt) */
 #badgesModal .badges-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)) !important;
-    gap: 16px !important;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 8px !important;
 }
 
-/* Badge Card - Preview Tasarım */
+/* Badge Card - Preview Tasarım (boyut küçültüldü) */
 #badgesModal .badge-card {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-    border-radius: 20px !important;
-    padding: 20px 16px !important;
+    border-radius: 12px !important;
+    padding: 12px 8px 10px 8px !important;
     text-align: center !important;
     position: relative !important;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
@@ -8858,8 +8895,9 @@ body.no-scroll {
 }
 
 #badgesModal .badge-card:hover {
-    transform: translateY(-8px) scale(1.02) !important;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
+    /* Sadece hafif büyüt, yukarı kaydırma */
+    transform: scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
     border-color: #667eea !important;
 }
 
@@ -8895,8 +8933,8 @@ body.no-scroll {
 
 /* Badge Icon - Preview Tasarım */
 #badgesModal .badge-icon {
-    font-size: 56px !important;
-    margin-bottom: 12px !important;
+    font-size: 32px !important;
+    margin-bottom: 6px !important;
     display: block !important;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
     transition: transform 0.3s !important;
@@ -8906,9 +8944,127 @@ body.no-scroll {
     transform: scale(1.15) rotate(5deg) !important;
 }
 
-/* Badge Title - Preview Tasarım */
+/* Tüm rozet ikonları için ortak boyut/stil (Muvaffakiyetler) */
+#achievement-first_win .badge-icon,
+#achievement-daily_goal .badge-icon,
+#achievement-combo_master .badge-icon,
+#achievement-xp_500 .badge-icon,
+#achievement-xp_2000 .badge-icon,
+#achievement-xp_8500 .badge-icon,
+#achievement-xp_25500 .badge-icon,
+#achievement-xp_85000 .badge-icon,
+#achievement-xp_1000000 .badge-icon,
+#achievement-streak_7 .badge-icon,
+#achievement-level_5 .badge-icon,
+#achievement-level_10 .badge-icon,
+#achievement-level_20 .badge-icon,
+#achievement-rozet_14 .badge-icon,
+#achievement-rozet_15 .badge-icon,
+#achievement-rozet_16 .badge-icon,
+#achievement-rozet_17 .badge-icon,
+#achievement-rozet_18 .badge-icon,
+#achievement-rozet_19 .badge-icon,
+#achievement-rozet_20 .badge-icon,
+#achievement-rozet_21 .badge-icon {
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 auto 2px auto !important;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: 0 !important;      /* Emoji metnini gizle */
+    line-height: 0 !important;
+}
+
+/* Her rozet için dosya eşleştirmesi - Tüm rozetler için !important ile kesin çalışır */
+#achievement-first_win .badge-icon {
+    background-image: url('assets/badges/rozet1.png') !important;
+}
+
+#achievement-daily_goal .badge-icon {
+    background-image: url('assets/badges/rozet2.png') !important;
+}
+
+#achievement-combo_master .badge-icon {
+    background-image: url('assets/badges/rozet3.png') !important;
+}
+
+#achievement-xp_500 .badge-icon {
+    background-image: url('assets/badges/rozet4.png') !important;
+}
+
+#achievement-xp_2000 .badge-icon {
+    background-image: url('assets/badges/rozet5.png') !important;
+}
+
+#achievement-xp_8500 .badge-icon {
+    background-image: url('assets/badges/rozet6.png') !important;
+}
+
+#achievement-xp_25500 .badge-icon {
+    background-image: url('assets/badges/rozet7.png') !important;
+}
+
+#achievement-xp_85000 .badge-icon {
+    background-image: url('assets/badges/rozet8.png') !important;
+}
+
+#achievement-xp_1000000 .badge-icon {
+    background-image: url('assets/badges/rozet9.png') !important;
+}
+
+#achievement-streak_7 .badge-icon {
+    background-image: url('assets/badges/rozet10.png') !important;
+}
+
+#achievement-level_5 .badge-icon {
+    background-image: url('assets/badges/rozet11.png') !important;
+}
+
+#achievement-level_10 .badge-icon {
+    background-image: url('assets/badges/rozet12.png') !important;
+}
+
+#achievement-level_20 .badge-icon {
+    background-image: url('assets/badges/rozet13.png') !important;
+}
+
+/* Gelecekte eklenecek rozetler için hazır slotlar (rozet14-21) - Aktif ve hazır */
+#achievement-rozet_14 .badge-icon {
+    background-image: url('assets/badges/rozet14.png') !important;
+}
+
+#achievement-rozet_15 .badge-icon {
+    background-image: url('assets/badges/rozet15.png') !important;
+}
+
+#achievement-rozet_16 .badge-icon {
+    background-image: url('assets/badges/rozet16.png') !important;
+}
+
+#achievement-rozet_17 .badge-icon {
+    background-image: url('assets/badges/rozet17.png') !important;
+}
+
+#achievement-rozet_18 .badge-icon {
+    background-image: url('assets/badges/rozet18.png') !important;
+}
+
+#achievement-rozet_19 .badge-icon {
+    background-image: url('assets/badges/rozet19.png') !important;
+}
+
+#achievement-rozet_20 .badge-icon {
+    background-image: url('assets/badges/rozet20.png') !important;
+}
+
+#achievement-rozet_21 .badge-icon {
+    background-image: url('assets/badges/rozet21.png') !important;
+}
+
+/* Badge Title - Preview Tasarım (daha küçük) */
 #badgesModal .badge-title {
-    font-size: 14px !important;
+    font-size: 11px !important;
     font-weight: 700 !important;
     color: #333 !important;
     margin-bottom: 6px !important;
@@ -8917,11 +9073,11 @@ body.no-scroll {
 
 /* Badge Description - Preview Tasarım */
 #badgesModal .badge-desc {
-    font-size: 11px !important;
+    font-size: 10px !important;
     color: #666 !important;
     line-height: 1.4 !important;
-    margin-bottom: 12px !important;
-    min-height: 30px !important;
+    margin-bottom: 6px !important;
+    min-height: 20px !important;
 }
 
 /* Badge Progress - Preview Tasarım */
@@ -8931,7 +9087,7 @@ body.no-scroll {
     background: #e0e0e0 !important;
     border-radius: 10px !important;
     overflow: hidden !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 4px !important;
     position: relative !important;
 }
 
@@ -8962,7 +9118,7 @@ body.no-scroll {
 
 /* Badge Status - Preview Tasarım */
 #badgesModal .badge-status {
-    font-size: 10px !important;
+    font-size: 9px !important;
     font-weight: 600 !important;
     color: #999 !important;
     text-transform: uppercase !important;
@@ -9402,17 +9558,17 @@ body.no-scroll {
 
     #badgesModal .badges-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     #badgesModal .badge-card {
-        padding: 10px 6px !important;
-        border-radius: 14px !important;
+        padding: 8px 4px !important;
+        border-radius: 10px !important;
     }
 
     #badgesModal .badge-icon {
-        font-size: 32px !important;
-        margin-bottom: 6px !important;
+        font-size: 28px !important;
+        margin-bottom: 4px !important;
     }
 
     #badgesModal .badge-title {

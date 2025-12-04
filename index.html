@@ -70,6 +70,37 @@
     <!-- Flutter Modern CSS -->
     <link rel="stylesheet" href="style.css">
     
+    <!-- Muvaffakiyetler rozetlerini biraz daha kompakt göster -->
+    <style>
+        /* Sadece Muvaffakiyetler modalındaki rozet kartları */
+        #badgesModal .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+        }
+
+        #badgesModal .badge-card {
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        #badgesModal .badge-icon {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        #badgesModal .badge-title {
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+
+        #badgesModal .badge-desc,
+        #badgesModal .badge-status {
+            font-size: 0.75rem;
+        }
+    </style>
+    
     <!-- Modüler JavaScript Dosyaları -->
     <script src="js/config.js"></script>
     <script src="js/constants.js"></script>
@@ -247,37 +278,37 @@
                 <div class="games-grid">
 
                     <button class="game-card" id="kelimeCevirBtn" aria-label="Kelime Çevir oyununu başlat - Arapça kelimelerin Türkçe Meâl karşılığını bul" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">🔄</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Kelime Çevir</div>
                         <div class="game-desc">Arapça kelimelerin Türkçe Meâl karşılığını Bul</div>
                     </button>
 
                     <button class="game-card" id="dinleBulBtn" aria-label="Dinle ve Bul oyununu başlat - Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">🎧</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Dinle ve Bul</div>
                         <div class="game-desc">Kuran'da geçen Arapça kelimeyi dinle ve sahih kelimeyi seç</div>
                     </button>
 
                     <button class="game-card" id="boslukDoldurBtn" aria-label="Boşluk Doldur oyununu başlat - Ayetteki eksik kelimeyi tamamla" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">✏️</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Boşluk Doldur</div>
                         <div class="game-desc">Ayetteki eksik kelimeyi tamamla</div>
                     </button>
 
                     <button class="game-card" id="duaEtBtn" aria-label="Dua Et modunu aç - Kuran'da geçen duaları dinle ve öğren" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">🤲</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Dua Et</div>
                         <div class="game-desc">Kuran'da geçen duaları dinle ve öğren</div>
                     </button>
 
                     <button class="game-card" id="ayetOkuBtn" aria-label="Ayet Oku modunu aç - Ayetin Arapça'sını oku ,dinle ve meâli idrak et" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">📖</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Ayet Oku</div>
                         <div class="game-desc">Ayetin Arapça'sını oku ,dinle ve meâli idrak et</div>
                     </button>
 
                     <button class="game-card" id="hadisOkuBtn" aria-label="Hadis Oku modunu aç - Hadis-i şerifleri oku ve istifade et" role="button" tabindex="0">
-                        <span class="game-icon" aria-hidden="true">📚</span>
+                        <span class="game-icon" aria-hidden="true"></span>
                         <div class="game-title">Hadis Oku</div>
                         <div class="game-desc">Hadis-i şerifleri oku ve istifade et</div>
                     </button>
@@ -669,7 +700,7 @@
                 <div id="badgesGrid" class="badges-grid">
                     <!-- Günlük Başarılar -->
                     <div class="badge-card" id="achievement-first_win" data-category="daily" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🎯</span>
+                        <span class="badge-icon">📿</span>
                         <div class="badge-title">İlk Zafer</div>
                         <div class="badge-desc">İlk sahih cevabın</div>
                         <div class="badge-progress">
@@ -679,7 +710,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-daily_goal" data-category="daily" onclick="event.stopPropagation();">
-                        <span class="badge-icon">⭐</span>
+                        <span class="badge-icon">☪</span>
                         <div class="badge-title">Günlük Kahraman</div>
                         <div class="badge-desc">Günlük virdi tamamla</div>
                         <div class="badge-progress">
@@ -690,7 +721,7 @@
 
                     <!-- Özel Başarılar -->
                     <div class="badge-card" id="achievement-combo_master" data-category="special" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🔥</span>
+                        <span class="badge-icon">🤲</span>
                         <div class="badge-title">Muvazebet Ustası</div>
                         <div class="badge-desc">5x muvazebet yap</div>
                         <div class="badge-progress">
@@ -710,7 +741,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-xp_2000" data-category="special" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🥉</span>
+                        <span class="badge-icon">🕌</span>
                         <div class="badge-title">Mübtedi Yolcu</div>
                         <div class="badge-desc">2,000 Hasene</div>
                         <div class="badge-progress">
@@ -720,7 +751,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-xp_8500" data-category="special" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🥈</span>
+                        <span class="badge-icon">🕋</span>
                         <div class="badge-title">Gümüş Ustası</div>
                         <div class="badge-desc">8,500 Hasene</div>
                         <div class="badge-progress">
@@ -730,7 +761,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-xp_25500" data-category="special" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🥇</span>
+                        <span class="badge-icon">☪</span>
                         <div class="badge-title">Altın Ustası</div>
                         <div class="badge-desc">25,500 Hasene</div>
                         <div class="badge-progress">
@@ -740,7 +771,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-xp_85000" data-category="special" onclick="event.stopPropagation();">
-                        <span class="badge-icon">💎</span>
+                        <span class="badge-icon">📿</span>
                         <div class="badge-title">Elmas Ustası</div>
                         <div class="badge-desc">85,000 Hasene</div>
                         <div class="badge-progress">
@@ -761,7 +792,7 @@
 
                     <!-- Seri Başarılar -->
                     <div class="badge-card" id="achievement-streak_7" data-category="streak" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🔥</span>
+                        <span class="badge-icon">📿</span>
                         <div class="badge-title">7 Gün Muvazebet</div>
                         <div class="badge-desc">7 gün üst üste talebe et</div>
                         <div class="badge-progress">
@@ -772,7 +803,7 @@
 
                     <!-- Mertebe Başarılar -->
                     <div class="badge-card" id="achievement-level_5" data-category="level" onclick="event.stopPropagation();">
-                        <span class="badge-icon">🏆</span>
+                        <span class="badge-icon">🕌</span>
                         <div class="badge-title">Mertebe 5</div>
                         <div class="badge-desc">Mertebe 5'e ulaş</div>
                         <div class="badge-progress">
@@ -782,7 +813,7 @@
                     </div>
 
                     <div class="badge-card" id="achievement-level_10" data-category="level" onclick="event.stopPropagation();">
-                        <span class="badge-icon">💎</span>
+                        <span class="badge-icon">👳</span>
                         <div class="badge-title">Mertebe 10</div>
                         <div class="badge-desc">Mertebe 10'a ulaş</div>
                         <div class="badge-progress">
@@ -799,6 +830,87 @@
                             <div class="badge-progress-fill" style="width: 0%;"></div>
                         </div>
                         <div class="badge-status">0/20</div>
+                    </div>
+
+                    <!-- Gelecekte eklenecek rozetler (rozet14-21) -->
+                    <div class="badge-card" id="achievement-rozet_14" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 14</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_15" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 15</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_16" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 16</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_17" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 17</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_18" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 18</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_19" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 19</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_20" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 20</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
+                    </div>
+
+                    <div class="badge-card" id="achievement-rozet_21" data-category="special" onclick="event.stopPropagation();">
+                        <span class="badge-icon">📿</span>
+                        <div class="badge-title">Yeni Rozet 21</div>
+                        <div class="badge-desc">Açıklama buraya gelecek</div>
+                        <div class="badge-progress">
+                            <div class="badge-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="badge-status">Kilitli</div>
                     </div>
                 </div>
             </div>
