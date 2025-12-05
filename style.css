@@ -2214,8 +2214,9 @@ body.no-scroll {
 }
 
 .daily-task-card.completed .daily-task-help-icon {
-    top: 32px; /* Completed badge'in tam altına taşı (8px top + 20px height + 4px gap = 32px) */
-    right: 6px; /* Sağa hizalı */
+    top: 6px; /* Üstten aynı mesafe */
+    left: 6px; /* Sol üste taşı - completed badge ile çakışmasın */
+    right: auto; /* Sağ hizalamayı kaldır */
     background: rgba(76, 175, 80, 0.1);
     z-index: 15 !important; /* Completed badge'in üstünde olmalı */
 }
@@ -7966,8 +7967,9 @@ body.no-scroll {
 }
 
 .daily-task-card.completed .daily-task-help-icon {
-    top: 32px; /* Completed badge'in tam altına taşı (8px top + 20px height + 4px gap = 32px) */
-    right: 6px; /* Sağa hizalı */
+    top: 6px; /* Üstten aynı mesafe */
+    left: 6px; /* Sol üste taşı - completed badge ile çakışmasın */
+    right: auto; /* Sağ hizalamayı kaldır */
     background: rgba(76, 175, 80, 0.1);
     z-index: 15 !important; /* Completed badge'in üstünde olmalı */
 }

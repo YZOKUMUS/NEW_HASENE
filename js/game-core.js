@@ -8669,13 +8669,38 @@ function createWeeklyTaskElement(task) {
     const div = document.createElement('div');
     div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
     
-    // Tıklama event'lerini durdur
+    // Tooltip için unique ID (onclick handler'dan önce tanımlanmalı)
+    const tooltipId = 'weekly-task-tooltip-' + task.id + '-' + Date.now();
+    
+    // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
+    // Ama help icon'a tıklanırsa engelleme (bilgi paneli açılabilir)
     div.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
+        // Help icon veya tooltip'e tıklanmadıysa engelle
+        const clickedElement = e.target;
+        const isHelpIcon = clickedElement.classList.contains('daily-task-help-icon') || 
+                          clickedElement.closest('.daily-task-help-icon');
+        const isTooltip = clickedElement.classList.contains('daily-task-tooltip') || 
+                         clickedElement.closest('.daily-task-tooltip') ||
+                         clickedElement.closest('.daily-task-tooltip-content');
+        
+        if (!isHelpIcon && !isTooltip) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
     };
     div.addEventListener('touchstart', function(e) {
-        e.stopPropagation();
+        // Help icon'a dokunulmadıysa engelle
+        const touchedElement = e.target;
+        const isHelpIcon = touchedElement.classList.contains('daily-task-help-icon') || 
+                          touchedElement.closest('.daily-task-help-icon');
+        const isTooltip = touchedElement.classList.contains('daily-task-tooltip') || 
+                         touchedElement.closest('.daily-task-tooltip') ||
+                         touchedElement.closest('.daily-task-tooltip-content');
+        
+        if (!isHelpIcon && !isTooltip) {
+            e.stopPropagation();
+        }
+        // preventDefault kaldırıldı - scroll'u engellemesin
     }, { passive: true });
     
     // Hover efekti
@@ -8693,9 +8718,6 @@ function createWeeklyTaskElement(task) {
     // Günlük görevlerle aynı HTML yapısı
     const weeklyDescription = getWeeklyTaskDescription(task);
     const taskHelp = getWeeklyTaskDetailedHelp(task);
-    
-    // Tooltip için unique ID
-    const tooltipId = 'weekly-task-tooltip-' + task.id + '-' + Date.now();
     
     div.innerHTML = `
         ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
@@ -8732,11 +8754,35 @@ function createWeeklyTaskElement(task) {
         helpIcon.onclick = function(e) {
             e.stopPropagation();
             e.preventDefault();
-            // Diğer tooltip'leri kapat
-            document.querySelectorAll('.daily-task-tooltip.show').forEach(t => {
-                if (t !== tooltip) t.classList.remove('show');
+            
+            // Eğer bu tooltip zaten açıksa, sadece kapat
+            if (tooltip.classList.contains('show')) {
+                tooltip.classList.remove('show');
+                return;
+            }
+            
+            // Diğer açık tooltip'leri anında kapat (transition'ı devre dışı bırakarak)
+            const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
+            openTooltips.forEach(t => {
+                if (t !== tooltip) {
+                    // Transition'ı geçici olarak kaldır, anında kapat
+                    t.style.transition = 'none';
+                    t.classList.remove('show');
+                    // Transition'ı geri ekle
+                    setTimeout(() => {
+                        t.style.transition = '';
+                    }, 10);
+                }
             });
-            tooltip.classList.toggle('show');
+            
+            // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
+            if (openTooltips.length > 0) {
+                setTimeout(() => {
+                    tooltip.classList.add('show');
+                }, 50);
+            } else {
+                tooltip.classList.add('show');
+            }
         };
         
         // Close butonuna tıklanınca kapat
@@ -8875,14 +8921,38 @@ function createTaskElement(task) {
     const div = document.createElement('div');
     div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
     
+    // Tooltip için unique ID (onclick handler'dan önce tanımlanmalı)
+    const tooltipId = 'task-tooltip-' + task.id + '-' + Date.now();
+    
     // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
+    // Ama help icon'a tıklanırsa engelleme (bilgi paneli açılabilir)
     div.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
+        // Help icon veya tooltip'e tıklanmadıysa engelle
+        const clickedElement = e.target;
+        const isHelpIcon = clickedElement.classList.contains('daily-task-help-icon') || 
+                          clickedElement.closest('.daily-task-help-icon');
+        const isTooltip = clickedElement.classList.contains('daily-task-tooltip') || 
+                         clickedElement.closest('.daily-task-tooltip') ||
+                         clickedElement.closest('.daily-task-tooltip-content');
+        
+        if (!isHelpIcon && !isTooltip) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
     };
     // Touch event'leri - scroll'u engellemeden sadece click'i engelle
     div.addEventListener('touchstart', function(e) {
-        e.stopPropagation();
+        // Help icon'a dokunulmadıysa engelle
+        const touchedElement = e.target;
+        const isHelpIcon = touchedElement.classList.contains('daily-task-help-icon') || 
+                          touchedElement.closest('.daily-task-help-icon');
+        const isTooltip = touchedElement.classList.contains('daily-task-tooltip') || 
+                         touchedElement.closest('.daily-task-tooltip') ||
+                         touchedElement.closest('.daily-task-tooltip-content');
+        
+        if (!isHelpIcon && !isTooltip) {
+            e.stopPropagation();
+        }
         // preventDefault kaldırıldı - scroll'u engellemesin
     }, { passive: true }); // Scroll performansı için passive: true
     
@@ -8900,9 +8970,6 @@ function createTaskElement(task) {
     
     const taskDescription = getTaskDescription(task);
     const taskHelp = getTaskDetailedHelp(task);
-    
-    // Tooltip için unique ID
-    const tooltipId = 'task-tooltip-' + task.id + '-' + Date.now();
     
     div.innerHTML = `
         ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
@@ -8939,11 +9006,35 @@ function createTaskElement(task) {
         helpIcon.onclick = function(e) {
             e.stopPropagation();
             e.preventDefault();
-            // Diğer tooltip'leri kapat
-            document.querySelectorAll('.daily-task-tooltip.show').forEach(t => {
-                if (t !== tooltip) t.classList.remove('show');
+            
+            // Eğer bu tooltip zaten açıksa, sadece kapat
+            if (tooltip.classList.contains('show')) {
+                tooltip.classList.remove('show');
+                return;
+            }
+            
+            // Diğer açık tooltip'leri anında kapat (transition'ı devre dışı bırakarak)
+            const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
+            openTooltips.forEach(t => {
+                if (t !== tooltip) {
+                    // Transition'ı geçici olarak kaldır, anında kapat
+                    t.style.transition = 'none';
+                    t.classList.remove('show');
+                    // Transition'ı geri ekle
+                    setTimeout(() => {
+                        t.style.transition = '';
+                    }, 10);
+                }
             });
-            tooltip.classList.toggle('show');
+            
+            // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
+            if (openTooltips.length > 0) {
+                setTimeout(() => {
+                    tooltip.classList.add('show');
+                }, 50);
+            } else {
+                tooltip.classList.add('show');
+            }
         };
         
         // Close butonuna tıklanınca kapat
@@ -9001,7 +9092,7 @@ function getTaskDescription(task) {
         'puan100': 'Günlük toplam 100 Hasene puanı kazan',
         'puan200': 'Günlük toplam 200 Hasene puanı kazan',
         'perfect5': '5 perfect oyun tamamla (hiç yanlış yapmadan en az 3 soru çöz)',
-        'allDiff': 'Kelime Çevir\'de 3 farklı zorluk seviyesinde oyna (Kolay, Orta, Zor)',
+        'allDiff': 'Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna (Kolay, Orta, Zor) - Sadece Kelime Çevir sayılır',
         'combo15': 'Herhangi bir oyun modunda toplam 15 doğru cevap ver',
         // Yeni görevler için açıklamalar
         'review5': 'İstatistikler > Tekrar Et modunda 5 zorlanılan kelimeyi pratik yap',
@@ -9051,8 +9142,10 @@ function getTaskDetailedHelp(task) {
         'allDiff': '💎 Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna: Kolay, Orta ve Zor.\n\n' +
                     '📝 Nasıl yapılır:\n' +
                     '1. Ana menüden zorluk seviyesini değiştir (Kolay/Orta/Zor butonları)\n' +
-                    '2. Her zorluk seviyesinde en az bir oyun oyna\n' +
-                    '3. 3 farklı zorluk seviyesinde oynadığında görev tamamlanır\n\n' +
+                    '2. Kelime Çevir oyununu başlat ve en az bir doğru cevap ver\n' +
+                    '3. Bu işlemi 3 farklı zorluk seviyesinde (Kolay, Orta, Zor) tekrarla\n' +
+                    '4. Her zorluk seviyesinde en az bir doğru cevap vermen gerekir\n\n' +
+                    '💡 İpucu: Sadece Kelime Çevir oyununda sayılır. Dinle Bul ve Boşluk Doldur sayılmaz.\n' +
                     '💡 İpucu: Aynı gün içinde farklı zorluk seviyelerinde oynayabilirsin.',
         'combo15': '⚡ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) toplam 15 doğru cevap ver.\n\n' +
                    '📝 Nasıl çalışır:\n' +
