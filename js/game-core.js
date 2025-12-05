@@ -8755,33 +8755,31 @@ function createWeeklyTaskElement(task) {
             e.stopPropagation();
             e.preventDefault();
             
-            // Eğer bu tooltip zaten açıksa, sadece kapat
-            if (tooltip.classList.contains('show')) {
-                tooltip.classList.remove('show');
-                return;
-            }
+            // Bu tooltip'in şu anki durumunu kontrol et
+            const wasOpen = tooltip.classList.contains('show');
             
-            // Diğer açık tooltip'leri anında kapat (transition'ı devre dışı bırakarak)
+            // TÜM açık tooltip'leri anında kapat (bu tooltip dahil)
             const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
             openTooltips.forEach(t => {
-                if (t !== tooltip) {
-                    // Transition'ı geçici olarak kaldır, anında kapat
-                    t.style.transition = 'none';
-                    t.classList.remove('show');
-                    // Transition'ı geri ekle
-                    setTimeout(() => {
-                        t.style.transition = '';
-                    }, 10);
-                }
+                // Transition'ı geçici olarak kaldır, anında kapat
+                t.style.transition = 'none';
+                t.classList.remove('show');
+                // Transition'ı geri ekle
+                setTimeout(() => {
+                    t.style.transition = '';
+                }, 10);
             });
             
-            // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
-            if (openTooltips.length > 0) {
-                setTimeout(() => {
+            // Eğer bu tooltip kapalıydıysa, onu aç (eğer açıktıysa zaten kapattık, tekrar açma)
+            if (!wasOpen) {
+                // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
+                if (openTooltips.length > 0) {
+                    setTimeout(() => {
+                        tooltip.classList.add('show');
+                    }, 50);
+                } else {
                     tooltip.classList.add('show');
-                }, 50);
-            } else {
-                tooltip.classList.add('show');
+                }
             }
         };
         
@@ -9007,33 +9005,31 @@ function createTaskElement(task) {
             e.stopPropagation();
             e.preventDefault();
             
-            // Eğer bu tooltip zaten açıksa, sadece kapat
-            if (tooltip.classList.contains('show')) {
-                tooltip.classList.remove('show');
-                return;
-            }
+            // Bu tooltip'in şu anki durumunu kontrol et
+            const wasOpen = tooltip.classList.contains('show');
             
-            // Diğer açık tooltip'leri anında kapat (transition'ı devre dışı bırakarak)
+            // TÜM açık tooltip'leri anında kapat (bu tooltip dahil)
             const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
             openTooltips.forEach(t => {
-                if (t !== tooltip) {
-                    // Transition'ı geçici olarak kaldır, anında kapat
-                    t.style.transition = 'none';
-                    t.classList.remove('show');
-                    // Transition'ı geri ekle
-                    setTimeout(() => {
-                        t.style.transition = '';
-                    }, 10);
-                }
+                // Transition'ı geçici olarak kaldır, anında kapat
+                t.style.transition = 'none';
+                t.classList.remove('show');
+                // Transition'ı geri ekle
+                setTimeout(() => {
+                    t.style.transition = '';
+                }, 10);
             });
             
-            // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
-            if (openTooltips.length > 0) {
-                setTimeout(() => {
+            // Eğer bu tooltip kapalıydıysa, onu aç (eğer açıktıysa zaten kapattık, tekrar açma)
+            if (!wasOpen) {
+                // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
+                if (openTooltips.length > 0) {
+                    setTimeout(() => {
+                        tooltip.classList.add('show');
+                    }, 50);
+                } else {
                     tooltip.classList.add('show');
-                }, 50);
-            } else {
-                tooltip.classList.add('show');
+                }
             }
         };
         
