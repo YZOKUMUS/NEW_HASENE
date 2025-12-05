@@ -8736,19 +8736,28 @@ function createWeeklyTaskElement(task) {
             <div class="daily-task-progress-text">${task.current}/${task.target}</div>
         </div>
         <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
-        <div class="daily-task-tooltip" id="${tooltipId}">
+    `;
+    
+    // Tooltip açma/kapama - Tooltip body'de oluşturulacak
+    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
+    
+    // Tooltip'i body'de oluştur (görev panelinin dışında açılsın)
+    let tooltip = document.getElementById(tooltipId);
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'daily-task-tooltip';
+        tooltip.id = tooltipId;
+        tooltip.innerHTML = `
             <div class="daily-task-tooltip-content">
                 <div class="daily-task-tooltip-title">${task.name}</div>
                 <div class="daily-task-tooltip-text">${taskHelp}</div>
                 <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
             </div>
-        </div>
-    `;
+        `;
+        document.body.appendChild(tooltip);
+    }
     
-    // Tooltip açma/kapama
-    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
-    const tooltip = div.querySelector(`#${tooltipId}`);
-    const closeBtn = div.querySelector(`#${tooltipId}-close`);
+    const closeBtn = tooltip.querySelector(`#${tooltipId}-close`);
     
     if (helpIcon && tooltip) {
         helpIcon.onclick = function(e) {
@@ -8986,19 +8995,28 @@ function createTaskElement(task) {
             <div class="daily-task-progress-text">${task.current}/${task.target}</div>
         </div>
         <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
-        <div class="daily-task-tooltip" id="${tooltipId}">
+    `;
+    
+    // Tooltip açma/kapama - Tooltip body'de oluşturulacak
+    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
+    
+    // Tooltip'i body'de oluştur (görev panelinin dışında açılsın)
+    let tooltip = document.getElementById(tooltipId);
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'daily-task-tooltip';
+        tooltip.id = tooltipId;
+        tooltip.innerHTML = `
             <div class="daily-task-tooltip-content">
                 <div class="daily-task-tooltip-title">${getTaskDisplayName(task)}</div>
                 <div class="daily-task-tooltip-text">${taskHelp}</div>
                 <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
             </div>
-        </div>
-    `;
+        `;
+        document.body.appendChild(tooltip);
+    }
     
-    // Tooltip açma/kapama
-    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
-    const tooltip = div.querySelector(`#${tooltipId}`);
-    const closeBtn = div.querySelector(`#${tooltipId}-close`);
+    const closeBtn = tooltip.querySelector(`#${tooltipId}-close`);
     
     if (helpIcon && tooltip) {
         helpIcon.onclick = function(e) {
