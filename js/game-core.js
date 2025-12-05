@@ -13077,8 +13077,21 @@ function checkBoslukAnswer(button, isCorrect) {
     log.debug(`📊 Önce - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
     log.debug(`📊 Önce - boşluk: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
     
-    // KELİME İSTATİSTİKLERİ SADECE KELİME ÇEVİR OYUNUNDA KAYIT EDİLİYOR
-    // Boşluk Doldur oyunu için istatistik kaydedilmiyor
+    // KELİME İSTATİSTİKLERİNİ GÜNCELLE (Boşluk Doldur Modu)
+    // Ayet kimliği ve kelime index'i kullanarak kelime ID'si oluştur
+    if (currentBoslukQuestion && missingWord && missingIndex !== -1) {
+        // Ayet kimliğinden sure ve ayet numarasını çıkar (örn: "2:255" -> "2:255")
+        const ayetId = currentBoslukQuestion.ayet_kimligi || currentBoslukQuestion.id || '0:0';
+        // Kelime ID formatı: "sure:ayet:kelimeIndex" (örn: "2:255:5")
+        const wordId = `${ayetId}:${missingIndex}`;
+        log.debug(`📊 Boşluk Doldur - Kelime istatistiği güncelleniyor: ${missingWord} (ID: ${wordId})`);
+        
+        // Alt modu da dahil et
+        const gameModeWithDifficulty = currentMode && currentDifficulty 
+            ? `boslukDoldur-${currentMode}-${currentDifficulty}` 
+            : 'boslukDoldur';
+        updateWordStats(wordId, isCorrect, gameModeWithDifficulty);
+    }
     
     const allBtns = elements.boslukOptions.querySelectorAll('.duolingo-option, .option');
     log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
