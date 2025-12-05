@@ -2834,13 +2834,21 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('hasene_dev_mode', '1');
         const btn = document.getElementById('devResetBtn');
         if (btn) btn.style.display = 'flex';
-        if (typeof log !== 'undefined') log.info('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
+        if (typeof log !== 'undefined' && typeof log.debug === 'function') {
+            log.debug('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
+        } else {
+            console.log('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
+        }
     };
     window.disableDevMode = function() {
         localStorage.removeItem('hasene_dev_mode');
         const btn = document.getElementById('devResetBtn');
         if (btn) btn.style.display = 'none';
-        if (typeof log !== 'undefined') log.info('🔧 Geliştirici modu kapatıldı.');
+        if (typeof log !== 'undefined' && typeof log.debug === 'function') {
+            log.debug('🔧 Geliştirici modu kapatıldı.');
+        } else {
+            console.log('🔧 Geliştirici modu kapatıldı.');
+        }
     };
     
     // 🧹 Otomatik storage temizliği (başlangıçta)

@@ -9032,7 +9032,7 @@ body.no-scroll {
 }
 
 #achievement-level_20 .badge-icon {
-    background-image: url('assets/badges/rozet13.png') !important;
+    background-image: url('assets/badges/rozet12.png') !important; /* Fallback: rozet13.png eksik, geçici olarak rozet12.png kullanılıyor */
 }
 
 /* Gelecekte eklenecek rozetler için hazır slotlar (rozet14-21) - Aktif ve hazır */
