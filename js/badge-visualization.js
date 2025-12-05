@@ -23,6 +23,8 @@
         
         // Seri Başarılar
         'achievement-streak_7': { color: '#FF6B35', glow: '#FF8C42' },
+        'achievement-streak_14': { color: '#FF8C42', glow: '#FFA500' },
+        'achievement-streak_21': { color: '#FFA500', glow: '#FFD700' },
         'achievement-streak_30': { color: '#FFD700', glow: '#FFA500' },
         
         // Mertebe Başarılar

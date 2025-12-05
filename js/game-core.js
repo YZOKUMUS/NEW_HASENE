@@ -3175,6 +3175,9 @@ function checkAchievements() {
             return dailyHasene >= goalHasene;
         }},
         { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7 },
+        { id: 'streak_14', name: '14 Gün Muvazebet', desc: '14 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 14 },
+        { id: 'streak_21', name: '21 Gün Muvazebet', desc: '21 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 21 },
+        { id: 'streak_30', name: '30 Gün Muvazebet', desc: '30 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 30 },
         { id: 'level_5', name: 'Mertebe 5', desc: 'Mertebe 5\'e ulaş', icon: '🏆', condition: () => level >= 5 },
         { id: 'level_10', name: 'Mertebe 10', desc: 'Mertebe 10\'a ulaş', icon: '💎', condition: () => level >= 10 },
         { id: 'level_20', name: 'Mertebe 20', desc: 'Mertebe 20\'ye ulaş', icon: '🌟', condition: () => level >= 20 },
@@ -5224,6 +5227,9 @@ function updateAllAchievements() {
             return goalHasene > 0 ? Math.min((dailyHasene / goalHasene) * 100, 100) : 0;
         }},
         { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7, progress: () => Math.min((streakData.currentStreak || 0) / 7 * 100, 100) },
+        { id: 'streak_14', name: '14 Gün Muvazebet', desc: '14 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 14, progress: () => Math.min((streakData.currentStreak || 0) / 14 * 100, 100) },
+        { id: 'streak_21', name: '21 Gün Muvazebet', desc: '21 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 21, progress: () => Math.min((streakData.currentStreak || 0) / 21 * 100, 100) },
+        { id: 'streak_30', name: '30 Gün Muvazebet', desc: '30 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 30, progress: () => Math.min((streakData.currentStreak || 0) / 30 * 100, 100) },
         { id: 'level_5', name: 'Mertebe 5', desc: 'Mertebe 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => {
             // Level 1 ise 0% göster, 1/5 değil
             if (level <= 1) return 0;
@@ -5314,6 +5320,12 @@ function updateAllAchievements() {
                     statusText.textContent = `${dailyHasene}/${goalHasene}`;
                 } else if (ach.id === 'streak_7') {
                     statusText.textContent = `${streakData.currentStreak || 0}/7`;
+                } else if (ach.id === 'streak_14') {
+                    statusText.textContent = `${streakData.currentStreak || 0}/14`;
+                } else if (ach.id === 'streak_21') {
+                    statusText.textContent = `${streakData.currentStreak || 0}/21`;
+                } else if (ach.id === 'streak_30') {
+                    statusText.textContent = `${streakData.currentStreak || 0}/30`;
                 } else if (ach.id.startsWith('level_')) {
                     const targetLevel = parseInt(ach.id.split('_')[1]);
                     // Level 1 ise 0/X göster, 1/X değil

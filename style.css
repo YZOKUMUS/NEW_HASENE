@@ -8961,6 +8961,9 @@ body.no-scroll {
 #achievement-xp_85000 .badge-icon,
 #achievement-xp_1000000 .badge-icon,
 #achievement-streak_7 .badge-icon,
+#achievement-streak_14 .badge-icon,
+#achievement-streak_21 .badge-icon,
+#achievement-streak_30 .badge-icon,
 #achievement-level_5 .badge-icon,
 #achievement-level_10 .badge-icon,
 #achievement-level_20 .badge-icon,
@@ -9021,6 +9024,18 @@ body.no-scroll {
 
 #achievement-streak_7 .badge-icon {
     background-image: url('assets/badges/rozet10.png') !important;
+}
+
+#achievement-streak_14 .badge-icon {
+    background-image: url('assets/badges/rozet22.png') !important;
+}
+
+#achievement-streak_21 .badge-icon {
+    background-image: url('assets/badges/rozet23.png') !important;
+}
+
+#achievement-streak_30 .badge-icon {
+    background-image: url('assets/badges/rozet24.png') !important;
 }
 
 #achievement-level_5 .badge-icon {
