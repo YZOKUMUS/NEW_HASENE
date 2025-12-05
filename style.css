@@ -1886,7 +1886,7 @@ body.no-scroll {
    ============================================ */
 
 .daily-tasks-content {
-    max-width: 460px !important;  /* Bir tık daha dar */
+    max-width: 380px !important;  /* Daha dar */
     width: 88% !important;
     max-height: 90vh !important;  /* Bir tık daha alçak */
     height: auto !important;
