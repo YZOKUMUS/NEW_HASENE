@@ -8933,7 +8933,8 @@ body.no-scroll {
 
 /* Badge Icon - Preview Tasarım */
 #badgesModal .badge-icon {
-    font-size: 32px !important;
+    font-size: 0 !important; /* Emoji metnini gizle - PNG ikonlar kullanılıyor */
+    line-height: 0 !important;
     margin-bottom: 6px !important;
     display: block !important;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
@@ -9567,7 +9568,8 @@ body.no-scroll {
     }
 
     #badgesModal .badge-icon {
-        font-size: 28px !important;
+        font-size: 0 !important; /* Emoji metnini gizle - mobil için */
+        line-height: 0 !important;
         margin-bottom: 4px !important;
     }
 
