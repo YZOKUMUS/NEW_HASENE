@@ -6,28 +6,28 @@
 (function() {
     'use strict';
 
-    // Rozet görsel eşleştirmeleri (emoji veya SVG)
+    // Rozet görsel eşleştirmeleri (renk bilgileri - PNG ikonlar CSS'te ayarlanmış)
     const badgeVisuals = {
         // Günlük Başarılar
-        'achievement-first_win': { emoji: '📿', color: '#FFD700', glow: '#FFA500' },
-        'achievement-daily_goal': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
+        'achievement-first_win': { color: '#FFD700', glow: '#FFA500' },
+        'achievement-daily_goal': { color: '#FFD700', glow: '#FFA500' },
         
         // Özel Başarılar
-        'achievement-combo_master': { emoji: '🤲', color: '#FF6B35', glow: '#FF8C42' },
-        'achievement-xp_500': { emoji: '🌱', color: '#4CAF50', glow: '#66BB6A' },
-        'achievement-xp_2000': { emoji: '🕌', color: '#CD7F32', glow: '#D4AF37' },
-        'achievement-xp_8500': { emoji: '🕋', color: '#C0C0C0', glow: '#E8E8E8' },
-        'achievement-xp_25500': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
-        'achievement-xp_85000': { emoji: '📿', color: '#B9F2FF', glow: '#E0F7FA' },
-        'achievement-xp_1000000': { emoji: '📖', color: '#8E24AA', glow: '#E1BEE7' }, // HAFIZ
+        'achievement-combo_master': { color: '#FF6B35', glow: '#FF8C42' },
+        'achievement-xp_500': { color: '#4CAF50', glow: '#66BB6A' },
+        'achievement-xp_2000': { color: '#CD7F32', glow: '#D4AF37' },
+        'achievement-xp_8500': { color: '#C0C0C0', glow: '#E8E8E8' },
+        'achievement-xp_25500': { color: '#FFD700', glow: '#FFA500' },
+        'achievement-xp_85000': { color: '#B9F2FF', glow: '#E0F7FA' },
+        'achievement-xp_1000000': { color: '#8E24AA', glow: '#E1BEE7' }, // HAFIZ
         
         // Seri Başarılar
-        'achievement-streak_7': { emoji: '📿', color: '#FF6B35', glow: '#FF8C42' },
-        'achievement-streak_30': { emoji: '☪', color: '#FFD700', glow: '#FFA500' },
+        'achievement-streak_7': { color: '#FF6B35', glow: '#FF8C42' },
+        'achievement-streak_30': { color: '#FFD700', glow: '#FFA500' },
         
         // Mertebe Başarılar
-        'achievement-level_5': { emoji: '🕌', color: '#FFD700', glow: '#FFA500' },
-        'achievement-level_10': { emoji: '👳', color: '#FFD700', glow: '#FFA500' },
+        'achievement-level_5': { color: '#FFD700', glow: '#FFA500' },
+        'achievement-level_10': { color: '#FFD700', glow: '#FFA500' },
     };
 
     // Rozet kazanma animasyon stilleri
@@ -151,16 +151,43 @@
             existingPopup.remove();
         }
 
-        const visual = badgeVisuals[badgeId] || { emoji: '🏅', color: '#FFD700', glow: '#FFA500' };
+        const visual = badgeVisuals[badgeId] || { color: '#FFD700', glow: '#FFA500' };
+
+        // Badge ID'sine göre PNG dosya numarasını belirle
+        const badgeImageMap = {
+            'achievement-first_win': 'rozet1.png',
+            'achievement-daily_goal': 'rozet2.png',
+            'achievement-combo_master': 'rozet3.png',
+            'achievement-xp_500': 'rozet4.png',
+            'achievement-xp_2000': 'rozet5.png',
+            'achievement-xp_8500': 'rozet6.png',
+            'achievement-xp_25500': 'rozet7.png',
+            'achievement-xp_85000': 'rozet8.png',
+            'achievement-xp_1000000': 'rozet9.png',
+            'achievement-streak_7': 'rozet10.png',
+            'achievement-level_5': 'rozet11.png',
+            'achievement-level_10': 'rozet12.png',
+            'achievement-level_20': 'rozet13.png',
+            'achievement-rozet_14': 'rozet14.png',
+            'achievement-rozet_15': 'rozet15.png',
+            'achievement-rozet_16': 'rozet16.png',
+            'achievement-rozet_17': 'rozet17.png',
+            'achievement-rozet_18': 'rozet18.png',
+            'achievement-rozet_19': 'rozet19.png',
+            'achievement-rozet_20': 'rozet20.png',
+            'achievement-rozet_21': 'rozet21.png'
+        };
+        
+        const iconFile = badgeImageMap[badgeId] || 'rozet1.png';
 
         const popup = document.createElement('div');
         popup.id = 'badge-unlock-popup';
         popup.className = 'badge-unlock-popup';
         popup.style.setProperty('--badge-color', visual.color);
         popup.style.setProperty('--badge-glow', visual.glow);
-
+        
         popup.innerHTML = `
-            <div class="badge-icon-large">${visual.emoji}</div>
+            <div class="badge-icon-large" style="width: 80px; height: 80px; margin: 0 auto; background-image: url('assets/badges/${iconFile}'); background-size: contain; background-repeat: no-repeat; background-position: center; font-size: 0;"></div>
             <div class="badge-title-large">${badgeTitle}</div>
             <div class="badge-desc-large">${badgeDesc}</div>
             <button class="close-popup" onclick="this.parentElement.remove()">Harika! 🎉</button>
@@ -193,10 +220,10 @@
 
         if (!visual) return;
 
-        // Rozet icon'unu güncelle
+        // Rozet icon'u CSS'te PNG olarak ayarlanmış, emoji ekleme
         const iconElement = badgeCard.querySelector('.badge-icon');
         if (iconElement) {
-            iconElement.textContent = visual.emoji;
+            // Emoji ekleme - PNG ikonlar CSS'te zaten ayarlanmış
             iconElement.style.setProperty('--badge-glow', visual.glow);
         }
 
