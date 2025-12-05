@@ -7954,10 +7954,10 @@ function updateTaskProgress(gameType, amount = 1) {
         }
     }
 
-    // Zorluk takibi
-    if (currentDifficulty) {
+    // Zorluk takibi - Sadece Kelime Çevir oyununda (görev açıklamasına göre)
+    if (currentDifficulty && gameType === 'kelimeCevir') {
         dailyTasks.todayStats.farklıZorluk.add(currentDifficulty);
-        log.debug(`🎯 Zorluk eklendi: ${currentDifficulty}, toplam: ${dailyTasks.todayStats.farklıZorluk.size}`);
+        log.debug(`🎯 Zorluk eklendi: ${currentDifficulty}, toplam: ${dailyTasks.todayStats.farklıZorluk.size} (sadece Kelime Çevir)`);
     }
     
     // Oyun modu takibi (allGameModes için)
