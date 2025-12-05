@@ -143,8 +143,38 @@ async function loadKelimeData() {
     } catch (error) {
         dataLoadStatus.kelimeBul.loading = false;
         hideLoading();
+        
+        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
+        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
+            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
+            if (typeof getCachedJSON === 'function') {
+                try {
+                    const cached = await getCachedJSON('data/kelimebul.json');
+                    if (cached) {
+                        kelimeBulData = cached;
+                        dataLoadStatus.kelimeBul.loaded = true;
+                        log.debug('✅ Kelime verileri cache\'den yüklendi (sunucu hatası sonrası)');
+                        return kelimeBulData;
+                    }
+                } catch (cacheError) {
+                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
+                }
+            }
+        }
+        
+        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
+        if (kelimeBulData && kelimeBulData.length > 0) {
+            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
+            dataLoadStatus.kelimeBul.loaded = true;
+            return kelimeBulData;
+        }
+        
+        // Son çare: hata göster
         log.error('Kelime verileri yükleme hatası:', error);
-        showError(error, () => loadKelimeData());
+        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
+        if (!kelimeBulData || kelimeBulData.length === 0) {
+            showError(error, () => loadKelimeData());
+        }
         throw error;
     }
 }
@@ -192,8 +222,38 @@ async function loadAyetData() {
     } catch (error) {
         dataLoadStatus.ayetOku.loading = false;
         hideLoading();
+        
+        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
+        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
+            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
+            if (typeof getCachedJSON === 'function') {
+                try {
+                    const cached = await getCachedJSON('data/ayetoku.json');
+                    if (cached) {
+                        ayetOkuData = cached;
+                        dataLoadStatus.ayetOku.loaded = true;
+                        log.debug('✅ Ayet verileri cache\'den yüklendi (sunucu hatası sonrası)');
+                        return ayetOkuData;
+                    }
+                } catch (cacheError) {
+                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
+                }
+            }
+        }
+        
+        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
+        if (ayetOkuData && ayetOkuData.length > 0) {
+            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
+            dataLoadStatus.ayetOku.loaded = true;
+            return ayetOkuData;
+        }
+        
+        // Son çare: hata göster
         log.error('Ayet verileri yükleme hatası:', error);
-        showError(error, () => loadAyetData());
+        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
+        if (!ayetOkuData || ayetOkuData.length === 0) {
+            showError(error, () => loadAyetData());
+        }
         throw error;
     }
 }
@@ -241,8 +301,38 @@ async function loadDuaData() {
     } catch (error) {
         dataLoadStatus.dua.loading = false;
         hideLoading();
+        
+        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
+        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
+            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
+            if (typeof getCachedJSON === 'function') {
+                try {
+                    const cached = await getCachedJSON('data/duaet.json');
+                    if (cached) {
+                        duaData = cached;
+                        dataLoadStatus.dua.loaded = true;
+                        log.debug('✅ Dua verileri cache\'den yüklendi (sunucu hatası sonrası)');
+                        return duaData;
+                    }
+                } catch (cacheError) {
+                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
+                }
+            }
+        }
+        
+        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
+        if (duaData && duaData.length > 0) {
+            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
+            dataLoadStatus.dua.loaded = true;
+            return duaData;
+        }
+        
+        // Son çare: hata göster
         log.error('Dua verileri yükleme hatası:', error);
-        showError(error, () => loadDuaData());
+        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
+        if (!duaData || duaData.length === 0) {
+            showError(error, () => loadDuaData());
+        }
         throw error;
     }
 }
@@ -291,8 +381,38 @@ async function loadHadisData() {
     } catch (error) {
         dataLoadStatus.hadis.loading = false;
         hideLoading();
+        
+        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
+        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
+            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
+            if (typeof getCachedJSON === 'function') {
+                try {
+                    const cached = await getCachedJSON('data/hadisoku.json');
+                    if (cached) {
+                        hadisData = cached;
+                        dataLoadStatus.hadis.loaded = true;
+                        log.debug('✅ Hadis verileri cache\'den yüklendi (sunucu hatası sonrası)');
+                        return hadisData;
+                    }
+                } catch (cacheError) {
+                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
+                }
+            }
+        }
+        
+        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
+        if (hadisData && hadisData.length > 0) {
+            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
+            dataLoadStatus.hadis.loaded = true;
+            return hadisData;
+        }
+        
+        // Son çare: hata göster
         log.error('Hadis verileri yükleme hatası:', error);
-        showError(error, () => loadHadisData());
+        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
+        if (!hadisData || hadisData.length === 0) {
+            showError(error, () => loadHadisData());
+        }
         throw error;
     }
 }
