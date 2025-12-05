@@ -1332,6 +1332,12 @@
                 <button id="filterRecent" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
                     Son Görülen
                 </button>
+                <button id="filterKelimeCevir" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
+                    📚 Kelime Çevir
+                </button>
+                <button id="filterDinleBul" class="filter-btn" style="flex: 1; min-width: 80px; padding: 8px; border: none; border-radius: 6px; background: #95a5a6; color: white; font-size: 0.85em; cursor: pointer;">
+                    🎧 Dinle Bul
+                </button>
             </div>
 
             <!-- Kelime Listesi -->
@@ -1366,6 +1372,17 @@
                     
                     <strong>✅ Öğrenildi Kelimeler:</strong><br>
                     • Buton üzerindeki sayı, <strong>öğrenilmiş kelime sayısını</strong> gösterir<br>
+                    • <strong>Öğrenme Kriterleri:</strong> Ustalık seviyesi ≥ 3.0 VE Başarı oranı ≥ %60<br>
+                    • <strong>Ne zaman öğrenilmiş sayılır?</strong> Bir kelimeye en az 5 kez doğru cevap verip, başarı oranı %60'ın üzerine çıktığında ve ustalık seviyesi 3.0'a ulaştığında<br>
+                    • <strong>Ustalık Seviyesi:</strong> Her doğru cevap +0.2, her yanlış cevap -0.5 (0-5 arası)<br>
+                    • <strong>Örnek:</strong> 5 doğru cevap = 1.0 ustalık, 15 doğru cevap = 3.0 ustalık (öğrenildi!)<br><br>
+                    
+                    <strong>❌ Son Yanlış Cevaplar (Yeni Özellik):</strong><br>
+                    • Yanlış cevap verilen kelimeler <strong>özel listede tutulur</strong> ve <strong>çok yüksek öncelik</strong> alır<br>
+                    • En yeni yanlış cevap verilen kelime <strong>100x daha fazla şansa</strong> sahip<br>
+                    • Yanlış cevap verilen kelimeler genelde <strong>1-10 soru içinde</strong> tekrar sorulur<br>
+                    • Doğru cevap verildiğinde listeden çıkar ve normal önceliğe döner<br>
+                    • Kelime kartlarında <strong>❌ (Son yanlış #X)</strong> işareti görünür<br><br>
                     • Her kelime ayrı bir kart olarak listelenir<br>
                     • En az 15 doğru cevap ve %60 muvaffakiyet oranı gerekir<br>
                     • Ustalık mertebesi 3.0'ın üzerinde olmalı<br>

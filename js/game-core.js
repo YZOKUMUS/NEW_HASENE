@@ -1489,6 +1489,8 @@ function updateWordStatistics() {
         const filterMastered = document.getElementById('filterMastered');
         const filterStruggling = document.getElementById('filterStruggling');
         const filterRecent = document.getElementById('filterRecent');
+        const filterKelimeCevir = document.getElementById('filterKelimeCevir');
+        const filterDinleBul = document.getElementById('filterDinleBul');
         
         // Favoriler ve tekrar listesini yükle
         if (typeof loadFavorites === 'function') loadFavorites();
@@ -1555,6 +1557,24 @@ function updateWordStatistics() {
             };
             filterRecent.setAttribute('data-listener-added', 'true');
         }
+        if (filterKelimeCevir && !filterKelimeCevir.hasAttribute('data-listener-added')) {
+            filterKelimeCevir.onclick = (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                updateAllTabButtons();
+                filterWordStats('kelimecevir');
+            };
+            filterKelimeCevir.setAttribute('data-listener-added', 'true');
+        }
+        if (filterDinleBul && !filterDinleBul.hasAttribute('data-listener-added')) {
+            filterDinleBul.onclick = (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                updateAllTabButtons();
+                filterWordStats('dinlebul');
+            };
+            filterDinleBul.setAttribute('data-listener-added', 'true');
+        }
     } catch (error) {
         log.error('❌ updateWordStatistics HATA:', error);
         log.error('Stack trace:', error.stack);
@@ -1601,6 +1621,10 @@ function updateAllTabButtons() {
         let strugglingCount = 0;
         // Son görülen sayısı (son 7 gün)
         let recentCount = 0;
+        // Kelime Çevir modunda çalışılan kelime sayısı
+        let kelimeCevirCount = 0;
+        // Dinle Bul modunda çalışılan kelime sayısı
+        let dinleBulCount = 0;
         
         Object.values(wordStats).forEach(stat => {
             if (!stat) return;
@@ -1628,6 +1652,16 @@ function updateAllTabButtons() {
             // Son görülen: son 7 gün içinde
             if (daysSinceLastSeen < 7) {
                 recentCount++;
+            }
+            
+            // Kelime Çevir modunda çalışılan kelimeler
+            if (stat.gameModes && stat.gameModes.kelimeCevir && stat.gameModes.kelimeCevir.attempts > 0) {
+                kelimeCevirCount++;
+            }
+            
+            // Dinle Bul modunda çalışılan kelimeler
+            if (stat.gameModes && stat.gameModes.dinleBul && stat.gameModes.dinleBul.attempts > 0) {
+                dinleBulCount++;
             }
         });
         
@@ -1673,6 +1707,20 @@ function updateAllTabButtons() {
         if (filterRecentBtn) {
             filterRecentBtn.textContent = recentCount > 0 ? `Son Görülen (${recentCount})` : 'Son Görülen';
             filterRecentBtn.title = recentCount > 0 ? `Son 7 günde ${recentCount} kelime görüldü` : 'Son 7 günde kelime görülmedi';
+        }
+        
+        // Kelime Çevir butonu
+        const filterKelimeCevirBtn = document.getElementById('filterKelimeCevir');
+        if (filterKelimeCevirBtn) {
+            filterKelimeCevirBtn.textContent = kelimeCevirCount > 0 ? `📚 Kelime Çevir (${kelimeCevirCount})` : '📚 Kelime Çevir';
+            filterKelimeCevirBtn.title = kelimeCevirCount > 0 ? `Kelime Çevir modunda ${kelimeCevirCount} kelime çalışıldı` : 'Kelime Çevir modunda henüz kelime çalışılmadı';
+        }
+        
+        // Dinle Bul butonu
+        const filterDinleBulBtn = document.getElementById('filterDinleBul');
+        if (filterDinleBulBtn) {
+            filterDinleBulBtn.textContent = dinleBulCount > 0 ? `🎧 Dinle Bul (${dinleBulCount})` : '🎧 Dinle Bul';
+            filterDinleBulBtn.title = dinleBulCount > 0 ? `Dinle Bul modunda ${dinleBulCount} kelime çalışıldı` : 'Dinle Bul modunda henüz kelime çalışılmadı';
         }
         
     } catch (error) {
@@ -1817,7 +1865,9 @@ function filterWordStats(filterType) {
             'review': '#1abc9c',    // Turkuaz
             'mastered': '#27ae60',  // Yeşil
             'struggling': '#e74c3c', // Kırmızı
-            'recent': '#9b59b6'     // Mor
+            'recent': '#9b59b6',     // Mor
+            'kelimecevir': '#2980b9', // Mavi (Kelime Çevir)
+            'dinlebul': '#8e44ad'     // Mor (Dinle Bul)
         };
         
         const normalizedFilterType = String(filterType).toLowerCase();
@@ -1902,13 +1952,19 @@ function filterWordStats(filterType) {
             const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(wordId)) ||
                                (typeof reviewWords !== 'undefined' && Array.isArray(reviewWords) && reviewWords.includes(wordId));
             
+            // Oyun modu bazlı filtreleme
+            const hasKelimeCevir = stat.gameModes && stat.gameModes.kelimeCevir && stat.gameModes.kelimeCevir.attempts > 0;
+            const hasDinleBul = stat.gameModes && stat.gameModes.dinleBul && stat.gameModes.dinleBul.attempts > 0;
+            
             const shouldShow = 
                 filterType === 'all' ||
                 (filterType === 'favorites' && isFav) ||
                 (filterType === 'review' && needsReview) ||
                 (filterType === 'mastered' && stat.masteryLevel >= 3.0 && stat.successRate >= 0.6) ||
                 (filterType === 'struggling' && (stat.successRate < 0.6 || stat.masteryLevel < 1.0)) ||
-                (filterType === 'recent' && (Date.now() - stat.lastSeen) < 7 * 24 * 60 * 60 * 1000); // Son 7 gün
+                (filterType === 'recent' && (Date.now() - stat.lastSeen) < 7 * 24 * 60 * 60 * 1000) || // Son 7 gün
+                (filterType === 'kelimecevir' && hasKelimeCevir) || // Kelime Çevir modunda çalışılan kelimeler
+                (filterType === 'dinlebul' && hasDinleBul); // Dinle Bul modunda çalışılan kelimeler
             
             log.stats('🤔 shouldShow:', shouldShow, 'filterType:', filterType, 'stat:', stat);
             
@@ -2099,6 +2155,16 @@ function filterWordStats(filterType) {
         const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(item.wordId)) ||
                            (typeof reviewWords !== 'undefined' && reviewWords.includes(item.wordId));
         
+        // Son yanlış cevap verilen kelimeler listesinde mi kontrol et
+        let recentlyWrong = [];
+        try {
+            recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
+        } catch (e) {
+            recentlyWrong = [];
+        }
+        const isRecentlyWrong = recentlyWrong.includes(item.wordId);
+        const wrongIndex = recentlyWrong.indexOf(item.wordId);
+        
         // Tekrar nedeni (sadece review filtresinde göster)
         let reviewReason = '';
         if (filterType === 'review' && needsReview) {
@@ -2123,6 +2189,7 @@ function filterWordStats(filterType) {
                             ${item.wordData.kelime || item.wordId}
                             ${isFav ? ' ⭐' : ''}
                             ${needsReview ? ' 🔄' : ''}
+                            ${isRecentlyWrong ? ` ❌<span style="font-size: 0.6em; color: #e74c3c; margin-left: 4px;">(Son yanlış #${wrongIndex + 1})</span>` : ''}
                         </div>
                         <div style="font-size: 0.9em; color: #666;">${item.wordData.anlam || 'Bilinmiyor'}</div>
                     </div>
@@ -2146,6 +2213,75 @@ function filterWordStats(filterType) {
                         <div style="color: #666;">Öncelik</div>
                     </div>
                 </div>
+                
+                ${item.gameModes ? (() => {
+                    // Kelime Çevir modlarını topla (alt modlar dahil)
+                    const kelimeCevirModes = Object.keys(item.gameModes).filter(key => key.startsWith('kelimeCevir'));
+                    const hasKelimeCevir = kelimeCevirModes.length > 0;
+                    const hasDinleBul = item.gameModes.dinleBul;
+                    
+                    if (!hasKelimeCevir && !hasDinleBul) return '';
+                    
+                    // Kelime Çevir toplam istatistikleri
+                    let kelimeCevirTotal = { correct: 0, wrong: 0, attempts: 0 };
+                    kelimeCevirModes.forEach(mode => {
+                        const modeStats = item.gameModes[mode];
+                        if (modeStats) {
+                            kelimeCevirTotal.correct += modeStats.correct || 0;
+                            kelimeCevirTotal.wrong += modeStats.wrong || 0;
+                            kelimeCevirTotal.attempts += modeStats.attempts || 0;
+                        }
+                    });
+                    const kelimeCevirSuccessRate = kelimeCevirTotal.attempts > 0 
+                        ? (kelimeCevirTotal.correct / kelimeCevirTotal.attempts) 
+                        : 0;
+                    
+                    return `
+                <div style="margin-top: 8px; padding: 8px; background: #f0f7ff; border-radius: 6px; border-left: 3px solid #3498db;">
+                    <div style="font-size: 0.75em; font-weight: 600; color: #2c3e50; margin-bottom: 6px;">📊 Oyun Modu Bazlı Tekrarlanma:</div>
+                    <div style="display: grid; grid-template-columns: ${hasKelimeCevir && hasDinleBul ? '1fr 1fr' : '1fr'}; gap: 6px; font-size: 0.7em;">
+                        ${hasKelimeCevir ? `
+                        <div style="text-align: center; padding: 4px; background: white; border-radius: 4px;">
+                            <div style="font-weight: bold; color: #2980b9;">📚 Kelime Çevir</div>
+                            ${kelimeCevirModes.length > 1 ? `<div style="font-size: 0.75em; color: #999; margin-bottom: 2px;">(${kelimeCevirModes.length} alt mod)</div>` : ''}
+                            <div style="color: #666; margin-top: 2px;">
+                                <span style="color: #27ae60;">✓ ${kelimeCevirTotal.correct}</span> / 
+                                <span style="color: #e74c3c;">✗ ${kelimeCevirTotal.wrong}</span> 
+                                (${kelimeCevirTotal.attempts} deneme)
+                            </div>
+                            <div style="color: #666; font-size: 0.85em; margin-top: 2px;">
+                                Başarı: ${Math.round(kelimeCevirSuccessRate * 100)}%
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${hasDinleBul ? `
+                        <div style="text-align: center; padding: 4px; background: white; border-radius: 4px;">
+                            <div style="font-weight: bold; color: #8e44ad;">🎧 Dinle Bul</div>
+                            <div style="color: #666; margin-top: 2px;">
+                                <span style="color: #27ae60;">✓ ${item.gameModes.dinleBul.correct || 0}</span> / 
+                                <span style="color: #e74c3c;">✗ ${item.gameModes.dinleBul.wrong || 0}</span> 
+                                (${item.gameModes.dinleBul.attempts || 0} deneme)
+                            </div>
+                            <div style="color: #666; font-size: 0.85em; margin-top: 2px;">
+                                Başarı: ${item.gameModes.dinleBul.successRate ? Math.round(item.gameModes.dinleBul.successRate * 100) : 0}%
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
+                })() : ''}
+                
+                ${item.masteryLevel < 3.0 ? `
+                <div style="margin-top: 8px; padding: 6px; background: #fff3cd; border-radius: 4px; border-left: 3px solid #ffc107;">
+                    <div style="font-size: 0.7em; color: #856404; font-weight: 600; margin-bottom: 4px;">📈 Öğrenme Durumu:</div>
+                    <div style="font-size: 0.7em; color: #666; line-height: 1.4;">
+                        Mevcut Ustalık: <strong>${Math.round(item.masteryLevel * 10) / 10}</strong> / 3.0<br>
+                        ${item.masteryLevel < 3.0 ? `Öğrenmek için: <strong>${Math.ceil((3.0 - item.masteryLevel) / 0.2)}</strong> doğru cevap daha gerekli` : '✅ Öğrenildi!'}
+                        ${item.successRate < 0.6 ? `<br>Başarı oranı: <strong>${Math.round(item.successRate * 100)}%</strong> (Hedef: %60)` : ''}
+                    </div>
+                </div>
+                ` : ''}
                 
                 <div style="margin-top: 8px; font-size: 0.75em; color: #666; text-align: center;">
                     Son görülme: ${new Date(item.lastSeen).toLocaleDateString('tr-TR')}
@@ -2186,11 +2322,27 @@ function saveWordStats(wordStats) {
 window.loadWordStats = loadWordStats;
 window.saveWordStats = saveWordStats;
 
-function updateWordStats(wordId, isCorrect) {
+function updateWordStats(wordId, isCorrect, gameMode = null) {
     // NULL KONTROL - wordId geçerli mi?
     if (!wordId || typeof wordId !== 'string') {
         log.error('❌ Geçersiz wordId:', wordId);
         return;
+    }
+    
+    // Oyun modunu belirle (eğer verilmediyse aktif modu kullan)
+    if (!gameMode) {
+        // Aktif oyun modunu belirle
+        if (typeof currentGameMode !== 'undefined' && currentGameMode) {
+            gameMode = currentGameMode;
+        } else if (document.getElementById('kelimeCevirScreen') && document.getElementById('kelimeCevirScreen').style.display !== 'none') {
+            gameMode = 'kelimeCevir';
+        } else if (document.getElementById('dinleBulScreen') && document.getElementById('dinleBulScreen').style.display !== 'none') {
+            gameMode = 'dinleBul';
+        } else if (document.getElementById('boslukDoldurScreen') && document.getElementById('boslukDoldurScreen').style.display !== 'none') {
+            gameMode = 'boslukDoldur';
+        } else {
+            gameMode = 'unknown'; // Bilinmeyen mod
+        }
     }
     
     const wordStats = loadWordStats();
@@ -2202,11 +2354,14 @@ function updateWordStats(wordId, isCorrect) {
             wrong: 0,
             lastSeen: Date.now(),
             masteryLevel: 0,
-            priority: 1.0
+            priority: 1.0,
+            gameModes: {} // Her oyun modu için ayrı istatistikler
         };
     }
 
     const stats = wordStats[wordId];
+    
+    // Genel istatistikler
     stats.attempts++;
     stats.lastSeen = Date.now();
 
@@ -2215,18 +2370,74 @@ function updateWordStats(wordId, isCorrect) {
         // Doğru cevap - ustalık artır, öncelik azalt
         stats.masteryLevel = Math.min(5, stats.masteryLevel + 0.2);
         stats.priority = Math.max(0.1, stats.priority * 0.8);
+        
+        // Doğru cevap verilen kelimeyi recentlyWrong listesinden çıkar
+        let recentlyWrong = [];
+        try {
+            recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
+            const index = recentlyWrong.indexOf(wordId);
+            if (index !== -1) {
+                recentlyWrong.splice(index, 1);
+                localStorage.setItem('hasene_recentlyWrong', JSON.stringify(recentlyWrong));
+                log.stats(`✅ Doğru cevap verilen kelime recentlyWrong listesinden çıkarıldı: ${wordId}`);
+            }
+        } catch (e) {
+            log.error('❌ recentlyWrong listesi güncellenirken hata:', e);
+        }
     } else {
         stats.wrong++;
         // Yanlış cevap - ustalık azalt, öncelik artır
         stats.masteryLevel = Math.max(0, stats.masteryLevel - 0.5);
         stats.priority = Math.min(3.0, stats.priority * 1.5);
+        
+        // Yanlış cevap verilen kelimeleri "recentlyWrong" listesine ekle
+        // Bu liste son 50 yanlış cevap verilen kelimeyi tutar
+        let recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
+        // Aynı kelime zaten listede varsa kaldır (tekrar eklemek için)
+        recentlyWrong = recentlyWrong.filter(id => id !== wordId);
+        // En başa ekle (en yeni yanlış cevap en önde)
+        recentlyWrong.unshift(wordId);
+        // Son 50 kelimeyi tut (çok eski olanları kaldır)
+        recentlyWrong = recentlyWrong.slice(0, 50);
+        localStorage.setItem('hasene_recentlyWrong', JSON.stringify(recentlyWrong));
+        log.stats(`❌ Yanlış cevap verilen kelime recentlyWrong listesine eklendi: ${wordId}`);
     }
 
-    // Başarı oranı hesapla
+    // Oyun modu bazlı istatistikler
+    if (!stats.gameModes) {
+        stats.gameModes = {};
+    }
+    
+    if (!stats.gameModes[gameMode]) {
+        stats.gameModes[gameMode] = {
+            attempts: 0,
+            correct: 0,
+            wrong: 0,
+            lastSeen: Date.now()
+        };
+    }
+    
+    const modeStats = stats.gameModes[gameMode];
+    modeStats.attempts++;
+    modeStats.lastSeen = Date.now();
+    
+    if (isCorrect) {
+        modeStats.correct++;
+    } else {
+        modeStats.wrong++;
+    }
+    
+    // Oyun modu bazlı başarı oranı
+    modeStats.successRate = modeStats.attempts > 0 ? (modeStats.correct / modeStats.attempts) : 0;
+
+    // Genel başarı oranı hesapla
     stats.successRate = stats.attempts > 0 ? (stats.correct / stats.attempts) : 0;
 
     saveWordStats(wordStats);
-    log.stats(`📊 ${wordId} kelimesi istatistiği güncellendi:`, stats);
+    log.stats(`📊 ${wordId} kelimesi istatistiği güncellendi (Mod: ${gameMode}):`, {
+        genel: { attempts: stats.attempts, correct: stats.correct, wrong: stats.wrong },
+        [gameMode]: modeStats
+    });
     
     // Tekrar listesini güncelle
     if (typeof updateReviewList === 'function') {
@@ -2238,6 +2449,15 @@ function selectIntelligentWord(filteredData) {
     const wordStats = loadWordStats();
     const now = Date.now();
     const oneDay = 24 * 60 * 60 * 1000;
+    
+    // Son yanlış cevap verilen kelimeleri yükle (en yeni en önde)
+    let recentlyWrong = [];
+    try {
+        recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
+    } catch (e) {
+        log.error('❌ recentlyWrong listesi yüklenirken hata:', e);
+        recentlyWrong = [];
+    }
     
     // Review Mode kontrolü - currentMode güvenli erişim
     const safeCurrentMode = typeof currentMode !== 'undefined' 
@@ -2273,6 +2493,19 @@ function selectIntelligentWord(filteredData) {
         const stats = wordStats[word.id];
         let priorityScore = 1.0;
         
+        // EN ÖNEMLİ: Son yanlış cevap verilen kelimelere ÇOK YÜKSEK öncelik ver
+        // recentlyWrong listesi en yeni yanlış cevap verilen kelimeden en eskiye doğru sıralı
+        const wrongIndex = recentlyWrong.indexOf(word.id);
+        if (wrongIndex !== -1) {
+            // En yeni yanlış cevap (index 0) = 100x öncelik
+            // İkinci yanlış cevap (index 1) = 50x öncelik
+            // Üçüncü yanlış cevap (index 2) = 25x öncelik
+            // ... şeklinde azalır, minimum 5x öncelik
+            const wrongMultiplier = Math.max(5.0, 100.0 / Math.pow(2, wrongIndex));
+            priorityScore *= wrongMultiplier;
+            log.debug(`❌ Son yanlış cevap verilen kelime: ${word.id} (sıra: ${wrongIndex + 1}) - Öncelik çarpanı: ${wrongMultiplier.toFixed(1)}x`);
+        }
+        
         // Zorlanılan kelimeleri tespit et (hem Review Mode hem normal mod için)
         const isStrugglingWord = stats && (stats.successRate < 0.6 || stats.masteryLevel < 1.0);
         
@@ -2282,7 +2515,8 @@ function selectIntelligentWord(filteredData) {
             log.debug(`🔄 Review Mode - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
         } 
         // Normal mod: Zorlanılan kelimelere orta öncelik ver (1.5x)
-        else if (!isReviewMode && isStrugglingWord) {
+        else if (!isReviewMode && isStrugglingWord && wrongIndex === -1) {
+            // recentlyWrong listesinde değilse zorlanılan kelime önceliği ver
             priorityScore *= 1.5; // Normal modda zorlanılan kelimelere 1.5x öncelik
             log.debug(`📚 Normal Mod - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
         }
@@ -10681,8 +10915,12 @@ function checkAnswer(button, isCorrect) {
     log.game(`🎯 Mod: ${currentMode}, Zorluk: ${currentDifficulty}`);
 
     // KELİME İSTATİSTİKLERİNİ GÜNCELLE
-    log.game(`📊 Kelime istatistiği güncelleniyor: ${currentQuestion.kelime} (ID: ${currentQuestion.id})`);
-    updateWordStats(currentQuestion.id, isCorrect);
+    // Alt modu da dahil et (klasik, zor, kolay)
+    const gameModeWithDifficulty = currentMode && currentDifficulty 
+        ? `kelimeCevir-${currentMode}-${currentDifficulty}` 
+        : 'kelimeCevir';
+    log.game(`📊 Kelime istatistiği güncelleniyor: ${currentQuestion.kelime} (ID: ${currentQuestion.id}, Mod: ${gameModeWithDifficulty})`);
+    updateWordStats(currentQuestion.id, isCorrect, gameModeWithDifficulty);
 
     if (isCorrect) {
         log.game(`✅ === SAHİH CEVAP İŞLEMİ ===`);
@@ -12364,7 +12602,7 @@ function checkDinleAnswer(button, isCorrect) {
     
     // KELİME İSTATİSTİKLERİNİ GÜNCELLE (Dinle Modu)
     log.debug(`📊 Kelime istatistiği güncelleniyor (Dinle): ${currentDinleQuestion.kelime} (ID: ${currentDinleQuestion.id})`);
-    updateWordStats(currentDinleQuestion.id, isCorrect);
+    updateWordStats(currentDinleQuestion.id, isCorrect, 'dinleBul');
     
     const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
     log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
