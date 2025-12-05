@@ -7616,7 +7616,7 @@ function generateDailyTasks(date) {
 
     // Genişletilmiş bonus görevler listesi (daha fazla çeşitlilik)
     const bonusTasksList = [
-        { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 soru çöz', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
+        { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 perfect oyun tamamla', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
         { id: 'allDiff', name: '3 farklı zorlukta oyna', target: 3, current: 0, type: 'farklıZorluk', reward: 2 },
         { id: 'combo15', name: '15 doğru cevap ver (bonus)', target: 15, current: 0, type: 'toplamDogru', reward: 2 },
         { id: 'dinle5', name: '5 kelime dinle (bonus)', target: 5, current: 0, type: 'dinleBul', reward: 2 },
@@ -9000,7 +9000,7 @@ function getTaskDescription(task) {
         'dogru20': 'Herhangi bir oyun modunda toplam 20 doğru cevap ver',
         'puan100': 'Günlük toplam 100 Hasene puanı kazan',
         'puan200': 'Günlük toplam 200 Hasene puanı kazan',
-        'perfect5': '5 oyunda hiç yanlış yapmadan en az 3 soru çöz',
+        'perfect5': '5 perfect oyun tamamla (hiç yanlış yapmadan en az 3 soru çöz)',
         'allDiff': 'Kelime Çevir\'de 3 farklı zorluk seviyesinde oyna (Kolay, Orta, Zor)',
         'combo15': 'Herhangi bir oyun modunda toplam 15 doğru cevap ver',
         // Yeni görevler için açıklamalar
@@ -9040,11 +9040,14 @@ function getTaskDetailedHelp(task) {
         'dogru20': '⭐ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) 20 doğru cevap ver. Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır.',
         'puan100': '💰 Günlük toplam 100 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
         'puan200': '💰 Günlük toplam 200 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
-        'perfect5': '🔥 Kelime Çevir, Dinle Bul veya Boşluk Doldur oyunlarında oyun içinde hiç yanlış yapmadan en az 3 soru çöz.\n\n' +
-                    '💡 Önemli: Doğru cevapların peş peşe olması gerekmez. Sadece oyun içinde hiç yanlış yapmamış olman yeterli.\n\n' +
+        'perfect5': '🔥 Kelime Çevir, Dinle Bul veya Boşluk Doldur oyunlarında 5 perfect oyun tamamla.\n\n' +
+                    '💡 Nasıl çalışır:\n' +
+                    '• Her oyunda hiç yanlış yapmadan en az 3 soru çöz\n' +
+                    '• Doğru cevapların peş peşe olması gerekmez, sadece oyun içinde hiç yanlış yapmamış olman yeterli\n' +
+                    '• Her perfect oyun için 1 sayı artar\n\n' +
                     '📝 Örnek: 3 doğru, 1 yanlış, 2 doğru → Sayılmaz (yanlış var)\n' +
-                    '✅ Örnek: 3 doğru, 0 yanlış → Sayılır (hiç yanlış yok)\n\n' +
-                    '🎯 Bu şekilde 5 oyun tamamladığında görev tamamlanır. Oyunu bitirmeden çıkarsan da sayılır (geri butonuna basıp onaylarsan).',
+                    '✅ Örnek: 3 doğru, 0 yanlış → Sayılır (1 perfect oyun)\n\n' +
+                    '🎯 Bu şekilde 5 perfect oyun tamamladığında görev tamamlanır. Oyunu bitirmeden çıkarsan da sayılır (geri butonuna basıp onaylarsan).',
         'allDiff': '💎 Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna: Kolay, Orta ve Zor.\n\n' +
                     '📝 Nasıl yapılır:\n' +
                     '1. Ana menüden zorluk seviyesini değiştir (Kolay/Orta/Zor butonları)\n' +
@@ -9121,7 +9124,7 @@ function getTaskDisplayName(task) {
         'dogru20': '20 Doğru Cevap (Fazilet)',
         'puan100': '100 Puan Topla',
         'puan200': '200 Puan Topla (Fazilet)',
-        'perfect5': 'Mükemmel Seri (5 Sual)',
+        'perfect5': 'Mükemmel Seri (5 Oyun)',
         'allDiff': '3 Farklı Zorlukta Talebe Et',
         'combo15': '15 Doğru Cevap (Muvazebet)',
         // Yeni görevler
@@ -9336,10 +9339,20 @@ function addToGlobalPoints(points, correctAnswers = 0) {
         
         // Perfect streak kontrolü - Oyun bitiminde: hiç yanlış yapılmamışsa ve yeterli soru cevaplandıysa
         // Oyun başına 1 perfect streak (her doğru cevap için değil)
-        if (sessionWrong === 0 && sessionCorrect >= 3 && correctAnswers >= 3) {
-            // Bu oyun için perfect streak yoksa artır
-            dailyTasks.todayStats.perfectStreak = (dailyTasks.todayStats.perfectStreak || 0) + 1;
-            log.game(`🔥 Perfect streak artırıldı! Mevcut: ${dailyTasks.todayStats.perfectStreak}`);
+        // Koşullar: sessionWrong = 0 (hiç yanlış yok) ve sessionCorrect >= 3 (en az 3 doğru)
+        const isPerfectStreak = sessionWrong === 0 && sessionCorrect >= 3;
+        
+        if (isPerfectStreak) {
+            const oldPerfectStreak = dailyTasks.todayStats.perfectStreak || 0;
+            dailyTasks.todayStats.perfectStreak = oldPerfectStreak + 1;
+            log.game(`🔥 Perfect streak artırıldı! Eski: ${oldPerfectStreak}, Yeni: ${dailyTasks.todayStats.perfectStreak} (sessionCorrect: ${sessionCorrect}, sessionWrong: ${sessionWrong})`);
+            
+            // Görevleri hemen güncelle (perfect streak görevleri için)
+            if (typeof updateTasksDisplay === 'function') {
+                setTimeout(() => updateTasksDisplay(), 100);
+            }
+        } else {
+            log.debug(`⚠️ Perfect streak sayılmadı: sessionWrong=${sessionWrong}, sessionCorrect=${sessionCorrect} (en az 3 doğru ve 0 yanlış gerekiyor)`);
         }
         
         // Oyun süresi takibi - gameState.session.startTime varsa süreyi hesapla ve ekle
@@ -10235,6 +10248,10 @@ elements.backFromBoslukBtn.onclick = async () => {
                 }
                 
                 // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
+                // NOT: Boşluk Doldur için session değerlerini güncelle (perfect streak kontrolü için)
+                sessionScore = boslukScore;
+                sessionCorrect = boslukCorrect;
+                sessionWrong = boslukWrong;
                 addToGlobalPoints(sessionScore, sessionCorrect);
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
@@ -10335,6 +10352,10 @@ elements.backFromDinleBtn.onclick = async () => {
                 }
                 
                 // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
+                // NOT: Dinle Bul için session değerlerini güncelle (perfect streak kontrolü için)
+                sessionScore = dinleScore;
+                sessionCorrect = dinleCorrect;
+                sessionWrong = dinleWrong;
                 addToGlobalPoints(sessionScore, sessionCorrect);
             } else {
                 forceLog('[4] Puan YOK - Direkt cikis');
