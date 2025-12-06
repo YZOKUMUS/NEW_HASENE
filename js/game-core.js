@@ -4004,6 +4004,13 @@ function saveToIndexedDB(key, value) {
         log.warn(`⚠️ IndexedDB db yok, kaydedilemedi: ${key}`);
         return;
     }
+    
+    // Database connection durumunu kontrol et
+    if (db.readyState !== 'open') {
+        log.warn(`⚠️ IndexedDB connection kapalı, kaydedilemedi: ${key}`);
+        return;
+    }
+    
     try {
         const transaction = db.transaction(['gameData'], 'readwrite');
         const store = transaction.objectStore('gameData');
@@ -4359,6 +4366,15 @@ async function loadStats() {
     // Günlük kontrol
     checkDailyProgress();
     
+    // KRİTİK: Sıfırlama flag'ini kontrol et
+    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+    if (statsJustReset) {
+        log.debug('🔄 İstatistikler yeni sıfırlandı, checkDailyTasks atlanıyor (görevler oluşturulmayacak)');
+        localStorage.removeItem('hasene_statsJustReset'); // Flag'i temizle
+        // Görevler oluşturulmayacak - kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
+        return;
+    }
+    
     // KRİTİK: checkDailyTasks'ı çağırmadan önce verilerin yüklendiğinden emin ol
     // Eğer veriler yüklendiyse ve bugünkü ilerlemeler varsa, onları koru
     const today = getLocalDateString();
@@ -4430,6 +4446,13 @@ function getNextLevelRequiredPoints(currentLevel) {
 
 // Debounced saveStats - 500ms bekle, sonra kaydet
 function debouncedSaveStats() {
+    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
+    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+    if (statsJustReset) {
+        log.debug('🔄 İstatistikler yeni sıfırlandı, debouncedSaveStats atlanıyor');
+        return;
+    }
+    
     window.pendingSave = true;
     if (window.saveStatsTimeout) {
         clearTimeout(window.saveStatsTimeout);
@@ -4446,6 +4469,13 @@ function debouncedSaveStats() {
 
 // Acil kaydetme (oyun bitişi gibi kritik durumlar için)
 async function saveStatsImmediate() {
+    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
+    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+    if (statsJustReset) {
+        log.debug('🔄 İstatistikler yeni sıfırlandı, saveStatsImmediate atlanıyor');
+        return;
+    }
+    
     if (window.saveStatsTimeout) {
         clearTimeout(window.saveStatsTimeout);
         window.saveStatsTimeout = null;
@@ -4455,6 +4485,13 @@ async function saveStatsImmediate() {
 }
 
 async function saveStats() {
+    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
+    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+    if (statsJustReset) {
+        log.debug('🔄 İstatistikler yeni sıfırlandı, saveStats atlanıyor');
+        return;
+    }
+    
     try {
         // ÇOKLU KAYDETME SİSTEMİ (Üçüncü taraf çerez sorunu için)
         
@@ -4560,7 +4597,7 @@ async function saveStats() {
     }
 }
 
-function resetAllStats() {
+async function resetAllStats() {
     // =========================================
     // 🔥 TEMEL SKORLAR
     // =========================================
@@ -4661,17 +4698,80 @@ if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasen
     // Her 1 hedeften 540 XP geliyorsa — dilersen değiştir
 
     // =========================================
-    // 🔥 INDEXED DB TEMİZLE
+    // 🔥 INDEXED DB TEMİZLE - TÜM KEY'LERİ SİL
     // =========================================
-    if (db) {
-try {
-    const transaction = db.transaction(['gameData'], 'readwrite');
-    const store = transaction.objectStore('gameData');
-    store.clear();
-    log.debug('🗑️ IndexedDB temizlendi');
-} catch(e) {
-    log.error('IndexedDB temizleme hatası:', e);
-}
+    // IndexedDB'yi güvenli şekilde temizle (tek transaction içinde)
+    const clearIndexedDB = async () => {
+        if (!db) {
+            log.debug('⚠️ IndexedDB db yok, temizleme atlanıyor');
+            return;
+        }
+        
+        try {
+            // Database connection durumunu kontrol et
+            if (db.readyState !== 'open') {
+                log.warn('⚠️ IndexedDB connection kapalı, temizleme atlanıyor');
+                return;
+            }
+            
+            // Tek bir transaction içinde tüm işlemleri yap
+            const transaction = db.transaction(['gameData'], 'readwrite');
+            const store = transaction.objectStore('gameData');
+            
+            // Tüm key'leri sil
+            const keysToDelete = [
+                'hasene_totalPoints',
+                'hasene_badges',
+                'hasene_streak',
+                'hasene_dailyTasks',
+                'hasene_weeklyTasks',
+                'hasene_currentMode',
+                'hasene_currentDifficulty',
+                'hasene_wordStats',
+                'gameStats'
+            ];
+            
+            // Tüm key'leri sil (tek transaction içinde)
+            const deletePromises = keysToDelete.map(key => {
+                return new Promise((resolve) => {
+                    try {
+                        const deleteRequest = store.delete(key);
+                        deleteRequest.onsuccess = () => resolve();
+                        deleteRequest.onerror = () => resolve(); // Hata olsa bile devam et
+                    } catch(e) {
+                        resolve(); // Hata olsa bile devam et
+                    }
+                });
+            });
+            
+            // Tüm silme işlemlerini bekle
+            await Promise.all(deletePromises);
+            
+            // Store'u temizle
+            const clearRequest = store.clear();
+            await new Promise((resolve, reject) => {
+                clearRequest.onsuccess = () => resolve();
+                clearRequest.onerror = () => reject(clearRequest.error);
+            });
+            
+            // Transaction'ın tamamlanmasını bekle
+            await new Promise((resolve) => {
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => resolve(); // Hata olsa bile devam et
+            });
+            
+            log.debug('🗑️ IndexedDB temizlendi (tüm key\'ler ve store silindi)');
+        } catch(e) {
+            log.error('IndexedDB temizleme hatası:', e);
+        }
+    };
+    
+    // IndexedDB'yi temizle (await ile bekle - işlem tamamlanana kadar bekle)
+    try {
+        await clearIndexedDB();
+        log.debug('✅ IndexedDB temizleme tamamlandı');
+    } catch(e) {
+        log.error('IndexedDB temizleme hatası:', e);
     }
 
     // =========================================
@@ -4786,9 +4886,20 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
     }
 
     // =========================================
-    // 🔥 YENİ DAILY TASK ÜRET
+    // 🔥 YENİ GÖREVLER ÜRETME - SIFIRLAMA SONRASI GÖREV OLUŞTURMA
+    // NOT: Görevler oluşturulmuyor, kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
     // =========================================
-    generateDailyTasks(getLocalDateString());
+    // generateDailyTasks çağrılmıyor - sıfırlama sonrası görevler oluşturulmamalı
+    // Görevler checkDailyTasks/checkWeeklyTasks içinde otomatik oluşturulacak
+    
+    // =========================================
+    // 🔥 SIFIRLAMA FLAG'İ SET ET
+    // =========================================
+    // Sıfırlama yapıldığını işaretle - loadStats ve checkDailyTasks bu flag'i kontrol edecek
+    localStorage.setItem('hasene_statsJustReset', 'true');
+    
+    // NOT: Veriler zaten yukarıda temizlendi (IndexedDB ve localStorage)
+    // Bu flag sayesinde loadStats ve checkDailyTasks otomatik görev oluşturmayacak
 
     // =========================================
     // 🔥 UI GÜNCELLE - TÜM İSTATİSTİK ALANLARI
@@ -4798,8 +4909,11 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
     updateStatsBar();
     updateUI();
     if (typeof updateDailyGoalDisplay === "function") {
-updateDailyGoalDisplay();
+        updateDailyGoalDisplay();
     }
+    
+    // NOT: saveStats çağrılmıyor - sıfırlama sonrası veriler kaydedilmemeli
+    // Kullanıcı ilk oyunu oynadığında otomatik kaydedilecek
 
     // İstatistikler Modal - Seviye İlerleme Barı
     const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
@@ -6850,7 +6964,7 @@ function handleStatsModalClick(event) {
     closeStatsModal();
 }
 
-function confirmResetStats() {
+async function confirmResetStats() {
     const confirmed = confirm('🚨 DİKKAT!\n\nTüm ders verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm nişanlar (silinir)\n• Tüm muvaffakiyetler (sıfırlanır)\n• Muvaffakiyet terakki barları (0%\'a döner)\n• Mertebe nişanları (Mütebahhir, Mütecaviz, Müterakki, Mübtedi - sıfırlanır)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük vazifeler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• İstatistikler paneli tüm alanları (sıfırlanır)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK VİRD XP (0\'a döner)\n• Muvaffakiyetler modal istatistikleri (sıfırlanır)\n• Takvim modal streak bilgisi (sıfırlanır)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
     
     if (confirmed) {
@@ -6859,7 +6973,7 @@ function confirmResetStats() {
         
         if (doubleConfirmed) {
             closeStatsModal(); // Modal'ı kapat
-            resetAllStats(); // Mevcut fonksiyonu kullan
+            await resetAllStats(); // Mevcut fonksiyonu kullan (await ile bekle - IndexedDB temizleme tamamlanana kadar bekle)
         }
     }
 }
@@ -8027,6 +8141,15 @@ if (typeof window !== 'undefined') {
  * Haftalık görevleri kontrol et ve gerekirse oluştur
  */
 function checkWeeklyTasks() {
+    // KRİTİK: Sıfırlama flag'ini kontrol et
+    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+    if (statsJustReset) {
+        log.debug('🔄 İstatistikler yeni sıfırlandı, checkWeeklyTasks atlanıyor (görevler oluşturulmayacak)');
+        // Flag'i temizleme - loadStats içinde zaten temizlendi
+        // Görevler oluşturulmayacak - kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
+        return;
+    }
+    
     const today = getLocalDateString();
     const weekStart = getWeekStartDate();
     
