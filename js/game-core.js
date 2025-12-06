@@ -5354,8 +5354,8 @@ function addSessionPoints(points) {
     // Bugünkü toplam puana da ekle (günlük performans için)
     dailyTasks.todayStats.toplamPuan += points;
     
-    // Bugünkü toplam doğru cevap sayısını güncelle
-    dailyTasks.todayStats.toplamDogru++;
+    // NOT: toplamDogru artık sadece updateTaskProgress içinde artırılıyor (çift ekleme önlemek için)
+    // Eski kod: dailyTasks.todayStats.toplamDogru++; // ÇİFT EKLEME - KALDIRILDI
     
     // Daily correct sayısını storage'a kaydet (detaylı istatistikler için)
     const currentDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
@@ -5366,6 +5366,7 @@ function addSessionPoints(points) {
     if (typeof updateTaskProgress === 'function') {
         // toplamPuan için updateTaskProgress çağrılmayacak (çift ekleme önlemek için)
         // updateTaskProgress('toplamPuan', points); // ÇİFT EKLEME - KALDIRILDI
+        // toplamDogru artık sadece burada artırılıyor (updateTaskProgress içinde)
         updateTaskProgress('toplamDogru', 1);
     }
     
