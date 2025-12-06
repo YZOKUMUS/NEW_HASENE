@@ -4124,54 +4124,149 @@ async function loadStats() {
     const savedStreakIndexedDB = await loadFromIndexedDB('hasene_streak');
     const savedStreak = savedStreakIndexedDB || localStorage.getItem('hasene_streak');
     if (savedStreak) {
-        streakData = { ...streakData, ...JSON.parse(typeof savedStreak === 'string' ? savedStreak : JSON.stringify(savedStreak)) };
+        try {
+            const parsedStreak = JSON.parse(typeof savedStreak === 'string' ? savedStreak : JSON.stringify(savedStreak));
+            streakData = { ...streakData, ...parsedStreak };
+            
+            // playDates array'inin varlığını kontrol et
+            if (!streakData.playDates || !Array.isArray(streakData.playDates)) {
+                log.warn('⚠️ playDates array bulunamadı veya geçersiz, varsayılan değerle başlatılıyor');
+                streakData.playDates = [];
+            }
+            
+            // Diğer alanların varlığını kontrol et ve varsayılan değerlerle başlat
+            if (typeof streakData.currentStreak !== 'number') {
+                streakData.currentStreak = 0;
+            }
+            if (typeof streakData.bestStreak !== 'number') {
+                streakData.bestStreak = 0;
+            }
+            if (typeof streakData.totalPlayDays !== 'number') {
+                streakData.totalPlayDays = 0;
+            }
+            if (typeof streakData.lastPlayDate !== 'string') {
+                streakData.lastPlayDate = '';
+            }
+            if (typeof streakData.dailyGoal !== 'number') {
+                streakData.dailyGoal = 5; // Varsayılan günlük hedef
+            }
+            if (typeof streakData.todayProgress !== 'number') {
+                streakData.todayProgress = 0;
+            }
+            if (typeof streakData.todayDate !== 'string') {
+                streakData.todayDate = '';
+            }
+            
+            log.debug('✅ Streak verileri yüklendi:', {
+                currentStreak: streakData.currentStreak,
+                bestStreak: streakData.bestStreak,
+                totalPlayDays: streakData.totalPlayDays,
+                playDatesCount: streakData.playDates.length,
+                lastPlayDate: streakData.lastPlayDate
+            });
+        } catch (error) {
+            log.error('❌ Streak verileri parse hatası:', error);
+            // Hata durumunda varsayılan değerlerle devam et
+            streakData.playDates = streakData.playDates || [];
+        }
+    } else {
+        // Veri yoksa varsayılan değerlerle başlat
+        log.debug('⚠️ Streak verisi bulunamadı, varsayılan değerlerle başlatılıyor');
+        streakData.playDates = streakData.playDates || [];
     }
     
     // Günlük görevler yükle (IndexedDB öncelikli) - BU ÇOOK ÖNEMLİ!
     const savedTasksIndexedDB = await loadFromIndexedDB('hasene_dailyTasks');
     const savedTasks = savedTasksIndexedDB || localStorage.getItem('hasene_dailyTasks');
     if (savedTasks) {
-        dailyTasks = { ...dailyTasks, ...JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks)) };
-        window.dailyTasks = dailyTasks; // Global erişim için güncelle
-        // Set nesnelerini yeniden oluştur (güvenli şekilde)
-        if (dailyTasks.todayStats) {
-            const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
-            if (Array.isArray(farkliZorlukValue)) {
-                dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
-            } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
-                dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
-            } else {
-                dailyTasks.todayStats.farklıZorluk = new Set([]);
+        try {
+            const parsedTasks = JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks));
+            dailyTasks = { ...dailyTasks, ...parsedTasks };
+            window.dailyTasks = dailyTasks; // Global erişim için güncelle
+            
+            // Set nesnelerini yeniden oluştur (güvenli şekilde)
+            if (dailyTasks.todayStats) {
+                const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
+                if (Array.isArray(farkliZorlukValue)) {
+                    dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
+                } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
+                    dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
+                } else {
+                    dailyTasks.todayStats.farklıZorluk = new Set([]);
+                }
+                
+                const allGameModesValue = dailyTasks.todayStats.allGameModes;
+                if (Array.isArray(allGameModesValue)) {
+                    dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
+                } else if (allGameModesValue && typeof allGameModesValue === 'object') {
+                    dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
+                } else {
+                    dailyTasks.todayStats.allGameModes = new Set([]);
+                }
             }
             
-            const allGameModesValue = dailyTasks.todayStats.allGameModes;
-            if (Array.isArray(allGameModesValue)) {
-                dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
-            } else if (allGameModesValue && typeof allGameModesValue === 'object') {
-                dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
-            } else {
-                dailyTasks.todayStats.allGameModes = new Set([]);
+            // lastTaskDate kontrolü - eğer boş veya geçersiz ise bugünün tarihiyle başlat
+            const today = getLocalDateString();
+            if (!dailyTasks.lastTaskDate || dailyTasks.lastTaskDate === '') {
+                log.debug('⚠️ lastTaskDate boş, bugünün tarihiyle başlatılıyor:', today);
+                dailyTasks.lastTaskDate = today;
             }
+        } catch (error) {
+            log.error('❌ Günlük görevler parse hatası:', error);
+            // Hata durumunda varsayılan değerlerle devam et
+            dailyTasks.lastTaskDate = getLocalDateString();
         }
+    } else {
+        // Veri yoksa bugünün tarihiyle başlat
+        const today = getLocalDateString();
+        log.debug('⚠️ Günlük görev verisi bulunamadı, bugünün tarihiyle başlatılıyor:', today);
+        dailyTasks.lastTaskDate = today;
     }
     
     // Haftalık görevler yükle (IndexedDB öncelikli)
     const savedWeeklyTasksIndexedDB = await loadFromIndexedDB('hasene_weeklyTasks');
     const savedWeeklyTasks = savedWeeklyTasksIndexedDB || localStorage.getItem('hasene_weeklyTasks');
     if (savedWeeklyTasks) {
-        weeklyTasks = { ...weeklyTasks, ...JSON.parse(typeof savedWeeklyTasks === 'string' ? savedWeeklyTasks : JSON.stringify(savedWeeklyTasks)) };
-        window.weeklyTasks = weeklyTasks; // Global erişim için güncelle
-        // Set nesnelerini yeniden oluştur (güvenli şekilde)
-        if (weeklyTasks.weekStats) {
-            const allModesValue = weeklyTasks.weekStats.allModesPlayed;
-            if (Array.isArray(allModesValue)) {
-                weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
-            } else if (allModesValue && typeof allModesValue === 'object') {
-                weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
-            } else {
-                weeklyTasks.weekStats.allModesPlayed = new Set([]);
+        try {
+            const parsedWeeklyTasks = JSON.parse(typeof savedWeeklyTasks === 'string' ? savedWeeklyTasks : JSON.stringify(savedWeeklyTasks));
+            weeklyTasks = { ...weeklyTasks, ...parsedWeeklyTasks };
+            window.weeklyTasks = weeklyTasks; // Global erişim için güncelle
+            
+            // Set nesnelerini yeniden oluştur (güvenli şekilde)
+            if (weeklyTasks.weekStats) {
+                const allModesValue = weeklyTasks.weekStats.allModesPlayed;
+                if (Array.isArray(allModesValue)) {
+                    weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
+                } else if (allModesValue && typeof allModesValue === 'object') {
+                    weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
+                } else {
+                    weeklyTasks.weekStats.allModesPlayed = new Set([]);
+                }
             }
+            
+            // lastWeekStart kontrolü - eğer boş veya geçersiz ise bugünün haftasıyla başlat
+            const weekStart = getWeekStartDate();
+            if (!weeklyTasks.lastWeekStart || weeklyTasks.lastWeekStart === '') {
+                log.debug('⚠️ lastWeekStart boş, bugünün haftasıyla başlatılıyor:', weekStart);
+                weeklyTasks.lastWeekStart = weekStart;
+                weeklyTasks.weekStart = weekStart;
+                weeklyTasks.weekEnd = getWeekEndDate();
+            }
+        } catch (error) {
+            log.error('❌ Haftalık görevler parse hatası:', error);
+            // Hata durumunda varsayılan değerlerle devam et
+            const weekStart = getWeekStartDate();
+            weeklyTasks.lastWeekStart = weekStart;
+            weeklyTasks.weekStart = weekStart;
+            weeklyTasks.weekEnd = getWeekEndDate();
         }
+    } else {
+        // Veri yoksa bugünün haftasıyla başlat
+        const weekStart = getWeekStartDate();
+        log.debug('⚠️ Haftalık görev verisi bulunamadı, bugünün haftasıyla başlatılıyor:', weekStart);
+        weeklyTasks.lastWeekStart = weekStart;
+        weeklyTasks.weekStart = weekStart;
+        weeklyTasks.weekEnd = getWeekEndDate();
     }
     
     // Oyun ayarları yükle (currentMode ve currentDifficulty) - ÇOOK ÖNEMLİ!
@@ -7571,19 +7666,74 @@ window.testStreak = testStreakScenarios;
 function checkDailyTasks() {
     const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
     
+    // Güvenlik kontrolü: dailyTasks objesi var mı?
+    if (!dailyTasks) {
+        log.warn('⚠️ dailyTasks objesi bulunamadı, başlatılıyor...');
+        dailyTasks = {
+            lastTaskDate: '',
+            tasks: [],
+            bonusTasks: [],
+            completedTasks: [],
+            rewardsClaimed: false,
+            todayStats: {
+                kelimeCevir: 0,
+                dinleBul: 0,
+                boslukDoldur: 0,
+                ayetOku: 0,
+                duaOgre: 0,
+                hadisOku: 0,
+                toplamDogru: 0,
+                toplamYanlis: 0,
+                toplamPuan: 0,
+                perfectStreak: 0,
+                farklıZorluk: new Set(),
+                reviewWords: 0,
+                comboCount: 0,
+                accuracy: 0,
+                allGameModes: new Set(),
+                streakMaintain: 0,
+                totalPlayTime: 0
+            }
+        };
+        window.dailyTasks = dailyTasks;
+    }
+    
+    // lastTaskDate kontrolü - boş, null veya undefined ise bugünün tarihiyle karşılaştır
+    const lastTaskDate = dailyTasks.lastTaskDate || '';
+    const isNewDay = lastTaskDate !== today && lastTaskDate !== '';
+    
     log.debug('🔍 Günlük görev kontrolü:', {
         bugün: today,
-        sonGörevTarihi: dailyTasks.lastTaskDate,
-        yeniGünMü: dailyTasks.lastTaskDate !== today,
-        mevcutTamamlananlar: dailyTasks.completedTasks.length,
+        sonGörevTarihi: lastTaskDate,
+        yeniGünMü: isNewDay,
+        mevcutTamamlananlar: dailyTasks.completedTasks?.length || 0,
         bugünküStats: dailyTasks.todayStats
     });
     
     // Eğer yeni gün başladıysa görevleri yenile
-    if (dailyTasks.lastTaskDate !== today) {
+    // NOT: lastTaskDate boş ise (ilk yükleme), bugünün tarihiyle başlat ama mevcut ilerlemeleri koru
+    if (isNewDay) {
         log.debug('🔄 Yeni gün başladı, görevler yenileniyor...');
         generateDailyTasks(today);
         // Görevler oluşturulduktan sonra badge'i güncelle
+        if (typeof updateTasksDisplay === 'function') {
+            updateTasksDisplay();
+        }
+    } else if (lastTaskDate === '') {
+        // İlk yükleme - bugünün tarihiyle başlat ama mevcut ilerlemeleri koru
+        log.debug('🔄 İlk yükleme, bugünün tarihiyle başlatılıyor (ilerlemeler korunuyor)...');
+        // NOT: lastTaskDate'i generateDailyTasks çağrılmadan ÖNCE set etme!
+        // generateDailyTasks içinde lastTaskDate kontrolü yapılıyor, bu yüzden boş bırak
+        // Görevler yoksa oluştur (ama bugünkü ilerlemeleri koruyarak)
+        if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
+            // generateDailyTasks bugünkü ilerlemeleri koruyacak şekilde çağrılıyor
+            // lastTaskDate === '' olduğu için shouldPreserveStats true olacak
+            generateDailyTasks(today);
+        } else {
+            // Görevler varsa sadece lastTaskDate'i güncelle
+            dailyTasks.lastTaskDate = today;
+        }
+        // Badge'i güncelle
         if (typeof updateTasksDisplay === 'function') {
             updateTasksDisplay();
         }
@@ -7602,6 +7752,20 @@ function checkDailyTasks() {
 }
 
 function generateDailyTasks(date) {
+    const today = getLocalDateString();
+    const isToday = date === today;
+    
+    // KRİTİK: lastTaskDate'i kontrol etmeden ÖNCE bugünkü ilerlemeleri yedekle!
+    // Eğer bugünün tarihiyle çağrılıyorsa ve mevcut todayStats varsa, onu koru!
+    // lastTaskDate === today VEYA lastTaskDate === '' (ilk yükleme) ise bugünkü ilerlemeleri koru
+    const currentLastTaskDate = dailyTasks.lastTaskDate || '';
+    const shouldPreserveStats = isToday && dailyTasks.todayStats && (currentLastTaskDate === today || currentLastTaskDate === '');
+    
+    // Mevcut todayStats, completedTasks ve rewardsClaimed'i yedekle (eğer korunacaksa)
+    const preservedStats = shouldPreserveStats ? { ...dailyTasks.todayStats } : null;
+    const preservedCompletedTasks = shouldPreserveStats && Array.isArray(dailyTasks.completedTasks) ? [...dailyTasks.completedTasks] : null;
+    const preservedRewardsClaimed = shouldPreserveStats ? dailyTasks.rewardsClaimed : null;
+    
     // Temel görevler listesi (tüm oyun modlarını kapsayacak şekilde genişletildi)
     const baseTasks = [
         { id: 'kelime5', name: '5 kelime çevir', target: 5, current: 0, type: 'kelimeCevir', reward: 1 },
@@ -7636,29 +7800,60 @@ function generateDailyTasks(date) {
     // Rastgele 4 bonus görev seç (3'ten 4'e çıkarıldı - daha fazla çeşitlilik)
     const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 4);
 
+    // lastTaskDate'i güncelle
     dailyTasks.lastTaskDate = date;
     dailyTasks.tasks = baseTasks;
     dailyTasks.bonusTasks = selectedBonus;
-    dailyTasks.completedTasks = [];
-    dailyTasks.rewardsClaimed = false;
-    dailyTasks.todayStats = {
-        kelimeCevir: 0,
-        dinleBul: 0,
-        boslukDoldur: 0,
-        ayetOku: 0,
-        duaOgre: 0,
-        hadisOku: 0,
-        toplamDogru: 0,
-        toplamYanlis: 0,
-        toplamPuan: 0,
-        perfectStreak: 0,
-        farklıZorluk: new Set(),
-        reviewWords: 0,      // Yeni: Review mode kelime sayısı
-        comboCount: 0,       // Yeni: Combo sayısı
-        accuracy: 0,         // Yeni: Başarı oranı (%)
-        allGameModes: new Set(), // Yeni: Oynanan oyun modları
-        streakMaintain: 0    // Yeni: Seri koruma
-    };
+    
+    // KRİTİK: completedTasks ve rewardsClaimed'i koru (eğer bugünkü ilerlemeler korunuyorsa)
+    if (shouldPreserveStats && preservedCompletedTasks !== null) {
+        dailyTasks.completedTasks = preservedCompletedTasks;
+        dailyTasks.rewardsClaimed = preservedRewardsClaimed !== null ? preservedRewardsClaimed : false;
+        log.debug('✅ Tamamlanan görevler ve ödüller korundu:', {
+            completedTasks: dailyTasks.completedTasks.length,
+            rewardsClaimed: dailyTasks.rewardsClaimed
+        });
+    } else {
+        // Yeni gün başladı - sıfırla
+        dailyTasks.completedTasks = [];
+        dailyTasks.rewardsClaimed = false;
+    }
+    
+    // KRİTİK: todayStats'ı sadece gerçekten yeni gün başladığında sıfırla
+    if (shouldPreserveStats && preservedStats) {
+        // Bugünkü ilerlemeleri koru - sadece Set nesnelerini yeniden oluştur
+        dailyTasks.todayStats = {
+            ...preservedStats,
+            farklıZorluk: preservedStats.farklıZorluk instanceof Set 
+                ? preservedStats.farklıZorluk 
+                : new Set(Array.isArray(preservedStats.farklıZorluk) ? preservedStats.farklıZorluk : []),
+            allGameModes: preservedStats.allGameModes instanceof Set
+                ? preservedStats.allGameModes
+                : new Set(Array.isArray(preservedStats.allGameModes) ? preservedStats.allGameModes : [])
+        };
+        log.debug('✅ Bugünkü ilerlemeler korundu:', dailyTasks.todayStats);
+    } else {
+        // Yeni gün başladı - todayStats'ı sıfırla
+        dailyTasks.todayStats = {
+            kelimeCevir: 0,
+            dinleBul: 0,
+            boslukDoldur: 0,
+            ayetOku: 0,
+            duaOgre: 0,
+            hadisOku: 0,
+            toplamDogru: 0,
+            toplamYanlis: 0,
+            toplamPuan: 0,
+            perfectStreak: 0,
+            farklıZorluk: new Set(),
+            reviewWords: 0,      // Yeni: Review mode kelime sayısı
+            comboCount: 0,       // Yeni: Combo sayısı
+            accuracy: 0,         // Yeni: Başarı oranı (%)
+            allGameModes: new Set(), // Yeni: Oynanan oyun modları
+            streakMaintain: 0,   // Yeni: Seri koruma
+            totalPlayTime: 0     // Yeni: Toplam oyun süresi
+        };
+    }
 
     log.debug('🎯 Yeni günlük görevler oluşturuldu:', {
         tarih: date,
@@ -7719,19 +7914,63 @@ function checkWeeklyTasks() {
     const today = getLocalDateString();
     const weekStart = getWeekStartDate();
     
+    // Güvenlik kontrolü: weeklyTasks objesi var mı?
+    if (!weeklyTasks) {
+        log.warn('⚠️ weeklyTasks objesi bulunamadı, başlatılıyor...');
+        weeklyTasks = {
+            lastWeekStart: '',
+            weekStart: '',
+            weekEnd: '',
+            tasks: [],
+            completedTasks: [],
+            rewardsClaimed: false,
+            weekStats: {
+                totalHasene: 0,
+                totalCorrect: 0,
+                totalWrong: 0,
+                daysPlayed: 0,
+                streakDays: 0,
+                allModesPlayed: new Set(),
+                comboCount: 0
+            }
+        };
+        window.weeklyTasks = weeklyTasks;
+    }
+    
+    // lastWeekStart kontrolü - boş, null veya undefined ise bugünün haftasıyla karşılaştır
+    const lastWeekStart = weeklyTasks.lastWeekStart || '';
+    const isNewWeek = lastWeekStart !== weekStart && lastWeekStart !== '';
+    
     log.debug('🔍 Haftalık görev kontrolü:', {
         bugün: today,
         haftaBaşlangıç: weekStart,
-        sonHaftaBaşlangıç: weeklyTasks.lastWeekStart,
-        yeniHaftaMü: weeklyTasks.lastWeekStart !== weekStart
+        sonHaftaBaşlangıç: lastWeekStart,
+        yeniHaftaMü: isNewWeek
     });
     
     // Eğer yeni hafta başladıysa görevleri yenile
-    if (weeklyTasks.lastWeekStart !== weekStart) {
+    // NOT: lastWeekStart boş ise (ilk yükleme), bugünün haftasıyla başlat ama mevcut ilerlemeleri koru
+    if (isNewWeek) {
         log.debug('🔄 Yeni hafta başladı, haftalık görevler yenileniyor...');
         generateWeeklyTasks(weekStart);
         // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
         // updateTasksDisplay zaten showDailyTasksModal içinde çağrılıyor
+    } else if (lastWeekStart === '') {
+        // İlk yükleme - bugünün haftasıyla başlat ama mevcut ilerlemeleri koru
+        log.debug('🔄 İlk yükleme, bugünün haftasıyla başlatılıyor (ilerlemeler korunuyor)...');
+        // NOT: lastWeekStart'i generateWeeklyTasks çağrılmadan ÖNCE set etme!
+        // generateWeeklyTasks içinde lastWeekStart kontrolü yapılıyor, bu yüzden boş bırak
+        // Görevler yoksa oluştur (ama bu haftanın ilerlemelerini koruyarak)
+        if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+            // generateWeeklyTasks bu haftanın ilerlemelerini koruyacak şekilde çağrılıyor
+            // lastWeekStart === '' olduğu için shouldPreserveStats true olacak
+            generateWeeklyTasks(weekStart);
+        } else {
+            // Görevler varsa sadece lastWeekStart'i güncelle
+            weeklyTasks.lastWeekStart = weekStart;
+            weeklyTasks.weekStart = weekStart;
+            weeklyTasks.weekEnd = getWeekEndDate();
+        }
     } else {
         log.debug('✅ Aynı hafta, mevcut görevler korunuyor');
         // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
@@ -7744,6 +7983,19 @@ function checkWeeklyTasks() {
  */
 function generateWeeklyTasks(weekStart) {
     const weekEnd = getWeekEndDate(new Date(weekStart));
+    const currentWeekStart = getWeekStartDate();
+    const isCurrentWeek = weekStart === currentWeekStart;
+    
+    // KRİTİK: lastWeekStart'i kontrol etmeden ÖNCE bu haftanın ilerlemelerini yedekle!
+    // Eğer mevcut hafta ile çağrılıyorsa ve mevcut weekStats varsa, onu koru!
+    // lastWeekStart === currentWeekStart VEYA lastWeekStart === '' (ilk yükleme) ise bu haftanın ilerlemelerini koru
+    const currentLastWeekStart = weeklyTasks.lastWeekStart || '';
+    const shouldPreserveStats = isCurrentWeek && weeklyTasks.weekStats && (currentLastWeekStart === currentWeekStart || currentLastWeekStart === '');
+    
+    // Mevcut weekStats, completedTasks ve rewardsClaimed'i yedekle (eğer korunacaksa)
+    const preservedStats = shouldPreserveStats ? { ...weeklyTasks.weekStats } : null;
+    const preservedCompletedTasks = shouldPreserveStats && Array.isArray(weeklyTasks.completedTasks) ? [...weeklyTasks.completedTasks] : null;
+    const preservedRewardsClaimed = shouldPreserveStats ? weeklyTasks.rewardsClaimed : null;
     
     // Haftalık görevler listesi (daha uzun vadeli hedefler)
     const weeklyTasksList = [
@@ -7755,22 +8007,49 @@ function generateWeeklyTasks(weekStart) {
         { id: 'week_streak7', name: '7 gün seri koru', target: 7, current: 0, type: 'streakDays', reward: 8 }
     ];
     
+    // lastWeekStart'i güncelle
     weeklyTasks.lastWeekStart = weekStart;
     weeklyTasks.weekStart = weekStart;
     weeklyTasks.weekEnd = weekEnd;
     weeklyTasks.tasks = weeklyTasksList;
-    weeklyTasks.completedTasks = [];
-    weeklyTasks.rewardsClaimed = false;
-    weeklyTasks.weekStats = {
-        totalHasene: 0,
-        totalCorrect: 0,
-        totalWrong: 0,
-        daysPlayed: 0,
-        // perfectDays ve reviewWordsCount görevleri kaldırıldı
-        streakDays: 0,
-        allModesPlayed: new Set(),
-        comboCount: 0
-    };
+    
+    // KRİTİK: completedTasks ve rewardsClaimed'i koru (eğer bu haftanın ilerlemeleri korunuyorsa)
+    if (shouldPreserveStats && preservedCompletedTasks !== null) {
+        weeklyTasks.completedTasks = preservedCompletedTasks;
+        weeklyTasks.rewardsClaimed = preservedRewardsClaimed !== null ? preservedRewardsClaimed : false;
+        log.debug('✅ Tamamlanan haftalık görevler ve ödüller korundu:', {
+            completedTasks: weeklyTasks.completedTasks.length,
+            rewardsClaimed: weeklyTasks.rewardsClaimed
+        });
+    } else {
+        // Yeni hafta başladı - sıfırla
+        weeklyTasks.completedTasks = [];
+        weeklyTasks.rewardsClaimed = false;
+    }
+    
+    // KRİTİK: weekStats'ı sadece gerçekten yeni hafta başladığında sıfırla
+    if (shouldPreserveStats && preservedStats) {
+        // Bu haftanın ilerlemelerini koru - sadece Set nesnelerini yeniden oluştur
+        weeklyTasks.weekStats = {
+            ...preservedStats,
+            allModesPlayed: preservedStats.allModesPlayed instanceof Set
+                ? preservedStats.allModesPlayed
+                : new Set(Array.isArray(preservedStats.allModesPlayed) ? preservedStats.allModesPlayed : [])
+        };
+        log.debug('✅ Bu haftanın ilerlemeleri korundu:', weeklyTasks.weekStats);
+    } else {
+        // Yeni hafta başladı - weekStats'ı sıfırla
+        weeklyTasks.weekStats = {
+            totalHasene: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            daysPlayed: 0,
+            // perfectDays ve reviewWordsCount görevleri kaldırıldı
+            streakDays: 0,
+            allModesPlayed: new Set(),
+            comboCount: 0
+        };
+    }
     
     log.debug('🎯 Yeni haftalık görevler oluşturuldu:', {
         haftaBaşlangıç: weekStart,
