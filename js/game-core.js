@@ -3990,12 +3990,23 @@ function initIndexedDB() {
 }
 
 function saveToIndexedDB(key, value) {
-    if (!db) return;
+    if (!db) {
+        log.warn(`⚠️ IndexedDB db yok, kaydedilemedi: ${key}`);
+        return;
+    }
     try {
         const transaction = db.transaction(['gameData'], 'readwrite');
         const store = transaction.objectStore('gameData');
-        store.put(value, key);
-    } catch(e) { log.error('IndexedDB save failed:', e); }
+        const request = store.put(value, key);
+        request.onsuccess = () => {
+            log.debug(`✅ IndexedDB'ye kaydedildi: ${key}`);
+        };
+        request.onerror = () => {
+            log.error(`❌ IndexedDB kaydetme hatası: ${key}`, request.error);
+        };
+    } catch(e) { 
+        log.error('❌ IndexedDB save failed:', e); 
+    }
 }
 
 function loadFromIndexedDB(key) {
@@ -4181,6 +4192,22 @@ async function loadStats() {
     if (savedTasks) {
         try {
             const parsedTasks = JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks));
+            
+            // KRİTİK: Bugünkü ilerlemeleri kontrol et
+            const today = getLocalDateString();
+            const loadedLastTaskDate = parsedTasks.lastTaskDate || '';
+            const isTodayData = loadedLastTaskDate === today;
+            
+            log.debug('📥 Günlük görevler yükleniyor:', {
+                loadedLastTaskDate: loadedLastTaskDate,
+                bugün: today,
+                bugünküVeriMü: isTodayData,
+                todayStatsVarMı: !!parsedTasks.todayStats,
+                todayStatsToplamPuan: parsedTasks.todayStats?.toplamPuan || 0,
+                completedTasksSayısı: parsedTasks.completedTasks?.length || 0
+            });
+            
+            // Verileri birleştir - bugünkü ilerlemeleri koru
             dailyTasks = { ...dailyTasks, ...parsedTasks };
             window.dailyTasks = dailyTasks; // Global erişim için güncelle
             
@@ -4206,10 +4233,27 @@ async function loadStats() {
             }
             
             // lastTaskDate kontrolü - eğer boş veya geçersiz ise bugünün tarihiyle başlat
-            const today = getLocalDateString();
             if (!dailyTasks.lastTaskDate || dailyTasks.lastTaskDate === '') {
                 log.debug('⚠️ lastTaskDate boş, bugünün tarihiyle başlatılıyor:', today);
                 dailyTasks.lastTaskDate = today;
+            }
+            
+            // KRİTİK: Bugünkü veriler yüklendiyse logla
+            if (isTodayData && dailyTasks.todayStats) {
+                log.debug('✅ Bugünkü ilerlemeler yüklendi:', {
+                    toplamPuan: dailyTasks.todayStats.toplamPuan,
+                    toplamDogru: dailyTasks.todayStats.toplamDogru,
+                    completedTasks: dailyTasks.completedTasks?.length || 0
+                });
+            }
+            
+            // KRİTİK: Bugünkü veriler yüklendiyse logla
+            if (isTodayData && dailyTasks.todayStats) {
+                log.debug('✅ Bugünkü ilerlemeler yüklendi:', {
+                    toplamPuan: dailyTasks.todayStats.toplamPuan,
+                    toplamDogru: dailyTasks.todayStats.toplamDogru,
+                    completedTasks: dailyTasks.completedTasks?.length || 0
+                });
             }
         } catch (error) {
             log.error('❌ Günlük görevler parse hatası:', error);
@@ -4285,9 +4329,10 @@ async function loadStats() {
     }
     
     log.debug('📋 Günlük görevler yüklendi:', {
-        completedTasks: dailyTasks.completedTasks.length,
+        completedTasks: dailyTasks.completedTasks?.length || 0,
         todayStats: dailyTasks.todayStats,
-        lastTaskDate: dailyTasks.lastTaskDate
+        lastTaskDate: dailyTasks.lastTaskDate,
+        toplamPuan: dailyTasks.todayStats?.toplamPuan || 0
     });
     
     log.debug('🎮 Oyun ayarları yüklendi:', {
@@ -4297,7 +4342,35 @@ async function loadStats() {
     
     // Günlük kontrol
     checkDailyProgress();
-    checkDailyTasks(); // Bu fonksiyon içinde zaten updateTasksDisplay() çağrılıyor
+    
+    // KRİTİK: checkDailyTasks'ı çağırmadan önce verilerin yüklendiğinden emin ol
+    // Eğer veriler yüklendiyse ve bugünkü ilerlemeler varsa, onları koru
+    const today = getLocalDateString();
+    const hasTodayProgress = dailyTasks.lastTaskDate === today && dailyTasks.todayStats && 
+        (dailyTasks.todayStats.toplamPuan > 0 || dailyTasks.todayStats.toplamDogru > 0 || 
+         dailyTasks.completedTasks?.length > 0);
+    
+    if (hasTodayProgress) {
+        log.debug('✅ Bugünkü ilerlemeler mevcut, checkDailyTasks atlanıyor:', {
+            toplamPuan: dailyTasks.todayStats.toplamPuan,
+            toplamDogru: dailyTasks.todayStats.toplamDogru,
+            completedTasks: dailyTasks.completedTasks?.length || 0
+        });
+        // Sadece görevler yoksa oluştur, ama bugünkü ilerlemeleri koru
+        if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
+            log.debug('⚠️ Görevler yok, bugünkü ilerlemeleri koruyarak oluşturuluyor...');
+            generateDailyTasks(today);
+        } else {
+            // Görevler var, sadece display'i güncelle
+            if (typeof updateTasksDisplay === 'function') {
+                updateTasksDisplay();
+            }
+        }
+    } else {
+        // Normal kontrol - bugünkü ilerlemeler yok veya yeni gün
+        log.debug('🔄 Normal checkDailyTasks çağrılıyor...');
+        checkDailyTasks(); // Bu fonksiyon içinde zaten updateTasksDisplay() çağrılıyor
+    }
 }
 
 // Daha zorlu seviye hesaplama sistemi
@@ -4369,21 +4442,39 @@ async function saveStats() {
     try {
         // ÇOKLU KAYDETME SİSTEMİ (Üçüncü taraf çerez sorunu için)
         
+        // KRİTİK: Bugünkü ilerlemeleri kontrol et ve kaydet
+        const today = getLocalDateString();
+        const isToday = dailyTasks.lastTaskDate === today;
+        
+        log.debug('💾 Veriler kaydediliyor:', {
+            bugün: today,
+            lastTaskDate: dailyTasks.lastTaskDate,
+            bugünküVeriMü: isToday,
+            todayStats: dailyTasks.todayStats,
+            completedTasks: dailyTasks.completedTasks?.length || 0
+        });
+        
         // 1. IndexedDB (ana sistem - çerez engellemelerinden etkilenmez)
         if (db) {
             saveToIndexedDB('hasene_totalPoints', totalPoints.toString());
             saveToIndexedDB('hasene_badges', JSON.stringify(badges));
             saveToIndexedDB('hasene_streak', JSON.stringify(streakData));
             
+            // GÜNLÜK GÖREVLER - bugünkü ilerlemeleri mutlaka kaydet!
             const tasksToSave = { 
                 ...dailyTasks, 
                 todayStats: {
                     ...dailyTasks.todayStats,
-                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk || []),
-                    allGameModes: Array.from(dailyTasks.todayStats.allGameModes || [])
+                    farklıZorluk: Array.from(dailyTasks.todayStats?.farklıZorluk || []),
+                    allGameModes: Array.from(dailyTasks.todayStats?.allGameModes || [])
                 }
             };
             saveToIndexedDB('hasene_dailyTasks', JSON.stringify(tasksToSave));
+            log.debug('✅ Günlük görevler IndexedDB\'ye kaydedildi:', {
+                lastTaskDate: tasksToSave.lastTaskDate,
+                todayStats: tasksToSave.todayStats,
+                completedTasks: tasksToSave.completedTasks?.length || 0
+            });
             
             // Haftalık görevler kaydet
             const weeklyTasksToSave = {
