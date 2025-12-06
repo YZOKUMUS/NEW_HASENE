@@ -9913,43 +9913,42 @@ function addToGlobalPoints(points, correctAnswers = 0) {
         playSound('levelup');
     }
     
-    // Günlük ilerlemeyi güncelle
-    if (correctAnswers > 0) {
-        updateDailyProgress(correctAnswers);
+    // NOT: updateDailyProgress artık her doğru cevapta çağrılıyor (checkAnswer, checkDinleAnswer, checkBoslukAnswer içinde)
+    // Burada tekrar çağırmaya gerek yok, çift sayımı önlemek için kaldırıldı
+    // Eski kod: if (correctAnswers > 0) { updateDailyProgress(correctAnswers); }
+    
+    // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor (satır 4230)
+    // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
+    // updateTaskProgress('toplamDogru', correctAnswers);
+    // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
+    
+    // Perfect streak kontrolü - Oyun bitiminde: hiç yanlış yapılmamışsa ve yeterli soru cevaplandıysa
+    // Oyun başına 1 perfect streak (her doğru cevap için değil)
+    // Koşullar: sessionWrong = 0 (hiç yanlış yok) ve sessionCorrect >= 3 (en az 3 doğru)
+    const isPerfectStreak = sessionWrong === 0 && sessionCorrect >= 3;
+    
+    if (isPerfectStreak) {
+        const oldPerfectStreak = dailyTasks.todayStats.perfectStreak || 0;
+        dailyTasks.todayStats.perfectStreak = oldPerfectStreak + 1;
+        log.game(`🔥 Perfect streak artırıldı! Eski: ${oldPerfectStreak}, Yeni: ${dailyTasks.todayStats.perfectStreak} (sessionCorrect: ${sessionCorrect}, sessionWrong: ${sessionWrong})`);
         
-        // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor (satır 4230)
-        // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-        // updateTaskProgress('toplamDogru', correctAnswers);
-        // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
-        
-        // Perfect streak kontrolü - Oyun bitiminde: hiç yanlış yapılmamışsa ve yeterli soru cevaplandıysa
-        // Oyun başına 1 perfect streak (her doğru cevap için değil)
-        // Koşullar: sessionWrong = 0 (hiç yanlış yok) ve sessionCorrect >= 3 (en az 3 doğru)
-        const isPerfectStreak = sessionWrong === 0 && sessionCorrect >= 3;
-        
-        if (isPerfectStreak) {
-            const oldPerfectStreak = dailyTasks.todayStats.perfectStreak || 0;
-            dailyTasks.todayStats.perfectStreak = oldPerfectStreak + 1;
-            log.game(`🔥 Perfect streak artırıldı! Eski: ${oldPerfectStreak}, Yeni: ${dailyTasks.todayStats.perfectStreak} (sessionCorrect: ${sessionCorrect}, sessionWrong: ${sessionWrong})`);
-            
-            // Görevleri hemen güncelle (perfect streak görevleri için)
-            if (typeof updateTasksDisplay === 'function') {
-                setTimeout(() => updateTasksDisplay(), 100);
-            }
-        } else {
-            log.debug(`⚠️ Perfect streak sayılmadı: sessionWrong=${sessionWrong}, sessionCorrect=${sessionCorrect} (en az 3 doğru ve 0 yanlış gerekiyor)`);
+        // Görevleri hemen güncelle (perfect streak görevleri için)
+        if (typeof updateTasksDisplay === 'function') {
+            setTimeout(() => updateTasksDisplay(), 100);
         }
-        
-        // Oyun süresi takibi - gameState.session.startTime varsa süreyi hesapla ve ekle
-        if (gameState && gameState.session && gameState.session.startTime) {
-            const sessionDuration = Date.now() - gameState.session.startTime;
-            if (sessionDuration > 0) {
-                dailyTasks.todayStats.totalPlayTime = (dailyTasks.todayStats.totalPlayTime || 0) + sessionDuration;
-                log.game(`⏱️ Oyun süresi eklendi: ${Math.round(sessionDuration / 1000)} saniye`);
-            }
-            // Oyun bitince startTime'ı sıfırla
-            gameState.session.startTime = null;
+    } else {
+        log.debug(`⚠️ Perfect streak sayılmadı: sessionWrong=${sessionWrong}, sessionCorrect=${sessionCorrect} (en az 3 doğru ve 0 yanlış gerekiyor)`);
+    }
+    
+    // Oyun süresi takibi - gameState.session.startTime varsa süreyi hesapla ve ekle
+    if (gameState && gameState.session && gameState.session.startTime) {
+        const sessionDuration = Date.now() - gameState.session.startTime;
+        if (sessionDuration > 0) {
+            dailyTasks.todayStats.totalPlayTime = (dailyTasks.todayStats.totalPlayTime || 0) + sessionDuration;
+            log.game(`⏱️ Oyun süresi eklendi: ${Math.round(sessionDuration / 1000)} saniye`);
         }
+        // Oyun bitince startTime'ı sıfırla
+        gameState.session.startTime = null;
     }
     
     // NOT: Liderlik tablosu artık addSessionPoints içinde her puan eklendiğinde güncelleniyor
@@ -11584,6 +11583,11 @@ function checkAnswer(button, isCorrect) {
         
         // Daily task progress - her doğru cevap için
         updateTaskProgress('kelimeCevir', 1);
+        
+        // Streak ilerlemesini güncelle - her doğru cevapta
+        if (typeof updateDailyProgress === 'function') {
+            updateDailyProgress(1);
+        }
         
         // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
         // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
@@ -13291,6 +13295,11 @@ function checkDinleAnswer(button, isCorrect) {
         // Daily task progress - her doğru cevap için
         updateTaskProgress('dinleBul', 1);
         
+        // Streak ilerlemesini güncelle - her doğru cevapta
+        if (typeof updateDailyProgress === 'function') {
+            updateDailyProgress(1);
+        }
+        
         // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
         // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
         
@@ -13781,6 +13790,11 @@ function checkBoslukAnswer(button, isCorrect) {
         
         // Daily task progress - her doğru cevap için
         updateTaskProgress('boslukDoldur', 1);
+        
+        // Streak ilerlemesini güncelle - her doğru cevapta
+        if (typeof updateDailyProgress === 'function') {
+            updateDailyProgress(1);
+        }
         
         // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
         // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
