@@ -4022,6 +4022,12 @@ function loadFromIndexedDB(key) {
     });
 }
 
+// Global erişim için window objesine ekle
+if (typeof window !== 'undefined') {
+    window.loadFromIndexedDB = loadFromIndexedDB;
+    window.saveToIndexedDB = saveToIndexedDB;
+}
+
 // URL TABANLI VERİ SAKLAMA (Mobil fallback - hiçbir şey çalışmazsa)
 function saveToURL() {
     const gameData = {
@@ -7998,6 +8004,12 @@ function getWeekEndDate(date = new Date()) {
     return getLocalDateString(weekEnd);
 }
 
+// Global erişim için window objesine ekle
+if (typeof window !== 'undefined') {
+    window.getWeekStartDate = getWeekStartDate;
+    window.getWeekEndDate = getWeekEndDate;
+}
+
 /**
  * Haftalık görevleri kontrol et ve gerekirse oluştur
  */
@@ -8676,6 +8688,12 @@ function updateTasksDisplay() {
         generateDailyTasks(getLocalDateString());
     }
     
+    // Güvenlik kontrolü: Eğer bonus görevler boşsa, yeniden oluştur
+    if (!dailyTasks.bonusTasks || dailyTasks.bonusTasks.length === 0) {
+        log.debug('⚠️ Bonus tasks boş, yeniden oluşturuluyor...');
+        generateDailyTasks(getLocalDateString());
+    }
+    
     const completedCount = dailyTasks.completedTasks.length;
     const totalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
     const incompleteCount = totalCount - completedCount;
@@ -8823,10 +8841,32 @@ function updateTasksDisplay() {
         bonusList.innerHTML = '';
         
         if (dailyTasks.bonusTasks && dailyTasks.bonusTasks.length > 0) {
+            log.debug('📋 Bonus görevler gösteriliyor:', {
+                count: dailyTasks.bonusTasks.length,
+                tasks: dailyTasks.bonusTasks.map(t => t.id)
+            });
             dailyTasks.bonusTasks.forEach(task => {
                 const taskElement = createTaskElement(task);
                 bonusList.appendChild(taskElement);
             });
+        } else {
+            log.warn('⚠️ Bonus görevler boş veya tanımsız:', {
+                bonusTasks: dailyTasks.bonusTasks,
+                hasBonusTasks: !!dailyTasks.bonusTasks,
+                length: dailyTasks.bonusTasks?.length || 0
+            });
+            // Bonus görevler yoksa, yeniden oluştur
+            if (!dailyTasks.bonusTasks || dailyTasks.bonusTasks.length === 0) {
+                log.debug('🔄 Bonus görevler yeniden oluşturuluyor...');
+                generateDailyTasks(getLocalDateString());
+                // Tekrar göster
+                if (dailyTasks.bonusTasks && dailyTasks.bonusTasks.length > 0) {
+                    dailyTasks.bonusTasks.forEach(task => {
+                        const taskElement = createTaskElement(task);
+                        bonusList.appendChild(taskElement);
+                    });
+                }
+            }
         }
     } else {
         log.error('❌ bonusTasksList elementi bulunamadı!');
@@ -8847,10 +8887,28 @@ function updateTasksDisplay() {
 }
 
 function updateWeeklyTasksDisplay() {
+    // Güvenlik kontrolü: weeklyTasks objesi var mı?
+    if (!weeklyTasks) {
+        log.error('❌ weeklyTasks objesi bulunamadı!');
+        return;
+    }
+    
+    // Güvenlik kontrolü: completedTasks ve rewardsClaimed başlat
+    if (!Array.isArray(weeklyTasks.completedTasks)) {
+        weeklyTasks.completedTasks = [];
+    }
+    if (typeof weeklyTasks.rewardsClaimed !== 'boolean') {
+        weeklyTasks.rewardsClaimed = false;
+    }
+    
     // Haftalık görevler yoksa oluştur (sadece bir kez, sonsuz döngü olmaz)
     if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+        log.debug('⚠️ Haftalık görevler boş, yeniden oluşturuluyor...');
         if (typeof checkWeeklyTasks === 'function') {
             checkWeeklyTasks();
+        } else if (typeof generateWeeklyTasks === 'function') {
+            const weekStart = getWeekStartDate();
+            generateWeeklyTasks(weekStart);
         }
     }
     
@@ -8982,6 +9040,10 @@ function updateWeeklyTasksDisplay() {
     weeklyList.innerHTML = '';
     
     if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
+        log.debug('📋 Haftalık görevler gösteriliyor:', {
+            count: weeklyTasks.tasks.length,
+            tasks: weeklyTasks.tasks.map(t => t.id)
+        });
         weeklyTasks.tasks.forEach(task => {
             // Günlük görevler gibi aynı stili kullan
             const taskElement = createWeeklyTaskElement(task);
@@ -9003,7 +9065,37 @@ function updateWeeklyTasksDisplay() {
             }
         }
     } else {
-        weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
+        log.warn('⚠️ Haftalık görevler boş veya tanımsız:', {
+            tasks: weeklyTasks.tasks,
+            hasTasks: !!weeklyTasks.tasks,
+            length: weeklyTasks.tasks?.length || 0
+        });
+        // Haftalık görevler yoksa, yeniden oluştur
+        if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+            log.debug('🔄 Haftalık görevler yeniden oluşturuluyor...');
+            const weekStart = getWeekStartDate();
+            if (typeof generateWeeklyTasks === 'function') {
+                generateWeeklyTasks(weekStart);
+                // Tekrar göster
+                if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
+                    weeklyTasks.tasks.forEach(task => {
+                        const taskElement = createWeeklyTaskElement(task);
+                        weeklyList.appendChild(taskElement);
+                    });
+                    // Tamamlanan görev sayısı
+                    const completedWeekly = weeklyTasks.completedTasks.length;
+                    const totalWeekly = weeklyTasks.tasks.length;
+                    weeklyCompletedCount.textContent = completedWeekly;
+                    weeklyTotalCount.textContent = totalWeekly;
+                } else {
+                    weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
+                }
+            } else {
+                weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
+            }
+        } else {
+            weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
+        }
     }
 }
 
@@ -14612,10 +14704,28 @@ async function showDataStatus() {
     try {
         // Verileri yükle
         const today = getLocalDateString();
-        const weekStart = getWeekStartDate();
+        
+        // Hafta başlangıç tarihini hesapla (getWeekStartDate fonksiyonu yoksa)
+        let weekStart;
+        if (typeof getWeekStartDate === 'function') {
+            weekStart = getWeekStartDate();
+        } else {
+            // Manuel hesaplama
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
+            const weekStartDate = new Date(d.setDate(diff));
+            weekStart = getLocalDateString(weekStartDate);
+        }
         
         // IndexedDB ve localStorage'dan verileri kontrol et
-        const indexedDBData = await loadFromIndexedDB('gameStats');
+        let indexedDBData = null;
+        if (typeof loadFromIndexedDB === 'function') {
+            indexedDBData = await loadFromIndexedDB('gameStats');
+        } else if (typeof window.loadFromIndexedDB === 'function') {
+            indexedDBData = await window.loadFromIndexedDB('gameStats');
+        }
         const localStorageData = localStorage.getItem('gameStats');
         
         // Mevcut verileri al
@@ -14639,6 +14749,8 @@ async function showDataStatus() {
                 todayStats: currentDailyTasks.todayStats || null,
                 completedTasks: currentDailyTasks.completedTasks?.length || 0,
                 totalTasks: currentDailyTasks.tasks?.length || 0,
+                bonusTasks: currentDailyTasks.bonusTasks?.length || 0,
+                completedBonusTasks: currentDailyTasks.bonusTasks ? currentDailyTasks.bonusTasks.filter(t => currentDailyTasks.completedTasks?.includes(t.id)).length : 0,
                 isToday: currentDailyTasks.lastTaskDate === today
             },
             weeklyTasks: {
@@ -14703,7 +14815,9 @@ async function showDataStatus() {
                         </div>
                         <div style="font-size: 0.85em; color: ${dataStatus.dailyTasks.isToday ? '#155724' : '#856404'};">
                             <div>Son Tarih: <strong>${dataStatus.dailyTasks.lastTaskDate}</strong></div>
-                            <div>Tamamlanan: <strong>${dataStatus.dailyTasks.completedTasks}</strong> / ${dataStatus.dailyTasks.totalTasks}</div>
+                            <div>Tamamlanan: <strong>${dataStatus.dailyTasks.completedTasks}</strong> / ${dataStatus.dailyTasks.totalTasks + dataStatus.dailyTasks.bonusTasks}</div>
+                            <div>Temel Görevler: <strong>${dataStatus.dailyTasks.totalTasks}</strong> | Fazilet Vazifeleri: <strong>${dataStatus.dailyTasks.bonusTasks}</strong></div>
+                            <div>Fazilet Tamamlanan: <strong>${dataStatus.dailyTasks.completedBonusTasks}</strong> / ${dataStatus.dailyTasks.bonusTasks}</div>
                             ${dataStatus.dailyTasks.todayStats ? `<div>Bugünkü Puan: <strong>${dataStatus.dailyTasks.todayStats.toplamPuan || 0}</strong></div>` : ''}
                             ${!dataStatus.dailyTasks.isToday ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugünkü görevler değil!</strong></div>' : ''}
                         </div>
