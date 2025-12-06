@@ -1289,7 +1289,12 @@ function addDailyXP(xp) {
             
             updateStatsBar();
             debouncedSaveStats(); // Debounced kaydetme
-            checkAchievements();
+            // checkAchievements fonksiyonunu güvenli şekilde çağır
+            if (typeof checkAchievements === 'function') {
+                checkAchievements();
+            } else {
+                log.debug('⚠️ checkAchievements henüz yüklenmedi, atlanıyor...');
+            }
         }, 1000);
     }
     
@@ -3212,6 +3217,11 @@ function checkAchievements() {
             }, 500);
         });
     }
+}
+
+// Global erişim için
+if (typeof window !== 'undefined') {
+    window.checkAchievements = checkAchievements;
 }
 
 
@@ -5211,7 +5221,10 @@ function addSessionPoints(points) {
     // UI güncelle
     updateUI(); // Oyun içi barı güncelle
     updateStatsBar(); // Üst barı güncelle
-    checkAchievements(); // Başarımları kontrol et
+    // Başarımları kontrol et (güvenli şekilde)
+    if (typeof checkAchievements === 'function') {
+        checkAchievements();
+    }
     
     log.game(`📊 Sonra: sessionScore=${sessionScore}, totalPoints=${totalPoints}, combo=${comboCount}`);
     log.game(`✅ addSessionPoints tamamlandı!`);
@@ -9732,7 +9745,10 @@ function claimDailyRewards() {
         dailyTasks.rewardsClaimed = true;
         debouncedSaveStats(); // Debounced kaydetme
         updateStatsBar();
-        checkAchievements();
+        // Başarımları kontrol et (güvenli şekilde)
+        if (typeof checkAchievements === 'function') {
+            checkAchievements();
+        }
         
         // Ödül modalı göster
         showSuccessMessage('🎉 Tüm günlük vazifeleri tamamladın! +2,500 Hasene ihsan!');
@@ -9940,7 +9956,10 @@ function addToGlobalPoints(points, correctAnswers = 0) {
     // Burada tekrar güncellemeye gerek yok (çift ekleme önlenir)
     
     updateStatsBar(); // Global barı güncelle
-    checkAchievements(); // Başarımları kontrol et
+    // Başarımları kontrol et (güvenli şekilde)
+    if (typeof checkAchievements === 'function') {
+        checkAchievements();
+    }
     debouncedSaveStats(); // Debounced kaydetme // Verileri kaydet
     
     // Görevleri güncelle (perfect streak gibi görevler için)
@@ -14343,7 +14362,11 @@ setTimeout(async () => {
         if (missingAchievements.length > 0) {
             log.debug('   ⚠️ Eksik başarımlar:', missingAchievements.join(', '));
             log.debug('   💡 checkAchievements() çağrılıyor...');
-            checkAchievements();
+            if (typeof checkAchievements === 'function') {
+                checkAchievements();
+            } else {
+                log.debug('   ⚠️ checkAchievements henüz yüklenmedi, atlanıyor...');
+            }
         }
 
         // 4. VERİ KALICILIĞI KONTROLÜ
