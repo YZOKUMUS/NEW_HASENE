@@ -15106,26 +15106,58 @@ async function showDataStatus() {
         const hasIndexedDBData = !!(indexedDBData || indexedDBStreak || indexedDBDailyTasks || indexedDBWeeklyTasks);
         
         // ============ LOCALSTORAGE VERİ KONTROLÜ ============
-        let localStorageData = null;
+        // ÖNCE: Sıfırlama flag'ini kontrol et - eğer flag varsa, veri yok demektir
+        const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
+        
         let dailyTasksData = null;
         let weeklyTasksData = null;
         let streakDataStorage = null;
+        let totalPointsData = null;
+        let badgesData = null;
         
-        try {
-            localStorageData = localStorage.getItem('gameStats');
-            dailyTasksData = localStorage.getItem('hasene_dailyTasks');
-            weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
-            // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
-            streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
-        } catch (e) {
-            // localStorage hatası - sessizce devam et
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('⚠️ localStorage okuma hatası (görmezden geliniyor):', e);
+        // KRİTİK: Sıfırlama flag'i varsa, localStorage'dan HİÇBİR VERİ OKUMA
+        // Flag varsa, localStorage'da veri olsa bile "veri yok" olarak göster
+        if (statsJustReset) {
+            // Flag varsa, tüm veriler null olarak kalacak
+            // Bu sayede hasAnyLocalStorageData false olacak
+            log.debug('🔄 Sıfırlama flag\'i aktif, localStorage verileri okunmayacak');
+        } else {
+            // Flag yoksa localStorage'dan veri oku
+            try {
+                dailyTasksData = localStorage.getItem('hasene_dailyTasks');
+                weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
+                // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
+                streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
+                totalPointsData = localStorage.getItem('hasene_totalPoints');
+                badgesData = localStorage.getItem('hasene_badges');
+                
+                // KRİTİK: Boş string, 'null', 'undefined', '{}', '[]' gibi değerleri null olarak kabul et
+                if (dailyTasksData === 'null' || dailyTasksData === 'undefined' || dailyTasksData === '{}' || dailyTasksData === '[]' || dailyTasksData === '') {
+                    dailyTasksData = null;
+                }
+                if (weeklyTasksData === 'null' || weeklyTasksData === 'undefined' || weeklyTasksData === '{}' || weeklyTasksData === '[]' || weeklyTasksData === '') {
+                    weeklyTasksData = null;
+                }
+                if (streakDataStorage === 'null' || streakDataStorage === 'undefined' || streakDataStorage === '{}' || streakDataStorage === '[]' || streakDataStorage === '') {
+                    streakDataStorage = null;
+                }
+                if (totalPointsData === 'null' || totalPointsData === 'undefined' || totalPointsData === '' || totalPointsData === '0') {
+                    totalPointsData = null;
+                }
+                if (badgesData === 'null' || badgesData === 'undefined' || badgesData === '{}' || badgesData === '[]' || badgesData === '') {
+                    badgesData = null;
+                }
+            } catch (e) {
+                // localStorage hatası - sessizce devam et
+                if (typeof log !== 'undefined' && log.debug) {
+                    log.debug('⚠️ localStorage okuma hatası (görmezden geliniyor):', e);
+                }
             }
         }
         
-        // Veri var mı kontrolü (herhangi bir veri varsa true)
-        const hasAnyLocalStorageData = !!(localStorageData || dailyTasksData || weeklyTasksData || streakDataStorage);
+        // Veri var mı kontrolü (sadece gerçek oyun verilerini kontrol et, flag'leri hariç tut)
+        // KRİTİK: Sıfırlama flag'i varsa, localStorage'da veri yok demektir (hasAnyLocalStorageData = false)
+        const hasAnyLocalStorageData = !statsJustReset && !!(dailyTasksData || weeklyTasksData || streakDataStorage || totalPointsData || badgesData);
         
         // ============ MEVCUT VERİLERİ AL ============
         // ÖNCE localStorage/IndexedDB'den veri oku, yoksa global değişkenlerden oku
@@ -15214,10 +15246,11 @@ async function showDataStatus() {
             localStorage: {
                 exists: hasAnyLocalStorageData,
                 hasData: hasAnyLocalStorageData,
-                gameStats: !!localStorageData,
                 dailyTasks: !!dailyTasksData,
                 weeklyTasks: !!weeklyTasksData,
-                streakData: !!streakDataStorage
+                streakData: !!streakDataStorage,
+                totalPoints: !!totalPointsData,
+                badges: !!badgesData
             },
             dailyTasks: {
                 exists: !!currentDailyTasks,
