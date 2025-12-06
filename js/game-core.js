@@ -14731,7 +14731,8 @@ async function showDataStatus() {
         const localStorageData = localStorage.getItem('gameStats');
         const dailyTasksData = localStorage.getItem('hasene_dailyTasks');
         const weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
-        const streakDataStorage = localStorage.getItem('hasene_streakData');
+        // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
+        const streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
         
         // Veri var mı kontrolü (herhangi bir veri varsa true)
         const hasAnyLocalStorageData = !!(localStorageData || dailyTasksData || weeklyTasksData || streakDataStorage);
@@ -14744,8 +14745,12 @@ async function showDataStatus() {
         // Veri durumu bilgilerini hazırla
         const dataStatus = {
             indexedDB: {
-                exists: !!indexedDBData,
-                hasData: indexedDBData && Object.keys(indexedDBData).length > 0
+                exists: hasIndexedDBData,
+                hasData: hasIndexedDBData,
+                gameStats: !!indexedDBData,
+                streak: !!indexedDBStreak,
+                dailyTasks: !!indexedDBDailyTasks,
+                weeklyTasks: !!indexedDBWeeklyTasks
             },
             localStorage: {
                 exists: hasAnyLocalStorageData,
@@ -14809,6 +14814,7 @@ async function showDataStatus() {
                         </div>
                         <div style="font-size: 0.85em; color: ${dataStatus.indexedDB.hasData ? '#155724' : '#721c24'};">
                             ${dataStatus.indexedDB.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
+                            ${dataStatus.indexedDB.hasData ? '<div style="margin-top: 4px; font-size: 0.8em;">Günlük: ' + (dataStatus.indexedDB.dailyTasks ? '✅' : '❌') + ' | Haftalık: ' + (dataStatus.indexedDB.weeklyTasks ? '✅' : '❌') + ' | Streak: ' + (dataStatus.indexedDB.streak ? '✅' : '❌') + '</div>' : ''}
                         </div>
                     </div>
                     
