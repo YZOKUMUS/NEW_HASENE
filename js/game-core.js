@@ -4844,17 +4844,20 @@ for (let i = 0; i < localStorage.length; i++) {
 keysToRemove.forEach(key => localStorage.removeItem(key));
 
 // Ek güvenlik: Son 90 günün verilerini de temizle (eğer yukarıdaki tarama eksik kaldıysa)
-const today = new Date();
-for (let i = 0; i < 90; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dateKey = `${year}-${month}-${day}`;
-    const dayKey = `hasene_daily_${dateKey}`;
-    localStorage.removeItem(dayKey);
-}
+// NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
+setTimeout(() => {
+    const today = new Date();
+    for (let i = 0; i < 90; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateKey = `${year}-${month}-${day}`;
+        const dayKey = `hasene_daily_${dateKey}`;
+        localStorage.removeItem(dayKey);
+    }
+}, 0);
 
 // Genel detaylı istatistik key'lerini temizle
 localStorage.removeItem('hasene_detailedStats');
@@ -4923,138 +4926,149 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
     // =========================================
     // 🔥 UI GÜNCELLE - TÜM İSTATİSTİK ALANLARI
     // =========================================
-    
-    // Üst bar güncelle
-    updateStatsBar();
-    updateUI();
-    if (typeof updateDailyGoalDisplay === "function") {
-        updateDailyGoalDisplay();
-    }
-    
-    // Üst bar elementlerini manuel sıfırla (ek güvenlik)
-    const gamePointsEl = document.getElementById('gamePoints');
-    const starPointsEl = document.getElementById('starPoints');
-    const playerLevelEl = document.getElementById('playerLevel');
-    if (gamePointsEl) gamePointsEl.textContent = '0';
-    if (starPointsEl) starPointsEl.textContent = '0';
-    if (playerLevelEl) playerLevelEl.textContent = '1. Mertebe';
-    
-    // Oyun ekranı elementlerini sıfırla
-    const correctEl = document.getElementById('correct');
-    const wrongEl = document.getElementById('wrong');
-    const boslukCorrectEl = document.getElementById('boslukCorrect');
-    const boslukWrongEl = document.getElementById('boslukWrong');
-    const dinleCorrectEl = document.getElementById('dinleCorrect');
-    const dinleWrongEl = document.getElementById('dinleWrong');
-    if (correctEl) correctEl.textContent = '0';
-    if (wrongEl) wrongEl.textContent = '0';
-    if (boslukCorrectEl) boslukCorrectEl.textContent = '0';
-    if (boslukWrongEl) boslukWrongEl.textContent = '0';
-    if (dinleCorrectEl) dinleCorrectEl.textContent = '0';
-    if (dinleWrongEl) dinleWrongEl.textContent = '0';
-    
-    // Level Up Modal elementlerini sıfırla
-    const newLevelEl = document.getElementById('newLevel');
-    const modalTotalPointsEl = document.getElementById('modalTotalPoints');
-    const modalNextLevelPointsEl = document.getElementById('modalNextLevelPoints');
-    const confirmCorrectEl = document.getElementById('confirmCorrect');
-    const confirmWrongEl = document.getElementById('confirmWrong');
-    if (newLevelEl) newLevelEl.textContent = '1';
-    if (modalTotalPointsEl) modalTotalPointsEl.textContent = '0';
-    if (modalNextLevelPointsEl) modalNextLevelPointsEl.textContent = '1,000';
-    if (confirmCorrectEl) confirmCorrectEl.textContent = '0';
-    if (confirmWrongEl) confirmWrongEl.textContent = '0';
+    // NOT: updateStatsBar, updateUI gibi fonksiyonları daha sonra çağır (performans için)
+    // Bu fonksiyonlar kendi içlerinde DOM sorguları yapıyor, bu yüzden setTimeout ile erteleniyor
+    setTimeout(() => {
+        updateStatsBar();
+        updateUI();
+        if (typeof updateDailyGoalDisplay === "function") {
+            updateDailyGoalDisplay();
+        }
+    }, 0);
     
     // NOT: saveStats çağrılmıyor - sıfırlama sonrası veriler kaydedilmemeli
     // Kullanıcı ilk oyunu oynadığında otomatik kaydedilecek
 
-    // İstatistikler Modal - Seviye İlerleme Barı
-    const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
-    const statsNextLevelEl = document.getElementById('statsNextLevel');
-    const statsLevelProgressEl = document.getElementById('statsLevelProgress');
-    const statsLevelPointsNeededEl = document.getElementById('statsLevelPointsNeeded');
-    if (statsCurrentLevelEl) statsCurrentLevelEl.textContent = '1';
-    if (statsNextLevelEl) statsNextLevelEl.textContent = '2';
-    if (statsLevelProgressEl) statsLevelProgressEl.style.width = '0%';
-    if (statsLevelPointsNeededEl) statsLevelPointsNeededEl.textContent = '1,000';
-
-    // İstatistikler Modal - Rozet Sistemi
-    const statsBronzeEl = document.getElementById('statsBronze');
-    const statsSilverEl = document.getElementById('statsSilver');
-    const statsGoldEl = document.getElementById('statsGold');
-    const statsDiamondEl = document.getElementById('statsDiamond');
-    if (statsBronzeEl) statsBronzeEl.textContent = '0';
-    if (statsSilverEl) statsSilverEl.textContent = '0';
-    if (statsGoldEl) statsGoldEl.textContent = '0';
-    if (statsDiamondEl) statsDiamondEl.textContent = '0';
-
-    // Başarılar Modal - Mertebe Rozetleri
-    const diamondBadgeCountEl = document.getElementById('diamondBadgeCount');
-    const goldBadgeCountEl = document.getElementById('goldBadgeCount');
-    const silverBadgeCountEl = document.getElementById('silverBadgeCount');
-    const bronzeBadgeCountEl = document.getElementById('bronzeBadgeCount');
-    if (diamondBadgeCountEl) diamondBadgeCountEl.textContent = '0';
-    if (goldBadgeCountEl) goldBadgeCountEl.textContent = '0';
-    if (silverBadgeCountEl) silverBadgeCountEl.textContent = '0';
-    if (bronzeBadgeCountEl) bronzeBadgeCountEl.textContent = '0';
-
-    // İstatistikler Modal - Başarı Analizi
-    const statsSuccessRateEl = document.getElementById('statsSuccessRate');
-    const statsAvgPointsPerDayEl = document.getElementById('statsAvgPointsPerDay');
-    const statsPlayConsistencyEl = document.getElementById('statsPlayConsistency');
-    const statsLevelProgressTextEl = document.getElementById('statsLevelProgressText');
-    if (statsSuccessRateEl) statsSuccessRateEl.textContent = '0%';
-    if (statsAvgPointsPerDayEl) statsAvgPointsPerDayEl.textContent = '0';
-    if (statsPlayConsistencyEl) statsPlayConsistencyEl.textContent = '0%';
-    if (statsLevelProgressTextEl) statsLevelProgressTextEl.textContent = '0%';
-
-    // İstatistikler Modal - Muvazebet İstatistikleri
-    const statsCurrentStreakEl = document.getElementById('statsCurrentStreak');
-    const statsBestStreakEl = document.getElementById('statsBestStreak');
-    const statsTotalDaysEl = document.getElementById('statsTotalDays');
-    const statsTodayProgressEl = document.getElementById('statsTodayProgress');
-    if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = '0';
-    if (statsBestStreakEl) statsBestStreakEl.textContent = '0';
-    if (statsTotalDaysEl) statsTotalDaysEl.textContent = '0';
-    if (statsTodayProgressEl) statsTodayProgressEl.textContent = '0';
-
-    // İstatistikler Modal - Oyun Türü İstatistikleri
-    const statsKelimeCevirEl = document.getElementById('statsKelimeCevir');
-    const statsDinleBulEl = document.getElementById('statsDinleBul');
-    const statsBoslukDoldurEl = document.getElementById('statsBoslukDoldur');
-    const statsAyetOkuEl = document.getElementById('statsAyetOku');
-    const statsDuaOgreEl = document.getElementById('statsDuaOgre');
-    const statsHadisOkuEl = document.getElementById('statsHadisOku');
-    if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = '0';
-    if (statsDinleBulEl) statsDinleBulEl.textContent = '0';
-    if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = '0';
-    if (statsAyetOkuEl) statsAyetOkuEl.textContent = '0';
-    if (statsDuaOgreEl) statsDuaOgreEl.textContent = '0';
-    if (statsHadisOkuEl) statsHadisOkuEl.textContent = '0';
-
-    // İstatistikler Modal - Bugünkü Performans
-    const statsTodayCorrectEl = document.getElementById('statsTodayCorrect');
-    const statsTodayPointsEl = document.getElementById('statsTodayPoints');
-    const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
-    const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
-    if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = '0';
-    if (statsTodayPointsEl) statsTodayPointsEl.textContent = '0';
-    if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = '0';
-    if (statsDifficultyCountEl) statsDifficultyCountEl.textContent = '0';
-
-    // İstatistikler Modal - Kelime İstatistikleri
-    const wordStatsTotalEl = document.getElementById('wordStatsTotal');
-    const wordStatsMasteredEl = document.getElementById('wordStatsMastered');
-    const wordStatsStrugglingEl = document.getElementById('wordStatsStruggling');
-    if (wordStatsTotalEl) wordStatsTotalEl.textContent = '0';
-    if (wordStatsMasteredEl) wordStatsMasteredEl.textContent = '0';
-    if (wordStatsStrugglingEl) wordStatsStrugglingEl.textContent = '0';
-    
-    // Kelime Ameli - Ortalama Başarı ve En Zor Kelime
-    const analyticsAvgSuccessEl = document.getElementById('analyticsAvgSuccess');
-    const analyticsHardestWordEl = document.getElementById('analyticsHardestWord');
-    if (analyticsAvgSuccessEl) analyticsAvgSuccessEl.textContent = '%0';
-    if (analyticsHardestWordEl) analyticsHardestWordEl.textContent = '-';
+    // İstatistikler Modal - Tüm DOM güncellemeleri (performans için optimize edilmiş)
+    // NOT: DOM sorgularını önce yap, sonra güncellemeleri yap (Forced reflow'u azaltır)
+    // setTimeout kullanarak DOM güncellemelerini bir sonraki event loop'a erteliyoruz
+    setTimeout(() => {
+        // Tüm DOM sorgularını önce yap (tek seferde)
+        const elements = {
+            // Seviye İlerleme Barı
+            statsCurrentLevel: document.getElementById('statsCurrentLevel'),
+            statsNextLevel: document.getElementById('statsNextLevel'),
+            statsLevelProgress: document.getElementById('statsLevelProgress'),
+            statsLevelPointsNeeded: document.getElementById('statsLevelPointsNeeded'),
+            // Rozet Sistemi
+            statsBronze: document.getElementById('statsBronze'),
+            statsSilver: document.getElementById('statsSilver'),
+            statsGold: document.getElementById('statsGold'),
+            statsDiamond: document.getElementById('statsDiamond'),
+            // Başarılar Modal - Mertebe Rozetleri
+            diamondBadgeCount: document.getElementById('diamondBadgeCount'),
+            goldBadgeCount: document.getElementById('goldBadgeCount'),
+            silverBadgeCount: document.getElementById('silverBadgeCount'),
+            bronzeBadgeCount: document.getElementById('bronzeBadgeCount'),
+            // Başarı Analizi
+            statsSuccessRate: document.getElementById('statsSuccessRate'),
+            statsAvgPointsPerDay: document.getElementById('statsAvgPointsPerDay'),
+            statsPlayConsistency: document.getElementById('statsPlayConsistency'),
+            statsLevelProgressText: document.getElementById('statsLevelProgressText'),
+            // Muvazebet İstatistikleri
+            statsCurrentStreak: document.getElementById('statsCurrentStreak'),
+            statsBestStreak: document.getElementById('statsBestStreak'),
+            statsTotalDays: document.getElementById('statsTotalDays'),
+            statsTodayProgress: document.getElementById('statsTodayProgress'),
+            // Oyun Türü İstatistikleri
+            statsKelimeCevir: document.getElementById('statsKelimeCevir'),
+            statsDinleBul: document.getElementById('statsDinleBul'),
+            statsBoslukDoldur: document.getElementById('statsBoslukDoldur'),
+            statsAyetOku: document.getElementById('statsAyetOku'),
+            statsDuaOgre: document.getElementById('statsDuaOgre'),
+            statsHadisOku: document.getElementById('statsHadisOku'),
+            // Bugünkü Performans
+            statsTodayCorrect: document.getElementById('statsTodayCorrect'),
+            statsTodayPoints: document.getElementById('statsTodayPoints'),
+            statsPerfectStreak: document.getElementById('statsPerfectStreak'),
+            statsDifficultyCount: document.getElementById('statsDifficultyCount'),
+            // Kelime İstatistikleri
+            wordStatsTotal: document.getElementById('wordStatsTotal'),
+            wordStatsMastered: document.getElementById('wordStatsMastered'),
+            wordStatsStruggling: document.getElementById('wordStatsStruggling'),
+            // Kelime Ameli
+            analyticsAvgSuccess: document.getElementById('analyticsAvgSuccess'),
+            analyticsHardestWord: document.getElementById('analyticsHardestWord'),
+            // Başarılar Modal
+            badgesUnlockedCount: document.getElementById('badgesUnlockedCount'),
+            badgesTotalCount: document.getElementById('badgesTotalCount'),
+            badgesProgressPercent: document.getElementById('badgesProgressPercent'),
+            // Takvim Modal
+            calendarStreakCount: document.getElementById('calendarStreakCount'),
+            // Üst bar
+            gamePoints: document.getElementById('gamePoints'),
+            starPoints: document.getElementById('starPoints'),
+            playerLevel: document.getElementById('playerLevel'),
+            // Oyun ekranı
+            correct: document.getElementById('correct'),
+            wrong: document.getElementById('wrong'),
+            boslukCorrect: document.getElementById('boslukCorrect'),
+            boslukWrong: document.getElementById('boslukWrong'),
+            dinleCorrect: document.getElementById('dinleCorrect'),
+            dinleWrong: document.getElementById('dinleWrong'),
+            // Level Up Modal
+            newLevel: document.getElementById('newLevel'),
+            modalTotalPoints: document.getElementById('modalTotalPoints'),
+            modalNextLevelPoints: document.getElementById('modalNextLevelPoints'),
+            confirmCorrect: document.getElementById('confirmCorrect'),
+            confirmWrong: document.getElementById('confirmWrong')
+        };
+        
+        // Şimdi tüm güncellemeleri yap (tek seferde, DOM sorgusu yok)
+        if (elements.statsCurrentLevel) elements.statsCurrentLevel.textContent = '1';
+        if (elements.statsNextLevel) elements.statsNextLevel.textContent = '2';
+        if (elements.statsLevelProgress) elements.statsLevelProgress.style.width = '0%';
+        if (elements.statsLevelPointsNeeded) elements.statsLevelPointsNeeded.textContent = '1,000';
+        if (elements.statsBronze) elements.statsBronze.textContent = '0';
+        if (elements.statsSilver) elements.statsSilver.textContent = '0';
+        if (elements.statsGold) elements.statsGold.textContent = '0';
+        if (elements.statsDiamond) elements.statsDiamond.textContent = '0';
+        if (elements.diamondBadgeCount) elements.diamondBadgeCount.textContent = '0';
+        if (elements.goldBadgeCount) elements.goldBadgeCount.textContent = '0';
+        if (elements.silverBadgeCount) elements.silverBadgeCount.textContent = '0';
+        if (elements.bronzeBadgeCount) elements.bronzeBadgeCount.textContent = '0';
+        if (elements.statsSuccessRate) elements.statsSuccessRate.textContent = '0%';
+        if (elements.statsAvgPointsPerDay) elements.statsAvgPointsPerDay.textContent = '0';
+        if (elements.statsPlayConsistency) elements.statsPlayConsistency.textContent = '0%';
+        if (elements.statsLevelProgressText) elements.statsLevelProgressText.textContent = '0%';
+        if (elements.statsCurrentStreak) elements.statsCurrentStreak.textContent = '0';
+        if (elements.statsBestStreak) elements.statsBestStreak.textContent = '0';
+        if (elements.statsTotalDays) elements.statsTotalDays.textContent = '0';
+        if (elements.statsTodayProgress) elements.statsTodayProgress.textContent = '0';
+        if (elements.statsKelimeCevir) elements.statsKelimeCevir.textContent = '0';
+        if (elements.statsDinleBul) elements.statsDinleBul.textContent = '0';
+        if (elements.statsBoslukDoldur) elements.statsBoslukDoldur.textContent = '0';
+        if (elements.statsAyetOku) elements.statsAyetOku.textContent = '0';
+        if (elements.statsDuaOgre) elements.statsDuaOgre.textContent = '0';
+        if (elements.statsHadisOku) elements.statsHadisOku.textContent = '0';
+        if (elements.statsTodayCorrect) elements.statsTodayCorrect.textContent = '0';
+        if (elements.statsTodayPoints) elements.statsTodayPoints.textContent = '0';
+        if (elements.statsPerfectStreak) elements.statsPerfectStreak.textContent = '0';
+        if (elements.statsDifficultyCount) elements.statsDifficultyCount.textContent = '0';
+        if (elements.wordStatsTotal) elements.wordStatsTotal.textContent = '0';
+        if (elements.wordStatsMastered) elements.wordStatsMastered.textContent = '0';
+        if (elements.wordStatsStruggling) elements.wordStatsStruggling.textContent = '0';
+        if (elements.analyticsAvgSuccess) elements.analyticsAvgSuccess.textContent = '%0';
+        if (elements.analyticsHardestWord) elements.analyticsHardestWord.textContent = '-';
+        if (elements.badgesUnlockedCount) elements.badgesUnlockedCount.textContent = '0';
+        if (elements.badgesTotalCount) elements.badgesTotalCount.textContent = '20';
+        if (elements.badgesProgressPercent) elements.badgesProgressPercent.textContent = '0%';
+        if (elements.calendarStreakCount) elements.calendarStreakCount.textContent = '0';
+        if (elements.gamePoints) elements.gamePoints.textContent = '0';
+        if (elements.starPoints) elements.starPoints.textContent = '0';
+        if (elements.playerLevel) elements.playerLevel.textContent = '1. Mertebe';
+        if (elements.correct) elements.correct.textContent = '0';
+        if (elements.wrong) elements.wrong.textContent = '0';
+        if (elements.boslukCorrect) elements.boslukCorrect.textContent = '0';
+        if (elements.boslukWrong) elements.boslukWrong.textContent = '0';
+        if (elements.dinleCorrect) elements.dinleCorrect.textContent = '0';
+        if (elements.dinleWrong) elements.dinleWrong.textContent = '0';
+        if (elements.newLevel) elements.newLevel.textContent = '1';
+        if (elements.modalTotalPoints) elements.modalTotalPoints.textContent = '0';
+        if (elements.modalNextLevelPoints) elements.modalNextLevelPoints.textContent = '1,000';
+        if (elements.confirmCorrect) elements.confirmCorrect.textContent = '0';
+        if (elements.confirmWrong) elements.confirmWrong.textContent = '0';
+    }, 0);
     
     // Kelime istatistiklerini sıfırla (wordStats objesi)
     try {
@@ -5088,33 +5102,24 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
         log.error('Favoriler/tekrar listesi sıfırlama hatası:', e);
     }
 
-    // Başarılar Modal - İstatistikler Özeti
-    const badgesUnlockedCountEl = document.getElementById('badgesUnlockedCount');
-    const badgesTotalCountEl = document.getElementById('badgesTotalCount');
-    const badgesProgressPercentEl = document.getElementById('badgesProgressPercent');
-    if (badgesUnlockedCountEl) badgesUnlockedCountEl.textContent = '0';
-    if (badgesTotalCountEl) badgesTotalCountEl.textContent = '20';
-    if (badgesProgressPercentEl) badgesProgressPercentEl.textContent = '0%';
-
-    // Takvim Modal - Streak bilgisi
-    const calendarStreakCountEl = document.getElementById('calendarStreakCount');
-    if (calendarStreakCountEl) calendarStreakCountEl.textContent = '0';
-
     // =========================================
     // 🔥 YENİ BADGES PANEL TASARIMI GÜNCELLEMELERİ
     // =========================================
     // Achievement sıfırlama flag'i set et (updateAllAchievements için)
     localStorage.setItem('achievementsJustReset', 'true');
     
-    // Achievement kartlarını güncelle (yeni tasarım için - tüm rozetleri kilitli yap)
-    if (typeof updateAllAchievements === 'function') {
-updateAllAchievements();
-    }
-    
-    // Başarılar Modal istatistiklerini güncelle (sıfırlanmış durumda)
-    if (typeof updateBadgesModalStats === 'function') {
-updateBadgesModalStats();
-    }
+    // NOT: Bu fonksiyonları setTimeout ile erteleyerek click handler'ı bloklamayı önle
+    setTimeout(() => {
+        // Achievement kartlarını güncelle (yeni tasarım için - tüm rozetleri kilitli yap)
+        if (typeof updateAllAchievements === 'function') {
+            updateAllAchievements();
+        }
+        
+        // Başarılar Modal istatistiklerini güncelle (sıfırlanmış durumda)
+        if (typeof updateBadgesModalStats === 'function') {
+            updateBadgesModalStats();
+        }
+    }, 0);
     
     // =========================================
     // 🔥 YENİ PANELLERİ GÜNCELLE (MOBİL UYUMLU)
@@ -5141,19 +5146,23 @@ if (typeof getWeeklyScores === 'function' && typeof getMonthlyScores === 'functi
     localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
 }
 
-// Liderlik tablosunu sıfırlanmış değerlerle güncelle
-if (typeof updateLeaderboard === 'function') {
-    updateLeaderboard();
-}
+// Liderlik tablosunu sıfırlanmış değerlerle güncelle (setTimeout ile ertele)
+setTimeout(() => {
+    if (typeof updateLeaderboard === 'function') {
+        updateLeaderboard();
+    }
+}, 0);
     } catch(e) {
 log.error('Liderlik tablosu güncelleme hatası:', e);
     }
     
-    // Detaylı istatistikleri güncelle (eğer fonksiyon varsa)
+    // Detaylı istatistikleri güncelle (eğer fonksiyon varsa) - setTimeout ile ertele
     try {
-if (typeof updateDetailedStats === 'function') {
-    updateDetailedStats();
-}
+setTimeout(() => {
+    if (typeof updateDetailedStats === 'function') {
+        updateDetailedStats();
+    }
+}, 0);
 // Detaylı istatistik verilerini zorla sıfırla (mobil için)
 localStorage.setItem('dailyCorrect', '0');
 localStorage.setItem('dailyWrong', '0');
@@ -7068,7 +7077,11 @@ async function confirmResetStats() {
         
         if (doubleConfirmed) {
             closeStatsModal(); // Modal'ı kapat
-            await resetAllStats(); // Mevcut fonksiyonu kullan (await ile bekle - IndexedDB temizleme tamamlanana kadar bekle)
+            // NOT: resetAllStats'ı await etmeden çağır (click handler'ı bloklamasın)
+            // IndexedDB işlemleri arka planda tamamlanacak
+            resetAllStats().catch(err => {
+                log.error('❌ resetAllStats hatası:', err);
+            });
         }
     }
 }
