@@ -14996,24 +14996,78 @@ async function showDataStatus() {
         const hasAnyLocalStorageData = !!(localStorageData || dailyTasksData || weeklyTasksData || streakDataStorage);
         
         // ============ MEVCUT VERİLERİ AL ============
-        // Global değişkenlerden verileri al (güvenli şekilde)
-        const currentDailyTasks = (typeof dailyTasks !== 'undefined' && dailyTasks) 
-            ? dailyTasks 
-            : (typeof window.dailyTasks !== 'undefined' && window.dailyTasks) 
-                ? window.dailyTasks 
-                : {};
+        // ÖNCE localStorage/IndexedDB'den veri oku, yoksa global değişkenlerden oku
+        // Sıfırlama sonrası localStorage/IndexedDB'de veri yoksa global değişkenlerden okuma
+        let currentDailyTasks = {};
+        let currentWeeklyTasks = {};
+        let currentStreakData = {};
         
-        const currentWeeklyTasks = (typeof weeklyTasks !== 'undefined' && weeklyTasks) 
-            ? weeklyTasks 
-            : (typeof window.weeklyTasks !== 'undefined' && window.weeklyTasks) 
-                ? window.weeklyTasks 
-                : {};
+        // localStorage'dan veri oku (öncelikli)
+        if (dailyTasksData) {
+            try {
+                currentDailyTasks = JSON.parse(dailyTasksData);
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else if (indexedDBDailyTasks) {
+            try {
+                currentDailyTasks = typeof indexedDBDailyTasks === 'string' ? JSON.parse(indexedDBDailyTasks) : indexedDBDailyTasks;
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else {
+            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
+            // NOT: Sıfırlama sonrası global değişkenler boş olmalı, bu yüzden bu kısım çalışmayacak
+            if (typeof dailyTasks !== 'undefined' && dailyTasks && dailyTasks.lastTaskDate) {
+                currentDailyTasks = dailyTasks;
+            } else if (typeof window.dailyTasks !== 'undefined' && window.dailyTasks && window.dailyTasks.lastTaskDate) {
+                currentDailyTasks = window.dailyTasks;
+            }
+        }
         
-        const currentStreakData = (typeof streakData !== 'undefined' && streakData) 
-            ? streakData 
-            : (typeof window.streakData !== 'undefined' && window.streakData) 
-                ? window.streakData 
-                : {};
+        // Haftalık görevler
+        if (weeklyTasksData) {
+            try {
+                currentWeeklyTasks = JSON.parse(weeklyTasksData);
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else if (indexedDBWeeklyTasks) {
+            try {
+                currentWeeklyTasks = typeof indexedDBWeeklyTasks === 'string' ? JSON.parse(indexedDBWeeklyTasks) : indexedDBWeeklyTasks;
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else {
+            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
+            if (typeof weeklyTasks !== 'undefined' && weeklyTasks && weeklyTasks.lastWeekStart) {
+                currentWeeklyTasks = weeklyTasks;
+            } else if (typeof window.weeklyTasks !== 'undefined' && window.weeklyTasks && window.weeklyTasks.lastWeekStart) {
+                currentWeeklyTasks = window.weeklyTasks;
+            }
+        }
+        
+        // Streak verileri
+        if (streakDataStorage) {
+            try {
+                currentStreakData = JSON.parse(streakDataStorage);
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else if (indexedDBStreak) {
+            try {
+                currentStreakData = typeof indexedDBStreak === 'string' ? JSON.parse(indexedDBStreak) : indexedDBStreak;
+            } catch(e) {
+                // Parse hatası - boş obje kullan
+            }
+        } else {
+            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
+            if (typeof streakData !== 'undefined' && streakData && (streakData.currentStreak > 0 || streakData.lastPlayDate)) {
+                currentStreakData = streakData;
+            } else if (typeof window.streakData !== 'undefined' && window.streakData && (window.streakData.currentStreak > 0 || window.streakData.lastPlayDate)) {
+                currentStreakData = window.streakData;
+            }
+        }
         
         // Veri durumu bilgilerini hazırla (güvenli şekilde - tüm değerler kontrol ediliyor)
         const dataStatus = {
