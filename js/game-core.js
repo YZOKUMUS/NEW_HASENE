@@ -4682,6 +4682,8 @@ todayStats: {
 const defaultGoalReset = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
 storage.set("dailyGoalHasene", defaultGoalReset.toString());  // hedef sıfır → varsayılan
 storage.set("dailyHasene", "0");         // günlük kazanılan XP sıfır
+storage.set("dailyCorrect", "0");        // günlük doğru cevap sayısı sıfır (Bugünkü Amel için)
+storage.set("dailyWrong", "0");          // günlük yanlış cevap sayısı sıfır
 storage.set("dailyGoalLevel", "normal"); // varsayılan zorluk
 storage.remove("lastDailyXPReset");      // reset tarihi temizle
 
@@ -5271,8 +5273,10 @@ function addSessionPoints(points) {
     storage.set('dailyCorrect', (currentDailyCorrect + 1).toString());
     
     // Günlük ve haftalık görevleri güncelle
+    // NOT: toplamPuan zaten yukarıda eklendi, updateTaskProgress içinde tekrar eklenmesin diye özel kontrol yapılıyor
     if (typeof updateTaskProgress === 'function') {
-        updateTaskProgress('toplamPuan', points);
+        // toplamPuan için updateTaskProgress çağrılmayacak (çift ekleme önlemek için)
+        // updateTaskProgress('toplamPuan', points); // ÇİFT EKLEME - KALDIRILDI
         updateTaskProgress('toplamDogru', 1);
     }
     
@@ -5308,9 +5312,10 @@ function addSessionPoints(points) {
         dailyTasks.todayStats.toplamPuan += comboBonus; // Bugünkü puana da ekle!
         
         // Günlük ve haftalık görevleri güncelle (combo bonusu için)
-        if (typeof updateTaskProgress === 'function') {
-            updateTaskProgress('toplamPuan', comboBonus);
-        }
+        // NOT: toplamPuan zaten yukarıda eklendi, updateTaskProgress içinde tekrar eklenmesin diye çağrılmıyor
+        // if (typeof updateTaskProgress === 'function') {
+        //     updateTaskProgress('toplamPuan', comboBonus); // ÇİFT EKLEME - KALDIRILDI
+        // }
         
         // COMBO BONUSUNU DAILY XP'YE DE EKLE
         addDailyXP(comboBonus);
@@ -8459,7 +8464,11 @@ function updateTaskProgress(gameType, amount = 1) {
     };
     
     // Oyun tipine göre istatistiği güncelle
-    if (dailyTasks.todayStats[gameType] !== undefined) {
+    // NOT: toplamPuan addSessionPoints içinde zaten ekleniyor, burada tekrar eklenmesin (çift ekleme önlemek için)
+    if (gameType === 'toplamPuan') {
+        log.debug(`⚠️ updateTaskProgress('toplamPuan') çağrıldı ama çift ekleme önlemek için atlandı (zaten addSessionPoints içinde eklendi)`);
+        // toplamPuan için burada ekleme yapma, sadece görev ilerlemesini güncelle
+    } else if (dailyTasks.todayStats[gameType] !== undefined) {
         // Set tipi için özel işlem
         if (dailyTasks.todayStats[gameType] instanceof Set) {
             if (typeof amount === 'string') {
@@ -8518,12 +8527,18 @@ function updateTaskProgress(gameType, amount = 1) {
                 const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
                 const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
                 task.current = dailyHasene >= goalHasene ? 1 : 0;
+            } else if (task.type === 'toplamPuan') {
+                // toplamPuan görevleri: Bugünkü toplam puandan al
+                task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
             } else {
                 task.current = Math.min(task.target, dailyTasks.todayStats[gameType] || 0);
             }
         } else {
             // Diğer görev tipleri için de kontrol et (gameType değişmese bile)
-            if (task.type === 'comboCount') {
+            if (task.type === 'toplamPuan') {
+                // toplamPuan görevleri: Bugünkü toplam puandan al
+                task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
+            } else if (task.type === 'comboCount') {
                 task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
             } else if (task.type === 'reviewWords') {
                 task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
@@ -14958,7 +14973,8 @@ async function showDataStatus() {
                 : (typeof window.loadFromIndexedDB === 'function' ? window.loadFromIndexedDB : null);
             
             if (loadFunc) {
-                indexedDBData = await loadFunc('gameStats').catch(() => null);
+                // IndexedDB'de veriler farklı key'lerde saklanıyor
+                indexedDBData = await loadFunc('hasene_totalPoints').catch(() => null);
                 indexedDBStreak = await loadFunc('hasene_streak').catch(() => null);
                 indexedDBDailyTasks = await loadFunc('hasene_dailyTasks').catch(() => null);
                 indexedDBWeeklyTasks = await loadFunc('hasene_weeklyTasks').catch(() => null);
