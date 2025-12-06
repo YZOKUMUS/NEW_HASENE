@@ -11288,6 +11288,8 @@ function loadQuestion() {
             btn.classList.add('turkish-option');
         }
         btn.textContent = opt.text;
+        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
+        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
         
         // Touch event tracking (scroll/tap ayrımı için)
         let touchStart = { x: 0, y: 0, time: 0 };
@@ -11387,11 +11389,14 @@ function loadQuestion() {
     elements.nextBtn.style.display = 'none';
     elements.hintBtn.disabled = false;
     
-    // Tüm butonları aktif et
+    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
     const allBtns = document.querySelectorAll('.duolingo-option, .option');
     allBtns.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('disabled', 'correct', 'wrong');
+        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
     });
 
     // İlerleme güncelle
@@ -11792,11 +11797,18 @@ if (elements.hintBtn) {
         }
         
         const allBtns = gameScreen.querySelectorAll('.duolingo-option, .option');
+        
+        // Yanlış cevapları bul - data-correct attribute'unu kullan (daha güvenilir)
         const wrongBtns = Array.from(allBtns).filter(btn => {
             if (btn.disabled) return false;
-            const btnText = btn.textContent || btn.innerText || '';
-            // Doğru cevabı içermeyen butonları bul
-            return !btnText.includes(currentQuestion.anlam);
+            // data-correct attribute'u varsa onu kullan (en güvenilir yöntem)
+            const isCorrect = btn.getAttribute('data-correct') === 'true';
+            if (isCorrect) return false; // Doğru cevabı atla
+            
+            // Fallback: Eğer data-correct yoksa, eski yöntemi kullan
+            const btnText = (btn.textContent || btn.innerText || '').trim();
+            const correctAnswer = (currentQuestion.anlam || '').trim();
+            return btnText !== correctAnswer && !btnText.includes(correctAnswer);
         });
     
         if (wrongBtns.length > 0) {
@@ -13095,6 +13107,8 @@ function loadDinleQuestion() {
         } else {
             btn.textContent = opt.text;
         }
+        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
+        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
         
         // Touch event tracking (scroll/tap ayrımı için)
         let touchStart = { x: 0, y: 0, time: 0 };
@@ -13177,11 +13191,14 @@ function loadDinleQuestion() {
     elements.dinleNextBtn.style.display = 'none';
     }
     
-    // Tüm butonları aktif et
+    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
     const allBtns = document.querySelectorAll('.dinle-mode .duolingo-option, .dinle-mode .option');
     allBtns.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('disabled', 'correct', 'wrong');
+        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
     });
     
     // Mikrofon butonunu her zaman aktif et (kullanıcı istediği zaman kullanabilsin)
@@ -13551,6 +13568,8 @@ function loadBoslukQuestion() {
     allOptions.forEach((opt, i) => {
         const btn = document.createElement('button');
         btn.className = 'duolingo-option';
+        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
+        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
         // Boşluk Doldur'da her zaman Arapça format kullan (ayet parçaları)
         if (opt.text === '...' || opt.text.trim() === '') {
             // Boş seçenekler için normal format
@@ -13648,11 +13667,14 @@ function loadBoslukQuestion() {
     elements.boslukNextBtn.style.display = 'none';
     }
     
-    // Tüm butonları aktif et
+    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
     const allBtns = document.querySelectorAll('.bosluk-mode .duolingo-option, .bosluk-mode .option');
     allBtns.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('disabled', 'correct', 'wrong');
+        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
     });
 
     // Otomatik ses çal
@@ -14702,60 +14724,138 @@ setTimeout(async () => {
  */
 async function showDataStatus() {
     try {
-        // Verileri yükle
-        const today = getLocalDateString();
-        
-        // Hafta başlangıç tarihini hesapla (getWeekStartDate fonksiyonu yoksa)
-        let weekStart;
-        if (typeof getWeekStartDate === 'function') {
-            weekStart = getWeekStartDate();
-        } else {
-            // Manuel hesaplama
+        // ============ GÜVENLİ FONKSİYON ÇAĞRILARI ============
+        // getLocalDateString fonksiyonu kontrolü
+        let today = '';
+        try {
+            if (typeof getLocalDateString === 'function') {
+                today = getLocalDateString();
+            } else if (typeof window.getLocalDateString === 'function') {
+                today = window.getLocalDateString();
+            } else {
+                // Fallback: Manuel hesaplama
+                const d = new Date();
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                today = `${year}-${month}-${day}`;
+            }
+        } catch (e) {
+            // Fallback: Manuel hesaplama
             const d = new Date();
-            d.setHours(0, 0, 0, 0);
-            const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
-            const weekStartDate = new Date(d.setDate(diff));
-            weekStart = getLocalDateString(weekStartDate);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            today = `${year}-${month}-${day}`;
         }
         
-        // IndexedDB ve localStorage'dan verileri kontrol et
+        // Hafta başlangıç tarihini hesapla (getWeekStartDate fonksiyonu yoksa)
+        let weekStart = '';
+        try {
+            if (typeof getWeekStartDate === 'function') {
+                weekStart = getWeekStartDate();
+            } else if (typeof window.getWeekStartDate === 'function') {
+                weekStart = window.getWeekStartDate();
+            } else {
+                // Manuel hesaplama
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
+                const weekStartDate = new Date(d.setDate(diff));
+                if (typeof getLocalDateString === 'function') {
+                    weekStart = getLocalDateString(weekStartDate);
+                } else {
+                    const year = weekStartDate.getFullYear();
+                    const month = String(weekStartDate.getMonth() + 1).padStart(2, '0');
+                    const dayStr = String(weekStartDate.getDate()).padStart(2, '0');
+                    weekStart = `${year}-${month}-${dayStr}`;
+                }
+            }
+        } catch (e) {
+            // Fallback: Manuel hesaplama
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            const weekStartDate = new Date(d.setDate(diff));
+            const year = weekStartDate.getFullYear();
+            const month = String(weekStartDate.getMonth() + 1).padStart(2, '0');
+            const dayStr = String(weekStartDate.getDate()).padStart(2, '0');
+            weekStart = `${year}-${month}-${dayStr}`;
+        }
+        
+        // ============ INDEXEDDB VERİ KONTROLÜ ============
         // IndexedDB'de veriler farklı key'lerde saklanıyor: hasene_totalPoints, hasene_dailyTasks, hasene_weeklyTasks, hasene_streak
         let indexedDBData = null;
         let indexedDBStreak = null;
         let indexedDBDailyTasks = null;
         let indexedDBWeeklyTasks = null;
-        if (typeof loadFromIndexedDB === 'function') {
-            indexedDBData = await loadFromIndexedDB('gameStats');
-            indexedDBStreak = await loadFromIndexedDB('hasene_streak');
-            indexedDBDailyTasks = await loadFromIndexedDB('hasene_dailyTasks');
-            indexedDBWeeklyTasks = await loadFromIndexedDB('hasene_weeklyTasks');
-        } else if (typeof window.loadFromIndexedDB === 'function') {
-            indexedDBData = await window.loadFromIndexedDB('gameStats');
-            indexedDBStreak = await window.loadFromIndexedDB('hasene_streak');
-            indexedDBDailyTasks = await window.loadFromIndexedDB('hasene_dailyTasks');
-            indexedDBWeeklyTasks = await window.loadFromIndexedDB('hasene_weeklyTasks');
+        
+        try {
+            const loadFunc = typeof loadFromIndexedDB === 'function' 
+                ? loadFromIndexedDB 
+                : (typeof window.loadFromIndexedDB === 'function' ? window.loadFromIndexedDB : null);
+            
+            if (loadFunc) {
+                indexedDBData = await loadFunc('gameStats').catch(() => null);
+                indexedDBStreak = await loadFunc('hasene_streak').catch(() => null);
+                indexedDBDailyTasks = await loadFunc('hasene_dailyTasks').catch(() => null);
+                indexedDBWeeklyTasks = await loadFunc('hasene_weeklyTasks').catch(() => null);
+            }
+        } catch (e) {
+            // IndexedDB hatası - sessizce devam et
+            if (typeof log !== 'undefined' && log.debug) {
+                log.debug('⚠️ IndexedDB okuma hatası (görmezden geliniyor):', e);
+            }
         }
         
         // IndexedDB'de herhangi bir veri var mı?
         const hasIndexedDBData = !!(indexedDBData || indexedDBStreak || indexedDBDailyTasks || indexedDBWeeklyTasks);
         
-        // localStorage'dan tüm verileri kontrol et
-        const localStorageData = localStorage.getItem('gameStats');
-        const dailyTasksData = localStorage.getItem('hasene_dailyTasks');
-        const weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
-        // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
-        const streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
+        // ============ LOCALSTORAGE VERİ KONTROLÜ ============
+        let localStorageData = null;
+        let dailyTasksData = null;
+        let weeklyTasksData = null;
+        let streakDataStorage = null;
+        
+        try {
+            localStorageData = localStorage.getItem('gameStats');
+            dailyTasksData = localStorage.getItem('hasene_dailyTasks');
+            weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
+            // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
+            streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
+        } catch (e) {
+            // localStorage hatası - sessizce devam et
+            if (typeof log !== 'undefined' && log.debug) {
+                log.debug('⚠️ localStorage okuma hatası (görmezden geliniyor):', e);
+            }
+        }
         
         // Veri var mı kontrolü (herhangi bir veri varsa true)
         const hasAnyLocalStorageData = !!(localStorageData || dailyTasksData || weeklyTasksData || streakDataStorage);
         
-        // Mevcut verileri al
-        const currentDailyTasks = dailyTasks || {};
-        const currentWeeklyTasks = weeklyTasks || {};
-        const currentStreakData = streakData || {};
+        // ============ MEVCUT VERİLERİ AL ============
+        // Global değişkenlerden verileri al (güvenli şekilde)
+        const currentDailyTasks = (typeof dailyTasks !== 'undefined' && dailyTasks) 
+            ? dailyTasks 
+            : (typeof window.dailyTasks !== 'undefined' && window.dailyTasks) 
+                ? window.dailyTasks 
+                : {};
         
-        // Veri durumu bilgilerini hazırla
+        const currentWeeklyTasks = (typeof weeklyTasks !== 'undefined' && weeklyTasks) 
+            ? weeklyTasks 
+            : (typeof window.weeklyTasks !== 'undefined' && window.weeklyTasks) 
+                ? window.weeklyTasks 
+                : {};
+        
+        const currentStreakData = (typeof streakData !== 'undefined' && streakData) 
+            ? streakData 
+            : (typeof window.streakData !== 'undefined' && window.streakData) 
+                ? window.streakData 
+                : {};
+        
+        // Veri durumu bilgilerini hazırla (güvenli şekilde - tüm değerler kontrol ediliyor)
         const dataStatus = {
             indexedDB: {
                 exists: hasIndexedDBData,
@@ -14775,35 +14875,41 @@ async function showDataStatus() {
             },
             dailyTasks: {
                 exists: !!currentDailyTasks,
-                lastTaskDate: currentDailyTasks.lastTaskDate || 'Yok',
-                todayStats: currentDailyTasks.todayStats || null,
-                completedTasks: currentDailyTasks.completedTasks?.length || 0,
-                totalTasks: currentDailyTasks.tasks?.length || 0,
-                bonusTasks: currentDailyTasks.bonusTasks?.length || 0,
-                completedBonusTasks: currentDailyTasks.bonusTasks ? currentDailyTasks.bonusTasks.filter(t => currentDailyTasks.completedTasks?.includes(t.id)).length : 0,
-                isToday: currentDailyTasks.lastTaskDate === today
+                lastTaskDate: (currentDailyTasks && currentDailyTasks.lastTaskDate) ? String(currentDailyTasks.lastTaskDate) : 'Yok',
+                todayStats: (currentDailyTasks && currentDailyTasks.todayStats) ? currentDailyTasks.todayStats : null,
+                completedTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.completedTasks)) ? currentDailyTasks.completedTasks.length : 0,
+                totalTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.tasks)) ? currentDailyTasks.tasks.length : 0,
+                bonusTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.bonusTasks)) ? currentDailyTasks.bonusTasks.length : 0,
+                completedBonusTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.bonusTasks) && Array.isArray(currentDailyTasks.completedTasks)) 
+                    ? currentDailyTasks.bonusTasks.filter(t => t && t.id && currentDailyTasks.completedTasks.includes(t.id)).length 
+                    : 0,
+                isToday: (currentDailyTasks && currentDailyTasks.lastTaskDate) ? currentDailyTasks.lastTaskDate === today : false
             },
             weeklyTasks: {
                 exists: !!currentWeeklyTasks,
-                lastWeekStart: currentWeeklyTasks.lastWeekStart || 'Yok',
-                weekStats: currentWeeklyTasks.weekStats || null,
-                completedTasks: currentWeeklyTasks.completedTasks?.length || 0,
-                totalTasks: currentWeeklyTasks.tasks?.length || 0,
-                isCurrentWeek: currentWeeklyTasks.lastWeekStart === weekStart
+                lastWeekStart: (currentWeeklyTasks && currentWeeklyTasks.lastWeekStart) ? String(currentWeeklyTasks.lastWeekStart) : 'Yok',
+                weekStats: (currentWeeklyTasks && currentWeeklyTasks.weekStats) ? currentWeeklyTasks.weekStats : null,
+                completedTasks: (currentWeeklyTasks && Array.isArray(currentWeeklyTasks.completedTasks)) ? currentWeeklyTasks.completedTasks.length : 0,
+                totalTasks: (currentWeeklyTasks && Array.isArray(currentWeeklyTasks.tasks)) ? currentWeeklyTasks.tasks.length : 0,
+                isCurrentWeek: (currentWeeklyTasks && currentWeeklyTasks.lastWeekStart) ? currentWeeklyTasks.lastWeekStart === weekStart : false
             },
             streak: {
                 exists: !!currentStreakData,
-                currentStreak: currentStreakData.currentStreak || 0,
-                bestStreak: currentStreakData.bestStreak || 0,
-                lastPlayDate: currentStreakData.lastPlayDate || 'Yok',
-                totalPlayDays: currentStreakData.totalPlayDays || 0,
-                todayProgress: currentStreakData.todayProgress || 0,
-                dailyGoal: currentStreakData.dailyGoal || 5,
-                isToday: currentStreakData.lastPlayDate === today || (currentStreakData.todayProgress || 0) > 0,
-                isGoalCompleted: (currentStreakData.todayProgress || 0) >= (currentStreakData.dailyGoal || 5)
+                currentStreak: (currentStreakData && typeof currentStreakData.currentStreak === 'number') ? currentStreakData.currentStreak : 0,
+                bestStreak: (currentStreakData && typeof currentStreakData.bestStreak === 'number') ? currentStreakData.bestStreak : 0,
+                lastPlayDate: (currentStreakData && currentStreakData.lastPlayDate) ? String(currentStreakData.lastPlayDate) : 'Yok',
+                totalPlayDays: (currentStreakData && typeof currentStreakData.totalPlayDays === 'number') ? currentStreakData.totalPlayDays : 0,
+                todayProgress: (currentStreakData && typeof currentStreakData.todayProgress === 'number') ? currentStreakData.todayProgress : 0,
+                dailyGoal: (currentStreakData && typeof currentStreakData.dailyGoal === 'number') ? currentStreakData.dailyGoal : 5,
+                isToday: (currentStreakData && currentStreakData.lastPlayDate) 
+                    ? (currentStreakData.lastPlayDate === today || ((typeof currentStreakData.todayProgress === 'number' && currentStreakData.todayProgress > 0)))
+                    : false,
+                isGoalCompleted: (currentStreakData && typeof currentStreakData.todayProgress === 'number' && typeof currentStreakData.dailyGoal === 'number')
+                    ? currentStreakData.todayProgress >= currentStreakData.dailyGoal
+                    : false
             },
-            today: today,
-            weekStart: weekStart
+            today: today || '',
+            weekStart: weekStart || ''
         };
         
         // Modal HTML'i oluştur
@@ -14892,35 +14998,103 @@ async function showDataStatus() {
             </div>
         `;
         
-        // Modal'ı ekle
-        const existingModal = document.getElementById('dataStatusModal');
-        if (existingModal) {
-            existingModal.remove();
+        // Modal'ı ekle (güvenli şekilde)
+        try {
+            const existingModal = document.getElementById('dataStatusModal');
+            if (existingModal && existingModal.parentNode) {
+                existingModal.parentNode.removeChild(existingModal);
+            }
+        } catch (e) {
+            // Modal temizleme hatası - görmezden gel
+            if (typeof log !== 'undefined' && log.debug) {
+                log.debug('⚠️ Modal temizleme hatası (görmezden geliniyor):', e);
+            }
         }
         
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        // Modal HTML'ini güvenli şekilde ekle
+        if (document.body) {
+            try {
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            } catch (e) {
+                // HTML ekleme hatası
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('❌ Modal HTML ekleme hatası:', e);
+                }
+                throw new Error('Modal HTML eklenemedi: ' + (e.message || String(e)));
+            }
+        } else {
+            throw new Error('document.body bulunamadı');
+        }
         
         // Body scroll'u engelle
-        document.body.style.overflow = 'hidden';
-        
-        // Global close fonksiyonu
-        window.closeDataStatusModal = function() {
-            const modal = document.getElementById('dataStatusModal');
-            if (modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-                setTimeout(() => {
-                    if (modal.parentNode) {
-                        modal.parentNode.removeChild(modal);
-                    }
-                }, 300);
+        try {
+            if (document.body) {
+                document.body.style.overflow = 'hidden';
             }
-            delete window.closeDataStatusModal;
+        } catch (e) {
+            // Scroll engelleme hatası - görmezden gel
+            if (typeof log !== 'undefined' && log.debug) {
+                log.debug('⚠️ Scroll engelleme hatası (görmezden geliniyor):', e);
+            }
+        }
+        
+        // Global close fonksiyonu (güvenli şekilde)
+        window.closeDataStatusModal = function() {
+            try {
+                const modal = document.getElementById('dataStatusModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    if (document.body) {
+                        document.body.style.overflow = '';
+                    }
+                    setTimeout(() => {
+                        try {
+                            if (modal.parentNode) {
+                                modal.parentNode.removeChild(modal);
+                            }
+                        } catch (e) {
+                            // Modal silme hatası - görmezden gel
+                            if (typeof log !== 'undefined' && log.debug) {
+                                log.debug('⚠️ Modal silme hatası (görmezden geliniyor):', e);
+                            }
+                        }
+                    }, 300);
+                }
+            } catch (e) {
+                // Close fonksiyonu hatası - görmezden gel
+                if (typeof log !== 'undefined' && log.error) {
+                    log.error('❌ closeDataStatusModal hatası:', e);
+                }
+            } finally {
+                // Her durumda temizle
+                try {
+                    delete window.closeDataStatusModal;
+                } catch (e) {
+                    // Silme hatası - görmezden gel
+                }
+            }
         };
         
     } catch (error) {
-        log.error('❌ Veri durumu gösterilirken hata:', error);
-        showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + error.message);
+        // Hata yakalama - tüm hataları güvenli şekilde işle
+        const errorMessage = error && error.message ? error.message : String(error);
+        
+        // Log hatası
+        if (typeof log !== 'undefined' && log.error) {
+            log.error('❌ Veri durumu gösterilirken hata:', error);
+        } else {
+            console.error('❌ Veri durumu gösterilirken hata:', error);
+        }
+        
+        // Kullanıcıya hata mesajı göster
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
+        } else if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
+        } else {
+            // Son çare: alert kullan
+            alert('Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
+        }
     }
 }
 
