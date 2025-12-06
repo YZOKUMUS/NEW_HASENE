@@ -4697,6 +4697,8 @@ storage.set("dailyCorrect", "0");        // günlük doğru cevap sayısı sıf�
 storage.set("dailyWrong", "0");          // günlük yanlış cevap sayısı sıfır
 storage.set("dailyGoalLevel", "normal"); // varsayılan zorluk
 storage.remove("lastDailyXPReset");      // reset tarihi temizle
+storage.remove("lastDailyGoalDate");     // son günlük hedef tarihi temizle
+storage.set("dailyXP", "0");             // günlük XP sıfırla
 
 // UI Güncelle → Barları sıfırla
 const bar = document.getElementById("dailyGoalProgress");
@@ -4929,6 +4931,40 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
         updateDailyGoalDisplay();
     }
     
+    // Üst bar elementlerini manuel sıfırla (ek güvenlik)
+    const gamePointsEl = document.getElementById('gamePoints');
+    const starPointsEl = document.getElementById('starPoints');
+    const playerLevelEl = document.getElementById('playerLevel');
+    if (gamePointsEl) gamePointsEl.textContent = '0';
+    if (starPointsEl) starPointsEl.textContent = '0';
+    if (playerLevelEl) playerLevelEl.textContent = '1. Mertebe';
+    
+    // Oyun ekranı elementlerini sıfırla
+    const correctEl = document.getElementById('correct');
+    const wrongEl = document.getElementById('wrong');
+    const boslukCorrectEl = document.getElementById('boslukCorrect');
+    const boslukWrongEl = document.getElementById('boslukWrong');
+    const dinleCorrectEl = document.getElementById('dinleCorrect');
+    const dinleWrongEl = document.getElementById('dinleWrong');
+    if (correctEl) correctEl.textContent = '0';
+    if (wrongEl) wrongEl.textContent = '0';
+    if (boslukCorrectEl) boslukCorrectEl.textContent = '0';
+    if (boslukWrongEl) boslukWrongEl.textContent = '0';
+    if (dinleCorrectEl) dinleCorrectEl.textContent = '0';
+    if (dinleWrongEl) dinleWrongEl.textContent = '0';
+    
+    // Level Up Modal elementlerini sıfırla
+    const newLevelEl = document.getElementById('newLevel');
+    const modalTotalPointsEl = document.getElementById('modalTotalPoints');
+    const modalNextLevelPointsEl = document.getElementById('modalNextLevelPoints');
+    const confirmCorrectEl = document.getElementById('confirmCorrect');
+    const confirmWrongEl = document.getElementById('confirmWrong');
+    if (newLevelEl) newLevelEl.textContent = '1';
+    if (modalTotalPointsEl) modalTotalPointsEl.textContent = '0';
+    if (modalNextLevelPointsEl) modalNextLevelPointsEl.textContent = '1,000';
+    if (confirmCorrectEl) confirmCorrectEl.textContent = '0';
+    if (confirmWrongEl) confirmWrongEl.textContent = '0';
+    
     // NOT: saveStats çağrılmıyor - sıfırlama sonrası veriler kaydedilmemeli
     // Kullanıcı ilk oyunu oynadığında otomatik kaydedilecek
 
@@ -5013,6 +5049,12 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
     if (wordStatsTotalEl) wordStatsTotalEl.textContent = '0';
     if (wordStatsMasteredEl) wordStatsMasteredEl.textContent = '0';
     if (wordStatsStrugglingEl) wordStatsStrugglingEl.textContent = '0';
+    
+    // Kelime Ameli - Ortalama Başarı ve En Zor Kelime
+    const analyticsAvgSuccessEl = document.getElementById('analyticsAvgSuccess');
+    const analyticsHardestWordEl = document.getElementById('analyticsHardestWord');
+    if (analyticsAvgSuccessEl) analyticsAvgSuccessEl.textContent = '%0';
+    if (analyticsHardestWordEl) analyticsHardestWordEl.textContent = '-';
     
     // Kelime istatistiklerini sıfırla (wordStats objesi)
     try {
