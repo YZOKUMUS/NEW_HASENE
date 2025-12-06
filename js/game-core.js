@@ -4622,11 +4622,16 @@ async function resetAllStats() {
     // 🔥 STREAK + GÜNLÜK HEDEF SIFIRLA
     // =========================================
     streakData = {
-currentStreak: 0,
-playDates: [],
-dailyGoal: 5,
-dailyCorrect: 0
+        currentStreak: 0,
+        bestStreak: 0,
+        lastPlayDate: '',
+        totalPlayDays: 0,
+        dailyGoal: 5,
+        todayProgress: 0,
+        todayDate: '',
+        playDates: []
     };
+    window.streakData = streakData; // Global erişim için güncelle
 
     // =========================================
     // 🔥 DAILY TASKS SIFIRLA
@@ -4648,7 +4653,13 @@ todayStats: {
     toplamYanlis: 0,
     toplamPuan: 0,
     perfectStreak: 0,
-    farklıZorluk: new Set()
+    farklıZorluk: new Set(),
+    reviewWords: 0,
+    comboCount: 0,
+    accuracy: 0,
+    allGameModes: new Set(),
+    streakMaintain: 0,
+    totalPlayTime: 0
 }
     };
     window.dailyTasks = dailyTasks; // Global erişim için güncelle
@@ -4725,6 +4736,7 @@ if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasen
                 'hasene_totalPoints',
                 'hasene_badges',
                 'hasene_streak',
+                'hasene_streakData', // Streak data için ayrı key
                 'hasene_dailyTasks',
                 'hasene_weeklyTasks',
                 'hasene_currentMode',
@@ -4787,6 +4799,9 @@ if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasen
     localStorage.removeItem('hasene_currentMode');
     localStorage.removeItem('hasene_currentDifficulty');
     localStorage.removeItem('hasene_wordStats');
+    localStorage.removeItem('hasene_favorites'); // Favoriler sıfırla
+    localStorage.removeItem('hasene_reviewWords'); // Tekrar listesi sıfırla
+    localStorage.removeItem('hasene_recentlyWrong'); // Son yanlış cevaplar sıfırla
     localStorage.removeItem('dailyXP');
     localStorage.removeItem('unlockedAchievements'); // Achievement sistemini de sıfırla
     
@@ -4998,6 +5013,38 @@ log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
     if (wordStatsTotalEl) wordStatsTotalEl.textContent = '0';
     if (wordStatsMasteredEl) wordStatsMasteredEl.textContent = '0';
     if (wordStatsStrugglingEl) wordStatsStrugglingEl.textContent = '0';
+    
+    // Kelime istatistiklerini sıfırla (wordStats objesi)
+    try {
+        if (typeof saveWordStats === 'function') {
+            saveWordStats({}); // Boş obje kaydet
+        } else if (typeof window.saveWordStats === 'function') {
+            window.saveWordStats({}); // Boş obje kaydet
+        }
+        // localStorage'dan da sil (ek güvenlik)
+        localStorage.removeItem('hasene_wordStats');
+        // IndexedDB'den de sil (zaten yukarıda siliniyor ama emin olmak için)
+    } catch(e) {
+        log.error('Kelime istatistikleri sıfırlama hatası:', e);
+    }
+    
+    // Favoriler ve tekrar listesini sıfırla
+    try {
+        if (typeof secureSetItem === 'function') {
+            secureSetItem('hasene_favorites', []);
+        } else {
+            localStorage.setItem('hasene_favorites', JSON.stringify([]));
+        }
+        localStorage.setItem('hasene_reviewWords', JSON.stringify([]));
+        localStorage.setItem('hasene_recentlyWrong', JSON.stringify([]));
+        // Global değişkenleri de sıfırla
+        if (typeof window !== 'undefined') {
+            window.reviewWords = [];
+            window.favoriteWords = [];
+        }
+    } catch(e) {
+        log.error('Favoriler/tekrar listesi sıfırlama hatası:', e);
+    }
 
     // Başarılar Modal - İstatistikler Özeti
     const badgesUnlockedCountEl = document.getElementById('badgesUnlockedCount');
