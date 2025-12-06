@@ -14726,7 +14726,15 @@ async function showDataStatus() {
         } else if (typeof window.loadFromIndexedDB === 'function') {
             indexedDBData = await window.loadFromIndexedDB('gameStats');
         }
+        
+        // localStorage'dan tüm verileri kontrol et
         const localStorageData = localStorage.getItem('gameStats');
+        const dailyTasksData = localStorage.getItem('hasene_dailyTasks');
+        const weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
+        const streakDataStorage = localStorage.getItem('hasene_streakData');
+        
+        // Veri var mı kontrolü (herhangi bir veri varsa true)
+        const hasAnyLocalStorageData = !!(localStorageData || dailyTasksData || weeklyTasksData || streakDataStorage);
         
         // Mevcut verileri al
         const currentDailyTasks = dailyTasks || {};
@@ -14740,8 +14748,12 @@ async function showDataStatus() {
                 hasData: indexedDBData && Object.keys(indexedDBData).length > 0
             },
             localStorage: {
-                exists: !!localStorageData,
-                hasData: localStorageData && localStorageData !== '{}'
+                exists: hasAnyLocalStorageData,
+                hasData: hasAnyLocalStorageData,
+                gameStats: !!localStorageData,
+                dailyTasks: !!dailyTasksData,
+                weeklyTasks: !!weeklyTasksData,
+                streakData: !!streakDataStorage
             },
             dailyTasks: {
                 exists: !!currentDailyTasks,
@@ -14768,7 +14780,9 @@ async function showDataStatus() {
                 lastPlayDate: currentStreakData.lastPlayDate || 'Yok',
                 totalPlayDays: currentStreakData.totalPlayDays || 0,
                 todayProgress: currentStreakData.todayProgress || 0,
-                isToday: currentStreakData.lastPlayDate === today
+                dailyGoal: currentStreakData.dailyGoal || 5,
+                isToday: currentStreakData.lastPlayDate === today || (currentStreakData.todayProgress || 0) > 0,
+                isGoalCompleted: (currentStreakData.todayProgress || 0) >= (currentStreakData.dailyGoal || 5)
             },
             today: today,
             weekStart: weekStart
@@ -14805,6 +14819,7 @@ async function showDataStatus() {
                         </div>
                         <div style="font-size: 0.85em; color: ${dataStatus.localStorage.hasData ? '#155724' : '#721c24'};">
                             ${dataStatus.localStorage.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
+                            ${dataStatus.localStorage.hasData ? '<div style="margin-top: 4px; font-size: 0.8em;">Günlük: ' + (dataStatus.localStorage.dailyTasks ? '✅' : '❌') + ' | Haftalık: ' + (dataStatus.localStorage.weeklyTasks ? '✅' : '❌') + ' | Streak: ' + (dataStatus.localStorage.streakData ? '✅' : '❌') + '</div>' : ''}
                         </div>
                     </div>
                     
@@ -14846,8 +14861,8 @@ async function showDataStatus() {
                             <div>En İyi Streak: <strong>${dataStatus.streak.bestStreak}</strong> gün</div>
                             <div>Toplam Oyun Günü: <strong>${dataStatus.streak.totalPlayDays}</strong></div>
                             <div>Son Oyun Tarihi: <strong>${dataStatus.streak.lastPlayDate}</strong></div>
-                            <div>Bugünkü İlerleme: <strong>${dataStatus.streak.todayProgress}</strong> Hasene</div>
-                            ${!dataStatus.streak.isToday ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugün oynanmamış!</strong></div>' : ''}
+                            <div>Bugünkü İlerleme: <strong>${dataStatus.streak.todayProgress}</strong> / ${dataStatus.streak.dailyGoal} (Günlük Hedef)</div>
+                            ${dataStatus.streak.isGoalCompleted ? '<div style="margin-top: 4px; color: #155724;"><strong>✅ Günlük hedef tamamlandı!</strong></div>' : dataStatus.streak.todayProgress > 0 ? '<div style="margin-top: 4px; color: #856404;"><strong>⏳ Günlük hedef henüz tamamlanmadı</strong></div>' : '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugün oynanmamış!</strong></div>'}
                         </div>
                     </div>
                     
