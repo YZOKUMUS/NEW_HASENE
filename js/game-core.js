@@ -14720,12 +14720,25 @@ async function showDataStatus() {
         }
         
         // IndexedDB ve localStorage'dan verileri kontrol et
+        // IndexedDB'de veriler farklı key'lerde saklanıyor: hasene_totalPoints, hasene_dailyTasks, hasene_weeklyTasks, hasene_streak
         let indexedDBData = null;
+        let indexedDBStreak = null;
+        let indexedDBDailyTasks = null;
+        let indexedDBWeeklyTasks = null;
         if (typeof loadFromIndexedDB === 'function') {
             indexedDBData = await loadFromIndexedDB('gameStats');
+            indexedDBStreak = await loadFromIndexedDB('hasene_streak');
+            indexedDBDailyTasks = await loadFromIndexedDB('hasene_dailyTasks');
+            indexedDBWeeklyTasks = await loadFromIndexedDB('hasene_weeklyTasks');
         } else if (typeof window.loadFromIndexedDB === 'function') {
             indexedDBData = await window.loadFromIndexedDB('gameStats');
+            indexedDBStreak = await window.loadFromIndexedDB('hasene_streak');
+            indexedDBDailyTasks = await window.loadFromIndexedDB('hasene_dailyTasks');
+            indexedDBWeeklyTasks = await window.loadFromIndexedDB('hasene_weeklyTasks');
         }
+        
+        // IndexedDB'de herhangi bir veri var mı?
+        const hasIndexedDBData = !!(indexedDBData || indexedDBStreak || indexedDBDailyTasks || indexedDBWeeklyTasks);
         
         // localStorage'dan tüm verileri kontrol et
         const localStorageData = localStorage.getItem('gameStats');
