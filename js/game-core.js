@@ -10144,6 +10144,14 @@ function addToGlobalPoints(points, correctAnswers = 0) {
     if (typeof checkAchievements === 'function') {
         checkAchievements();
     }
+    
+    // NOT: Oyun oynandıktan sonra sıfırlama flag'ini temizle
+    // Bu sayede veriler kaydedilebilir
+    if (localStorage.getItem('hasene_statsJustReset') === 'true') {
+        localStorage.removeItem('hasene_statsJustReset');
+        log.debug('🔄 Oyun oynandı, sıfırlama flag\'i temizlendi');
+    }
+    
     debouncedSaveStats(); // Debounced kaydetme // Verileri kaydet
     
     // Görevleri güncelle (perfect streak gibi görevler için)
