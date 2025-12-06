@@ -14603,5 +14603,182 @@ setTimeout(async () => {
 
 }); // DOMContentLoaded event listener sonu
 
+// ============ VERİ DURUMU GÖSTERİCİ ============
+/**
+ * Veri durumunu gösteren modal açar
+ * Günlük/haftalık görevler, streak, ve diğer verilerin durumunu kontrol eder
+ */
+async function showDataStatus() {
+    try {
+        // Verileri yükle
+        const today = getLocalDateString();
+        const weekStart = getWeekStartDate();
+        
+        // IndexedDB ve localStorage'dan verileri kontrol et
+        const indexedDBData = await loadFromIndexedDB('gameStats');
+        const localStorageData = localStorage.getItem('gameStats');
+        
+        // Mevcut verileri al
+        const currentDailyTasks = dailyTasks || {};
+        const currentWeeklyTasks = weeklyTasks || {};
+        const currentStreakData = streakData || {};
+        
+        // Veri durumu bilgilerini hazırla
+        const dataStatus = {
+            indexedDB: {
+                exists: !!indexedDBData,
+                hasData: indexedDBData && Object.keys(indexedDBData).length > 0
+            },
+            localStorage: {
+                exists: !!localStorageData,
+                hasData: localStorageData && localStorageData !== '{}'
+            },
+            dailyTasks: {
+                exists: !!currentDailyTasks,
+                lastTaskDate: currentDailyTasks.lastTaskDate || 'Yok',
+                todayStats: currentDailyTasks.todayStats || null,
+                completedTasks: currentDailyTasks.completedTasks?.length || 0,
+                totalTasks: currentDailyTasks.tasks?.length || 0,
+                isToday: currentDailyTasks.lastTaskDate === today
+            },
+            weeklyTasks: {
+                exists: !!currentWeeklyTasks,
+                lastWeekStart: currentWeeklyTasks.lastWeekStart || 'Yok',
+                weekStats: currentWeeklyTasks.weekStats || null,
+                completedTasks: currentWeeklyTasks.completedTasks?.length || 0,
+                totalTasks: currentWeeklyTasks.tasks?.length || 0,
+                isCurrentWeek: currentWeeklyTasks.lastWeekStart === weekStart
+            },
+            streak: {
+                exists: !!currentStreakData,
+                currentStreak: currentStreakData.currentStreak || 0,
+                bestStreak: currentStreakData.bestStreak || 0,
+                lastPlayDate: currentStreakData.lastPlayDate || 'Yok',
+                totalPlayDays: currentStreakData.totalPlayDays || 0,
+                todayProgress: currentStreakData.todayProgress || 0,
+                isToday: currentStreakData.lastPlayDate === today
+            },
+            today: today,
+            weekStart: weekStart
+        };
+        
+        // Modal HTML'i oluştur
+        const modalHTML = `
+            <div class="modal" id="dataStatusModal" onclick="event.stopPropagation(); closeDataStatusModal();" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
+                <div class="modal-content" onclick="event.stopPropagation();" style="background: white; border-radius: 16px; padding: 20px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">
+                        <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🔍 Veri Durumu</h3>
+                        <button onclick="closeDataStatusModal();" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">×</button>
+                    </div>
+                    
+                    <div style="font-size: 0.9em; color: #666; margin-bottom: 20px;">
+                        <div style="margin-bottom: 8px;"><strong>Bugün:</strong> ${dataStatus.today}</div>
+                        <div style="margin-bottom: 8px;"><strong>Hafta Başlangıcı:</strong> ${dataStatus.weekStart}</div>
+                    </div>
+                    
+                    <!-- IndexedDB Durumu -->
+                    <div style="background: ${dataStatus.indexedDB.hasData ? '#d4edda' : '#f8d7da'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.indexedDB.hasData ? '#28a745' : '#dc3545'};">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.indexedDB.hasData ? '#155724' : '#721c24'};">
+                            ${dataStatus.indexedDB.hasData ? '✅' : '❌'} IndexedDB
+                        </div>
+                        <div style="font-size: 0.85em; color: ${dataStatus.indexedDB.hasData ? '#155724' : '#721c24'};">
+                            ${dataStatus.indexedDB.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
+                        </div>
+                    </div>
+                    
+                    <!-- localStorage Durumu -->
+                    <div style="background: ${dataStatus.localStorage.hasData ? '#d4edda' : '#f8d7da'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.localStorage.hasData ? '#28a745' : '#dc3545'};">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.localStorage.hasData ? '#155724' : '#721c24'};">
+                            ${dataStatus.localStorage.hasData ? '✅' : '❌'} localStorage
+                        </div>
+                        <div style="font-size: 0.85em; color: ${dataStatus.localStorage.hasData ? '#155724' : '#721c24'};">
+                            ${dataStatus.localStorage.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
+                        </div>
+                    </div>
+                    
+                    <!-- Günlük Görevler -->
+                    <div style="background: ${dataStatus.dailyTasks.isToday ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.dailyTasks.isToday ? '#28a745' : '#ffc107'};">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.dailyTasks.isToday ? '#155724' : '#856404'};">
+                            ${dataStatus.dailyTasks.isToday ? '✅' : '⚠️'} Günlük Görevler
+                        </div>
+                        <div style="font-size: 0.85em; color: ${dataStatus.dailyTasks.isToday ? '#155724' : '#856404'};">
+                            <div>Son Tarih: <strong>${dataStatus.dailyTasks.lastTaskDate}</strong></div>
+                            <div>Tamamlanan: <strong>${dataStatus.dailyTasks.completedTasks}</strong> / ${dataStatus.dailyTasks.totalTasks}</div>
+                            ${dataStatus.dailyTasks.todayStats ? `<div>Bugünkü Puan: <strong>${dataStatus.dailyTasks.todayStats.toplamPuan || 0}</strong></div>` : ''}
+                            ${!dataStatus.dailyTasks.isToday ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugünkü görevler değil!</strong></div>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Haftalık Görevler -->
+                    <div style="background: ${dataStatus.weeklyTasks.isCurrentWeek ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.weeklyTasks.isCurrentWeek ? '#28a745' : '#ffc107'};">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.weeklyTasks.isCurrentWeek ? '#155724' : '#856404'};">
+                            ${dataStatus.weeklyTasks.isCurrentWeek ? '✅' : '⚠️'} Haftalık Görevler
+                        </div>
+                        <div style="font-size: 0.85em; color: ${dataStatus.weeklyTasks.isCurrentWeek ? '#155724' : '#856404'};">
+                            <div>Son Hafta: <strong>${dataStatus.weeklyTasks.lastWeekStart}</strong></div>
+                            <div>Tamamlanan: <strong>${dataStatus.weeklyTasks.completedTasks}</strong> / ${dataStatus.weeklyTasks.totalTasks}</div>
+                            ${dataStatus.weeklyTasks.weekStats ? `<div>Haftalık Puan: <strong>${dataStatus.weeklyTasks.weekStats.toplamPuan || 0}</strong></div>` : ''}
+                            ${!dataStatus.weeklyTasks.isCurrentWeek ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bu haftanın görevleri değil!</strong></div>' : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Streak -->
+                    <div style="background: ${dataStatus.streak.isToday ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.streak.isToday ? '#28a745' : '#ffc107'};">
+                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.streak.isToday ? '#155724' : '#856404'};">
+                            ${dataStatus.streak.isToday ? '✅' : '⚠️'} Streak
+                        </div>
+                        <div style="font-size: 0.85em; color: ${dataStatus.streak.isToday ? '#155724' : '#856404'};">
+                            <div>Mevcut Streak: <strong>${dataStatus.streak.currentStreak}</strong> gün</div>
+                            <div>En İyi Streak: <strong>${dataStatus.streak.bestStreak}</strong> gün</div>
+                            <div>Toplam Oyun Günü: <strong>${dataStatus.streak.totalPlayDays}</strong></div>
+                            <div>Son Oyun Tarihi: <strong>${dataStatus.streak.lastPlayDate}</strong></div>
+                            <div>Bugünkü İlerleme: <strong>${dataStatus.streak.todayProgress}</strong> Hasene</div>
+                            ${!dataStatus.streak.isToday ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugün oynanmamış!</strong></div>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
+                        <button onclick="closeDataStatusModal();" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;">Tamam</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Modal'ı ekle
+        const existingModal = document.getElementById('dataStatusModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Body scroll'u engelle
+        document.body.style.overflow = 'hidden';
+        
+        // Global close fonksiyonu
+        window.closeDataStatusModal = function() {
+            const modal = document.getElementById('dataStatusModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.removeChild(modal);
+                    }
+                }, 300);
+            }
+            delete window.closeDataStatusModal;
+        };
+        
+    } catch (error) {
+        log.error('❌ Veri durumu gösterilirken hata:', error);
+        showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + error.message);
+    }
+}
+
+// Global erişim için
+if (typeof window !== 'undefined') {
+    window.showDataStatus = showDataStatus;
+}
 
 // ============ YENİ LOADING SCREEN BLOĞU SİLİNDİ ============
