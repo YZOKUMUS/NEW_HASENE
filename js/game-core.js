@@ -4791,110 +4791,93 @@ if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasen
     });
 
     // =========================================
-    // 🔥 LOCAL STORAGE TEMİZLE
+    // 🔥 LOCAL STORAGE TEMİZLE - TÜM HASENE_ KEY'LERİ
     // =========================================
-    localStorage.removeItem('hasene_totalPoints');
-    localStorage.removeItem('hasene_badges');
-    localStorage.removeItem('hasene_streak');
-    localStorage.removeItem('hasene_dailyTasks');
-    localStorage.removeItem('hasene_weeklyTasks');
-    localStorage.removeItem('hasene_currentMode');
-    localStorage.removeItem('hasene_currentDifficulty');
-    localStorage.removeItem('hasene_wordStats');
-    localStorage.removeItem('hasene_favorites'); // Favoriler sıfırla
-    localStorage.removeItem('hasene_reviewWords'); // Tekrar listesi sıfırla
-    localStorage.removeItem('hasene_recentlyWrong'); // Son yanlış cevaplar sıfırla
-    localStorage.removeItem('dailyXP');
-    localStorage.removeItem('unlockedAchievements'); // Achievement sistemini de sıfırla
+    // KRİTİK: Tüm hasene_ ile başlayan key'leri toplu olarak temizle
+    // Bu sayede hiçbir key kaçmaz
+    try {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.startsWith('hasene_') || key === 'dailyXP' || key === 'unlockedAchievements' || 
+                       key === 'dailyCorrect' || key === 'dailyWrong')) {
+                keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(key => {
+            try {
+                localStorage.removeItem(key);
+            } catch(e) {
+                // Sessizce devam et
+            }
+        });
+        log.debug(`✅ ${keysToRemove.length} localStorage key'i temizlendi`);
+    } catch(e) {
+        log.error('localStorage toplu temizleme hatası:', e);
+        // Fallback: Manuel temizleme
+        localStorage.removeItem('hasene_totalPoints');
+        localStorage.removeItem('hasene_badges');
+        localStorage.removeItem('hasene_streak');
+        localStorage.removeItem('hasene_dailyTasks');
+        localStorage.removeItem('hasene_weeklyTasks');
+        localStorage.removeItem('hasene_currentMode');
+        localStorage.removeItem('hasene_currentDifficulty');
+        localStorage.removeItem('hasene_wordStats');
+        localStorage.removeItem('hasene_favorites');
+        localStorage.removeItem('hasene_reviewWords');
+        localStorage.removeItem('hasene_recentlyWrong');
+        localStorage.removeItem('dailyXP');
+        localStorage.removeItem('unlockedAchievements');
+        localStorage.removeItem('dailyCorrect');
+        localStorage.removeItem('dailyWrong');
+    }
     
     // =========================================
     // 🔥 LİDERLİK TABLOSU SIFIRLA (MOBİL UYUMLU)
     // =========================================
+    // NOT: Bu key'ler yukarıdaki toplu temizleme ile zaten temizlendi
+    // Ama ekstra güvenlik için burada da kontrol ediyoruz
     try {
-localStorage.removeItem('hasene_weeklyScores');
-localStorage.removeItem('hasene_monthlyScores');
-localStorage.removeItem('haseneLeaderboard'); // Ana liderlik tablosu
-// Boş obje olarak set et (mobil uyumluluk için)
-localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
-localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
-localStorage.setItem('haseneLeaderboard', JSON.stringify([])); // Ana liderlik tablosu boş array
+        // haseneLeaderboard key'i hasene_ ile başlamadığı için özel kontrol
+        localStorage.removeItem('haseneLeaderboard');
     } catch(e) {
-log.error('Liderlik tablosu sıfırlama hatası:', e);
+        log.error('Liderlik tablosu sıfırlama hatası:', e);
     }
     
     // =========================================
     // 🔥 DETAYLI İSTATİSTİKLER SIFIRLA (MOBİL UYUMLU)
     // =========================================
-    try {
-// Günlük doğru/yanlış değerlerini sıfırla
-localStorage.removeItem('dailyCorrect');
-localStorage.removeItem('dailyWrong');
-localStorage.setItem('dailyCorrect', '0');
-localStorage.setItem('dailyWrong', '0');
-
-// Tarih bazlı günlük verilerini temizle (hasene_daily_YYYY-MM-DD formatındaki tüm key'ler)
-// NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
-setTimeout(() => {
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('hasene_daily_')) {
-            keysToRemove.push(key);
+    // NOT: dailyCorrect ve dailyWrong yukarıdaki toplu temizleme ile zaten temizlendi
+    // Tarih bazlı günlük verilerini temizle (hasene_daily_YYYY-MM-DD formatındaki tüm key'ler)
+    // NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
+    setTimeout(() => {
+        try {
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('hasene_daily_')) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            if (keysToRemove.length > 0) {
+                log.debug(`✅ ${keysToRemove.length} tarih bazlı key temizlendi`);
+            }
+        } catch(e) {
+            log.error('Tarih bazlı key temizleme hatası:', e);
         }
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-}, 0);
-
-// Ek güvenlik: Son 90 günün verilerini de temizle (eğer yukarıdaki tarama eksik kaldıysa)
-// NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
-setTimeout(() => {
-    const today = new Date();
-    for (let i = 0; i < 90; i++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const dateKey = `${year}-${month}-${day}`;
-        const dayKey = `hasene_daily_${dateKey}`;
-        localStorage.removeItem(dayKey);
-    }
-}, 0);
-
-// Genel detaylı istatistik key'lerini temizle
-localStorage.removeItem('hasene_detailedStats');
-localStorage.removeItem('hasene_dailyStats');
-localStorage.removeItem('hasene_weeklyStats');
-localStorage.removeItem('hasene_monthlyStats');
-localStorage.removeItem('hasene_trendStats');
-
-// Streak data'yı temizle (detaylı istatistikler için kullanılıyor)
-localStorage.removeItem('hasene_streakData');
-
-log.debug('✅ Detaylı istatistikler sıfırlandı (tarih bazlı veriler dahil)');
-    } catch(e) {
-log.error('Detaylı istatistikler sıfırlama hatası:', e);
-    }
+    }, 0);
     
     // =========================================
-    // 🔥 BİLDİRİMLER SIFIRLA (MOBİL UYUMLU)
+    // 🔥 BİLDİRİMLER VE SOSYAL PAYLAŞIM SIFIRLA
     // =========================================
+    // NOT: Bu key'ler yukarıdaki toplu temizleme ile zaten temizlendi (hasene_ ile başlıyorlar)
+    // Ekstra güvenlik için burada da kontrol ediyoruz
     try {
-localStorage.removeItem('hasene_notifications');
-localStorage.removeItem('hasene_notificationSettings');
-localStorage.removeItem('hasene_lastNotificationDate');
+        // hasene_ ile başlamayan key'ler için özel kontrol
+        // (şu an yok ama gelecekte eklenebilir)
     } catch(e) {
-log.error('Bildirimler sıfırlama hatası:', e);
-    }
-    
-    // =========================================
-    // 🔥 SOSYAL PAYLAŞIM SIFIRLA (MOBİL UYUMLU)
-    // =========================================
-    try {
-localStorage.removeItem('hasene_socialShare');
-localStorage.removeItem('hasene_shareHistory');
-    } catch(e) {
-log.error('Sosyal paylaşım sıfırlama hatası:', e);
+        log.error('Ekstra temizleme hatası:', e);
     }
 
     // =========================================
@@ -15157,7 +15140,19 @@ async function showDataStatus() {
         
         // Veri var mı kontrolü (sadece gerçek oyun verilerini kontrol et, flag'leri hariç tut)
         // KRİTİK: Sıfırlama flag'i varsa, localStorage'da veri yok demektir (hasAnyLocalStorageData = false)
-        const hasAnyLocalStorageData = !statsJustReset && !!(dailyTasksData || weeklyTasksData || streakDataStorage || totalPointsData || badgesData);
+        // Ayrıca, boş objeler/array'ler ve '0' değerleri de "veri yok" olarak kabul edilir
+        // NOT: Flag varsa, hasAnyLocalStorageData her zaman false olmalı (yukarıda zaten null yapıldı)
+        let hasAnyLocalStorageData = false;
+        if (!statsJustReset) {
+            // Flag yoksa, gerçek veri kontrolü yap
+            hasAnyLocalStorageData = !!(
+                (dailyTasksData && dailyTasksData !== '{}' && dailyTasksData !== '[]') ||
+                (weeklyTasksData && weeklyTasksData !== '{}' && weeklyTasksData !== '[]') ||
+                (streakDataStorage && streakDataStorage !== '{}' && streakDataStorage !== '[]') ||
+                (totalPointsData && totalPointsData !== '0' && totalPointsData !== '') ||
+                (badgesData && badgesData !== '{}' && badgesData !== '[]')
+            );
+        }
         
         // ============ MEVCUT VERİLERİ AL ============
         // ÖNCE localStorage/IndexedDB'den veri oku, yoksa global değişkenlerden oku

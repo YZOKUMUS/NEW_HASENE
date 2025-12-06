@@ -4,22 +4,36 @@
  */
 
 // Bildirim izni kontrolü
+// NOT: Bu fonksiyon sadece kullanıcı etkileşimi (click, touch, vb.) sonrasında çağrılmalıdır!
+// Tarayıcılar güvenlik politikası gereği bildirim izni isteğini sadece kullanıcı etkileşimi sonrasında kabul eder
 async function requestNotificationPermission() {
     if (!('Notification' in window)) {
         if (typeof log !== 'undefined') log.warn('Bu tarayıcı bildirimleri desteklemiyor');
         return false;
     }
 
+    // İzin zaten verilmişse true döndür
     if (Notification.permission === 'granted') {
         return true;
     }
 
-    if (Notification.permission !== 'denied') {
-        const permission = await Notification.requestPermission();
-        return permission === 'granted';
+    // İzin reddedilmişse false döndür
+    if (Notification.permission === 'denied') {
+        if (typeof log !== 'undefined') log.warn('Bildirim izni reddedilmiş');
+        return false;
     }
 
-    return false;
+    // İzin henüz istenmemişse, kullanıcı etkileşimi sonrasında izin iste
+    // NOT: Bu çağrı sadece kullanıcı etkileşimi (click, touch, vb.) sonrasında yapılmalıdır!
+    try {
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+    } catch (e) {
+        if (typeof log !== 'undefined') {
+            log.error('Bildirim izni isteği hatası:', e);
+        }
+        return false;
+    }
 }
 
 // Bildirim göster
@@ -349,30 +363,46 @@ function showAchievementNotification(achievement) {
 
 // Bildirimleri başlat
 function initNotifications() {
-    // İzin iste
-    requestNotificationPermission();
+    // KRİTİK: İzin isteğini kullanıcı etkileşimi olmadan yapma!
+    // Tarayıcılar sadece kullanıcı etkileşimi (click, touch, vb.) sonrasında izin isteğine izin verir
+    // Bu yüzden sadece mevcut izni kontrol et, yeni izin isteme
+    // İzin isteği kullanıcı etkileşimi sonrasında (örneğin ayarlar panelinde bir buton ile) yapılmalı
+    
+    // Mevcut izni kontrol et (sadece kontrol, izin isteme)
+    if (!('Notification' in window)) {
+        if (typeof log !== 'undefined') log.debug('Bu tarayıcı bildirimleri desteklemiyor');
+        return;
+    }
+    
+    // İzin zaten verilmişse devam et
+    if (Notification.permission === 'granted') {
+        // Günlük hatırlatıcı kontrolü (her 1 saatte bir)
+        setInterval(() => {
+            checkDailyReminder();
+        }, 60 * 60 * 1000); // 1 saat
 
-    // Günlük hatırlatıcı kontrolü (her 1 saatte bir)
-    setInterval(() => {
-        checkDailyReminder();
-    }, 60 * 60 * 1000); // 1 saat
+        // Günlük görev hatırlatıcısı kontrolü (her 30 dakikada bir - gece 23:00'ten sonra)
+        setInterval(() => {
+            checkDailyTasksReminder();
+        }, 30 * 60 * 1000); // 30 dakika
 
-    // Günlük görev hatırlatıcısı kontrolü (her 30 dakikada bir - gece 23:00'ten sonra)
-    setInterval(() => {
-        checkDailyTasksReminder();
-    }, 30 * 60 * 1000); // 30 dakika
+        // Streak uyarısı kontrolü (her 30 dakikada bir)
+        setInterval(() => {
+            checkStreakWarning();
+        }, 30 * 60 * 1000); // 30 dakika
 
-    // Streak uyarısı kontrolü (her 30 dakikada bir)
-    setInterval(() => {
-        checkStreakWarning();
-    }, 30 * 60 * 1000); // 30 dakika
-
-    // İlk kontrol
-    setTimeout(() => {
-        checkDailyReminder();
-        checkDailyTasksReminder();
-        checkStreakWarning();
-    }, window.CONSTANTS?.UI?.NOTIFICATION_DURATION || 5000); // Notification duration
+        // İlk kontrol
+        setTimeout(() => {
+            checkDailyReminder();
+            checkDailyTasksReminder();
+            checkStreakWarning();
+        }, window.CONSTANTS?.UI?.NOTIFICATION_DURATION || 5000); // Notification duration
+    } else {
+        // İzin verilmemişse, sadece log yaz (izinsiz bildirim gösterme)
+        if (typeof log !== 'undefined') {
+            log.debug('Bildirim izni verilmemiş. Kullanıcı etkileşimi sonrasında izin istenebilir.');
+        }
+    }
 }
 
 // Sayfa görünürlüğü değiştiğinde kontrol et
