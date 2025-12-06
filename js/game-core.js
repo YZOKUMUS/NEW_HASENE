@@ -4782,13 +4782,13 @@ if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasen
         }
     };
     
-    // IndexedDB'yi temizle (await ile bekle - işlem tamamlanana kadar bekle)
-    try {
-        await clearIndexedDB();
+    // IndexedDB'yi temizle (await etme - arka planda tamamlanacak, click handler'ı bloklamasın)
+    // NOT: IndexedDB işlemleri arka planda tamamlanacak, click handler hemen dönecek
+    clearIndexedDB().then(() => {
         log.debug('✅ IndexedDB temizleme tamamlandı');
-    } catch(e) {
+    }).catch(e => {
         log.error('IndexedDB temizleme hatası:', e);
-    }
+    });
 
     // =========================================
     // 🔥 LOCAL STORAGE TEMİZLE
@@ -4833,15 +4833,17 @@ localStorage.setItem('dailyCorrect', '0');
 localStorage.setItem('dailyWrong', '0');
 
 // Tarih bazlı günlük verilerini temizle (hasene_daily_YYYY-MM-DD formatındaki tüm key'ler)
-// localStorage'daki tüm key'leri tarayarak hasene_daily_ ile başlayanları temizle
-const keysToRemove = [];
-for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('hasene_daily_')) {
-        keysToRemove.push(key);
+// NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
+setTimeout(() => {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('hasene_daily_')) {
+            keysToRemove.push(key);
+        }
     }
-}
-keysToRemove.forEach(key => localStorage.removeItem(key));
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+}, 0);
 
 // Ek güvenlik: Son 90 günün verilerini de temizle (eğer yukarıdaki tarama eksik kaldıysa)
 // NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
@@ -5181,23 +5183,26 @@ log.error('Bildirimler güncelleme hatası:', e);
     }
     
     // Mobil cihazlarda localStorage'ı zorla temizle (tüm hasene_ ile başlayan key'ler)
+    // NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
     try {
-const keysToRemove = [];
-for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && (key.startsWith('hasene_weekly') || key.startsWith('hasene_monthly') || 
-               key.startsWith('hasene_detailed') || key.startsWith('hasene_notification') ||
-               key.startsWith('hasene_social') || key.startsWith('hasene_streakData'))) {
-        keysToRemove.push(key);
+setTimeout(() => {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('hasene_weekly') || key.startsWith('hasene_monthly') || 
+                   key.startsWith('hasene_detailed') || key.startsWith('hasene_notification') ||
+                   key.startsWith('hasene_social') || key.startsWith('hasene_streakData'))) {
+            keysToRemove.push(key);
+        }
     }
-}
-keysToRemove.forEach(key => {
-    try {
-        localStorage.removeItem(key);
-    } catch(e) {
-        log.debug('Key silme hatası (kritik değil):', key, e);
-    }
-});
+    keysToRemove.forEach(key => {
+        try {
+            localStorage.removeItem(key);
+        } catch(e) {
+            log.debug('Key silme hatası (kritik değil):', key, e);
+        }
+    });
+}, 0);
     } catch(e) {
 log.error('localStorage temizleme hatası:', e);
     }
