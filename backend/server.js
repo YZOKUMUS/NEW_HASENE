@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
-require('dotenv').config();
+// Only load dotenv in development
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 const connectDB = require('./config/database');
 const passport = require('./config/passport');
