@@ -1,15480 +1,4659 @@
-// Modüler JavaScript dosyaları yüklendi (config.js ve utils.js)
-// Artık CONFIG, log, getLocalDateString, hapticFeedback, initSwipeGestures,
-// sanitizeHTML, safeSetHTML, showLoading, hideLoading, encryptData, decryptData,
-// secureSetItem, secureGetItem, showCustomAlert fonksiyonları kullanılabilir
-
-// ============ HELPER FUNCTIONS ============
-// ⚡ SPEED ANIMATIONS SYSTEM
-function addSpeedAnimation(element, type = 'fade-in') {
-    if (!element) return;
-    element.classList.add(`speed-${type}`);
-    setTimeout(() => element.classList.remove(`speed-${type}`), 600);
-}
-
-// 🎯 NAVIGATION HELPER
-function setActiveNavItem(index) {
-    // Yeni bottom-nav için
-    document.querySelectorAll('.bottom-nav .nav-item').forEach((item, i) => {
-        item.classList.toggle('active', i === index);
-    });
-    // Eski flutter-nav-item için geriye dönük uyumluluk
-    document.querySelectorAll('.flutter-nav-item').forEach((item, i) => {
-        item.classList.toggle('active', i === index);
-    });
-}
-
-// 🎆 SUCCESS ANIMATIONS - CONFETTI SYSTEM
-function triggerConfetti() {
-    const container = document.createElement('div');
-    container.className = 'confetti-container';
-    document.body.appendChild(container);
-
-    // 50 konfeti parçası oluştur
-    for (let i = 0; i < 50; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti-piece';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.animationDelay = Math.random() * 2 + 's';
-        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-        container.appendChild(confetti);
-    }
-
-    // 3 saniye sonra temizle
-    setTimeout(() => {
-        if (container.parentNode) {
-            container.parentNode.removeChild(container);
-        }
-    }, 3000);
-}
-
-function triggerSuccessBurst(element) {
-    if (!element) return;
-    element.classList.add('success-burst');
-    setTimeout(() => element.classList.remove('success-burst'), 800);
-}
-
-// 📱 HAPTIC FEEDBACK SYSTEM
-function triggerHaptic(type = 'medium') {
-    // CONFIG kontrolü ile haptic feedback
-    if (!CONFIG.hapticEnabled) return;
-    
-    try {
-        // Modern haptic feedback API
-        if ('vibrate' in navigator) {
-            const patterns = {
-                light: [10],
-                medium: [20],
-                heavy: [50],
-                success: [20, 50, 20],
-                error: [50, 100, 50],
-                combo: [20, 30, 20, 30, 50],
-                warning: [30, 50, 30]
-            };
-            navigator.vibrate(patterns[type] || patterns.medium);
-        }
-    } catch (error) {
-        log.debug('Haptic feedback not supported');
-    }
-}
-
-// 🌐 ARABIC TEXT HELPER (Deprecated but kept for compatibility)
-function updateArabicTextColoring() {
-    // Fonksiyon kaldırıldı ama hala çağrılıyor, boş fonksiyon olarak tanımlı
-    // Hata önleme için
-}
-
-// 🌙 DARK MODE TOGGLE
-function toggleDarkMode() {
-    const body = document.body;
-    const isDark = body.classList.toggle('dark-mode');
-    const darkModeIcon = document.getElementById('darkModeIcon');
-    
-    // Debug
-    log.debug('Dark mode toggled:', isDark);
-    log.debug('Body classes:', body.className);
-    
-    // LocalStorage'a kaydet
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    
-    // Icon güncelle
-    if (darkModeIcon) {
-        darkModeIcon.textContent = isDark ? '☀️' : '🌙';
-    }
-    
-    // Buton stilini güncelle
-    const darkModeBtn = document.getElementById('darkModeToggle');
-    if (darkModeBtn) {
-        if (isDark) {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
-        } else {
-            darkModeBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        }
-    }
-}
-
-// Global erişim için (inline onclick handlers için gerekli)
-window.updateArabicTextColoring = updateArabicTextColoring;
-window.toggleDarkMode = toggleDarkMode;
-
-// ============ EVENT LISTENER YÖNETİMİ (Memory Leak Prevention) ============
-/**
- * StorageManager - Merkezi LocalStorage yönetimi
- * Error handling, caching ve quota management ile güvenli storage
- */
-class StorageManager {
-    constructor() {
-        this.storageAvailable = this.checkStorageAvailability();
-        this.cache = new Map();
-        log.debug('🗄️ StorageManager başlatıldı', { available: this.storageAvailable });
-    }
-
-    checkStorageAvailability() {
-        try {
-            const test = '__storage_test__';
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
-            return true;
-        } catch (e) {
-            log.error('❌ LocalStorage kullanılamıyor:', e);
-            return false;
-        }
-    }
-
-    get(key, defaultValue = null) {
-        if (!this.storageAvailable) {
-            log.warn('⚠️ Storage kullanılamıyor, default döndürülüyor');
-            return defaultValue;
-        }
-
-        if (this.cache.has(key)) {
-            return this.cache.get(key);
-        }
-
-        try {
-            const value = localStorage.getItem(key);
-            if (value === null) {
-                return defaultValue;
-            }
-
-            try {
-                const parsed = JSON.parse(value);
-                this.cache.set(key, parsed);
-                return parsed;
-            } catch (e) {
-                this.cache.set(key, value);
-                return value;
-            }
-        } catch (error) {
-            log.error(`❌ Storage okuma hatası (${key}):`, error);
-            return defaultValue;
-        }
-    }
-
-    set(key, value) {
-        if (!this.storageAvailable) {
-            log.warn('⚠️ Storage kullanılamıyor, veri kaydedilmedi');
-            return false;
-        }
-
-        try {
-            const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-            localStorage.setItem(key, serialized);
-            this.cache.set(key, value);
-            return true;
-        } catch (error) {
-            log.error(`❌ Storage yazma hatası (${key}):`, error);
-            
-            if (error.name === 'QuotaExceededError') {
-                log.error('💥 Storage kotası doldu! Temizlik yapılıyor...');
-                this.cleanup();
-                
-                try {
-                    const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-                    localStorage.setItem(key, serialized);
-                    this.cache.set(key, value);
-                    log.debug(`💾 Temizlikten sonra kaydedildi: ${key}`);
-                    return true;
-                } catch (retryError) {
-                    log.error(`❌ Temizlikten sonra bile başarısız: ${key}`);
-                    return false;
-                }
-            }
-            return false;
-        }
-    }
-
-    remove(key) {
-        if (!this.storageAvailable) return false;
-
-        try {
-            localStorage.removeItem(key);
-            this.cache.delete(key);
-            log.debug(`🗑️ Storage'dan silindi: ${key}`);
-            return true;
-        } catch (error) {
-            log.error(`❌ Storage silme hatası (${key}):`, error);
-            return false;
-        }
-    }
-
-    clear() {
-        if (!this.storageAvailable) return false;
-
-        try {
-            localStorage.clear();
-            this.cache.clear();
-            log.debug('🧹 Storage temizlendi');
-            return true;
-        } catch (error) {
-            log.error('❌ Storage temizleme hatası:', error);
-            return false;
-        }
-    }
-
-    cleanup() {
-        if (!this.storageAvailable) return;
-        
-        const keysToRemove = [];
-        const now = Date.now();
-        const ONE_YEAR = 365 * 24 * 60 * 60 * 1000; // 1 yıl
-        
-        try {
-            // 1. Geçici verileri temizle (temp, cache, old)
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    if (key.startsWith('temp_') || 
-                        key.startsWith('cache_') || 
-                        key.startsWith('old_') ||
-                        key.includes('_backup_') ||
-                        key.includes('_temp')) {
-                        keysToRemove.push(key);
-                    }
-                }
-            }
-            
-            // 2. 1 yıldan eski daily stats'ları temizle
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key) && key.startsWith('dailyStats_')) {
-                    try {
-                        const dateStr = key.replace('dailyStats_', '');
-                        const date = new Date(dateStr);
-                        if (!isNaN(date) && (now - date.getTime() > ONE_YEAR)) {
-                            keysToRemove.push(key);
-                        }
-                    } catch (e) {
-                        // Geçersiz tarih formatı, sil
-                        keysToRemove.push(key);
-                    }
-                }
-            }
-            
-            // 3. Boş veya geçersiz verileri temizle
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    const value = localStorage.getItem(key);
-                    if (!value || value === 'undefined' || value === 'null' || value === '{}' || value === '[]') {
-                        keysToRemove.push(key);
-                    }
-                }
-            }
-            
-            // Temizliği uygula
-            const removedCount = keysToRemove.length;
-            keysToRemove.forEach(key => this.remove(key));
-            
-            log.debug(`🧹 Storage cleanup: ${removedCount} anahtar temizlendi`);
-            return removedCount;
-        } catch (error) {
-            log.error('❌ Storage cleanup hatası:', error);
-            return 0;
-        }
-    }
-
-    getAllKeys() {
-        if (!this.storageAvailable) return [];
-
-        try {
-            return Object.keys(localStorage);
-        } catch (error) {
-            log.error('❌ Storage key listesi alınamadı:', error);
-            return [];
-        }
-    }
-
-    getSize() {
-        if (!this.storageAvailable) return 0;
-
-        try {
-            let totalSize = 0;
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    totalSize += localStorage[key].length + key.length;
-                }
-            }
-            return totalSize;
-        } catch (error) {
-            log.error('❌ Storage boyutu hesaplanamadı:', error);
-            return 0;
-        }
-    }
-
-    /**
-     * Veri doğrulama - Belirli bir key için beklenen veri yapısını kontrol et
-     * @param {string} key - Storage anahtarı
-     * @param {Object} schema - Beklenen veri şeması { type: 'object|array|number|string', required: ['field1', 'field2'] }
-     * @returns {boolean} - Veri geçerli mi?
-     */
-    validate(key, schema) {
-        const data = this.get(key);
-        if (data === null || data === undefined) {
-            return false;
-        }
-
-        // Tip kontrolü
-        if (schema.type) {
-            const actualType = Array.isArray(data) ? 'array' : typeof data;
-            if (actualType !== schema.type) {
-                log.warn(`⚠️ Storage validation failed: ${key} (expected ${schema.type}, got ${actualType})`);
-                return false;
-            }
-        }
-
-        // Required field kontrolü (sadece object için)
-        if (schema.required && typeof data === 'object' && !Array.isArray(data)) {
-            for (const field of schema.required) {
-                if (!(field in data)) {
-                    log.warn(`⚠️ Storage validation failed: ${key} missing required field "${field}"`);
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Güvenli get - Schema validation ile birlikte
-     * @param {string} key - Storage anahtarı
-     * @param {*} defaultValue - Default değer
-     * @param {Object} schema - Opsiyonel validation şeması
-     * @returns {*} - Storage değeri veya default
-     */
-    getSafe(key, defaultValue = null, schema = null) {
-        const data = this.get(key, defaultValue);
-        
-        // Schema varsa validate et
-        if (schema && data !== defaultValue) {
-            if (!this.validate(key, schema)) {
-                log.warn(`⚠️ Invalid data for ${key}, returning default`);
-                return defaultValue;
-            }
-        }
-        
-        return data;
-    }
-
-    /**
-     * Storage kullanım istatistikleri
-     * @returns {Object} - { used: number, total: number, percent: number, itemCount: number }
-     */
-    getStats() {
-        if (!this.storageAvailable) {
-            return { used: 0, total: 0, percent: 0, itemCount: 0 };
-        }
-
-        const used = this.getSize();
-        const total = 5 * 1024 * 1024; // 5MB (tarayıcı varsayılanı)
-        const percent = ((used / total) * 100).toFixed(2);
-        const itemCount = this.getAllKeys().length;
-
-        return {
-            used,
-            total,
-            percent: parseFloat(percent),
-            itemCount,
-            usedMB: (used / (1024 * 1024)).toFixed(2),
-            totalMB: (total / (1024 * 1024)).toFixed(2)
-        };
-    }
-
-    /**
-     * Otomatik temizlik - Storage %80 doluysa temizlik yap
-     * @returns {boolean} - Temizlik yapıldı mı?
-     */
-    autoCleanup() {
-        const stats = this.getStats();
-        if (stats.percent > 80) {
-            log.warn(`⚠️ Storage %${stats.percent} dolu, otomatik temizlik başlatılıyor...`);
-            const cleaned = this.cleanup();
-            log.debug(`🧹 Otomatik temizlik: ${cleaned} anahtar silindi`);
-            return true;
-        }
-        return false;
-    }
-}
-
-// Global storage manager
-const storage = new StorageManager();
-
-/**
- * Storage Schemas - Kritik veriler için validation şemaları
- * Type safety ve data integrity sağlar
- */
-const StorageSchemas = {
-    // User Data Schemas
-    dailyGoalHasene: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) > 0 },
-    dailyGoalLevel: { type: 'string', validate: (v) => ['easy', 'normal', 'serious'].includes(v) },
-    dailyHasene: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
-    dailyCorrect: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
-    dailyWrong: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
-    
-    // Game State Schemas
-    hasene_totalPoints: { type: 'string', validate: (v) => !isNaN(parseInt(v)) && parseInt(v) >= 0 },
-    hasene_wordStats: { type: 'object', validate: (v) => typeof v === 'object' && !Array.isArray(v) },
-    hasene_dailyTasks: { type: 'object', required: ['todayStats'], validate: (v) => v.todayStats !== undefined },
-    
-    // Achievement Schemas
-    unlockedAchievements: { type: 'array', validate: (v) => Array.isArray(v) },
-    hasene_badges: { type: 'object', validate: (v) => typeof v === 'object' },
-    
-    // Streak Data Schema
-    hasene_streakData: { 
-        type: 'object', 
-        required: ['currentStreak', 'bestStreak', 'playDates'],
-        validate: (v) => {
-            return v.currentStreak !== undefined && 
-                   v.bestStreak !== undefined && 
-                   Array.isArray(v.playDates);
-        }
-    }
-};
-
-/**
- * Storage Helper - Schema validation ile güvenli storage erişimi
- */
-const StorageHelper = {
-    /**
-     * Validation ile güvenli get
-     * @param {string} key - Storage key
-     * @param {*} defaultValue - Default değer
-     * @returns {*} - Validated değer veya default
-     */
-    getSafe(key, defaultValue = null) {
-        const schema = StorageSchemas[key];
-        if (!schema) {
-            // Schema yoksa normal get
-            return storage.get(key, defaultValue);
-        }
-        
-        const value = storage.get(key, defaultValue);
-        if (value === defaultValue) {
-            return value;
-        }
-        
-        // Type check
-        const actualType = Array.isArray(value) ? 'array' : typeof value;
-        if (actualType !== schema.type) {
-            log.warn(`⚠️ Type mismatch for ${key}: expected ${schema.type}, got ${actualType}. Using default.`);
-            return defaultValue;
-        }
-        
-        // Custom validation
-        if (schema.validate && !schema.validate(value)) {
-            log.warn(`⚠️ Validation failed for ${key}. Using default.`);
-            return defaultValue;
-        }
-        
-        // Required fields check (for objects)
-        if (schema.required && actualType === 'object') {
-            for (const field of schema.required) {
-                if (!(field in value)) {
-                    log.warn(`⚠️ Missing required field "${field}" in ${key}. Using default.`);
-                    return defaultValue;
-                }
-            }
-        }
-        
-        return value;
-    },
-
-    /**
-     * Validation ile güvenli set
-     * @param {string} key - Storage key
-     * @param {*} value - Değer
-     * @returns {boolean} - Başarılı mı?
-     */
-    setSafe(key, value) {
-        const schema = StorageSchemas[key];
-        if (!schema) {
-            // Schema yoksa normal set
-            return storage.set(key, value);
-        }
-        
-        // Type check
-        const actualType = Array.isArray(value) ? 'array' : typeof value;
-        if (actualType !== schema.type) {
-            log.error(`❌ Cannot save ${key}: type mismatch (expected ${schema.type}, got ${actualType})`);
-            return false;
-        }
-        
-        // Custom validation
-        if (schema.validate && !schema.validate(value)) {
-            log.error(`❌ Cannot save ${key}: validation failed`);
-            return false;
-        }
-        
-        // Required fields check
-        if (schema.required && actualType === 'object') {
-            for (const field of schema.required) {
-                if (!(field in value)) {
-                    log.error(`❌ Cannot save ${key}: missing required field "${field}"`);
-                    return false;
-                }
-            }
-        }
-        
-        return storage.set(key, value);
-    },
-
-    /**
-     * Schema tanımı ekle (runtime'da)
-     * @param {string} key - Storage key
-     * @param {Object} schema - Schema tanımı
-     */
-    addSchema(key, schema) {
-        StorageSchemas[key] = schema;
-        log.debug(`📋 Schema eklendi: ${key}`);
-    }
-};
-
-/**
- * Performance Monitor - Performans izleme ve optimizasyon
- * Memory, timing ve render performansını izler
- */
-const PerformanceMonitor = {
-    enabled: false, // CONFIG.debug true olunca otomatik aktif olur
-    
-    /**
-     * Fonksiyon çalışma süresini ölç
-     * @param {string} name - Fonksiyon adı
-     * @param {Function} fn - Ölçülecek fonksiyon
-     * @returns {*} - Fonksiyonun return değeri
-     */
-    measure(name, fn) {
-        if (!this.enabled) return fn();
-        
-        const start = performance.now();
-        const result = fn();
-        const end = performance.now();
-        const duration = (end - start).toFixed(2);
-        
-        if (duration > 16.67) { // 60 FPS threshold (1000ms / 60fps = 16.67ms)
-            log.warn(`⚠️ Slow function: ${name} took ${duration}ms (>16.67ms threshold)`);
-        } else {
-            log.debug(`⏱️ ${name}: ${duration}ms`);
-        }
-        
-        return result;
-    },
-
-    /**
-     * Async fonksiyon çalışma süresini ölç
-     * @param {string} name - Fonksiyon adı
-     * @param {Function} fn - Ölçülecek async fonksiyon
-     * @returns {Promise<*>}
-     */
-    async measureAsync(name, fn) {
-        if (!this.enabled) return await fn();
-        
-        const start = performance.now();
-        const result = await fn();
-        const end = performance.now();
-        const duration = (end - start).toFixed(2);
-        
-        log.debug(`⏱️ ${name} (async): ${duration}ms`);
-        return result;
-    },
-
-    /**
-     * Memory kullanımını raporla
-     */
-    logMemory() {
-        if (!this.enabled || !performance.memory) return;
-        
-        const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(2);
-        const total = (performance.memory.totalJSHeapSize / 1048576).toFixed(2);
-        const limit = (performance.memory.jsHeapSizeLimit / 1048576).toFixed(2);
-        
-        log.debug(`💾 Memory: ${used}MB / ${total}MB (Limit: ${limit}MB)`);
-    },
-
-    /**
-     * Storage kullanımını raporla
-     */
-    logStorage() {
-        if (!this.enabled) return;
-        
-        const stats = storage.getStats();
-        log.debug(`💾 Storage: ${stats.usedMB}MB / ${stats.totalMB}MB (${stats.percent}%) - ${stats.itemCount} items`);
-    },
-
-    /**
-     * Tüm performans metriklerini raporla
-     */
-    report() {
-        if (!this.enabled) return;
-        
-        log.debug('\n📊 === PERFORMANCE REPORT ===');
-        this.logMemory();
-        this.logStorage();
-        log.debug('===========================\n');
-    }
-};
-
-/**
- * Error Boundary - Global hata yakalama ve raporlama
- * Production'da kullanıcıya friendly mesaj, console'a detaylı log
- */
-const ErrorBoundary = {
-    /**
-     * Güvenli fonksiyon wrapper
-     * @param {Function} fn - Çalıştırılacak fonksiyon
-     * @param {*} fallbackValue - Hata durumunda döndürülecek değer
-     * @param {string} context - Hata context'i
-     * @returns {*}
-     */
-    safe(fn, fallbackValue = null, context = 'Unknown') {
-        try {
-            return fn();
-        } catch (error) {
-            log.error(`❌ Error in ${context}:`, error);
-            log.error('Stack trace:', error.stack);
-            
-            if (CONFIG.showCriticalErrors) {
-                showCustomAlert(
-                    `Bir hata oluştu: ${context}`,
-                    'error'
-                );
-            }
-            
-            return fallbackValue;
-        }
-    },
-
-    /**
-     * Güvenli async fonksiyon wrapper
-     * @param {Function} fn - Çalıştırılacak async fonksiyon
-     * @param {*} fallbackValue - Hata durumunda döndürülecek değer
-     * @param {string} context - Hata context'i
-     * @returns {Promise<*>}
-     */
-    async safeAsync(fn, fallbackValue = null, context = 'Unknown') {
-        try {
-            return await fn();
-        } catch (error) {
-            log.error(`❌ Async error in ${context}:`, error);
-            log.error('Stack trace:', error.stack);
-            
-            if (CONFIG.showCriticalErrors) {
-                showCustomAlert(
-                    `Bir hata oluştu: ${context}`,
-                    'error'
-                );
-            }
-            
-            return fallbackValue;
-        }
-    },
-
-    /**
-     * Global error handler'ı başlat
-     */
-    init() {
-        // Uncaught errors
-        window.addEventListener('error', (event) => {
-            log.error('❌ Global error:', event.error);
-            log.error('  Message:', event.message);
-            log.error('  File:', event.filename);
-            log.error('  Line:', event.lineno);
-            log.error('  Column:', event.colno);
-            
-            // Kullanıcıya bildirme
-            if (CONFIG.showCriticalErrors) {
-                showCustomAlert(
-                    'Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin.',
-                    'error'
-                );
-            }
-            
-            return true; // Prevent default error handling
-        });
-        
-        // Unhandled promise rejections
-        window.addEventListener('unhandledrejection', (event) => {
-            log.error('❌ Unhandled promise rejection:', event.reason);
-            log.error('  Promise:', event.promise);
-            
-            if (CONFIG.showCriticalErrors) {
-                showCustomAlert(
-                    'Bir işlem başarısız oldu. Lütfen tekrar deneyin.',
-                    'error'
-                );
-            }
-            
-            event.preventDefault();
-        });
-        
-        log.debug('✅ ErrorBoundary initialized');
-    }
-};
-
-// Performance monitoring'i CONFIG.debug ile aktif et
-if (CONFIG.debug) {
-    PerformanceMonitor.enabled = true;
-    log.debug('⚡ PerformanceMonitor enabled');
-}
-
-// Error boundary'yi başlat
-ErrorBoundary.init();
-
-/**
- * DOM Helper - Güvenli DOM element erişimi ve güncelleme
- * Null safety ile hata riski azaltılır
- */
-const DOM = {
-    /**
-     * Element'i güvenli şekilde al
-     * @param {string} id - Element ID
-     * @param {string} context - Hata mesajında gösterilecek context
-     * @returns {HTMLElement|null}
-     */
-    get(id, context = '') {
-        const el = document.getElementById(id);
-        if (!el && context) {
-            log.warn(`⚠️ Element bulunamadı: ${id} ${context ? `(${context})` : ''}`);
-        }
-        return el;
-    },
-
-    /**
-     * Text content'i güvenli şekilde güncelle
-     * @param {string} id - Element ID
-     * @param {string} value - Yeni text değeri
-     * @returns {boolean} - Başarılı mı?
-     */
-    setText(id, value) {
-        const el = this.get(id);
-        if (el) {
-            el.textContent = value;
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * HTML content'i güvenli şekilde güncelle
-     * @param {string} id - Element ID
-     * @param {string} html - Yeni HTML değeri
-     * @returns {boolean} - Başarılı mı?
-     */
-    setHTML(id, html) {
-        const el = this.get(id);
-        if (el) {
-            el.innerHTML = html;
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Class ekle (güvenli)
-     * @param {string} id - Element ID
-     * @param {string} className - Eklenecek class
-     * @returns {boolean} - Başarılı mı?
-     */
-    addClass(id, className) {
-        const el = this.get(id);
-        if (el) {
-            el.classList.add(className);
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Class kaldır (güvenli)
-     * @param {string} id - Element ID
-     * @param {string} className - Kaldırılacak class
-     * @returns {boolean} - Başarılı mı?
-     */
-    removeClass(id, className) {
-        const el = this.get(id);
-        if (el) {
-            el.classList.remove(className);
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Style güncelle (güvenli)
-     * @param {string} id - Element ID
-     * @param {string} property - CSS property
-     * @param {string} value - CSS value
-     * @returns {boolean} - Başarılı mı?
-     */
-    setStyle(id, property, value) {
-        const el = this.get(id);
-        if (el) {
-            el.style[property] = value;
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Birden fazla element için text güncelle
-     * @param {Object} updates - { elementId: value, ... }
-     * @returns {number} - Başarılı güncelleme sayısı
-     */
-    setTextBatch(updates) {
-        let successCount = 0;
-        for (const [id, value] of Object.entries(updates)) {
-            if (this.setText(id, value)) {
-                successCount++;
-            }
-        }
-        return successCount;
-    }
-};
-
-/**
- * EventListenerManager - Memory leak'leri önlemek için merkezi event listener yönetimi
- * WeakMap kullanarak elementler için listener'ları takip eder
- */
-class EventListenerManager {
-    constructor() {
-        this.listeners = new WeakMap();
-        log.debug('🎧 EventListenerManager başlatıldı');
-    }
-    
-    /**
-     * Event listener ekle ve kaydet
-     * @param {HTMLElement} element - Hedef element
-     * @param {string} event - Event tipi (click, touchstart vb.)
-     * @param {Function} handler - Event handler fonksiyonu
-     * @param {Object} options - addEventListener options
-     */
-    add(element, event, handler, options = {}) {
-        if (!element) {
-            log.warn('⚠️ EventListenerManager.add: element null!');
-            return;
-        }
-        
-        // Element için listener listesi al veya oluştur
-        let elementListeners = this.listeners.get(element);
-        if (!elementListeners) {
-            elementListeners = [];
-            this.listeners.set(element, elementListeners);
-        }
-        
-        // Listener'ı ekle
-        element.addEventListener(event, handler, options);
-        elementListeners.push({ event, handler, options });
-        
-        log.debug(`➕ Listener eklendi: ${event} (Toplam: ${elementListeners.length})`);
-    }
-    
-    /**
-     * Belirli bir element için tüm listener'ları temizle
-     * @param {HTMLElement} element - Temizlenecek element
-     */
-    cleanup(element) {
-        if (!element) {
-            log.warn('⚠️ EventListenerManager.cleanup: element null!');
-            return;
-        }
-        
-        const elementListeners = this.listeners.get(element);
-        if (!elementListeners) {
-            log.debug('ℹ️ Temizlenecek listener yok');
-            return;
-        }
-        
-        // Tüm listener'ları kaldır
-        let removed = 0;
-        elementListeners.forEach(({ event, handler, options }) => {
-            element.removeEventListener(event, handler, options);
-            removed++;
-        });
-        
-        // WeakMap'ten sil
-        this.listeners.delete(element);
-        
-        log.debug(`🧹 ${removed} listener temizlendi`);
-    }
-    
-    /**
-     * Birden fazla element için temizlik yap
-     * @param {Array<HTMLElement>} elements - Temizlenecek elementler
-     */
-    cleanupMultiple(elements) {
-        if (!Array.isArray(elements)) {
-            log.warn('⚠️ EventListenerManager.cleanupMultiple: elements array değil!');
-            return;
-        }
-        
-        elements.forEach(element => this.cleanup(element));
-        log.debug(`🧹 ${elements.length} element için cleanup tamamlandı`);
-    }
-}
-
-// Global instance oluştur
-const eventManager = new EventListenerManager();
-
-// ============ GLOBAL FONKSİYONLAR (onclick için erişilebilir olmalı) ============
-
-// NOT: switchStatsTab fonksiyonu kaldırıldı - Stats modal'da tab sistemi yok
-// Stats modal tek bir scroll edilebilir içerik olarak çalışıyor
-
-// Daily Goal Functions
-function showDailyGoalSettings() {
-    const modal = document.getElementById('dailyGoalModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        // Touch event'leri başlat
-        initDailyGoalModalTouchEvents();
-    }
-}
-
-function closeDailyGoalModal() {
-    const modal = document.getElementById('dailyGoalModal');
-    if (modal) {
-        // Event listener'ları temizle (memory leak prevention)
-        eventManager.cleanup(modal);
-        modal.style.display = 'none';
-        log.debug('🔒 Daily Goal Modal kapatıldı ve temizlendi');
-    }
-}
-
-// Global erişim için (inline onclick handlers)
-window.showDailyGoalSettings = showDailyGoalSettings;
-window.closeDailyGoalModal = closeDailyGoalModal;
-
-// ============ GENERIC MODAL TOUCH EVENT MANAGER ============
-/**
- * Tek bir fonksiyon ile tüm modallar için touch event'leri yönetir
- * DRY (Don't Repeat Yourself) prensibi
- */
-const modalTouchState = new Map(); // Her modal için ayrı state
-
-function initGenericModalTouchEvents(modalId, closeCallback) {
-    const modal = document.getElementById(modalId);
-    if (!modal) {
-        log.warn(`⚠️ Modal bulunamadı: ${modalId}`);
-        return;
-    }
-    
-    // Eğer zaten eklenmişse, tekrar ekleme
-    if (modal.hasAttribute('data-touch-events-initialized')) {
-        return;
-    }
-    modal.setAttribute('data-touch-events-initialized', 'true');
-    
-    // Bu modal için state oluştur
-    modalTouchState.set(modalId, {
-        touchStart: { x: 0, y: 0, time: 0 },
-        isScrolling: false
-    });
-    
-    const getState = () => modalTouchState.get(modalId);
-    
-    // Touch start event
-    eventManager.add(modal, 'touchstart', function(e) {
-        if (e.target && e.target.closest('.modal-content')) {
-            return;
-        }
-        
-        const touch = e.touches[0];
-        const state = getState();
-        state.touchStart = {
-            x: touch.clientX,
-            y: touch.clientY,
-            time: Date.now()
-        };
-        state.isScrolling = false;
-    }, { passive: true });
-    
-    // Touch move event
-    eventManager.add(modal, 'touchmove', function(e) {
-        if (e.target && e.target.closest('.modal-content')) {
-            return;
-        }
-        
-        const state = getState();
-        if (state.touchStart.x !== 0 || state.touchStart.y !== 0) {
-            const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - state.touchStart.x);
-            const deltaY = Math.abs(touch.clientY - state.touchStart.y);
-            if (deltaX > 10 || deltaY > 10) {
-                state.isScrolling = true;
-            }
-        }
-    }, { passive: true });
-    
-    // Touch end event
-    eventManager.add(modal, 'touchend', function(e) {
-        const state = getState();
-        
-        if (state.isScrolling) {
-            state.isScrolling = false;
-            state.touchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - state.touchStart.time;
-        const deltaX = Math.abs(touch.clientX - state.touchStart.x);
-        const deltaY = Math.abs(touch.clientY - state.touchStart.y);
-        
-        // Tap tespit edildi (hızlı dokunma, az hareket)
-        if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-            if (e.target && e.target.closest('.modal-content')) {
-                return;
-            }
-            // Close button kontrolü (varsayılan close button id pattern'i)
-            const closeButtonId = `close${modalId.charAt(0).toUpperCase() + modalId.slice(1, -5)}Btn`;
-            if (e.target && (e.target.id === closeButtonId || e.target.closest(`#${closeButtonId}`))) {
-                return;
-            }
-            // Modal dışına tap edildi, modalı kapat
-            if (typeof closeCallback === 'function') {
-                closeCallback();
-            }
-        }
-        
-        state.touchStart = { x: 0, y: 0, time: 0 };
-    }, { passive: true });
-    
-    log.debug(`✅ Generic touch events initialized for: ${modalId}`);
-}
-
-// ============ ESKI MODAL TOUCH EVENT FONKSİYONLARI (Backward Compatibility) ============
-// Yeni kodda initGenericModalTouchEvents kullanılmalı
-// Eski fonksiyonlar generic fonksiyonu çağırır
-
-// Daily Goal Modal için touch event'leri
-function initDailyGoalModalTouchEvents() {
-    // Yeni generic fonksiyon kullan
-    initGenericModalTouchEvents('dailyGoalModal', closeDailyGoalModal);
-}
-
-// Her yere tıklayınca kapatma fonksiyonu
-function handleDailyGoalModalClick(event) {
-    const target = event.target;
-    if (target && target.closest('button[onclick*="closeDailyGoalModal"]')) {
-        return;
-    }
-    if (target && target.closest('.modal-content')) {
-        return;
-    }
-    closeDailyGoalModal();
-}
-
-// Global olarak erişilebilir yap
-window.handleDailyGoalModalClick = handleDailyGoalModalClick;
-
-function setDailyGoal(level) {
-    // 1 saat oyun = ~8000 Hasene
-    // Constants'tan goal değerlerini al
-    const goalOptions = window.CONSTANTS?.DAILY_GOAL?.OPTIONS || {};
-    const goals = {
-        easy: { hasene: goalOptions.EASY || 1300, name: 'Rahat', icon: '🌱' },
-        normal: { hasene: goalOptions.NORMAL || 2700, name: 'Normal', icon: '🎯' },
-        serious: { hasene: goalOptions.SERIOUS || 6000, name: 'Ciddi', icon: '🔥' }
-    };
-    
-    const goal = goals[level];
-    // Storage manager ile güvenli kaydet
-    storage.set('dailyGoalLevel', level);
-    storage.set('dailyGoalHasene', goal.hasene.toString());
-    
-    // Günlük Hasene'yi sıfırla (her gün başta)
-    const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-    const lastDate = storage.get('lastDailyGoalDate');
-    // Eski format (toDateString) kontrolü - geriye uyumluluk için
-    const todayOldFormat = new Date().toDateString();
-    if (lastDate !== today && lastDate !== todayOldFormat) {
-        storage.set('dailyXP', '0');
-        storage.set('lastDailyGoalDate', today);
-    }
-    
-    updateDailyGoalDisplay();
-    closeDailyGoalModal();
-    
-    // Başarı mesajı
-    showSuccessMessage(goal.icon + ' Günlük virdin ' + goal.name + ' olarak ayarlandı!');
-}
-
-function updateDailyGoalDisplay() {
-    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
-    const goalXP = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-    const dailyXP = parseInt(storage.get('dailyHasene', '0')) || 0;
-    const goalLevel = storage.get('dailyGoalLevel', 'normal');
-    
-    const goals = {
-        easy: { name: 'Rahat', icon: '🌱' },
-        normal: { name: 'Normal', icon: '🎯' },
-        serious: { name: 'Ciddi', icon: '🔥' }
-    };
-    
-    // Division by zero check
-    const progressPercent = goalXP > 0 ? Math.min((dailyXP / goalXP) * 100, 100) : 0;
-    const isCompleted = dailyXP >= goalXP;
-    
-    // NULL KONTROL - Elementleri kontrol et
-    const progressEl = document.getElementById('dailyGoalProgress');
-    const progressTextEl = document.getElementById('dailyGoalProgressText');
-    const goalTextEl = document.getElementById('dailyGoalText');
-    const goalButton = document.querySelector('.goal-settings-btn');
-    const goalButtonIcon = document.getElementById('goalButtonIcon'); // Opsiyonel element
-    
-    if (!progressEl || !progressTextEl || !goalTextEl) {
-        log.error('❌ HATA: Günlük hedef elementleri bulunamadı!');
-        return;
-    }
-    
-    // Progress bar güncelle (yeni minimal tasarım için) - DOM helper ile güvenli
-    const progressBar = document.querySelector('.daily-goal-card .progress-bar');
-    const progressBarMinimal = document.querySelector('.progress-fill-minimal');
-    if (progressBar) {
-        progressBar.style.width = progressPercent + '%';
-    }
-    if (progressBarMinimal) {
-        progressBarMinimal.style.width = progressPercent + '%';
-        progressBarMinimal.setAttribute('aria-valuenow', Math.round(progressPercent));
-    }
-    if (progressEl) {
-        progressEl.style.width = progressPercent + '%';
-        progressEl.setAttribute('aria-valuenow', Math.round(progressPercent));
-    }
-    
-    // Text güncelle - formatlanmış versiyon
-    const formattedDailyXP = dailyXP.toLocaleString('tr-TR');
-    const formattedGoalXP = goalXP.toLocaleString('tr-TR');
-    DOM.setText('dailyGoalProgressText', `${formattedDailyXP} / ${formattedGoalXP}`);
-    DOM.setText('dailyGoalText', `Günlük Vird: ${goalXP} Hasene`);
-    
-    // Hedef tamamlandıysa
-    if (isCompleted) {
-        goalTextEl.textContent = '✅ Günlük vird tamamlandı!';
-        
-        // Butonu altın yap ve kutlama animasyonu ekle
-        if (goalButton) {
-            goalButton.classList.add('completed');
-            goalButton.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
-            goalButton.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.5), 0 0 0 0 rgba(255, 215, 0, 0.7)';
-            if (goalButtonIcon) {
-                goalButtonIcon.textContent = '✨';
-            }
-        }
-    } else {
-        // Hedef tamamlanmadıysa normal görünüm
-        if (goalButton) {
-            goalButton.classList.remove('completed');
-            goalButton.style.background = 'linear-gradient(135deg, #58cc02 0%, #4db300 100%)';
-            goalButton.style.boxShadow = '0 4px 12px rgba(88, 204, 2, 0.4), 0 0 0 0 rgba(88, 204, 2, 0.7)';
-            if (goalButtonIcon) {
-                goalButtonIcon.textContent = '🎯';
-            }
-        }
-    }
-}
-
-// Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
-function saveDailyStats() {
-    try {
-        const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-        const dayKey = `hasene_daily_${today}`;
-        
-        // Mevcut günlük verileri al veya yeni oluştur (storage manager ile)
-        const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-        const dailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
-        const dailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
-        
-        log.debug('💾 saveDailyStats çağrıldı:', {
-            today,
-            dayKey,
-            dailyHasene,
-            dailyCorrect,
-            dailyWrong
-        });
-        
-        // Tarih bazlı veriyi kaydet
-        const dayData = {
-            hasene: dailyHasene,
-            correct: dailyCorrect,
-            wrong: dailyWrong,
-            date: today
-        };
-        
-        storage.set(dayKey, dayData);
-        
-        // Doğrulama: Kaydedilen veriyi oku
-        const saved = storage.get(dayKey);
-        if (saved) {
-            log.debug('✅ Günlük veriler kaydedildi:', saved);
-        } else {
-            log.error('❌ Günlük veriler kaydedilemedi!');
-        }
-    } catch (error) {
-        log.error('❌ saveDailyStats hatası:', error);
-    }
-}
-
-function addDailyXP(xp) {
-    const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-    const lastDate = storage.get('lastDailyGoalDate');
-    // Eski format (toDateString) kontrolü - geriye uyumluluk için
-    const todayOldFormat = new Date().toDateString();
-    
-    // Yeni gün başladıysa sıfırla (storage manager ile)
-    if (lastDate !== today && lastDate !== todayOldFormat) {
-        storage.set('dailyXP', '0');
-        storage.set('lastDailyGoalDate', today);
-        
-        // Günlük verileri sıfırla
-        storage.set('dailyHasene', '0');
-        storage.set('dailyCorrect', '0');
-        storage.set('dailyWrong', '0');
-    }
-    
-    const currentXP = parseInt(storage.get('dailyHasene', '0')) || 0;
-    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
-    const goalXP = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-    const newXP = currentXP + xp;
-    
-    storage.set('dailyHasene', newXP.toString());
-    
-    // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
-    saveDailyStats();
-    
-    // Hedef tamamlandıysa
-    if (currentXP < goalXP && newXP >= goalXP) {
-        setTimeout(() => {
-            showSuccessMessage('🎉 Günlük virdi tamamladın! +1000 ihsan Hasene!');
-            // Bonus Hasene ekle (puan sistemine direkt ekle)
-            const dailyGoalBonus = 1000;
-            totalPoints += dailyGoalBonus;
-            
-            // Bugünkü toplam puana da ekle (istatistikler için)
-            dailyTasks.todayStats.toplamPuan += dailyGoalBonus;
-            
-            // Günlük ve haftalık görevleri güncelle (günlük vird bonusu için)
-            if (typeof updateTaskProgress === 'function') {
-                updateTaskProgress('toplamPuan', dailyGoalBonus);
-            }
-            
-            // Günlük vird bonusunu liderlik tablosuna da ekle
-            if (typeof updateLeaderboardScores === 'function' && dailyGoalBonus > 0) {
-                updateLeaderboardScores(dailyGoalBonus);
-                log.game(`📊 Liderlik tablosu güncellendi (günlük vird bonusu): +${dailyGoalBonus} Hasene`);
-            }
-            
-            // Günlük haseneye de bonusu ekle ki tüm günlük alanlar aynı toplamı kullansın
-            const currentDailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-            const newDailyHaseneWithBonus = currentDailyHasene + dailyGoalBonus;
-            storage.set('dailyHasene', newDailyHaseneWithBonus.toString());
-            saveDailyStats();
-            
-            updateStatsBar();
-            debouncedSaveStats(); // Debounced kaydetme
-            // checkAchievements fonksiyonunu güvenli şekilde çağır
-            if (typeof checkAchievements === 'function') {
-                checkAchievements();
-            } else {
-                log.debug('⚠️ checkAchievements henüz yüklenmedi, atlanıyor...');
-            }
-        }, 1000);
-    }
-    
-    updateDailyGoalDisplay();
-}
-
-function showSuccessMessage(message) {
-    const msg = document.createElement('div');
-    msg.textContent = message;
-    // comboIndicator ile aynı boyutlar: padding: 10px 16px, font-size: 14px, border-radius: 10px
-    msg.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 10000; box-shadow: 0 4px 15px rgba(74,222,128,0.4); animation: slideUp 0.3s ease; max-width: 90%; box-sizing: border-box; text-align: center; line-height: 1.3; margin: 0;';
-    document.body.appendChild(msg);
-    
-    setTimeout(() => {
-        msg.style.animation = 'slideDown 0.3s ease';
-        setTimeout(() => msg.remove(), 300);
-    }, 3000);
-}
-
-// Ses sistemi (GLOBAL)
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-function playSound(type) {
-    const now = audioContext.currentTime;
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    switch(type) {
-        case 'correct':
-            // Yükselen tonlar (C5 -> E5 -> G5)
-            oscillator.frequency.setValueAtTime(523.25, now); // C5
-            oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
-            oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            oscillator.start(now);
-            oscillator.stop(now + 0.3);
-            break;
-            
-        case 'wrong':
-            // Düşen ton (G4 -> C4)
-            oscillator.frequency.setValueAtTime(392.00, now); // G4
-            oscillator.frequency.exponentialRampToValueAtTime(261.63, now + 0.2); // C4
-            gainNode.gain.setValueAtTime(0.2, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-            oscillator.start(now);
-            oscillator.stop(now + 0.2);
-            break;
-            
-        case 'levelup':
-            // Fanfar (C5 -> E5 -> G5 -> C6)
-            oscillator.frequency.setValueAtTime(523.25, now); // C5
-            oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
-            oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
-            oscillator.frequency.setValueAtTime(1046.50, now + 0.3); // C6
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            oscillator.start(now);
-            oscillator.stop(now + 0.5);
-            break;
-            
-        case 'combo':
-            // Hızlı yükselen tonlar
-            oscillator.frequency.setValueAtTime(523.25, now); // C5
-            oscillator.frequency.setValueAtTime(783.99, now + 0.05); // G5
-            oscillator.frequency.setValueAtTime(1046.50, now + 0.1); // C6
-            gainNode.gain.setValueAtTime(0.25, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-            oscillator.start(now);
-            oscillator.stop(now + 0.15);
-            break;
-    }
-}
-
-// ============ REVIEW/PRACTICE MODE FONKSİYONLARI ============
-/**
- * Zorlanılan kelimeleri topla (Review Mode için)
- * @returns {Array<string>} Zorlanılan kelime listesi
- */
-function getStrugglingWords() {
-    try {
-        // loadWordStats fonksiyonunu bul (global veya window'da)
-        const loadWordStatsFn = typeof loadWordStats === 'function' 
-            ? loadWordStats 
-            : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' 
-                ? window.loadWordStats 
-                : null);
-        
-        if (!loadWordStatsFn) {
-            log.warn('⚠️ loadWordStats fonksiyonu bulunamadı, boş liste döndürülüyor');
-            return [];
-        }
-        
-        const wordStats = loadWordStatsFn();
-        if (!wordStats || typeof wordStats !== 'object') {
-            return [];
-        }
-        
-        // Zorlanılan kelimeleri filtrele
-        // Kriterler: successRate < 0.6 VEYA masteryLevel < 1.0
-        const strugglingWords = Object.keys(wordStats).filter(word => {
-            const stat = wordStats[word];
-            if (!stat || typeof stat !== 'object') return false;
-            
-            const successRate = parseFloat(stat.successRate) || 0;
-            const masteryLevel = parseFloat(stat.masteryLevel) || 0;
-            
-            return successRate < 0.6 || masteryLevel < 1.0;
-        });
-        
-        log.debug(`📚 Zorlanılan kelimeler bulundu: ${strugglingWords.length} kelime`);
-        return strugglingWords;
-    } catch (error) {
-        log.error('❌ getStrugglingWords hatası:', error);
-        return [];
-    }
-}
-
-/**
- * Review Mode için kelime seçimi (zayıf kelimeleri daha sık göster)
- * @param {Array<string>} allWords - Tüm kelime listesi
- * @param {Array<string>} strugglingWords - Zorlanılan kelime listesi
- * @returns {string} Seçilen kelime
- */
-function selectWordForReview(allWords, strugglingWords) {
-    if (!allWords || allWords.length === 0) {
-        return null;
-    }
-    
-    // Eğer zorlanılan kelime yoksa, normal seçim yap
-    if (!strugglingWords || strugglingWords.length === 0) {
-        return allWords[Math.floor(Math.random() * allWords.length)];
-    }
-    
-    // %70 ihtimalle zorlanılan kelimelerden, %30 ihtimalle normal kelimelerden seç
-    const useStruggling = Math.random() < 0.7;
-    
-    if (useStruggling) {
-        // Zorlanılan kelimelerden seç
-        const availableStruggling = strugglingWords.filter(word => allWords.includes(word));
-        if (availableStruggling.length > 0) {
-            return availableStruggling[Math.floor(Math.random() * availableStruggling.length)];
-        }
-    }
-    
-    // Normal kelimelerden seç
-    return allWords[Math.floor(Math.random() * allWords.length)];
-}
-
-// ============ KELİME İSTATİSTİKLERİ FONKSİYONLARI ============
-function updateWordStatistics() {
-    log.stats('📊 updateWordStatistics ÇAĞRILDI!');
-    
-    try {
-    const wordStats = loadWordStats();
-    log.stats('📦 wordStats yüklendi:', wordStats);
-    
-    // Genel istatistikleri hesapla - successRate ve masteryLevel değerlerini normalize et
-    const totalWords = Object.keys(wordStats).length;
-    const normalizedStats = Object.values(wordStats).map(stat => {
-        // successRate yoksa hesapla
-        let successRate = stat.successRate;
-        if (typeof successRate === 'undefined' || successRate === null) {
-            const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
-            successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
-        }
-        // masteryLevel yoksa 0 kabul et
-        const masteryLevel = (typeof stat.masteryLevel !== 'undefined' && stat.masteryLevel !== null) 
-            ? parseFloat(stat.masteryLevel) || 0 
-            : 0;
-        
-        return { ...stat, successRate, masteryLevel };
-    });
-    
-    const masteredWords = normalizedStats.filter(stat => stat.masteryLevel >= 3.0 && stat.successRate >= 0.6).length;
-    const strugglingWords = normalizedStats.filter(stat => stat.successRate < 0.6 || stat.masteryLevel < 1.0).length;
-    
-        // Genel özet güncelle (null kontrolü ile)
-        const wordStatsTotalEl = document.getElementById('wordStatsTotal');
-        const wordStatsMasteredEl = document.getElementById('wordStatsMastered');
-        const wordStatsStrugglingEl = document.getElementById('wordStatsStruggling');
-        
-        if (wordStatsTotalEl) wordStatsTotalEl.textContent = totalWords;
-        if (wordStatsMasteredEl) wordStatsMasteredEl.textContent = masteredWords;
-        if (wordStatsStrugglingEl) wordStatsStrugglingEl.textContent = strugglingWords;
-    
-    // Kelime listesini göster (varsayılan: hepsi)
-    filterWordStats('all');
-    
-        // Event listener'ları ekle (sadece bir kez) - null kontrolü ile
-        const filterAll = document.getElementById('filterAll');
-        const filterFavorites = document.getElementById('filterFavorites');
-        const filterReview = document.getElementById('filterReview');
-        const filterMastered = document.getElementById('filterMastered');
-        const filterStruggling = document.getElementById('filterStruggling');
-        const filterRecent = document.getElementById('filterRecent');
-        const filterKelimeCevir = document.getElementById('filterKelimeCevir');
-        const filterDinleBul = document.getElementById('filterDinleBul');
-        
-        // Favoriler ve tekrar listesini yükle
-        if (typeof loadFavorites === 'function') loadFavorites();
-        if (typeof loadReviewWords === 'function') loadReviewWords();
-        
-        // Tüm butonları güncelle
-        updateAllTabButtons();
-        
-        if (filterAll && !filterAll.hasAttribute('data-listener-added')) {
-            filterAll.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('all');
-            };
-            filterAll.setAttribute('data-listener-added', 'true');
-        }
-        if (filterFavorites && !filterFavorites.hasAttribute('data-listener-added')) {
-            filterFavorites.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (typeof loadFavorites === 'function') loadFavorites();
-                updateAllTabButtons();
-                filterWordStats('favorites');
-            };
-            filterFavorites.setAttribute('data-listener-added', 'true');
-        }
-        if (filterReview && !filterReview.hasAttribute('data-listener-added')) {
-            filterReview.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (typeof loadReviewWords === 'function') {
-                    loadReviewWords();
-                }
-                updateAllTabButtons();
-                filterWordStats('review');
-            };
-            filterReview.setAttribute('data-listener-added', 'true');
-        }
-        if (filterMastered && !filterMastered.hasAttribute('data-listener-added')) {
-            filterMastered.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('mastered');
-            };
-            filterMastered.setAttribute('data-listener-added', 'true');
-        }
-        if (filterStruggling && !filterStruggling.hasAttribute('data-listener-added')) {
-            filterStruggling.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('struggling');
-            };
-            filterStruggling.setAttribute('data-listener-added', 'true');
-        }
-        if (filterRecent && !filterRecent.hasAttribute('data-listener-added')) {
-            filterRecent.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('recent');
-            };
-            filterRecent.setAttribute('data-listener-added', 'true');
-        }
-        if (filterKelimeCevir && !filterKelimeCevir.hasAttribute('data-listener-added')) {
-            filterKelimeCevir.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('kelimecevir');
-            };
-            filterKelimeCevir.setAttribute('data-listener-added', 'true');
-        }
-        if (filterDinleBul && !filterDinleBul.hasAttribute('data-listener-added')) {
-            filterDinleBul.onclick = (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                updateAllTabButtons();
-                filterWordStats('dinlebul');
-            };
-            filterDinleBul.setAttribute('data-listener-added', 'true');
-        }
-    } catch (error) {
-        log.error('❌ updateWordStatistics HATA:', error);
-        log.error('Stack trace:', error.stack);
-    }
-}
-
-// Tüm sekme butonlarını güncelle (kelime sayıları ile)
-function updateAllTabButtons() {
-    try {
-        const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
-        if (!loadWordStatsFn) {
-            // loadWordStats henüz yüklenmemiş, sadece mevcut sayıları güncelle
-            return;
-        }
-        
-        const wordStats = loadWordStatsFn();
-        if (!wordStats || typeof wordStats !== 'object') {
-            return;
-        }
-        
-        const totalWords = Object.keys(wordStats).length;
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-        
-        // Favoriler sayısı
-        if (typeof loadFavorites === 'function') {
-            loadFavorites();
-        }
-        const favoriteWords = (typeof window !== 'undefined' && window.favoriteWords && Array.isArray(window.favoriteWords))
-            ? window.favoriteWords
-            : [];
-        
-        // Tekrar sayısı
-        if (typeof loadReviewWords === 'function') {
-            loadReviewWords();
-        }
-        const reviewWords = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords))
-            ? window.reviewWords
-            : [];
-        
-        // Öğrenildi sayısı
-        let masteredCount = 0;
-        // Zorlanılan sayısı
-        let strugglingCount = 0;
-        // Son görülen sayısı (son 7 gün)
-        let recentCount = 0;
-        // Kelime Çevir modunda çalışılan kelime sayısı
-        let kelimeCevirCount = 0;
-        // Dinle Bul modunda çalışılan kelime sayısı
-        let dinleBulCount = 0;
-        
-        Object.values(wordStats).forEach(stat => {
-            if (!stat) return;
-            
-            const totalAttempts = (stat.correct || 0) + (stat.wrong || 0);
-            // Başarı oranını hesapla (eğer yoksa)
-            let successRate = stat.successRate;
-            if (typeof successRate === 'undefined' || successRate === null) {
-                successRate = totalAttempts > 0 ? ((stat.correct || 0) / totalAttempts) : 0;
-            }
-            const masteryLevel = stat.masteryLevel || 0;
-            const lastSeen = stat.lastSeen || now;
-            const daysSinceLastSeen = (now - lastSeen) / oneDay;
-            
-            // Öğrenildi: ustalık >= 3.0 ve başarı >= 60%
-            if (masteryLevel >= 3.0 && successRate >= 0.6) {
-                masteredCount++;
-            }
-            
-            // Zorlanılan: başarı < 60% veya ustalık < 1.0
-            if (successRate < 0.6 || masteryLevel < 1.0) {
-                strugglingCount++;
-            }
-            
-            // Son görülen: son 7 gün içinde
-            if (daysSinceLastSeen < 7) {
-                recentCount++;
-            }
-            
-            // Kelime Çevir modunda çalışılan kelimeler
-            if (stat.gameModes && stat.gameModes.kelimeCevir && stat.gameModes.kelimeCevir.attempts > 0) {
-                kelimeCevirCount++;
-            }
-            
-            // Dinle Bul modunda çalışılan kelimeler
-            if (stat.gameModes && stat.gameModes.dinleBul && stat.gameModes.dinleBul.attempts > 0) {
-                dinleBulCount++;
-            }
-        });
-        
-        // Hepsi butonu
-        const filterAllBtn = document.getElementById('filterAll');
-        if (filterAllBtn) {
-            filterAllBtn.textContent = totalWords > 0 ? `Hepsi (${totalWords})` : 'Hepsi';
-            filterAllBtn.title = `${totalWords} kelime istatistiği var`;
-        }
-        
-        // Favoriler butonu
-        const filterFavoritesBtn = document.getElementById('filterFavorites');
-        if (filterFavoritesBtn) {
-            const count = favoriteWords.length;
-            filterFavoritesBtn.textContent = count > 0 ? `⭐ Favoriler (${count})` : '⭐ Favoriler';
-            filterFavoritesBtn.title = count > 0 ? `${count} favori kelime` : 'Favori kelime yok';
-        }
-        
-        // Tekrar butonu
-        const filterReviewBtn = document.getElementById('filterReview');
-        if (filterReviewBtn) {
-            const count = reviewWords.length;
-            filterReviewBtn.textContent = count > 0 ? `🔄 Tekrar (${count})` : '🔄 Tekrar';
-            filterReviewBtn.title = count > 0 ? `${count} kelime tekrar gerektiriyor` : 'Tekrar gerektiren kelime yok';
-        }
-        
-        // Öğrenildi butonu
-        const filterMasteredBtn = document.getElementById('filterMastered');
-        if (filterMasteredBtn) {
-            filterMasteredBtn.textContent = masteredCount > 0 ? `Öğrenildi (${masteredCount})` : 'Öğrenildi';
-            filterMasteredBtn.title = masteredCount > 0 ? `${masteredCount} kelime öğrenildi` : 'Henüz öğrenilmiş kelime yok';
-        }
-        
-        // Zorlanılan butonu
-        const filterStrugglingBtn = document.getElementById('filterStruggling');
-        if (filterStrugglingBtn) {
-            filterStrugglingBtn.textContent = strugglingCount > 0 ? `Zorlanılan (${strugglingCount})` : 'Zorlanılan';
-            filterStrugglingBtn.title = strugglingCount > 0 ? `${strugglingCount} kelime ile zorlanıyorsun` : 'Zorlandığın kelime yok';
-        }
-        
-        // Son Görülen butonu
-        const filterRecentBtn = document.getElementById('filterRecent');
-        if (filterRecentBtn) {
-            filterRecentBtn.textContent = recentCount > 0 ? `Son Görülen (${recentCount})` : 'Son Görülen';
-            filterRecentBtn.title = recentCount > 0 ? `Son 7 günde ${recentCount} kelime görüldü` : 'Son 7 günde kelime görülmedi';
-        }
-        
-        // Kelime Çevir butonu
-        const filterKelimeCevirBtn = document.getElementById('filterKelimeCevir');
-        if (filterKelimeCevirBtn) {
-            filterKelimeCevirBtn.textContent = kelimeCevirCount > 0 ? `📚 Kelime Çevir (${kelimeCevirCount})` : '📚 Kelime Çevir';
-            filterKelimeCevirBtn.title = kelimeCevirCount > 0 ? `Kelime Çevir modunda ${kelimeCevirCount} kelime çalışıldı` : 'Kelime Çevir modunda henüz kelime çalışılmadı';
-        }
-        
-        // Dinle Bul butonu
-        const filterDinleBulBtn = document.getElementById('filterDinleBul');
-        if (filterDinleBulBtn) {
-            filterDinleBulBtn.textContent = dinleBulCount > 0 ? `🎧 Dinle Bul (${dinleBulCount})` : '🎧 Dinle Bul';
-            filterDinleBulBtn.title = dinleBulCount > 0 ? `Dinle Bul modunda ${dinleBulCount} kelime çalışıldı` : 'Dinle Bul modunda henüz kelime çalışılmadı';
-        }
-        
-    } catch (error) {
-        log.error('❌ updateAllTabButtons hatası:', error);
-    }
-}
-
-// Tekrar butonuna kelime sayısını ekle (geriye uyumluluk için)
-function updateReviewButtonCount() {
-    updateAllTabButtons();
-}
-
-// Test fonksiyonu: Tekrar listesini konsolda detaylı göster
-// Test fonksiyonu - sadece debug modunda çalışır
-function testReviewWords() {
-    // Debug modu kontrolü
-    if (typeof CONFIG === 'undefined' || !CONFIG.debugTest) {
-        if (typeof log !== 'undefined' && log.error) {
-            log.error('❌ Test fonksiyonları sadece debug modunda çalışır. Konsolda: CONFIG.debugTest = true; yapın.');
-        }
-        return;
-    }
-    
-    log.debug('🧪 TEKRAR KELİMELERİ TEST RAPORU');
-    log.debug('=====================================');
-    
-    try {
-        // 1. loadWordStats kontrolü
-        const loadWordStatsFn = typeof loadWordStats === 'function' ? loadWordStats : (typeof window !== 'undefined' && typeof window.loadWordStats === 'function' ? window.loadWordStats : null);
-        if (!loadWordStatsFn) {
-            log.error('❌ loadWordStats fonksiyonu bulunamadı!');
-            return;
-        }
-        
-        const wordStats = loadWordStatsFn();
-        const totalWords = Object.keys(wordStats).length;
-        log.debug(`📊 Toplam kelime istatistiği: ${totalWords}`);
-        
-        // 2. loadReviewWords çağır
-        if (typeof loadReviewWords === 'function') {
-            loadReviewWords();
-        } else {
-            log.error('❌ loadReviewWords fonksiyonu bulunamadı!');
-            return;
-        }
-        
-        const reviewWords = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords)) 
-            ? window.reviewWords 
-            : [];
-        
-        log.debug(`🔄 Tekrar listesindeki kelime sayısı: ${reviewWords.length}`);
-        
-        if (reviewWords.length === 0) {
-            log.debug('ℹ️  Tekrar gerektiren kelime yok.');
-            log.debug('💡 Test için bir kelimeyi yanlış cevaplayın veya yeterince pratik yapmayın.');
-            return;
-        }
-        
-        // 3. Her kelime için detaylı analiz
-        log.debug('\n📋 TEKRAR LİSTESİ DETAYLARI:');
-        log.debug('----------------------------');
-        
-        const oneDay = 24 * 60 * 60 * 1000;
-        const now = Date.now();
-        
-        reviewWords.forEach((wordId, index) => {
-            const stats = wordStats[wordId];
-            if (!stats) {
-                log.debug(`${index + 1}. ${wordId}: ❌ İstatistik bulunamadı`);
-                return;
-            }
-            
-            const daysSinceLastSeen = (now - stats.lastSeen) / oneDay;
-            const totalAttempts = (stats.correct || 0) + (stats.wrong || 0);
-            const successRate = stats.successRate || 0;
-            const masteryLevel = stats.masteryLevel || 0;
-            
-            // Neden tekrar listesinde olduğunu belirle
-            const reasons = [];
-            if (successRate < 0.6) reasons.push(`Başarı oranı düşük (%${Math.round(successRate * 100)})`);
-            if (masteryLevel < 2.0) reasons.push(`Ustalık seviyesi düşük (${masteryLevel.toFixed(1)})`);
-            if (daysSinceLastSeen > 3) reasons.push(`${Math.round(daysSinceLastSeen)} gün önce görüldü`);
-            if (totalAttempts < 5) reasons.push(`Yetersiz pratik (${totalAttempts} deneme)`);
-            
-            log.debug(`\n${index + 1}. Kelime ID: ${wordId}`);
-            log.debug(`   📊 İstatistikler:`);
-            log.debug(`      - Doğru: ${stats.correct || 0}, Yanlış: ${stats.wrong || 0}, Toplam: ${totalAttempts}`);
-            log.debug(`      - Başarı oranı: %${Math.round(successRate * 100)}`);
-            log.debug(`      - Ustalık seviyesi: ${masteryLevel.toFixed(2)}`);
-            log.debug(`      - Son görülme: ${new Date(stats.lastSeen).toLocaleString('tr-TR')} (${Math.round(daysSinceLastSeen)} gün önce)`);
-            log.debug(`   🔄 Tekrar nedeni: ${reasons.join(', ')}`);
-        });
-        
-        // 4. Özet
-        log.debug('\n📈 ÖZET:');
-        log.debug(`   • Toplam kelime: ${totalWords}`);
-        log.debug(`   • Tekrar gerektiren: ${reviewWords.length}`);
-        log.debug(`   • Oran: %${Math.round((reviewWords.length / totalWords) * 100)}`);
-        
-        // 5. Buton güncellemesi
-        updateAllTabButtons();
-        log.debug('✅ Tüm butonlar güncellendi');
-        
-    } catch (error) {
-        log.error('❌ Test hatası:', error);
-        log.error('Stack trace:', error.stack);
-    }
-}
-
-// Global erişim için window'a ekle (sadece debug modunda çalışır)
-window.testReviewWords = testReviewWords;
-
-function filterWordStats(filterType) {
-    try {
-        log.stats('🔍 filterWordStats BAŞLADI, filterType:', filterType);
-        
-        // Favoriler ve tekrar listesini güncelle (filtreleme öncesi)
-        if (typeof loadFavorites === 'function') {
-            loadFavorites();
-        }
-        if (typeof loadReviewWords === 'function') {
-            loadReviewWords();
-        }
-        
-        // Tüm butonları güncelle
-        updateAllTabButtons();
-        
-        const wordStats = loadWordStats();
-        const listContainer = document.getElementById('wordStatsList');
-        log.stats('🔍 filterWordStats çağrıldı, filterType:', filterType, 'wordStats:', wordStats, 'toplam kelime:', Object.keys(wordStats).length);
-        log.elements('📦 listContainer elementi:', listContainer ? 'BULUNDU ✅' : 'BULUNAMADI ❌');
-        
-        if (!listContainer) {
-            log.error('❌ HATA: wordStatsList elementi bulunamadı!');
-            return;
-        }
-        
-        // Filtre butonlarını güncelle (her sekme için farklı renk)
-        const buttonColors = {
-            'all': '#2980b9',      // Koyu mavi
-            'favorites': '#f39c12', // Altın sarısı
-            'review': '#1abc9c',    // Turkuaz
-            'mastered': '#27ae60',  // Yeşil
-            'struggling': '#e74c3c', // Kırmızı
-            'recent': '#9b59b6',     // Mor
-            'kelimecevir': '#2980b9', // Mavi (Kelime Çevir)
-            'dinlebul': '#8e44ad'     // Mor (Dinle Bul)
-        };
-        
-        const normalizedFilterType = String(filterType).toLowerCase();
-        const activeColor = buttonColors[normalizedFilterType] || buttonColors['all'];
-        
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.background = '#95a5a6'; // Pasif renk (gri)
-        });
-        const filterBtn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
-        if (filterBtn) {
-            filterBtn.classList.add('active');
-            filterBtn.style.background = activeColor; // Sekme özel aktif renk
-        }
-        
-        let filteredStats = [];
-        
-        log.stats('🎯 kelimeCevirData uzunluğu:', window.kelimeCevirData ? window.kelimeCevirData.length : 'undefined');
-        log.stats('📦 wordStats keyleri:', Object.keys(wordStats));
-        
-        // Filtreleme
-        Object.entries(wordStats).forEach(([wordId, stat]) => {
-            log.stats('🔄 İşleniyor:', wordId, stat);
-            
-            // Eski veriler için eksik alanları hesapla
-            if (typeof stat.successRate === 'undefined') {
-                const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
-                stat.successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
-            }
-            if (typeof stat.masteryLevel === 'undefined') {
-                stat.masteryLevel = 0;
-            }
-            if (typeof stat.lastSeen === 'undefined') {
-                stat.lastSeen = Date.now();
-            }
-            
-            // Kelime verisini bul
-            let wordData = null;
-            
-            // ID formatı: "sure:ayet:kelime" (örn: "105:4:1" veya "2:51:4")
-            // kelimeCevirData'da ID aynı formatta
-            if (window.kelimeCevirData && window.kelimeCevirData.length > 0) {
-                wordData = window.kelimeCevirData.find(w => w.id === wordId);
-            }
-            
-            log.stats('🔍 wordId:', wordId, 'wordData bulundu mu?', wordData ? 'EVET ✅' : 'HAYIR ❌');
-            
-            // Bulunamazsa - önce kelimeBulData içinde ara (fallback)
-            if (!wordData) {
-                try {
-                    if (typeof kelimeBulData !== 'undefined' && Array.isArray(kelimeBulData)) {
-                        const fallbackWord = kelimeBulData.find(w => w.id === wordId);
-                        if (fallbackWord) {
-                            wordData = {
-                                kelime: fallbackWord.kelime,
-                                anlam: fallbackWord.anlam || fallbackWord.sure_adi || '',
-                                id: fallbackWord.id
-                            };
-                        }
-                    }
-                } catch (e) {
-                    log.error('⚠️ kelimeBulData fallback hatası:', e);
-                }
-            }
-            
-            // Hâlâ bulunamazsa - ID'den basit bir açıklama üret
-            if (!wordData) {
-                const [sure, ayet, kelimeIndex] = wordId.split(':');
-                wordData = { 
-                    kelime: wordId, // En azından ID'yi göster
-                    anlam: `Sure ${sure}, Ayet ${ayet}, Kelime ${kelimeIndex}`,
-                    id: wordId
-                };
-                // Sadece debug modunda göster (çok fazla uyarı olabilir)
-                log.stats('⚠️ Kelime verisi bulunamadı, geçici veri oluşturuldu:', wordData);
-            }
-            
-            // Favoriler kontrolü (güncel liste ile)
-            const isFav = typeof isFavorite !== 'undefined' && isFavorite(wordId);
-            
-            // Tekrar listesi kontrolü (güncel liste ile)
-            const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(wordId)) ||
-                               (typeof reviewWords !== 'undefined' && Array.isArray(reviewWords) && reviewWords.includes(wordId));
-            
-            // Oyun modu bazlı filtreleme
-            const hasKelimeCevir = stat.gameModes && stat.gameModes.kelimeCevir && stat.gameModes.kelimeCevir.attempts > 0;
-            const hasDinleBul = stat.gameModes && stat.gameModes.dinleBul && stat.gameModes.dinleBul.attempts > 0;
-            
-            const shouldShow = 
-                filterType === 'all' ||
-                (filterType === 'favorites' && isFav) ||
-                (filterType === 'review' && needsReview) ||
-                (filterType === 'mastered' && stat.masteryLevel >= 3.0 && stat.successRate >= 0.6) ||
-                (filterType === 'struggling' && (stat.successRate < 0.6 || stat.masteryLevel < 1.0)) ||
-                (filterType === 'recent' && (Date.now() - stat.lastSeen) < 7 * 24 * 60 * 60 * 1000) || // Son 7 gün
-                (filterType === 'kelimecevir' && hasKelimeCevir) || // Kelime Çevir modunda çalışılan kelimeler
-                (filterType === 'dinlebul' && hasDinleBul); // Dinle Bul modunda çalışılan kelimeler
-            
-            log.stats('🤔 shouldShow:', shouldShow, 'filterType:', filterType, 'stat:', stat);
-            
-            if (shouldShow) {
-                filteredStats.push({ wordId, ...stat, wordData });
-                log.stats('✅ Listeye eklendi:', wordId);
-            } else {
-                log.stats('❌ Listeye EKLENMEDİ:', wordId);
-            }
-        });
-        
-        log.stats('📋 Filtreleme TAMAMLANDI, sonuç:', filteredStats.length, 'kelime');
-        
-        // Sıralama (öncelik puanına göre)
-        filteredStats.sort((a, b) => {
-            if (filterType === 'recent') {
-                return b.lastSeen - a.lastSeen; // En son görülenler önce
-            } else if (filterType === 'review') {
-                // Tekrar listesi için özel öncelik sıralaması
-                if (typeof calculateReviewPriority !== 'undefined') {
-                    const priorityA = calculateReviewPriority(a);
-                    const priorityB = calculateReviewPriority(b);
-                    return priorityB - priorityA;
-                }
-                return b.priority - a.priority;
-            } else if (filterType === 'favorites') {
-                // Favoriler için son görülme zamanına göre sırala
-                return b.lastSeen - a.lastSeen;
-            }
-            return b.priority - a.priority; // Yüksek öncelik önce
-        });
-        
-        log.stats('📋 Sıralama sonrası:', filteredStats.length, 'kelime');
-        log.stats('📦 İlk 3 kelime:', filteredStats.slice(0, 3));
-        
-        // Liste içeriğini oluştur
-        if (filteredStats.length === 0) {
-            log.stats('⚠️ filteredStats boş, empty state gösteriliyor');
-        // Toplam kelime sayısını kontrol et
-        const totalWords = Object.keys(wordStats).length;
-        log.stats('📝 Filtrelenmiş liste boş. totalWords:', totalWords, 'filterType:', filterType);
-        
-        if (totalWords === 0) {
-            // Hiç oyun oynanmamış
-            log.stats('🎮 Hiç oyun oynanmamış - onboarding kartı gösteriliyor');
-            const cardHTML = `
-                <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; margin: 20px 0;">
-                    <div style="font-size: 3em; margin-bottom: 15px;">🎮</div>
-                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">Henüz Hiç Ders Talebe Etmedin!</div>
-                    <div style="font-size: 0.95em; opacity: 0.95; margin-bottom: 20px; line-height: 1.5;">
-                        Kelime istatistiklerini görmek için ders talebe etmeye başla!<br>
-                        Her kelimeyle çalıştıkça ilerleme kaydedilecek 📈
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 300px; margin: 0 auto;">
-                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                            <div style="font-size: 1.5em; margin-bottom: 5px;">📚</div>
-                            <div style="font-size: 0.8em;">Kelime Çevir</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                            <div style="font-size: 1.5em; margin-bottom: 5px;">🎧</div>
-                            <div style="font-size: 0.8em;">Dinle ve Bul</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                            <div style="font-size: 1.5em; margin-bottom: 5px;">✏️</div>
-                            <div style="font-size: 0.8em;">Boşluk Doldur</div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                            <div style="font-size: 1.5em; margin-bottom: 5px;">📖</div>
-                            <div style="font-size: 0.8em;">Ayet Oku</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
-                        Ana menüden bir oyun seç ve başla! 🚀
-                    </div>
-                </div>
-            `;
-            listContainer.innerHTML = cardHTML;
-            log.elements('✅ Kart HTML\'i listContainer\'a eklendi, innerHTML uzunluğu:', listContainer.innerHTML.length);
-            log.elements('📍 listContainer display:', window.getComputedStyle(listContainer).display);
-            log.elements('📍 listContainer visibility:', window.getComputedStyle(listContainer).visibility);
-        } else {
-            // Oyun oynanmış ama bu kategoride kelime yok
-            log.stats('📋 Oyun oynanmış ama bu kategoride kelime yok - filtre mesajı gösteriliyor');
-            const filterMessages = {
-                'all': 'Henüz hiç kelime istatistiği yok',
-                'favorites': 'Henüz favori kelime eklenmemiş. Kelime kartlarındaki ⭐ butonuna tıklayarak favorilere ekleyebilirsin!',
-                'review': 'Harika! Tekrar gerektiren kelime yok. Tüm kelimeler iyi durumda! 🎉',
-                'mastered': 'Henüz öğrenilmiş kelime yok. Daha fazla pratik yap! 💪',
-                'struggling': 'Harika! Zorlandığın kelime yok. Devam et! 🎉',
-                'recent': 'Son 7 günde kelime çalışılmamış. Bugün pratik yap! 📅'
-            };
-            
-            listContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; color: #666;">
-                    <div style="font-size: 2.5em; margin-bottom: 15px;">
-                        ${filterType === 'struggling' ? '🎉' : '🔍'}
-                    </div>
-                    <div style="font-size: 1.1em; font-weight: 600; margin-bottom: 10px; color: #333;">
-                        ${filterMessages[filterType] || 'Bu kategoride kelime bulunamadı'}
-                    </div>
-                    <div style="font-size: 0.9em; color: #666; margin-top: 10px;">
-                        ${filterType === 'mastered' ? 'Daha fazla ders talebe et ve kelimeleri öğren!' : 
-                          filterType === 'struggling' ? 'Tüm kelimeler iyi durumda!' :
-                          filterType === 'recent' ? 'Ders talebe ederek listeni güncel tut!' :
-                          'Ders talebe ederek istatistik oluşturmaya başla!'}
-                    </div>
-                </div>
-            `;
-        }
-        return;
-    }
-    
-    // Liste başlığı ekle (her sekme için açıklayıcı)
-    let listHeader = '';
-    if (filteredStats.length > 0) {
-        const count = filteredStats.length;
-        const colors = {
-            'all': { bg: '#e8f2ff', border: '#2980b9', icon: '📚' }, // Koyu mavi
-            'favorites': { bg: '#fff8e6', border: '#f39c12', icon: '⭐' }, // Altın sarısı
-            'review': { bg: '#e8f4f8', border: '#1abc9c', icon: '🔄' }, // Turkuaz
-            'mastered': { bg: '#d5f4e6', border: '#27ae60', icon: '✅' }, // Yeşil
-            'struggling': { bg: '#ffe6e6', border: '#e74c3c', icon: '📚' }, // Kırmızı
-            'recent': { bg: '#f0e6ff', border: '#9b59b6', icon: '🕐' } // Mor
-        };
-        
-        // filterType kontrolü ve renk seçimi (string olarak normalize et)
-        const normalizedFilterType = String(filterType).toLowerCase();
-        const color = colors[normalizedFilterType] || colors['all'];
-        
-        // Debug (sadece geliştirme için)
-        if (typeof log !== 'undefined' && log.stats) {
-            log.stats('🎨 Liste başlığı - filterType:', filterType, 'normalized:', normalizedFilterType, 'renk:', color.border);
-        }
-        
-        const messages = {
-            'all': {
-                title: `${count} kelime istatistiği var`,
-                desc: 'Tüm çalıştığın kelimeler aşağıda listelenmiştir.'
-            },
-            'favorites': {
-                title: `${count} favori kelime`,
-                desc: 'Favorilerine eklediğin kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
-            },
-            'review': {
-                title: `${count} farklı kelime tekrar gerektiriyor`,
-                desc: 'Her kelime ayrı bir kart olarak aşağıda listelenmiştir. Her kelimenin neden tekrar gerektirdiği kart üzerinde gösterilir.'
-            },
-            'mastered': {
-                title: `${count} kelime öğrenildi`,
-                desc: 'Ustalık seviyesi 3.0+ ve başarı oranı %60+ olan kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
-            },
-            'struggling': {
-                title: `${count} kelime ile zorlanıyorsun`,
-                desc: 'Başarı oranı %60 altında veya ustalık seviyesi 1.0 altında olan kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
-            },
-            'recent': {
-                title: `Son 7 günde ${count} kelime görüldü`,
-                desc: 'Son bir hafta içinde çalıştığın kelimeler. Her kelime ayrı bir kart olarak gösterilir.'
-            }
-        };
-        
-        const message = messages[filterType] || messages['all'];
-        
-        listHeader = `
-            <div style="background: ${color.bg}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${color.border};">
-                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                    <span>${color.icon}</span>
-                    <span>${message.title}</span>
-                </div>
-                <div style="font-size: 0.85em; color: #666; margin-top: 4px;">
-                    ${message.desc}
-                </div>
-            </div>
-        `;
-    }
-    
-    listContainer.innerHTML = listHeader + filteredStats.slice(0, 50).map(item => { // En fazla 50 kelime göster
-        // Kelime verisi yoksa veya geçersizse bu kartı gösterme
-        if (!item.wordData || !item.wordData.kelime || item.wordData.kelime.includes('undefined') || item.wordData.kelime.includes('bosluk')) {
-            return ''; // Boş string döndür
-        }
-        
-        const masteryColor = item.masteryLevel >= 3 ? '#27ae60' : item.masteryLevel >= 1.5 ? '#f39c12' : '#e74c3c';
-        const masteryText = item.masteryLevel >= 3 ? 'Öğrenildi' : item.masteryLevel >= 1.5 ? 'Öğreniliyor' : 'Zorlanıyor';
-        const successPercent = Math.round(item.successRate * 100);
-        
-        const isFav = typeof isFavorite !== 'undefined' && isFavorite(item.wordId);
-        const needsReview = (typeof window !== 'undefined' && window.reviewWords && Array.isArray(window.reviewWords) && window.reviewWords.includes(item.wordId)) ||
-                           (typeof reviewWords !== 'undefined' && reviewWords.includes(item.wordId));
-        
-        // Son yanlış cevap verilen kelimeler listesinde mi kontrol et
-        let recentlyWrong = [];
-        try {
-            recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
-        } catch (e) {
-            recentlyWrong = [];
-        }
-        const isRecentlyWrong = recentlyWrong.includes(item.wordId);
-        const wrongIndex = recentlyWrong.indexOf(item.wordId);
-        
-        // Tekrar nedeni (sadece review filtresinde göster)
-        let reviewReason = '';
-        if (filterType === 'review' && needsReview) {
-            const oneDay = 24 * 60 * 60 * 1000;
-            const daysSinceLastSeen = (Date.now() - item.lastSeen) / oneDay;
-            const totalAttempts = (item.correct || 0) + (item.wrong || 0);
-            const reasons = [];
-            if (item.successRate < 0.6) reasons.push('Başarı %60 altı');
-            if (item.masteryLevel < 2.0) reasons.push('Ustalık < 2.0');
-            if (daysSinceLastSeen > 3) reasons.push(`${Math.round(daysSinceLastSeen)} gün önce`);
-            if (totalAttempts < 5) reasons.push(`Pratik < 5`);
-            if (reasons.length > 0) {
-                reviewReason = `<div style="font-size: 0.7em; color: #e74c3c; margin-top: 4px; padding: 4px; background: #ffe6e6; border-radius: 4px;">🔄 Tekrar nedeni: ${reasons.join(', ')}</div>`;
-            }
-        }
-        
-        return `
-            <div style="background: white; border-radius: 8px; padding: 12px; margin: 8px 0; border-left: 4px solid ${masteryColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <div class="arabic" style="font-size: 1.3em; font-weight: bold; color: #2c3e50; margin-bottom: 2px; padding: 0;">
-                            ${item.wordData.kelime || item.wordId}
-                            ${isFav ? ' ⭐' : ''}
-                            ${needsReview ? ' 🔄' : ''}
-                            ${isRecentlyWrong ? ` ❌<span style="font-size: 0.6em; color: #e74c3c; margin-left: 4px;">(Son yanlış #${wrongIndex + 1})</span>` : ''}
-                        </div>
-                        <div style="font-size: 0.9em; color: #666;">${item.wordData.anlam || 'Bilinmiyor'}</div>
-                    </div>
-                    <div style="text-align: right; display: flex; gap: 5px; align-items: flex-start;">
-                        <button class="favorite-btn-inline" data-word-id="${item.wordId}" onclick="if(typeof toggleFavorite !== 'undefined') { const newState = toggleFavorite('${item.wordId}'); this.innerHTML = newState ? '⭐' : '☆'; this.style.background = newState ? '#ffc107' : 'transparent'; this.style.borderColor = newState ? '#ffc107' : '#ccc'; if(newState && typeof showSuccessMessage !== 'undefined') showSuccessMessage('⭐ Favorilere eklendi!'); }" style="background: ${isFav ? '#ffc107' : 'transparent'}; border: 2px solid ${isFav ? '#ffc107' : '#ccc'}; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; padding: 0; margin: 0; transition: all 0.3s ease;">${isFav ? '⭐' : '☆'}</button>
-                        <div style="background: ${masteryColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold;">${masteryText}</div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.8em;">
-                    <div style="text-align: center; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                        <div style="font-weight: bold; color: #27ae60;">${successPercent}%</div>
-                        <div style="color: #666;">Başarı</div>
-                    </div>
-                    <div style="text-align: center; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                        <div style="font-weight: bold; color: #3498db;">${(item.attempts || 0) || ((item.correct || 0) + (item.wrong || 0))}</div>
-                        <div style="color: #666;">Deneme</div>
-                    </div>
-                    <div style="text-align: center; padding: 6px; background: #f8f9fa; border-radius: 4px;">
-                        <div style="font-weight: bold; color: #f39c12;">${Math.round((item.priority || 1.0) * 100) / 100}</div>
-                        <div style="color: #666;">Öncelik</div>
-                    </div>
-                </div>
-                
-                ${item.gameModes ? (() => {
-                    // Kelime Çevir modlarını topla (alt modlar dahil)
-                    const kelimeCevirModes = Object.keys(item.gameModes).filter(key => key.startsWith('kelimeCevir'));
-                    const hasKelimeCevir = kelimeCevirModes.length > 0;
-                    const hasDinleBul = item.gameModes.dinleBul;
-                    
-                    if (!hasKelimeCevir && !hasDinleBul) return '';
-                    
-                    // Kelime Çevir toplam istatistikleri
-                    let kelimeCevirTotal = { correct: 0, wrong: 0, attempts: 0 };
-                    kelimeCevirModes.forEach(mode => {
-                        const modeStats = item.gameModes[mode];
-                        if (modeStats) {
-                            kelimeCevirTotal.correct += modeStats.correct || 0;
-                            kelimeCevirTotal.wrong += modeStats.wrong || 0;
-                            kelimeCevirTotal.attempts += modeStats.attempts || 0;
-                        }
-                    });
-                    const kelimeCevirSuccessRate = kelimeCevirTotal.attempts > 0 
-                        ? (kelimeCevirTotal.correct / kelimeCevirTotal.attempts) 
-                        : 0;
-                    
-                    return `
-                <div style="margin-top: 8px; padding: 8px; background: #f0f7ff; border-radius: 6px; border-left: 3px solid #3498db;">
-                    <div style="font-size: 0.75em; font-weight: 600; color: #2c3e50; margin-bottom: 6px;">📊 Oyun Modu Bazlı Tekrarlanma:</div>
-                    <div style="display: grid; grid-template-columns: ${hasKelimeCevir && hasDinleBul ? '1fr 1fr' : '1fr'}; gap: 6px; font-size: 0.7em;">
-                        ${hasKelimeCevir ? `
-                        <div style="text-align: center; padding: 4px; background: white; border-radius: 4px;">
-                            <div style="font-weight: bold; color: #2980b9;">📚 Kelime Çevir</div>
-                            ${kelimeCevirModes.length > 1 ? `<div style="font-size: 0.75em; color: #999; margin-bottom: 2px;">(${kelimeCevirModes.length} alt mod)</div>` : ''}
-                            <div style="color: #666; margin-top: 2px;">
-                                <span style="color: #27ae60;">✓ ${kelimeCevirTotal.correct}</span> / 
-                                <span style="color: #e74c3c;">✗ ${kelimeCevirTotal.wrong}</span> 
-                                (${kelimeCevirTotal.attempts} deneme)
-                            </div>
-                            <div style="color: #666; font-size: 0.85em; margin-top: 2px;">
-                                Başarı: ${Math.round(kelimeCevirSuccessRate * 100)}%
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${hasDinleBul ? `
-                        <div style="text-align: center; padding: 4px; background: white; border-radius: 4px;">
-                            <div style="font-weight: bold; color: #8e44ad;">🎧 Dinle Bul</div>
-                            <div style="color: #666; margin-top: 2px;">
-                                <span style="color: #27ae60;">✓ ${item.gameModes.dinleBul.correct || 0}</span> / 
-                                <span style="color: #e74c3c;">✗ ${item.gameModes.dinleBul.wrong || 0}</span> 
-                                (${item.gameModes.dinleBul.attempts || 0} deneme)
-                            </div>
-                            <div style="color: #666; font-size: 0.85em; margin-top: 2px;">
-                                Başarı: ${item.gameModes.dinleBul.successRate ? Math.round(item.gameModes.dinleBul.successRate * 100) : 0}%
-                            </div>
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-                `;
-                })() : ''}
-                
-                ${item.masteryLevel < 3.0 ? `
-                <div style="margin-top: 8px; padding: 6px; background: #fff3cd; border-radius: 4px; border-left: 3px solid #ffc107;">
-                    <div style="font-size: 0.7em; color: #856404; font-weight: 600; margin-bottom: 4px;">📈 Öğrenme Durumu:</div>
-                    <div style="font-size: 0.7em; color: #666; line-height: 1.4;">
-                        Mevcut Ustalık: <strong>${Math.round(item.masteryLevel * 10) / 10}</strong> / 3.0<br>
-                        ${item.masteryLevel < 3.0 ? `Öğrenmek için: <strong>${Math.ceil((3.0 - item.masteryLevel) / 0.2)}</strong> doğru cevap daha gerekli` : '✅ Öğrenildi!'}
-                        ${item.successRate < 0.6 ? `<br>Başarı oranı: <strong>${Math.round(item.successRate * 100)}%</strong> (Hedef: %60)` : ''}
-                    </div>
-                </div>
-                ` : ''}
-                
-                <div style="margin-top: 8px; font-size: 0.75em; color: #666; text-align: center;">
-                    Son görülme: ${new Date(item.lastSeen).toLocaleDateString('tr-TR')}
-                </div>
-                ${reviewReason}
-            </div>
-        `;
-        }).join('');
-        
-        log.stats('✅ HTML oluşturuldu ve listContainer\'a yazıldı!');
-        
-    } catch (error) {
-        log.error('🚨 filterWordStats HATA:', error);
-        log.error('Stack trace:', error.stack);
-    }
-}
-
-// ============ KELİME İSTATİSTİK YÖNETİMİ ============
-function loadWordStats() {
-    try {
-        const saved = localStorage.getItem('hasene_wordStats');
-        return saved ? JSON.parse(saved) : {};
-    } catch (error) {
-        log.error('📊 Kelime istatistikleri yüklenirken hata:', error);
-        return {};
-    }
-}
-
-function saveWordStats(wordStats) {
-    try {
-        localStorage.setItem('hasene_wordStats', JSON.stringify(wordStats));
-    } catch (error) {
-        log.error('📊 Kelime istatistikleri kaydedilirken hata:', error);
-    }
-}
-
-// Global erişim için window'a ekle
-window.loadWordStats = loadWordStats;
-window.saveWordStats = saveWordStats;
-
-function updateWordStats(wordId, isCorrect, gameMode = null) {
-    // NULL KONTROL - wordId geçerli mi?
-    if (!wordId || typeof wordId !== 'string') {
-        log.error('❌ Geçersiz wordId:', wordId);
-        return;
-    }
-    
-    // Oyun modunu belirle (eğer verilmediyse aktif modu kullan)
-    if (!gameMode) {
-        // Aktif oyun modunu belirle
-        if (typeof currentGameMode !== 'undefined' && currentGameMode) {
-            gameMode = currentGameMode;
-        } else if (document.getElementById('kelimeCevirScreen') && document.getElementById('kelimeCevirScreen').style.display !== 'none') {
-            gameMode = 'kelimeCevir';
-        } else if (document.getElementById('dinleBulScreen') && document.getElementById('dinleBulScreen').style.display !== 'none') {
-            gameMode = 'dinleBul';
-        } else if (document.getElementById('boslukDoldurScreen') && document.getElementById('boslukDoldurScreen').style.display !== 'none') {
-            gameMode = 'boslukDoldur';
-        } else {
-            gameMode = 'unknown'; // Bilinmeyen mod
-        }
-    }
-    
-    const wordStats = loadWordStats();
-    
-    if (!wordStats[wordId]) {
-        wordStats[wordId] = {
-            attempts: 0,
-            correct: 0,
-            wrong: 0,
-            lastSeen: Date.now(),
-            masteryLevel: 0,
-            priority: 1.0,
-            gameModes: {} // Her oyun modu için ayrı istatistikler
-        };
-    }
-
-    const stats = wordStats[wordId];
-    
-    // Genel istatistikler
-    stats.attempts++;
-    stats.lastSeen = Date.now();
-
-    if (isCorrect) {
-        stats.correct++;
-        // Doğru cevap - ustalık artır, öncelik azalt
-        stats.masteryLevel = Math.min(5, stats.masteryLevel + 0.2);
-        stats.priority = Math.max(0.1, stats.priority * 0.8);
-        
-        // Doğru cevap verilen kelimeyi recentlyWrong listesinden çıkar
-        let recentlyWrong = [];
-        try {
-            recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
-            const index = recentlyWrong.indexOf(wordId);
-            if (index !== -1) {
-                recentlyWrong.splice(index, 1);
-                localStorage.setItem('hasene_recentlyWrong', JSON.stringify(recentlyWrong));
-                log.stats(`✅ Doğru cevap verilen kelime recentlyWrong listesinden çıkarıldı: ${wordId}`);
-            }
-        } catch (e) {
-            log.error('❌ recentlyWrong listesi güncellenirken hata:', e);
-        }
-    } else {
-        stats.wrong++;
-        // Yanlış cevap - ustalık azalt, öncelik artır
-        stats.masteryLevel = Math.max(0, stats.masteryLevel - 0.5);
-        stats.priority = Math.min(3.0, stats.priority * 1.5);
-        
-        // Yanlış cevap verilen kelimeleri "recentlyWrong" listesine ekle
-        // Bu liste son 50 yanlış cevap verilen kelimeyi tutar
-        let recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
-        // Aynı kelime zaten listede varsa kaldır (tekrar eklemek için)
-        recentlyWrong = recentlyWrong.filter(id => id !== wordId);
-        // En başa ekle (en yeni yanlış cevap en önde)
-        recentlyWrong.unshift(wordId);
-        // Son 50 kelimeyi tut (çok eski olanları kaldır)
-        recentlyWrong = recentlyWrong.slice(0, 50);
-        localStorage.setItem('hasene_recentlyWrong', JSON.stringify(recentlyWrong));
-        log.stats(`❌ Yanlış cevap verilen kelime recentlyWrong listesine eklendi: ${wordId}`);
-    }
-
-    // Oyun modu bazlı istatistikler
-    if (!stats.gameModes) {
-        stats.gameModes = {};
-    }
-    
-    if (!stats.gameModes[gameMode]) {
-        stats.gameModes[gameMode] = {
-            attempts: 0,
-            correct: 0,
-            wrong: 0,
-            lastSeen: Date.now()
-        };
-    }
-    
-    const modeStats = stats.gameModes[gameMode];
-    modeStats.attempts++;
-    modeStats.lastSeen = Date.now();
-    
-    if (isCorrect) {
-        modeStats.correct++;
-    } else {
-        modeStats.wrong++;
-    }
-    
-    // Oyun modu bazlı başarı oranı
-    modeStats.successRate = modeStats.attempts > 0 ? (modeStats.correct / modeStats.attempts) : 0;
-
-    // Genel başarı oranı hesapla
-    stats.successRate = stats.attempts > 0 ? (stats.correct / stats.attempts) : 0;
-
-    saveWordStats(wordStats);
-    log.stats(`📊 ${wordId} kelimesi istatistiği güncellendi (Mod: ${gameMode}):`, {
-        genel: { attempts: stats.attempts, correct: stats.correct, wrong: stats.wrong },
-        [gameMode]: modeStats
-    });
-    
-    // Tekrar listesini güncelle
-    if (typeof updateReviewList === 'function') {
-        updateReviewList();
-    }
-}
-
-function selectIntelligentWord(filteredData) {
-    const wordStats = loadWordStats();
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
-    
-    // Son yanlış cevap verilen kelimeleri yükle (en yeni en önde)
-    let recentlyWrong = [];
-    try {
-        recentlyWrong = JSON.parse(localStorage.getItem('hasene_recentlyWrong') || '[]');
-    } catch (e) {
-        log.error('❌ recentlyWrong listesi yüklenirken hata:', e);
-        recentlyWrong = [];
-    }
-    
-    // Review Mode kontrolü - currentMode güvenli erişim
-    const safeCurrentMode = typeof currentMode !== 'undefined' 
-        ? currentMode 
-        : (typeof window !== 'undefined' && window.currentMode) 
-            ? window.currentMode 
-            : (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.defaultMode) 
-                ? CONFIG.defaultMode 
-                : 'klasik';
-    
-    // CONFIG.gameModes güvenli erişim
-    const gameModes = (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.gameModes) 
-        ? CONFIG.gameModes 
-        : {};
-    
-    const mode = gameModes[safeCurrentMode];
-    const isReviewMode = mode && mode.reviewMode === true;
-    let strugglingWords = [];
-    
-    if (isReviewMode) {
-        // Review Mode: Zorlanılan kelimeleri topla
-        strugglingWords = getStrugglingWords();
-        log.debug(`🔄 Review Mode aktif - ${strugglingWords.length} zorlanılan kelime bulundu`);
-        
-        // Eğer zorlanılan kelime yoksa uyarı ver
-        if (strugglingWords.length === 0) {
-            log.warn('⚠️ Review Mode aktif ama zorlanılan kelime yok! Normal moda geçiliyor.');
-        }
-    }
-
-    // Her kelime için öncelik puanı hesapla
-    const wordsWithPriority = filteredData.map(word => {
-        const stats = wordStats[word.id];
-        let priorityScore = 1.0;
-        
-        // EN ÖNEMLİ: Son yanlış cevap verilen kelimelere ÇOK YÜKSEK öncelik ver
-        // recentlyWrong listesi en yeni yanlış cevap verilen kelimeden en eskiye doğru sıralı
-        const wrongIndex = recentlyWrong.indexOf(word.id);
-        if (wrongIndex !== -1) {
-            // En yeni yanlış cevap (index 0) = 100x öncelik
-            // İkinci yanlış cevap (index 1) = 50x öncelik
-            // Üçüncü yanlış cevap (index 2) = 25x öncelik
-            // ... şeklinde azalır, minimum 5x öncelik
-            const wrongMultiplier = Math.max(5.0, 100.0 / Math.pow(2, wrongIndex));
-            priorityScore *= wrongMultiplier;
-            log.debug(`❌ Son yanlış cevap verilen kelime: ${word.id} (sıra: ${wrongIndex + 1}) - Öncelik çarpanı: ${wrongMultiplier.toFixed(1)}x`);
-        }
-        
-        // Zorlanılan kelimeleri tespit et (hem Review Mode hem normal mod için)
-        const isStrugglingWord = stats && (stats.successRate < 0.6 || stats.masteryLevel < 1.0);
-        
-        // Review Mode: Zorlanılan kelimelere ekstra öncelik ver (3x)
-        if (isReviewMode && strugglingWords.includes(word.id)) {
-            priorityScore *= 3.0; // Review Mode'da zorlanılan kelimelere 3x öncelik
-            log.debug(`🔄 Review Mode - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
-        } 
-        // Normal mod: Zorlanılan kelimelere orta öncelik ver (1.5x)
-        else if (!isReviewMode && isStrugglingWord && wrongIndex === -1) {
-            // recentlyWrong listesinde değilse zorlanılan kelime önceliği ver
-            priorityScore *= 1.5; // Normal modda zorlanılan kelimelere 1.5x öncelik
-            log.debug(`📚 Normal Mod - Zorlanılan kelime: ${word.id} - Öncelik: ${priorityScore}`);
-        }
-
-        if (stats) {
-            // Temel öncelik puanı (yanlış cevaplanan kelimeler daha öncelikli)
-            priorityScore *= stats.priority;
-
-            // Zaman faktörü (uzun süredir görülmeyen kelimeler)
-            const daysSinceLastSeen = (now - stats.lastSeen) / oneDay;
-            if (daysSinceLastSeen > 3) {
-                priorityScore *= (1 + daysSinceLastSeen * 0.1);
-            }
-
-            // Başarı oranı faktörü (düşük başarı oranı = yüksek öncelik)
-            if (stats.successRate < 0.6) {
-                // successRate 0-1 arası olduğu için sonuç 0.5-1.5 arası olur
-                priorityScore *= Math.max(0.1, 1.5 - stats.successRate);
-            }
-
-            // Ustalık seviyesi faktörü (düşük ustalık = yüksek öncelik)
-            // masteryLevel 0-5 arası olduğu için sonuç 1.0-2.0 arası olur
-            priorityScore *= Math.max(0.1, 2.0 - stats.masteryLevel / 5.0);
-        } else {
-            // Hiç görülmemiş kelimeler orta öncelikli
-            priorityScore *= 1.2;
-        }
-
-        return {
-            word,
-            priority: priorityScore
-        };
-    });
-
-    // Önceliğe göre sırala
-    wordsWithPriority.sort((a, b) => b.priority - a.priority);
-
-    // Weighted random selection (en öncelikli kelimeler daha fazla seçilir)
-    const totalWeight = wordsWithPriority.reduce((sum, item) => sum + item.priority, 0);
-    
-    // Güvenlik kontrolü: totalWeight 0 veya negatif olamaz
-    if (totalWeight <= 0 || wordsWithPriority.length === 0) {
-        log.warn('⚠️ Öncelik puanları hesaplanamadı, rastgele kelime seçiliyor');
-        // Array length check - prevent error if array is empty
-        if (!filteredData || filteredData.length === 0) {
-            log.error('❌ Filtrelenmiş veri bulunamadı!');
-            return null;
-        }
-        return filteredData[Math.floor(Math.random() * filteredData.length)];
-    }
-    
-    let random = Math.random() * totalWeight;
-
-    let selectedWord = null;
-    
-    for (const item of wordsWithPriority) {
-        random -= item.priority;
-        if (random <= 0) {
-            selectedWord = item.word;
-            
-            // Review Mode takibi: Eğer seçilen kelime zorlanılan kelimelerden ise
-            if (isReviewMode && strugglingWords.length > 0 && selectedWord && selectedWord.id) {
-                if (strugglingWords.includes(selectedWord.id)) {
-                    // Review mode'da zorlanılan kelime seçildi, takip et
-                    if (dailyTasks && dailyTasks.todayStats) {
-                        dailyTasks.todayStats.reviewWords = (dailyTasks.todayStats.reviewWords || 0) + 1;
-                        // Review görevlerini güncelle
-                        if (typeof updateTaskProgress === 'function') {
-                            updateTaskProgress('reviewWords', 1);
-                        }
-                    }
-                }
-            }
-            
-            return selectedWord;
-        }
-    }
-
-    // Fallback: ilk kelimeyi döndür
-    selectedWord = wordsWithPriority[0]?.word || filteredData[0];
-    
-    // Review Mode takibi (fallback için de)
-    if (isReviewMode && strugglingWords.length > 0 && selectedWord && selectedWord.id) {
-        if (strugglingWords.includes(selectedWord.id)) {
-            if (dailyTasks && dailyTasks.todayStats) {
-                dailyTasks.todayStats.reviewWords = (dailyTasks.todayStats.reviewWords || 0) + 1;
-                if (typeof updateTaskProgress === 'function') {
-                    updateTaskProgress('reviewWords', 1);
-                }
-            }
-        }
-    }
-    
-    return selectedWord;
-}
-
-// ============ GLOBAL FONKSİYONLAR SONU ============
-
-// ============ GLOBAL ERROR HANDLER ============
-// Error throttling - aynı hatayı tekrar tekrar loglamayı önle
-// NOT: ERROR_THROTTLE_MS artık error-boundary.js'de tanımlı, burada kullanıyoruz
-const errorThrottle = new Map();
-const GAME_CORE_ERROR_THROTTLE_MS = window.CONSTANTS?.ERROR?.THROTTLE_MS || 5000; // 5 saniye
-
-window.addEventListener('error', (event) => {
-    try {
-        // Error handler'ın kendisinden kaynaklanan hataları ignore et
-        if (event.filename && event.filename.includes('safety-checks.js') && 
-            event.message && event.message.includes('elements is not defined')) {
-            return; // Bu hatayı ignore et
-        }
-        
-        const errorKey = `${event.filename}:${event.lineno}:${event.message}`;
-        const now = Date.now();
-        
-        // Throttle kontrolü
-        if (errorThrottle.has(errorKey)) {
-            const lastTime = errorThrottle.get(errorKey);
-            if (now - lastTime < GAME_CORE_ERROR_THROTTLE_MS) {
-                return; // Aynı hata çok yakın zamanda loglandı, ignore et
-            }
-        }
-        errorThrottle.set(errorKey, now);
-        
-        // Throttle map'i temizle (bellek sızıntısını önle)
-        if (errorThrottle.size > 50) {
-            const oldestKey = errorThrottle.keys().next().value;
-            errorThrottle.delete(oldestKey);
-        }
-        
-        if (typeof log !== 'undefined' && log.error) {
-            log.error('🚨 Global Error:', {
-                message: event.message,
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno,
-                error: event.error
-            });
-        }
-        
-        // Kullanıcıya kritik olmayan hatalar için bildirim göster
-        if (event.error && !event.error.message?.includes('ResizeObserver') && 
-            !event.error.message?.includes('pendingSave') &&
-            !event.error.message?.includes('elements is not defined')) {
-            // ResizeObserver ve bilinen hataları ignore et
-            log.error('Uygulama hatası:', event.error);
-        }
-    } catch (e) {
-        // Error handler hatası - sessizce ignore et
-    }
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-    try {
-        // Promise rejection handler'ın kendisinden kaynaklanan hataları ignore et
-        if (event.reason && typeof event.reason === 'object' && 
-            event.reason.message && 
-            (event.reason.message.includes('pendingSave') || 
-             event.reason.message.includes('elements is not defined'))) {
-            return; // Bu hatayı ignore et
-        }
-        
-        if (typeof log !== 'undefined' && log.error) {
-            log.error('🚨 Unhandled Promise Rejection:', event.reason);
-        }
-        log.error('Promise rejection:', event.reason);
-    } catch (e) {
-        // Error handler hatası - sessizce ignore et
-    }
-});
-
-// ============ OFFLINE/ONLINE INDICATOR ============
-window.addEventListener('online', () => {
-    if (typeof showSuccessMessage === 'function') {
-        showSuccessMessage('✅ İnternet bağlantısı geri geldi!');
-    }
-    log.debug('🌐 Online');
-});
-
-window.addEventListener('offline', () => {
-    if (typeof showCustomAlert === 'function') {
-        showCustomAlert('⚠️ İnternet bağlantısı yok. Offline modda çalışıyorsunuz.', 'warning');
-    }
-    log.debug('📴 Offline');
-});
-
-// Sayfa yüklendiğinde online durumunu kontrol et
-if (!navigator.onLine) {
-    if (typeof showCustomAlert === 'function') {
-        setTimeout(() => {
-            showCustomAlert('⚠️ İnternet bağlantısı yok. Offline modda çalışıyorsunuz.', 'warning');
-        }, 1000);
-    }
-}
-
-// ============ GLOBAL CLEANUP (Memory Leak Önleme) ============
-const activeIntervals = new Set();
-const activeTimeouts = new Set();
-
-// Debounce değişkenleri (erken tanımlama - beforeunload için)
-// Global scope'a ekle (beforeunload event listener'ı için)
-if (typeof window.saveStatsTimeout === 'undefined') {
-    window.saveStatsTimeout = null;
-}
-if (typeof window.pendingSave === 'undefined') {
-    window.pendingSave = false;
-}
-
-// setInterval wrapper - otomatik takip
-const originalSetInterval = window.setInterval;
-window.setInterval = function(...args) {
-    const id = originalSetInterval.apply(this, args);
-    activeIntervals.add(id);
-    return id;
-};
-
-// clearInterval wrapper - otomatik temizlik
-const originalClearInterval = window.clearInterval;
-window.clearInterval = function(id) {
-    activeIntervals.delete(id);
-    return originalClearInterval.apply(this, arguments);
-};
-
-// setTimeout wrapper - otomatik takip
-const originalSetTimeout = window.setTimeout;
-window.setTimeout = function(...args) {
-    const id = originalSetTimeout.apply(this, args);
-    activeTimeouts.add(id);
-    return id;
-};
-
-// clearTimeout wrapper - otomatik temizlik
-const originalClearTimeout = window.clearTimeout;
-window.clearTimeout = function(id) {
-    activeTimeouts.delete(id);
-    return originalClearTimeout.apply(this, arguments);
-};
-
-// Sayfa kapanırken tüm interval ve timeout'ları temizle
-window.addEventListener('beforeunload', () => {
-    // Tüm interval'ları temizle
-    activeIntervals.forEach(id => {
-        try {
-            originalClearInterval(id);
-        } catch(e) {
-            // ignore
-        }
-    });
-    activeIntervals.clear();
-    
-    // Tüm timeout'ları temizle
-    activeTimeouts.forEach(id => {
-        try {
-            originalClearTimeout(id);
-        } catch(e) {
-            // ignore
-        }
-    });
-    activeTimeouts.clear();
-    
-    // Audio cleanup
-    if (typeof cleanupAudioListeners === 'function') {
-        cleanupAudioListeners();
-    }
-    
-    // Acil kaydetme (sayfa kapanırken)
-    if (typeof saveStatsImmediate === 'function' && window.pendingSave) {
-        saveStatsImmediate().catch(() => {});
-    }
-});
-
-// ============ KEYBOARD NAVIGATION ============
-document.addEventListener('keydown', (e) => {
-    // Escape tuşu ile modalları kapat
-    if (e.key === 'Escape') {
-        if (typeof closeAllModals === 'function') {
-            closeAllModals();
-        }
-        // Ayrıca spesifik modalları da kapat
-        if (typeof closeStatsModal === 'function' && document.getElementById('statsModal')?.style.display !== 'none') {
-            closeStatsModal();
-        }
-        if (typeof closeBadgesModal === 'function' && document.getElementById('badgesModal')?.style.display !== 'none') {
-            closeBadgesModal();
-        }
-        if (typeof closeCalendarModal === 'function' && document.getElementById('calendarModal')?.style.display !== 'none') {
-            closeCalendarModal();
-        }
-        if (typeof closeDailyTasksModal === 'function' && document.getElementById('dailyTasksModal')?.style.display !== 'none') {
-            closeDailyTasksModal();
-        }
-    }
-    
-    // Enter/Space ile butonları aktif et
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.tagName === 'BUTTON' && !e.target.disabled) {
-        e.preventDefault();
-        e.target.click();
-    }
-});
-
-// DOM yüklendikten sonra çalıştır
-document.addEventListener('DOMContentLoaded', function() {
-    // (commented) DOM yüklendi log removed during cleanup
-    
-    // 🔧 DEV MODE: Geliştirici araçlarını göster/gizle
-    // Konsola "enableDevMode()" yazarak aktifleştirilebilir
-    const isDevMode = localStorage.getItem('hasene_dev_mode') === '1';
-    const devResetBtn = document.getElementById('devResetBtn');
-    if (devResetBtn && isDevMode) {
-        devResetBtn.style.display = 'flex';
-    }
-    
-    // Global dev mode toggle fonksiyonu
-    window.enableDevMode = function() {
-        localStorage.setItem('hasene_dev_mode', '1');
-        const btn = document.getElementById('devResetBtn');
-        if (btn) btn.style.display = 'flex';
-        if (typeof log !== 'undefined' && typeof log.debug === 'function') {
-            log.debug('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
-        } else {
-            console.log('🔧 Geliştirici modu aktif edildi. Sayfayı yenileyin.');
-        }
-    };
-    window.disableDevMode = function() {
-        localStorage.removeItem('hasene_dev_mode');
-        const btn = document.getElementById('devResetBtn');
-        if (btn) btn.style.display = 'none';
-        if (typeof log !== 'undefined' && typeof log.debug === 'function') {
-            log.debug('🔧 Geliştirici modu kapatıldı.');
-        } else {
-            console.log('🔧 Geliştirici modu kapatıldı.');
-        }
-    };
-    
-    // 🧹 Otomatik storage temizliği (başlangıçta)
-    storage.autoCleanup();
-    
-    // Custom Alert Modal butonları için touch event'leri (passive)
-    const customAlertCloseBtn = document.getElementById('customAlertCloseBtn');
-    const customAlertOKBtn = document.getElementById('customAlertOKBtn');
-    
-    if (customAlertCloseBtn) {
-        customAlertCloseBtn.addEventListener('touchstart', function() {
-            this.style.background = '#f0f0f0';
-            this.style.color = '#333';
-        }, { passive: true });
-        customAlertCloseBtn.addEventListener('touchend', function() {
-            this.style.background = 'rgba(0,0,0,0.1)';
-            this.style.color = '#666';
-        }, { passive: true });
-    }
-    
-    if (customAlertOKBtn) {
-        customAlertOKBtn.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.95)';
-        }, { passive: true });
-        customAlertOKBtn.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
-        }, { passive: true });
-    }
-    
-    // Daily Goal'u başlat
-    if (!storage.get('dailyGoalHasene')) {
-        const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-        storage.set('dailyGoalHasene', defaultGoal.toString());
-        storage.set('dailyGoalLevel', 'normal');
-    }
-    updateDailyGoalDisplay();
-    
-    // Bildirimleri başlat
-    if (typeof initNotifications === 'function') {
-        initNotifications();
-    }
-    
-    // Modal butonlarına event listener ekle
-    const dailyTasksBtn = document.getElementById('dailyTasksBtn');
-    const statsBtn = document.getElementById('statsBtn');
-    const calendarBtn = document.getElementById('calendarBtn');
-    const xpInfoBtn = document.getElementById('xpInfoBtn');
-    
-    // Detaylı istatistikler butonuna event listener ekle (detailed-stats.js yüklendikten sonra)
-    setTimeout(() => {
-        // Detaylı istatistikler modal butonu (eski buton - hala çalışıyor olabilir)
-        const detailedStatsBtn = document.getElementById('detailedStatsBtn');
-        if (detailedStatsBtn) {
-            const handleDetailedStatsClick = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                
-                log.debug('📊 Detaylı istatistikler modal butonu tıklandı');
-                
-                if (typeof window.showDetailedStats === 'function') {
-                    log.debug('✅ showDetailedStats fonksiyonu bulundu, çağrılıyor...');
-                    window.showDetailedStats();
-                } else if (typeof showDetailedStats === 'function') {
-                    log.debug('✅ showDetailedStats fonksiyonu bulundu (global değil), çağrılıyor...');
-                    showDetailedStats();
-                } else {
-                    log.error('❌ showDetailedStats fonksiyonu bulunamadı!', typeof window.showDetailedStats, typeof showDetailedStats);
-                }
-                
-                return false;
-            };
-            
-            // Click event
-            detailedStatsBtn.addEventListener('click', handleDetailedStatsClick, { capture: true, passive: false });
-            
-            // Touch event (mobil için)
-            detailedStatsBtn.addEventListener('touchend', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                handleDetailedStatsClick(e);
-                return false;
-            }, { capture: true, passive: false });
-            
-            log.debug('✅ Detaylı istatistikler modal butonu event listener eklendi');
-        }
-    }, 100); // 100ms gecikme ile detailed-stats.js yüklensin
-    
-    // ============ AYARLAR - BURADAN KONTROLEDEBİLİRSİN ============
-    const CONFIG = {
-    // OYUN MODLARI
-    gameModes: {
-        klasik: {
-            name: '📚 Klasik',
-            description: 'Normal oyun • İpucu var • 10 soru',
-            questionsPerLevel: 10,
-            timeLimit: 0,  // 0 = süre yok
-            lives: 0,      // 0 = sınırsız can
-            showHint: true
-        },
-        hizli: {
-            name: '📖 30.cüz',
-            description: '78-114. sureler • 15 soru • 30 sn',
-            questionsPerLevel: 15,
-            timeLimit: 30,
-            lives: 0,
-            showHint: false
-        },
-        hayat: {
-            name: '❤️ 3 Can',
-            description: '3 hak • Yanlış = -1 can • 20 soru',
-            questionsPerLevel: 20,
-            timeLimit: 0,
-            lives: 3,
-            showHint: true
-        },
-        zorluk: {
-            name: '🔥 Zorluk',
-            description: 'Sadece zor kelimeler • 10 soru • 20 sn • 3 can',
-            questionsPerLevel: 10,
-            timeLimit: 20,
-            lives: 3,
-            showHint: false,
-            minDifficulty: 7  // 7-10 arası zorluk
-        },
-        tekrar: {
-            name: '🔄 Tekrar Et',
-            description: 'Zorlandığın kelimeler • 15 soru • İpucu var',
-            questionsPerLevel: 15,
-            timeLimit: 0,
-            lives: 0,
-            showHint: true,
-            reviewMode: true  // Review mode aktif
-        }
-    },
-
-    // ZORLUK SEVİYELERİ (1 saat oyun = ~8000 Hasene hedefli)
-    // Ortalama: ~22 XP/soru (360 soru/saat = 7920 XP + combolar)
-    difficultyLevels: {
-        kolay: {
-            name: '😊 Kolay',
-            minDiff: 5,
-            maxDiff: 9,
-            pointsMultiplier: 2  // ~13 XP/soru
-        },
-        orta: {
-            name: '😐 Orta',
-            minDiff: 10,
-            maxDiff: 11,
-            pointsMultiplier: 2  // ~21 XP/soru (ideal)
-        },
-        zor: {
-            name: '😤 Zor',
-            minDiff: 12,
-            maxDiff: 21,
-            pointsMultiplier: 2  // ~33 XP/soru
-        },
-        karisik: {
-            name: '🎲 Karışık',
-            minDiff: 5,
-            maxDiff: 21,
-            pointsMultiplier: 2  // ~26 XP/soru ortalama
-        }
-    },
-
-    // VARSAYILAN AYARLAR
-    defaultMode: 'klasik',
-    defaultDifficulty: 'orta',  // UI'da mevcut olan zorluk seviyesi
-    wrongAnswerPenalty: 5  // Yanlış cevap puan cezası
-};
-
-// ============ ÖZEL ONAY POP-UP ============
-function showCustomConfirm(correct, wrong, xp) {
-    forceLog('[MODAL] Fonksiyon cagrildi - Dogru=' + correct + ' Yanlis=' + wrong + ' XP=' + xp);
-    return new Promise((resolve) => {
-        forceLog('[MODAL] Promise olusturuldu');
-        const confirmModal = document.getElementById('customConfirm');
-        const confirmCorrect = document.getElementById('confirmCorrect');
-        const confirmWrong = document.getElementById('confirmWrong');
-        const confirmXP = document.getElementById('confirmXP');
-        const confirmOK = document.getElementById('confirmOK');
-        const confirmCancel = document.getElementById('confirmCancel');
-        const perfectLessonBonus = document.getElementById('perfectLessonBonus');
-        const perfectBonusAmount = document.getElementById('perfectBonusAmount');
-
-        forceLog('[MODAL] Element kontrol:', 
-            'Modal=' + !!confirmModal,
-            'Correct=' + !!confirmCorrect,
-            'Wrong=' + !!confirmWrong,
-            'XP=' + !!confirmXP,
-            'OK=' + !!confirmOK,
-            'Cancel=' + !!confirmCancel
-        );
-
-        if (!confirmModal || !confirmCorrect || !confirmWrong || !confirmXP || !confirmOK || !confirmCancel) {
-            log.error('[MODAL] HATA - Elementler bulunamadi!');
-            resolve(true);
-            return;
-        }
-
-        forceLog('[MODAL] Degerler guncelleniyor...');
-        confirmCorrect.textContent = correct;
-        confirmWrong.textContent = wrong;
-        // Hasene değerini formatlı göster (binlik ayırıcı ile)
-        confirmXP.textContent = typeof xp === 'number' ? xp.toLocaleString('tr-TR') : xp;
-        
-        // Mükemmel Ders kontrolü - Modal'da göster
-        const PERFECT_LESSON_TEST_MODE = true;
-        const MIN_QUESTIONS_FOR_PERFECT = 3;
-        const isPerfectLesson = PERFECT_LESSON_TEST_MODE && 
-                                 wrong === 0 && 
-                                 correct >= MIN_QUESTIONS_FOR_PERFECT && 
-                                 xp > 0;
-        
-        if (isPerfectLesson && perfectLessonBonus && perfectBonusAmount) {
-            const perfectBonus = Math.floor(xp * 0.5);
-            perfectBonusAmount.textContent = `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene`;
-            perfectLessonBonus.style.display = 'block';
-            forceLog('[MODAL] Mükemmel Ders bonusu modal\'da gosteriliyor: +' + perfectBonus);
-        } else if (perfectLessonBonus) {
-            perfectLessonBonus.style.display = 'none';
-        }
-
-        forceLog('[MODAL] Modal gosteriliyor...');
-        
-        // Modal'ı body'ye taşı (eğer başka bir yerdeyse)
-        if (confirmModal.parentNode !== document.body) {
-            document.body.appendChild(confirmModal);
-            forceLog('[MODAL] Modal body\'ye tasindi');
-        }
-        
-        // Önce tüm stil özelliklerini sıfırla
-        confirmModal.style.removeProperty('display');
-        confirmModal.style.removeProperty('visibility');
-        confirmModal.style.removeProperty('opacity');
-        
-        // CSS class ile göster (daha güvenilir)
-        confirmModal.classList.add('show');
-        
-        // Ayrıca inline style da ekle (çift güvence)
-        confirmModal.style.setProperty('display', 'flex', 'important');
-        confirmModal.style.setProperty('visibility', 'visible', 'important');
-        confirmModal.style.setProperty('opacity', '1', 'important');
-        confirmModal.style.setProperty('z-index', '11000', 'important');
-        
-        // requestAnimationFrame ile bir sonraki frame'de kontrol et
-        requestAnimationFrame(() => {
-            const computedDisplay = window.getComputedStyle(confirmModal).display;
-            const computedVisibility = window.getComputedStyle(confirmModal).visibility;
-            const computedOpacity = window.getComputedStyle(confirmModal).opacity;
-            const computedZIndex = window.getComputedStyle(confirmModal).zIndex;
-            const isVisible = confirmModal.offsetParent !== null;
-            
-            forceLog('[MODAL] Display degeri (sonraki frame):', computedDisplay);
-            forceLog('[MODAL] Visibility:', computedVisibility);
-            forceLog('[MODAL] Opacity:', computedOpacity);
-            forceLog('[MODAL] Z-index:', computedZIndex);
-            forceLog('[MODAL] Gorunur mu?', isVisible);
-            forceLog('[MODAL] Parent:', confirmModal.parentNode?.tagName || 'null');
-            
-            if (computedDisplay === 'none' || !isVisible || computedOpacity === '0') {
-                forceLog('[MODAL] HATA - Hala gorunmuyor! Zorla gosteriliyor...');
-                confirmModal.style.setProperty('display', 'flex', 'important');
-                confirmModal.style.setProperty('visibility', 'visible', 'important');
-                confirmModal.style.setProperty('opacity', '1', 'important');
-                confirmModal.style.setProperty('z-index', '11000', 'important');
-                confirmModal.style.setProperty('position', 'fixed', 'important');
-                confirmModal.style.setProperty('top', '0', 'important');
-                confirmModal.style.setProperty('left', '0', 'important');
-                confirmModal.style.setProperty('width', '100%', 'important');
-                confirmModal.style.setProperty('height', '100%', 'important');
-            }
-        });
-
-        const handleOK = () => {
-            forceLog('[MODAL] OK butonuna tiklandi');
-            confirmModal.classList.remove('show');
-            confirmModal.style.setProperty('display', 'none', 'important');
-            cleanup();
-            resolve(true);
-        };
-
-        const handleCancel = () => {
-            forceLog('[MODAL] Cancel butonuna tiklandi');
-            confirmModal.classList.remove('show');
-            confirmModal.style.setProperty('display', 'none', 'important');
-            cleanup();
-            resolve(false);
-        };
-
-        // Modal dışına tıklayınca kapat (sadece modal overlay'ine tıklanırsa)
-        const handleModalClick = (e) => {
-            if (e.target === confirmModal) {
-                forceLog('[MODAL] Modal disina tiklandi - Kapatiliyor');
-                handleCancel(); // Cancel olarak işaretle
-            }
-        };
-
-        const cleanup = () => {
-            forceLog('[MODAL] Cleanup yapiliyor...');
-            if (confirmOK) confirmOK.removeEventListener('click', handleOK);
-            if (confirmCancel) confirmCancel.removeEventListener('click', handleCancel);
-            if (confirmModal) confirmModal.removeEventListener('click', handleModalClick);
-        };
-
-        forceLog('[MODAL] Event listener\'lar ekleniyor...');
-        confirmOK.addEventListener('click', handleOK);
-        confirmCancel.addEventListener('click', handleCancel);
-        confirmModal.addEventListener('click', handleModalClick);
-        
-        forceLog('[MODAL] Event listener\'lar eklendi - Modal bekleniyor...');
-    });
-}
-
-// ============ ACHIEVEMENT SİSTEMİ (DOMContentLoaded İÇİNDE) ============
-function checkAchievements() {
-    const achievements = [
-        { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
-        { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5 },
-        { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük virdi tamamla', icon: '⭐', condition: () => {
-            const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-            const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-            return dailyHasene >= goalHasene;
-        }},
-        { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7 },
-        { id: 'streak_14', name: '14 Gün Muvazebet', desc: '14 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 14 },
-        { id: 'streak_21', name: '21 Gün Muvazebet', desc: '21 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 21 },
-        { id: 'streak_30', name: '30 Gün Muvazebet', desc: '30 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 30 },
-        { id: 'level_5', name: 'Mertebe 5', desc: 'Mertebe 5\'e ulaş', icon: '🏆', condition: () => level >= 5 },
-        { id: 'level_10', name: 'Mertebe 10', desc: 'Mertebe 10\'a ulaş', icon: '💎', condition: () => level >= 10 },
-        { id: 'level_20', name: 'Mertebe 20', desc: 'Mertebe 20\'ye ulaş', icon: '🌟', condition: () => level >= 20 },
-        // XP bazlı başarımlar (1 saat oyun = 8500 XP mantığında)
-        { id: 'xp_500', name: 'İlk Adım', desc: '500 Hasene topla (~4 dk)', icon: '🌱', condition: () => totalPoints >= 500 },
-        { id: 'xp_2000', name: 'Mübtedi Yolcu', desc: '2,000 Hasene (1 Bronz)', icon: '🥉', condition: () => totalPoints >= 2000 },
-        { id: 'xp_4000', name: 'Hızlı Talebe', desc: '4,000 Hasene topla', icon: '⚡', condition: () => totalPoints >= 4000 },
-        { id: 'xp_8500', name: 'Gümüş Ustası', desc: '8,500 Hasene (1 Gümüş)', icon: '🥈', condition: () => totalPoints >= 8500 },
-        { id: 'xp_17000', name: 'İkinci Gümüş', desc: '17,000 Hasene topla', icon: '💯', condition: () => totalPoints >= 17000 },
-        { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene (1 Altın)', icon: '🥇', condition: () => totalPoints >= 25500 },
-        { id: 'xp_51000', name: 'İkinci Altın', desc: '51,000 Hasene topla', icon: '🔥', condition: () => totalPoints >= 51000 },
-        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene (1 Elmas)', icon: '💎', condition: () => totalPoints >= 85000 },
-        { id: 'xp_170000', name: 'Ustalar Ustası', desc: '170,000 Hasene topla', icon: '✨', condition: () => totalPoints >= 170000 },
-        { id: 'xp_1000000', name: 'HAFIZ', desc: '1,000,000 Hasene topla', icon: '📖', condition: () => totalPoints >= 1000000 }
-    ];
-    
-    const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-    let newUnlocks = [];
-    
-    achievements.forEach(ach => {
-        if (!unlockedAchievements.includes(ach.id) && ach.condition()) {
-            unlockedAchievements.push(ach.id);
-            newUnlocks.push(ach);
-        }
-    });
-    
-    if (newUnlocks.length > 0) {
-        storage.set('unlockedAchievements', unlockedAchievements);
-        newUnlocks.forEach(ach => {
-            setTimeout(() => {
-                showAchievementUnlock(ach);
-            }, 500);
-        });
-    }
-}
-
-// Global erişim için
-if (typeof window !== 'undefined') {
-    window.checkAchievements = checkAchievements;
-}
-
-
-
-
-
-function showAchievementUnlock(achievement) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-100px);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px 30px;
-        border-radius: 16px;
-        z-index: 10001;
-        box-shadow: 0 10px 40px rgba(102,126,234,0.5);
-        text-align: center;
-        min-width: 280px;
-        animation: achievementSlide 0.5s ease forwards;
-    `;
-    
-    notification.innerHTML = `
-        <div style="font-size: 3em; margin-bottom: 10px;">${achievement.icon}</div>
-        <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">Müjde Kazanıldı!</div>
-        <div style="font-size: 1em; font-weight: 600; margin-bottom: 3px;">${achievement.name}</div>
-        <div style="font-size: 0.85em; opacity: 0.9;">${achievement.desc}</div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // CSS animation ekle
-    if (!document.getElementById('achievementAnim')) {
-        const style = document.createElement('style');
-        style.id = 'achievementAnim';
-        style.textContent = `
-            @keyframes achievementSlide {
-                to { transform: translateX(-50%) translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideUp 0.5s ease forwards';
-        setTimeout(() => notification.remove(), 500);
-    }, 4000);
-}
-
-// ============ OYUN DURUMU ============
-// Veri değişkenleri artık js/data-loader.js'de tanımlı (lazy loading için)
-// kelimeBulData, ayetOkuData, duaData, hadisData global olarak erişilebilir
-
-// ============ MERKEZI GAME STATE (Tüm oyun durumu burada) ============
-/**
- * gameState - Tüm oyun durumunu tek bir objede toplar
- * Avantajlar:
- * - Merkezi state yönetimi
- * - Kolay debug (tek objede tüm state)
- * - Daha iyi performans izleme
- * - State history tutma imkanı
- */
-const gameState = {
-    // === CURRENT QUESTION STATE ===
-    question: {
-        current: null,
-        ayetIndex: 0,
-        duaIndex: 0,
-        hadisIndex: 0,
-        count: 0,
-        hintUsed: false,
-        recentAnswerPositions: []  // Son 10 sorunun doğru cevap pozisyonları
-    },
-    
-    // === QUESTION COUNTS PER GAME TYPE ===
-    questionCounts: {
-        ayet: 0,
-        dua: 0,
-        hadis: 0,
-        dinle: 0,
-        bosluk: 0
-    },
-    
-    // === SESSION STATE (Mevcut oyun oturumu) ===
-    session: {
-        score: 0,
-        correct: 0,
-        wrong: 0,
-        comboCount: 0,
-        startTime: null
-    },
-    
-    // === GAME TYPE SCORES ===
-    gameScores: {
-        kelimeCevir: { score: 0, correct: 0, wrong: 0 },
-        dinleBul: { score: 0, correct: 0, wrong: 0 },
-        boslukDoldur: { score: 0, correct: 0, wrong: 0 }
-    },
-    
-    // === GLOBAL (PERSISTENT) STATE ===
-    global: {
-        totalPoints: 0,
-        starPoints: 0,
-        level: 1,
-        badges: {
-            bronze: 0,
-            silver: 0,
-            gold: 0,
-            diamond: 0
-        },
-        streak: {
-            currentStreak: 0,
-            bestStreak: 0,
-            lastPlayDate: '',
-            totalPlayDays: 0,
-            dailyGoal: 5,
-            todayProgress: 0,
-            todayDate: '',
-            playDates: []
-        },
-        dailyTasks: {
-            lastTaskDate: '',
-            tasks: [],
-            bonusTasks: [],
-            completedTasks: [],
-            rewardsClaimed: false,
-            todayStats: {
-                kelimeCevir: 0,
-                dinleBul: 0,
-                boslukDoldur: 0,
-                ayetOku: 0,
-                duaOgre: 0,
-                hadisOku: 0,
-                toplamDogru: 0,
-                toplamYanlis: 0,
-                toplamPuan: 0,
-                perfectStreak: 0,
-                farklıZorluk: new Set()
-            }
-        }
-    },
-    
-    // === GAME SETTINGS ===
-    settings: {
-        currentMode: CONFIG.defaultMode,
-        currentDifficulty: CONFIG.defaultDifficulty,
-        lives: 0,
-        timeLeft: 0
-    },
-    
-    // === AUDIO/MEDIA STATE ===
-    media: {
-        currentAudio: null,
-        isListening: false
-    },
-    
-    // === TIMERS ===
-    timers: {
-        main: null,
-        questionTimer: null
-    }
-};
-
-// ============ GERIYE UYUMLU DEĞİŞKENLER (Backward Compatibility) ============
-// Mevcut kodu kırmamak için eski değişken isimlerini koruyoruz
-// Yavaş yavaş bu değişkenleri gameState'e migrate edeceğiz
-
-let currentQuestion = null;
-let currentAyetIndex = 0;
-let currentDuaIndex = 0;
-let currentHadisIndex = 0;
-let hintUsed = false; 
-let ayetQuestionCount = 0;
-let duaQuestionCount = 0;
-let hadisQuestionCount = 0;
-const AYET_MAX_QUESTIONS = 10;
-const DUA_MAX_QUESTIONS = 10;
-const HADIS_MAX_QUESTIONS = 10;
-
-// Cevap pozisyon takibi (tahmin edilmesini zorlaştırmak için)
-let recentAnswerPositions = []; // Son 10 sorunun doğru cevap pozisyonları
-const MAX_POSITION_HISTORY = 10;
-
-// Ses kontrolü için
-let currentAudio = null;
-
-// Arapça karakter tespiti için yardımcı fonksiyon
-function isArabic(text) {
-    const arabicRegex = /[\u0600-\u06FF]/;
-    return arabicRegex.test(text);
-}
-
-// Kelime Çevir oyunu için
-let kelimeCevirScore = 0;
-let kelimeCevirCorrect = 0;
-let kelimeCevirWrong = 0;
-
-// Dinle ve Bul oyunu için
-let dinleScore = 0;
-let dinleCorrect = 0;
-let dinleWrong = 0;
-
-// Boşluk Doldur oyunu için
-let boslukScore = 0;
-let boslukCorrect = 0;
-let boslukWrong = 0;
-
-// GLOBAL (KALICI) PUANLAR
-let totalPoints = 0;  // Toplam oyun puanı (kalıcı)
-let starPoints = 0;   // Yıldız puanı (her 100 Hasene = 1 yıldız - constants'tan alınır)
-let level = 1;        // Global seviye
-
-// ROZET SİSTEMİ
+// ============================================
+// GAME CORE - Ana Oyun Mantığı
+// ============================================
+
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
+
+let totalPoints = 0;
 let badges = {
-    bronze: 0,   // Bronz rozetler (5 yıldız = 1 bronz)
-    silver: 0,   // Gümüş rozetler (5 bronz = 1 gümüş)
-    gold: 0,     // Altın rozetler (5 gümüş = 1 altın)
-    diamond: 0   // Elmas rozetler (5 altın = 1 elmas)
+    stars: 0,
+    bronze: 0,
+    silver: 0,
+    gold: 0,
+    diamond: 0
 };
 
-// STREAK SİSTEMİ (GÜNLİK TAKİP)
 let streakData = {
-    currentStreak: 0,    // Mevcut ardışık gün sayısı
-    bestStreak: 0,       // En iyi streak rekoru
-    lastPlayDate: '',    // Son oyun oynanan tarih (YYYY-MM-DD)
-    totalPlayDays: 0,    // Toplam oyun oynanan gün sayısı
-    dailyGoal: 5,        // Günlük hedef (doğru cevap sayısı)
-    todayProgress: 0,    // Bugünkü ilerleme
-    todayDate: '',       // Bugünün tarihi
-    playDates: []        // Oyun oynanan tarihler listesi
+    currentStreak: 0,
+    bestStreak: 0,
+    totalPlayDays: 0,
+    lastPlayDate: '',
+    playDates: [],
+    dailyGoal: 5,
+    todayProgress: 0,
+    todayDate: ''
 };
 
-// GÜNLİK GÖREVLER SİSTEMİ
 let dailyTasks = {
-    lastTaskDate: '',    // Son görev yenileme tarihi
-    tasks: [],           // Günlük görevler listesi
-    bonusTasks: [],      // Bonus görevler listesi
-    completedTasks: [],  // Tamamlanan görevler
-    rewardsClaimed: false, // Ödül toplandı mı?
-    todayStats: {        // Bugünkü oyun istatistikleri
-        kelimeCevir: 0,
-        dinleBul: 0,
-        boslukDoldur: 0,
-        ayetOku: 0,
-        duaOgre: 0,
-        hadisOku: 0,
+    lastTaskDate: '',
+    tasks: [],
+    bonusTasks: [],
+    completedTasks: [],
+    todayStats: {
         toplamDogru: 0,
-        toplamYanlis: 0,  // Bugünkü toplam yanlış cevap sayısı
         toplamPuan: 0,
-        perfectStreak: 0,
+        comboCount: 0,
+        allGameModes: new Set(),
         farklıZorluk: new Set(),
-        reviewWords: 0,      // Yeni: Review mode kelime sayısı
-        comboCount: 0,      // Yeni: Combo sayısı
-        accuracy: 0,        // Yeni: Başarı oranı (%)
-        allGameModes: new Set(), // Yeni: Oynanan oyun modları
-        streakMaintain: 0,   // Yeni: Seri koruma
-        totalPlayTime: 0    // Yeni: Toplam oyun süresi (milisaniye)
-    }
+        perfectStreak: 0,
+        accuracy: 0,
+        reviewWords: new Set(),
+        streakMaintain: 0,
+        totalPlayTime: 0,
+        ayetOku: 0,
+        duaEt: 0,
+        hadisOku: 0
+    },
+    rewardsClaimed: false
 };
 
-// HAFTALIK GÖREVLER SİSTEMİ
 let weeklyTasks = {
-    lastWeekStart: '',   // Son hafta başlangıç tarihi (YYYY-MM-DD)
-    weekStart: '',       // Bu haftanın başlangıç tarihi
-    weekEnd: '',         // Bu haftanın bitiş tarihi
-    tasks: [],           // Haftalık görevler listesi
-    completedTasks: [],  // Tamamlanan haftalık görevler
-    rewardsClaimed: false, // Ödül toplandı mı?
-    weekStats: {         // Bu haftanın istatistikleri
+    lastWeekStart: '',
+    weekStart: '',
+    weekEnd: '',
+    tasks: [],
+    completedTasks: [],
+    weekStats: {
         totalHasene: 0,
         totalCorrect: 0,
         totalWrong: 0,
         daysPlayed: 0,
-        // perfectDays ve reviewWordsCount görevleri kaldırıldı
-        streakDays: 0,    // Üst üste oynanan günler
-        allModesPlayed: new Set(), // Oynanan tüm oyun modları
+        streakDays: 0,
+        allModesPlayed: new Set(),
         comboCount: 0
+    },
+    rewardsClaimed: false
+};
+
+let wordStats = {};
+let unlockedAchievements = []; // [{id: string, unlockedAt: number}, ...]
+let unlockedBadges = []; // [{id: string, unlockedAt: number}, ...] - Kazanılan rozet ID'leri ve zamanları
+let perfectLessonsCount = 0; // Toplam mükemmel ders sayısı
+let gameStats = {
+    totalCorrect: 0,
+    totalWrong: 0,
+    gameModeCounts: {
+        'kelime-cevir': 0,
+        'dinle-bul': 0,
+        'bosluk-doldur': 0,
+        'ayet-oku': 0,
+        'dua-et': 0,
+        'hadis-oku': 0
     }
 };
 
-// Global erişim için (bildirim sistemi için)
-window.dailyTasks = dailyTasks;
-window.weeklyTasks = weeklyTasks;
+// Oyun durumu
+let currentGame = null;
+let currentDifficulty = 'medium';
+let currentGameMode = null;
+let currentSubMode = null;
+let allWordsData = null; // Tüm kelime verileri (yanlış cevaplar için)
 
-// SESSION (OYUN İÇİ) PUANLAR
-let sessionScore = 0;     // Bu oyunun puanı
-let sessionCorrect = 0;   // Bu oyunun doğru sayısı
-let sessionWrong = 0;     // Bu oyunun yanlış sayısı
-let comboCount = 0;       // Üst üste doğru sayısı (combo)
+// Doğru cevap pozisyon takibi (eşit dağılım için)
+let correctAnswerPositions = {
+    count: [0, 0, 0, 0], // Her pozisyonun kullanım sayısı
+    total: 0 // Toplam soru sayısı
+};
 
-// ESKI DEĞİŞKENLER (Geriye uyumluluk için)
-let score = 0;
-let correct = 0;
-let wrong = 0;
-let questionCount = 0;
-let currentMode = CONFIG.defaultMode;
-let currentDifficulty = CONFIG.defaultDifficulty;
+// Audio yönetimi - audio-manager.js modülü kullanılıyor
+// currentAudio değişkeni ve stopCurrentAudio fonksiyonu audio-manager.js'de tanımlı
 
-    log.debug('Session değişkenleri başlatıldı:', {sessionScore, sessionCorrect, sessionWrong});
-    log.debug(`🏁 Varsayılan zorluk seviyesi: ${currentDifficulty}`);
-let lives = 0;
-let timer = null;
-let timeLeft = 0;
+// stopCurrentAudio fonksiyonu audio-manager.js modülünde tanımlı
 
-// ============ DOM ELEMANLARI ============
+// Global erişim için window'a ekle
+window.currentGame = currentGame;
+window.currentGameMode = currentGameMode;
+window.currentSubMode = currentSubMode;
+
+// Session değişkenleri
+let sessionScore = 0;
+let sessionCorrect = 0;
+let sessionWrong = 0;
+let comboCount = 0;
+let maxCombo = 0;
+let currentQuestion = 0;
+let questions = [];
+let currentQuestionData = null;
+let hintUsed = false;
+let lives = 3;
+
+// ============================================
+// DOM ELEMENTS
+// ============================================
+
 const elements = {
-    // Ana menü
-    mainMenu: document.getElementById('mainMenu'),
-    kelimeCevirBtn: document.getElementById('kelimeCevirBtn'),
-    dinleBulBtn: document.getElementById('dinleBulBtn'),
-    boslukDoldurBtn: document.getElementById('boslukDoldurBtn'),
-    duaEtBtn: document.getElementById('duaEtBtn'),
-    ayetOkuBtn: document.getElementById('ayetOkuBtn'),
-    hadisOkuBtn: document.getElementById('hadisOkuBtn'),
-    
-    // Kelime oyunu
-    score: document.getElementById('score'),
-    // level: document.getElementById('level'), // Kaldırıldı - Mertebe artık gösterilmiyor
-    correct: document.getElementById('correct'),
-    wrong: document.getElementById('wrong'),
-    progressBar: document.getElementById('progressBar'),
-    sureInfo: document.getElementById('sureInfo'),
-    arabicWord: document.getElementById('arabicWord'),
-    audioBtn: document.getElementById('audioBtn'),
-    hintBtn: document.getElementById('hintBtn'),
-    options: document.getElementById('options'),
-    feedback: document.getElementById('feedback'),
-    nextBtn: document.getElementById('nextBtn'),
-    difficulty: document.getElementById('difficulty'),
-    modal: document.getElementById('modal'),
-    newLevel: document.getElementById('newLevel'),
-    modalBtn: document.getElementById('modalBtn'),
-    modeSelector: document.getElementById('modeSelector'),
-    gameScreen: document.getElementById('gameScreen'),
-    settingsBtn: document.getElementById('settingsBtn'),
-    startBtn: document.getElementById('startBtn'),
-    modeButtons: document.getElementById('modeButtons'),
-    difficultyButtons: document.getElementById('difficultyButtons'),
-    lives: document.getElementById('lives'),
-    livesDisplay: document.getElementById('livesDisplay'),
-    timer: document.getElementById('timer'),
-    timerDisplay: document.getElementById('timerDisplay'),
-    currentMode: document.getElementById('currentMode'),
-    gameOverModal: document.getElementById('gameOverModal'),
-    gameOverTitle: document.getElementById('gameOverTitle'),
-    gameOverText: document.getElementById('gameOverText'),
-    finalScore: document.getElementById('finalScore'),
-    restartBtn: document.getElementById('restartBtn'),
-    backToMenuBtn: document.getElementById('backToMenuBtn'),
-    backFromGameBtn: document.getElementById('backFromGameBtn'),
-    
-    // Ayet modu
-    ayetMode: document.getElementById('ayetMode'),
-    ayetSureInfo: document.getElementById('ayetSureInfo'),
-    ayetArabic: document.getElementById('ayetArabic'),
-    ayetTranslation: document.getElementById('ayetTranslation'),
-    ayetAudioBtn: document.getElementById('ayetAudioBtn'),
-    prevAyetBtn: document.getElementById('prevAyetBtn'),
-    nextAyetBtn: document.getElementById('nextAyetBtn'),
-    backFromAyetBtn: document.getElementById('backFromAyetBtn'),
-    
-    // Dua modu
-    duaMode: document.getElementById('duaMode'),
-    duaSureInfo: document.getElementById('duaSureInfo'),
-    duaArabic: document.getElementById('duaArabic'),
-    duaTranslation: document.getElementById('duaTranslation'),
-    duaAudioBtn: document.getElementById('duaAudioBtn'),
-    prevDuaBtn: document.getElementById('prevDuaBtn'),
-    nextDuaBtn: document.getElementById('nextDuaBtn'),
-    backFromDuaBtn: document.getElementById('backFromDuaBtn'),
-    
-    // Hadis modu
-    hadisMode: document.getElementById('hadisMode'),
-    hadisCategory: document.getElementById('hadisCategory'),
-    hadisTitle: document.getElementById('hadisTitle'),
-    hadisHeader: document.getElementById('hadisHeader'),
-    hadisText: document.getElementById('hadisText'),
-    hadisRef: document.getElementById('hadisRef'),
-    prevHadisBtn: document.getElementById('prevHadisBtn'),
-    nextHadisBtn: document.getElementById('nextHadisBtn'),
-    backFromHadisBtn: document.getElementById('backFromHadisBtn'),
-    
-    // Boşluk Doldur modu
-    boslukMode: document.getElementById('boslukMode'),
-    boslukSureInfo: document.getElementById('boslukSureInfo'),
-    boslukAyetText: document.getElementById('boslukAyetText'),
-    boslukAudioBtn: document.getElementById('boslukAudioBtn'),
-    boslukOptions: document.getElementById('boslukOptions'),
-    boslukFeedback: document.getElementById('boslukFeedback'),
-    boslukNextBtn: document.getElementById('boslukNextBtn'),
-    boslukScore: document.getElementById('boslukScore'),
-    boslukCorrect: document.getElementById('boslukCorrect'),
-    boslukWrong: document.getElementById('boslukWrong'),
-    backFromBoslukBtn: document.getElementById('backFromBoslukBtn'),
-    
-    // Dinle ve Bul modu
-    dinleMode: document.getElementById('dinleMode'),
-    dinleSureInfo: document.getElementById('dinleSureInfo'),
-    dinleAudioBtn: document.getElementById('dinleAudioBtn'),
-    dinleOptions: document.getElementById('dinleOptions'),
-    dinleFeedback: document.getElementById('dinleFeedback'),
-    dinleNextBtn: document.getElementById('dinleNextBtn'),
-    dinleScore: document.getElementById('dinleScore'),
-    dinleCorrect: document.getElementById('dinleCorrect'),
-    dinleWrong: document.getElementById('dinleWrong'),
-    backFromDinleBtn: document.getElementById('backFromDinleBtn')
+    loadingScreen: document.getElementById('loadingScreen'),
+    totalPointsEl: document.getElementById('total-points'),
+    starPointsEl: document.getElementById('star-points'),
+    currentLevelEl: document.getElementById('current-level'),
+    dailyGoalProgress: document.getElementById('daily-goal-progress'),
+    dailyGoalCurrent: document.getElementById('daily-goal-current'),
+    dailyGoalTarget: document.getElementById('daily-goal-target'),
+    dailyGoalPercent: document.getElementById('daily-goal-percent'),
+    currentStreakEl: document.getElementById('current-streak')
 };
 
-// ============ KRİTİK: NULL KONTROL - EKSIK ELEMENTLER ============
-function checkElements() {
-    const missing = [];
-    const critical = ['mainMenu', 'kelimeCevirBtn', 'dinleBulBtn', 'boslukDoldurBtn', 
-                    'ayetOkuBtn', 'gameScreen', 'modeSelector'];
-    
-    for (const [key, value] of Object.entries(elements)) {
-        if (!value) {
-            missing.push(key);
-            if (critical.includes(key)) {
-                log.error(`❌ KRİTİK: '${key}' elementi bulunamadı!`);
-            }
-        }
-    }
-    
-    if (missing.length > 0) {
-        log.warn('⚠️ Eksik elementler:', missing.join(', '));
-    }
-    
-    return missing.length === 0;
-}
+// ============================================
+// VERİ YÜKLEME VE KAYDETME
+// ============================================
 
-// ============ SES DURDURMA FONKSİYONU ============
-function stopCurrentAudio() {
-    if (currentAudio) {
-        log.audio('⏹️ Mevcut ses durduruluyor:', {
-            paused: currentAudio.paused,
-            currentTime: currentAudio.currentTime,
-            duration: currentAudio.duration,
-            src: currentAudio.src
-        });
-        
-        if (!currentAudio.paused) {
-            currentAudio.pause();
-            log.audio('⏸️ Ses durduruldu');
-        }
-        
-        // Event listener'ları comprehensive cleanup
-        cleanupAudioListeners();
-        log.audio('🧹 Event listenerlar temizlendi');
-        
-        currentAudio.currentTime = 0;
-        log.audio('🔄 Ses başa sarıldı');
-        currentAudio = null;
-        log.audio('🗑️ Audio object temizlendi');
-    } else {
-        log.audio('ℹ️ Durduracak ses yok');
-    }
-}
-
-// ============ SES ÇALMA FONKSİYONU ============
-function cleanupAudioListeners() {
-    // Tüm audio event listener'larını temizle (memory leak önleme)
-    if (currentAudio) {
-        try {
-            currentAudio.onloadeddata = null;
-            currentAudio.oncanplay = null;
-            currentAudio.onended = null;
-            currentAudio.onerror = null;
-            currentAudio.ontimeupdate = null;
-            currentAudio.onpause = null;
-            currentAudio.onplay = null;
-            currentAudio.onloadstart = null;
-            // Also remove addEventListener if used
-            if (currentAudio.removeEventListener) {
-                currentAudio.removeEventListener('loadeddata', () => {});
-                currentAudio.removeEventListener('canplay', () => {});
-                currentAudio.removeEventListener('ended', () => {});
-                currentAudio.removeEventListener('error', () => {});
-                currentAudio.removeEventListener('timeupdate', () => {});
-            }
-        } catch (e) {
-            log.debug('Audio cleanup warning:', e);
-        }
-    }
-}
-
-
-// Navigasyon bar'ı gizle/göster fonksiyonları
-function hideBottomNavBar() {
-    const bottomNavBar = document.getElementById('bottomNavBar');
-    if (bottomNavBar) {
-bottomNavBar.style.display = 'none';
-    }
-}
-
-function showBottomNavBar() {
-    const bottomNavBar = document.getElementById('bottomNavBar');
-    if (bottomNavBar) {
-bottomNavBar.style.display = 'flex';
-    }
-}
-
-function hideAllGameScreens() {
-    const screens = [
-'kelimeCevirScreen',
-'dinleBulScreen',
-'boslukDoldurScreen',
-'ayetOkuScreen',
-'hadisOkuScreen',
-'duaOgrenScreen'
-    ];
-
-    screens.forEach(id => {
-const el = document.getElementById(id);
-if (el) el.style.display = 'none';
-    });
-}
-
-// Global olarak erişilebilir yap
-window.hideAllGameScreens = hideAllGameScreens;
-
-// Tüm modalları kapat
-function closeAllModals() {
-    const modals = ['statsModal', 'badgesModal', 'calendarModal', 'dailyTasksModal', 'onboardingModal', 'dailyGoalModal', 'xpInfoModal', 'customAlertModal', 'customConfirm'];
-    modals.forEach(modalId => {
-const modal = document.getElementById(modalId);
-if (modal) {
-    modal.style.display = 'none';
-    modal.style.zIndex = '';
-    // Force reflow to ensure modal is hidden before next operation
-    modal.offsetHeight;
-}
-    });
-    // Body scroll'u tekrar aktif et
-    document.body.style.overflow = '';
-    
-    // Bottom nav bar'ı tekrar göster (tüm modallar kapandığında)
-    if (typeof showBottomNavBar === 'function') {
-showBottomNavBar();
-    }
-}
-
-// Global olarak erişilebilir yap
-window.closeAllModals = closeAllModals;
-
-
-
-
-// Hide all mode containers so only the requested mode is visible
-function hideAllModes() {
-    // Tüm oyun modlarını ve ekranları gizle (mainMenu hariç)
-    const modeKeys = ['dinleMode','hadisMode','boslukMode','ayetMode','duaMode','modeSelector','gameScreen'];
-    modeKeys.forEach(k => {
-        try {
-            const el = elements[k];
-            if (el && el.style) {
-                el.style.display = 'none';
-                // Z-index'i de sıfırla (ekranların üst üste binmesini önle)
-                el.style.zIndex = '';
-            }
-        } catch (e) {
-            // ignore missing elements
-        }
-    });
-    
-    // Tüm game screen container'larını da gizle
-    const screenIds = ['kelimeCevirScreen', 'dinleBulScreen', 'boslukDoldurScreen', 'ayetOkuScreen', 'hadisOkuScreen', 'duaOgrenScreen'];
-    screenIds.forEach(screenId => {
-        try {
-            const screen = document.getElementById(screenId);
-            if (screen && screen.style) {
-                screen.style.display = 'none';
-                screen.style.zIndex = '';
-            }
-        } catch (e) {
-            // ignore missing elements
-        }
-    });
-    
-    // Tüm modal'ları da gizle
-    const modals = ['statsModal', 'badgesModal', 'calendarModal', 'dailyTasksModal', 'onboardingModal', 'dailyGoalModal', 'xpInfoModal'];
-    modals.forEach(modalId => {
-        try {
-            const modal = document.getElementById(modalId);
-            if (modal && modal.style) {
-                modal.style.display = 'none';
-                modal.style.zIndex = '';
-            }
-        } catch (e) {
-            // ignore missing elements
-        }
-    });
-}
-
-// 🏠 NAVIGATION - ANA MENÜ
-function goToMainMenu() {
-    log.debug('🏠 Ana menüye dönülüyor...');
-    
-    // Timer varsa durdur
-    if (typeof stopTimer === 'function') {
-        stopTimer();
-    }
-    
-    // Oyun seslerini durdur
-    if (typeof currentAudio !== 'undefined' && currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    
-    // Tüm modalları kapat
-    closeAllModals();
-    
-    // Tüm oyun modlarını gizle
-    hideAllModes();
-    
-    // Ana menüyü göster
-    if (elements.mainMenu) {
-        elements.mainMenu.style.display = 'block';
-    } else {
-        const mainMenu = document.getElementById('mainMenu');
-        if (mainMenu) mainMenu.style.display = 'block';
-    }
-    
-    // Navigasyon bar'ı göster
-    showBottomNavBar();
-    
-    // Settings butonunu gizle (ana menüde gerekmez)
-    if (elements.settingsBtn) {
-        elements.settingsBtn.style.display = 'none';
-    }
-    
-    log.debug('✅ Ana menü gösterildi');
-}
-
-// Global erişim için
-window.goToMainMenu = goToMainMenu;
-
-function playAudio(audioUrl, button) {
-    // Eğer ses çalıyorsa durdur
-    stopCurrentAudio();
-    
-    if (!audioUrl) {
-        log.error('Ses dosyası bulunamadı');
-        if (button) button.disabled = false;
-        return;
-    }
-    
-    // URL doğrulama
-    if (!audioUrl.startsWith('http://') && !audioUrl.startsWith('https://') && !audioUrl.startsWith('data:')) {
-        log.error('Geçersiz ses URL formatı:', audioUrl);
-        if (button) button.disabled = false;
-        return;
-    }
-    
-    // Butonu devre dışı bırak
-    if (button) button.disabled = true;
-    
-    try {
-        currentAudio = new Audio(audioUrl);
-        
-        // Ses yüklendiğinde çal
-        currentAudio.addEventListener('loadeddata', () => {
-            currentAudio.play().catch(err => {
-                log.error('Ses çalma hatası:', err);
-                log.error('Ses URL:', audioUrl);
-                if (button) button.disabled = false;
-                cleanupAudioListeners();
-                currentAudio = null;
-            });
-        });
-        
-        // Ses bittiğinde butonu aktif et ve cleanup
-        currentAudio.onended = () => {
-                if (button) button.disabled = false;
-                cleanupAudioListeners();
-                if (currentAudio) {
-                    currentAudio = null;
-                }
-            };
-            
-            // Hata durumunda cleanup
-            currentAudio.onerror = (e) => {
-                log.error('Ses dosyası yüklenemedi:', audioUrl);
-                log.error('Hata kodu:', currentAudio.error?.code);
-                log.error('Hata mesajı:', currentAudio.error?.message);
-                if (button) button.disabled = false;
-                cleanupAudioListeners();
-                if (currentAudio) {
-                    currentAudio = null;
-                }
-            };
-        
-        // Ses dosyasını yükle
-        currentAudio.load();
-        
-    } catch (err) {
-        log.error('Audio oluşturma hatası:', err);
-        log.error('Ses URL:', audioUrl);
-        if (button) button.disabled = false;
-        currentAudio = null;
-    }
-}
-
-// ============ NETWORK - FETCH WITH RETRY ============
-async function fetchWithRetry(url, retries = null, delay = null) {
-    // Constants'tan değerleri al
-    const maxRetries = retries || window.CONSTANTS?.ERROR?.MAX_RETRIES || 3;
-    const retryDelay = delay || window.CONSTANTS?.ERROR?.RETRY_DELAY || 1000;
-    
-    // JSON yükleme hatalarında otomatik retry
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            log.debug(`📡 Fetch attempt ${i + 1}/${maxRetries} failed for ${url}`);
-            if (i === maxRetries - 1) {
-                // Son deneme de başarısız
-                throw new Error(`Failed to load ${url} after ${maxRetries} attempts: ${error.message}`);
-            }
-            // Retry öncesi bekle (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
-        }
-    }
-}
-
-
-
-
-
-// ============ VERİ YÜKLEME ============
-// Artık lazy loading kullanılıyor - veriler sadece ihtiyaç duyulduğunda yüklenir
-// loadKelimeData(), loadAyetData(), loadDuaData(), loadHadisData() fonksiyonları
-// js/data-loader.js dosyasında tanımlı
-
-async function loadData() {
-    try {
-        // Sadece mod seçiciyi ve butonları başlat
-        // Veriler lazy loading ile yüklenecek
-        initModeSelector();
-        initMainMenuDifficultyButtons();
-        
-    } catch (error) {
-        log.error('Veri yükleme hatası:', error);
-        // NULL KONTROL - mainMenu varsa hata mesajı göster
-        if (elements.mainMenu) {
-            elements.mainMenu.innerHTML = '<p style="color: red; text-align: center;">Veriler yüklenemedi!</p>';
-        } else {
-            log.error('❌ KRİTİK: mainMenu elementi bulunamadı!');
-        }
-    }
-}
-
-// ============ İNDEXEDDB SİSTEMİ (ÜÇÜNCü TARAF ÇEREZİ SORUNU İÇİN) ============
-let db = null;
-
-function initIndexedDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('HaseneGameDB', 1);
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-            db = request.result;
-            resolve(db);
-        };
-        
-        request.onupgradeneeded = (event) => {
-            db = event.target.result;
-            if (!db.objectStoreNames.contains('gameData')) {
-                db.createObjectStore('gameData');
-            }
-        };
-    });
-}
-
-function saveToIndexedDB(key, value) {
-    if (!db) {
-        log.warn(`⚠️ IndexedDB db yok, kaydedilemedi: ${key}`);
-        return;
-    }
-    
-    // Database connection durumunu kontrol et
-    if (db.readyState !== 'open') {
-        log.warn(`⚠️ IndexedDB connection kapalı, kaydedilemedi: ${key}`);
-        return;
-    }
-    
-    try {
-        const transaction = db.transaction(['gameData'], 'readwrite');
-        const store = transaction.objectStore('gameData');
-        const request = store.put(value, key);
-        request.onsuccess = () => {
-            log.debug(`✅ IndexedDB'ye kaydedildi: ${key}`);
-        };
-        request.onerror = () => {
-            log.error(`❌ IndexedDB kaydetme hatası: ${key}`, request.error);
-        };
-    } catch(e) { 
-        log.error('❌ IndexedDB save failed:', e); 
-    }
-}
-
-function loadFromIndexedDB(key) {
-    return new Promise((resolve) => {
-        if (!db) { resolve(null); return; }
-        try {
-            const transaction = db.transaction(['gameData'], 'readonly');
-            const store = transaction.objectStore('gameData');
-            const request = store.get(key);
-            request.onsuccess = () => resolve(request.result || null);
-            request.onerror = () => resolve(null);
-        } catch(e) { resolve(null); }
-    });
-}
-
-// Global erişim için window objesine ekle
-if (typeof window !== 'undefined') {
-    window.loadFromIndexedDB = loadFromIndexedDB;
-    window.saveToIndexedDB = saveToIndexedDB;
-}
-
-// URL TABANLI VERİ SAKLAMA (Mobil fallback - hiçbir şey çalışmazsa)
-function saveToURL() {
-    const gameData = {
-        p: totalPoints, // points
-        b: badges.bronze + ',' + badges.silver + ',' + badges.gold + ',' + badges.diamond, // badges
-        s: streakData.currentStreak, // streak
-        d: getLocalDateString() // date (yerel tarih)
-    };
-    const encoded = btoa(JSON.stringify(gameData));
-    const newUrl = window.location.origin + window.location.pathname + '?data=' + encoded;
-    
-    // URL'yi geçmişe ekle (geri butonu ile erişilebilir)
-    if (window.history.pushState) {
-        window.history.pushState({gameData: encoded}, '', newUrl);
-    }
-    log.debug('🔗 URL\'ye kaydedildi:', totalPoints, 'puan');
-}
-
-function loadFromURL() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const data = urlParams.get('data');
-        if (data) {
-            const decoded = JSON.parse(atob(data));
-            totalPoints = parseInt(decoded.p) || 0;
-            
-            // Rozet verilerini yükle
-            if (decoded.b) {
-                const badgeArray = decoded.b.split(',');
-                badges.bronze = parseInt(badgeArray[0]) || 0;
-                badges.silver = parseInt(badgeArray[1]) || 0;
-                badges.gold = parseInt(badgeArray[2]) || 0;
-                badges.diamond = parseInt(badgeArray[3]) || 0;
-            }
-            
-            // Streak verilerini yükle
-            if (decoded.s) {
-                streakData.currentStreak = parseInt(decoded.s) || 0;
-            }
-            
-            log.debug('🔗 URL\'den yüklendi:', totalPoints, 'puan');
-            return true;
-        }
-    } catch(e) {
-        log.error('URL yükleme hatası:', e);
-    }
-    return false;
-}
-
-// ============ İSTATİSTİK BAR FONKSİYONLARI ============
+/**
+ * Tüm istatistikleri yükler
+ */
 async function loadStats() {
     try {
-        // Loading state göster
-        if (typeof showLoading !== 'undefined') {
-            showLoading('İstatistikler yükleniyor...');
+        // API'den yükle (öncelikli) - eğer API client mevcutsa
+        if (typeof window !== 'undefined' && typeof loadUserStats === 'function') {
+            try {
+                const apiStats = await loadUserStats();
+                if (apiStats) {
+                    // API'den gelen verileri kullan
+                    totalPoints = parseInt(apiStats.totalPoints) || 0;
+                    if (isNaN(totalPoints) || totalPoints < 0) totalPoints = 0;
+                    
+                    badges = apiStats.badges || badges;
+                    streakData = apiStats.streakData || streakData;
+                    dailyTasks = apiStats.dailyTasks || dailyTasks;
+                    weeklyTasks = apiStats.weeklyTasks || weeklyTasks;
+                    wordStats = apiStats.wordStats || {};
+                    unlockedAchievements = apiStats.unlockedAchievements || [];
+                    unlockedBadges = apiStats.unlockedBadges || [];
+                    perfectLessonsCount = parseInt(apiStats.perfectLessonsCount) || 0;
+                    gameStats = apiStats.gameStats || gameStats;
+                    
+                    // Set'leri yeniden oluştur
+                    if (dailyTasks.todayStats) {
+                        dailyTasks.todayStats.allGameModes = new Set(dailyTasks.todayStats.allGameModes || []);
+                        dailyTasks.todayStats.farklıZorluk = new Set(dailyTasks.todayStats.farklıZorluk || []);
+                        dailyTasks.todayStats.reviewWords = new Set(dailyTasks.todayStats.reviewWords || []);
+                    }
+                    if (weeklyTasks.weekStats) {
+                        weeklyTasks.weekStats.allModesPlayed = new Set(weeklyTasks.weekStats.allModesPlayed || []);
+                    }
+                    
+                    // Günlük hedefler
+                    if (apiStats.dailyGoalHasene) {
+                        localStorage.setItem('dailyGoalHasene', apiStats.dailyGoalHasene.toString());
+                    }
+                    if (apiStats.dailyGoalLevel) {
+                        localStorage.setItem('dailyGoalLevel', apiStats.dailyGoalLevel);
+                    }
+                    if (apiStats.dailyCorrect !== undefined) {
+                        localStorage.setItem('dailyCorrect', apiStats.dailyCorrect.toString());
+                    }
+                    if (apiStats.dailyWrong !== undefined) {
+                        localStorage.setItem('dailyWrong', apiStats.dailyWrong.toString());
+                    }
+                    if (apiStats.dailyXP !== undefined) {
+                        localStorage.setItem('dailyXP', apiStats.dailyXP.toString());
+                    }
+                    if (apiStats.lastDailyGoalDate) {
+                        localStorage.setItem('lastDailyGoalDate', apiStats.lastDailyGoalDate);
+                    }
+                    
+                    // Migration işlemleri (eski format desteği)
+                    const todayForMigration = getLocalDateString();
+                    Object.keys(wordStats).forEach(wordId => {
+                        const stats = wordStats[wordId];
+                        if (stats.easeFactor === undefined) stats.easeFactor = 2.5;
+                        if (stats.interval === undefined) {
+                            if (stats.attempts === 0) stats.interval = 0;
+                            else if (stats.attempts === 1) stats.interval = 1;
+                            else if (stats.attempts === 2 && stats.correct === 2) stats.interval = 6;
+                            else stats.interval = Math.max(1, Math.floor(stats.attempts * (stats.easeFactor || 2.5)));
+                        }
+                        if (stats.nextReviewDate === undefined) {
+                            if (stats.lastWrong) stats.nextReviewDate = addDays(todayForMigration, 1);
+                            else if (stats.lastCorrect) stats.nextReviewDate = addDays(todayForMigration, stats.interval || 1);
+                            else stats.nextReviewDate = todayForMigration;
+                        }
+                        if (stats.lastReview === undefined) {
+                            stats.lastReview = stats.lastCorrect || stats.lastWrong || todayForMigration;
+                        }
+                    });
+                    
+                    // Eski format kontrolü
+                    if (unlockedAchievements.length > 0 && typeof unlockedAchievements[0] === 'string') {
+                        unlockedAchievements = unlockedAchievements.map((id, index) => ({
+                            id: id,
+                            unlockedAt: Date.now() - (unlockedAchievements.length - index) * 1000
+                        }));
+                    }
+                    if (unlockedBadges.length > 0 && typeof unlockedBadges[0] === 'string') {
+                        unlockedBadges = unlockedBadges.map((id, index) => ({
+                            id: id,
+                            unlockedAt: Date.now() - (unlockedBadges.length - index) * 1000
+                        }));
+                    }
+                    
+                    // UI'ı güncelle
+                    updateStatsBar();
+                    updateDailyGoalDisplay();
+                    updateTasksDisplay();
+                    
+                    infoLog('İstatistikler API\'den yüklendi');
+                    return;
+                }
+            } catch (error) {
+                // API hatası - fallback'e geç
+                warnLog('API\'den yüklenemedi, fallback kullanılıyor:', error);
+            }
         }
         
-        // IndexedDB'den yükle (üçüncü taraf çerez sorunu için)
+        // Fallback: IndexedDB'den yükle
         const savedPoints = await loadFromIndexedDB('hasene_totalPoints');
-        const savedBadges = await loadFromIndexedDB('hasene_badges');
-        const savedStreak = await loadFromIndexedDB('hasene_streak');
-        const savedTasks = await loadFromIndexedDB('hasene_dailyTasks');
-        
-        // Puanları yükle (IndexedDB öncelikli, localStorage yedek)
-        totalPoints = parseInt(savedPoints || localStorage.getItem('hasene_totalPoints') || '0');
-        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-        starPoints = Math.floor(totalPoints / starThreshold);
-        level = calculateLevel(totalPoints);
-        
-        log.debug('📊 IndexedDB yüklendi:', {totalPoints, savedPoints});
-    } catch (error) {
-        log.debug('IndexedDB hatası, localStorage denenecek:', error);
-        try {
-            // localStorage dene
-            totalPoints = parseInt(localStorage.getItem('hasene_totalPoints') || '0');
-            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
-        starPoints = Math.floor(totalPoints / starThreshold);
-            level = calculateLevel(totalPoints);
-            log.debug('📊 localStorage yüklendi:', totalPoints);
-        } catch (localError) {
-            log.debug('localStorage da çalışmıyor, URL deneniyor:', localError);
-            // Son çare: URL'den yükle
-            const urlLoaded = loadFromURL();
-            if (urlLoaded) {
-                const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100;
-        starPoints = Math.floor(totalPoints / starThreshold);
-                level = calculateLevel(totalPoints);
-            } else {
-                // Hiçbir şey çalışmıyor, varsayılan değerler
-                totalPoints = 0;
-                starPoints = 0;
-                level = 1;
-                log.warn('⚠️ Hiçbir veri sistemi çalışmıyor, sıfırdan başlatılıyor');
-            }
-        }
-    } finally {
-        // Loading state'i kapat
-        if (typeof hideLoading !== 'undefined') {
-            setTimeout(() => hideLoading(), 300);
-        }
-    }
-    
-    // Rozet sistemi yükle (IndexedDB öncelikli)
-    const savedBadgesIndexedDB = await loadFromIndexedDB('hasene_badges');
-    const savedBadgesData = savedBadgesIndexedDB || localStorage.getItem('hasene_badges');
-    if (savedBadgesData) {
-        badges = JSON.parse(typeof savedBadgesData === 'string' ? savedBadgesData : JSON.stringify(savedBadgesData));
-    }
-    
-    // Streak sistemi yükle (IndexedDB öncelikli)
-    const savedStreakIndexedDB = await loadFromIndexedDB('hasene_streak');
-    const savedStreak = savedStreakIndexedDB || localStorage.getItem('hasene_streak');
-    if (savedStreak) {
-        try {
-            const parsedStreak = JSON.parse(typeof savedStreak === 'string' ? savedStreak : JSON.stringify(savedStreak));
-            streakData = { ...streakData, ...parsedStreak };
-            
-            // playDates array'inin varlığını kontrol et
-            if (!streakData.playDates || !Array.isArray(streakData.playDates)) {
-                log.warn('⚠️ playDates array bulunamadı veya geçersiz, varsayılan değerle başlatılıyor');
-                streakData.playDates = [];
-            }
-            
-            // Diğer alanların varlığını kontrol et ve varsayılan değerlerle başlat
-            if (typeof streakData.currentStreak !== 'number') {
-                streakData.currentStreak = 0;
-            }
-            if (typeof streakData.bestStreak !== 'number') {
-                streakData.bestStreak = 0;
-            }
-            if (typeof streakData.totalPlayDays !== 'number') {
-                streakData.totalPlayDays = 0;
-            }
-            if (typeof streakData.lastPlayDate !== 'string') {
-                streakData.lastPlayDate = '';
-            }
-            if (typeof streakData.dailyGoal !== 'number') {
-                streakData.dailyGoal = 5; // Varsayılan günlük hedef
-            }
-            if (typeof streakData.todayProgress !== 'number') {
-                streakData.todayProgress = 0;
-            }
-            if (typeof streakData.todayDate !== 'string') {
-                streakData.todayDate = '';
-            }
-            
-            log.debug('✅ Streak verileri yüklendi:', {
-                currentStreak: streakData.currentStreak,
-                bestStreak: streakData.bestStreak,
-                totalPlayDays: streakData.totalPlayDays,
-                playDatesCount: streakData.playDates.length,
-                lastPlayDate: streakData.lastPlayDate
-            });
-        } catch (error) {
-            log.error('❌ Streak verileri parse hatası:', error);
-            // Hata durumunda varsayılan değerlerle devam et
-            streakData.playDates = streakData.playDates || [];
-        }
-    } else {
-        // Veri yoksa varsayılan değerlerle başlat
-        log.debug('⚠️ Streak verisi bulunamadı, varsayılan değerlerle başlatılıyor');
-        streakData.playDates = streakData.playDates || [];
-    }
-    
-    // Günlük görevler yükle (IndexedDB öncelikli) - BU ÇOOK ÖNEMLİ!
-    const savedTasksIndexedDB = await loadFromIndexedDB('hasene_dailyTasks');
-    const savedTasks = savedTasksIndexedDB || localStorage.getItem('hasene_dailyTasks');
-    if (savedTasks) {
-        try {
-            const parsedTasks = JSON.parse(typeof savedTasks === 'string' ? savedTasks : JSON.stringify(savedTasks));
-            
-            // KRİTİK: Bugünkü ilerlemeleri kontrol et
-            const today = getLocalDateString();
-            const loadedLastTaskDate = parsedTasks.lastTaskDate || '';
-            const isTodayData = loadedLastTaskDate === today;
-            
-            log.debug('📥 Günlük görevler yükleniyor:', {
-                loadedLastTaskDate: loadedLastTaskDate,
-                bugün: today,
-                bugünküVeriMü: isTodayData,
-                todayStatsVarMı: !!parsedTasks.todayStats,
-                todayStatsToplamPuan: parsedTasks.todayStats?.toplamPuan || 0,
-                completedTasksSayısı: parsedTasks.completedTasks?.length || 0
-            });
-            
-            // Verileri birleştir - bugünkü ilerlemeleri koru
-            dailyTasks = { ...dailyTasks, ...parsedTasks };
-            window.dailyTasks = dailyTasks; // Global erişim için güncelle
-            
-            // Set nesnelerini yeniden oluştur (güvenli şekilde)
-            if (dailyTasks.todayStats) {
-                const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
-                if (Array.isArray(farkliZorlukValue)) {
-                    dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
-                } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
-                    dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
-                } else {
-                    dailyTasks.todayStats.farklıZorluk = new Set([]);
-                }
-                
-                const allGameModesValue = dailyTasks.todayStats.allGameModes;
-                if (Array.isArray(allGameModesValue)) {
-                    dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
-                } else if (allGameModesValue && typeof allGameModesValue === 'object') {
-                    dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
-                } else {
-                    dailyTasks.todayStats.allGameModes = new Set([]);
-                }
-            }
-            
-            // lastTaskDate kontrolü - eğer boş veya geçersiz ise bugünün tarihiyle başlat
-            if (!dailyTasks.lastTaskDate || dailyTasks.lastTaskDate === '') {
-                log.debug('⚠️ lastTaskDate boş, bugünün tarihiyle başlatılıyor:', today);
-                dailyTasks.lastTaskDate = today;
-            }
-            
-            // KRİTİK: Bugünkü veriler yüklendiyse logla
-            if (isTodayData && dailyTasks.todayStats) {
-                log.debug('✅ Bugünkü ilerlemeler yüklendi:', {
-                    toplamPuan: dailyTasks.todayStats.toplamPuan,
-                    toplamDogru: dailyTasks.todayStats.toplamDogru,
-                    completedTasks: dailyTasks.completedTasks?.length || 0
-                });
-            }
-            
-            // KRİTİK: Bugünkü veriler yüklendiyse logla
-            if (isTodayData && dailyTasks.todayStats) {
-                log.debug('✅ Bugünkü ilerlemeler yüklendi:', {
-                    toplamPuan: dailyTasks.todayStats.toplamPuan,
-                    toplamDogru: dailyTasks.todayStats.toplamDogru,
-                    completedTasks: dailyTasks.completedTasks?.length || 0
-                });
-            }
-        } catch (error) {
-            log.error('❌ Günlük görevler parse hatası:', error);
-            // Hata durumunda varsayılan değerlerle devam et
-            dailyTasks.lastTaskDate = getLocalDateString();
-        }
-    } else {
-        // Veri yoksa bugünün tarihiyle başlat
-        const today = getLocalDateString();
-        log.debug('⚠️ Günlük görev verisi bulunamadı, bugünün tarihiyle başlatılıyor:', today);
-        dailyTasks.lastTaskDate = today;
-    }
-    
-    // Haftalık görevler yükle (IndexedDB öncelikli)
-    const savedWeeklyTasksIndexedDB = await loadFromIndexedDB('hasene_weeklyTasks');
-    const savedWeeklyTasks = savedWeeklyTasksIndexedDB || localStorage.getItem('hasene_weeklyTasks');
-    if (savedWeeklyTasks) {
-        try {
-            const parsedWeeklyTasks = JSON.parse(typeof savedWeeklyTasks === 'string' ? savedWeeklyTasks : JSON.stringify(savedWeeklyTasks));
-            weeklyTasks = { ...weeklyTasks, ...parsedWeeklyTasks };
-            window.weeklyTasks = weeklyTasks; // Global erişim için güncelle
-            
-            // Set nesnelerini yeniden oluştur (güvenli şekilde)
-            if (weeklyTasks.weekStats) {
-                const allModesValue = weeklyTasks.weekStats.allModesPlayed;
-                if (Array.isArray(allModesValue)) {
-                    weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
-                } else if (allModesValue && typeof allModesValue === 'object') {
-                    weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
-                } else {
-                    weeklyTasks.weekStats.allModesPlayed = new Set([]);
-                }
-            }
-            
-            // lastWeekStart kontrolü - eğer boş veya geçersiz ise bugünün haftasıyla başlat
-            const weekStart = getWeekStartDate();
-            if (!weeklyTasks.lastWeekStart || weeklyTasks.lastWeekStart === '') {
-                log.debug('⚠️ lastWeekStart boş, bugünün haftasıyla başlatılıyor:', weekStart);
-                weeklyTasks.lastWeekStart = weekStart;
-                weeklyTasks.weekStart = weekStart;
-                weeklyTasks.weekEnd = getWeekEndDate();
-            }
-        } catch (error) {
-            log.error('❌ Haftalık görevler parse hatası:', error);
-            // Hata durumunda varsayılan değerlerle devam et
-            const weekStart = getWeekStartDate();
-            weeklyTasks.lastWeekStart = weekStart;
-            weeklyTasks.weekStart = weekStart;
-            weeklyTasks.weekEnd = getWeekEndDate();
-        }
-    } else {
-        // Veri yoksa bugünün haftasıyla başlat
-        const weekStart = getWeekStartDate();
-        log.debug('⚠️ Haftalık görev verisi bulunamadı, bugünün haftasıyla başlatılıyor:', weekStart);
-        weeklyTasks.lastWeekStart = weekStart;
-        weeklyTasks.weekStart = weekStart;
-        weeklyTasks.weekEnd = getWeekEndDate();
-    }
-    
-    // Oyun ayarları yükle (currentMode ve currentDifficulty) - ÇOOK ÖNEMLİ!
-    const savedModeIndexedDB = await loadFromIndexedDB('hasene_currentMode');
-    const savedMode = savedModeIndexedDB || localStorage.getItem('hasene_currentMode');
-    if (savedMode && CONFIG.gameModes[savedMode]) {
-        currentMode = savedMode;
-        log.debug(`🎮 Kaydedilen mod yüklendi: ${currentMode}`);
-    }
-    
-    const savedDifficultyIndexedDB = await loadFromIndexedDB('hasene_currentDifficulty');
-    const savedDifficulty = savedDifficultyIndexedDB || localStorage.getItem('hasene_currentDifficulty');
-    if (savedDifficulty && CONFIG.difficultyLevels[savedDifficulty]) {
-        currentDifficulty = savedDifficulty;
-        log.debug(`🎯 Kaydedilen zorluk yüklendi: ${currentDifficulty}`);
-    }
-    
-    log.debug('📋 Günlük görevler yüklendi:', {
-        completedTasks: dailyTasks.completedTasks?.length || 0,
-        todayStats: dailyTasks.todayStats,
-        lastTaskDate: dailyTasks.lastTaskDate,
-        toplamPuan: dailyTasks.todayStats?.toplamPuan || 0
-    });
-    
-    log.debug('🎮 Oyun ayarları yüklendi:', {
-        currentMode: currentMode,
-        currentDifficulty: currentDifficulty
-    });
-    
-    // Günlük kontrol
-    checkDailyProgress();
-    
-    // KRİTİK: Sıfırlama flag'ini kontrol et
-    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-    if (statsJustReset) {
-        log.debug('🔄 İstatistikler yeni sıfırlandı, checkDailyTasks atlanıyor (görevler oluşturulmayacak)');
-        localStorage.removeItem('hasene_statsJustReset'); // Flag'i temizle
-        // Görevler oluşturulmayacak - kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
-        return;
-    }
-    
-    // KRİTİK: checkDailyTasks'ı çağırmadan önce verilerin yüklendiğinden emin ol
-    // Eğer veriler yüklendiyse ve bugünkü ilerlemeler varsa, onları koru
-    const today = getLocalDateString();
-    const hasTodayProgress = dailyTasks.lastTaskDate === today && dailyTasks.todayStats && 
-        (dailyTasks.todayStats.toplamPuan > 0 || dailyTasks.todayStats.toplamDogru > 0 || 
-         dailyTasks.completedTasks?.length > 0);
-    
-    if (hasTodayProgress) {
-        log.debug('✅ Bugünkü ilerlemeler mevcut, checkDailyTasks atlanıyor:', {
-            toplamPuan: dailyTasks.todayStats.toplamPuan,
-            toplamDogru: dailyTasks.todayStats.toplamDogru,
-            completedTasks: dailyTasks.completedTasks?.length || 0
-        });
-        // Sadece görevler yoksa oluştur, ama bugünkü ilerlemeleri koru
-        if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
-            log.debug('⚠️ Görevler yok, bugünkü ilerlemeleri koruyarak oluşturuluyor...');
-            generateDailyTasks(today);
+        if (savedPoints !== null) {
+            totalPoints = parseInt(savedPoints) || 0;
+            if (isNaN(totalPoints) || totalPoints < 0) totalPoints = 0;
         } else {
-            // Görevler var, sadece display'i güncelle
-            if (typeof updateTasksDisplay === 'function') {
-                updateTasksDisplay();
+            // localStorage'dan yükle (yedek)
+            totalPoints = parseInt(localStorage.getItem('hasene_totalPoints') || '0') || 0;
+            if (isNaN(totalPoints) || totalPoints < 0) totalPoints = 0;
+        }
+
+        const savedBadges = await loadFromIndexedDB('hasene_badges');
+        if (savedBadges) {
+            badges = savedBadges;
+        } else {
+            const localBadges = safeGetItem('hasene_badges', badges);
+            badges = localBadges;
+        }
+
+        const savedStreak = await loadFromIndexedDB('hasene_streakData');
+        if (savedStreak) {
+            streakData = savedStreak;
+        } else {
+            const localStreak = safeGetItem('hasene_streakData', streakData);
+            streakData = localStreak;
+        }
+
+        const savedDailyTasks = await loadFromIndexedDB('hasene_dailyTasks');
+        if (savedDailyTasks) {
+            dailyTasks = savedDailyTasks;
+            // Set'leri yeniden oluştur
+            if (dailyTasks.todayStats) {
+                dailyTasks.todayStats.allGameModes = new Set(dailyTasks.todayStats.allGameModes || []);
+                dailyTasks.todayStats.farklıZorluk = new Set(dailyTasks.todayStats.farklıZorluk || []);
+                dailyTasks.todayStats.reviewWords = new Set(dailyTasks.todayStats.reviewWords || []);
+                // Yeni alanlar için varsayılan değerler
+                if (dailyTasks.todayStats.ayetOku === undefined) dailyTasks.todayStats.ayetOku = 0;
+                if (dailyTasks.todayStats.duaEt === undefined) dailyTasks.todayStats.duaEt = 0;
+                if (dailyTasks.todayStats.hadisOku === undefined) dailyTasks.todayStats.hadisOku = 0;
+            }
+        } else {
+            const localDailyTasks = safeGetItem('hasene_dailyTasks', dailyTasks);
+            dailyTasks = localDailyTasks;
+            if (dailyTasks.todayStats) {
+                dailyTasks.todayStats.allGameModes = new Set(dailyTasks.todayStats.allGameModes || []);
+                dailyTasks.todayStats.farklıZorluk = new Set(dailyTasks.todayStats.farklıZorluk || []);
+                dailyTasks.todayStats.reviewWords = new Set(dailyTasks.todayStats.reviewWords || []);
+                // Yeni alanlar için varsayılan değerler
+                if (dailyTasks.todayStats.ayetOku === undefined) dailyTasks.todayStats.ayetOku = 0;
+                if (dailyTasks.todayStats.duaEt === undefined) dailyTasks.todayStats.duaEt = 0;
+                if (dailyTasks.todayStats.hadisOku === undefined) dailyTasks.todayStats.hadisOku = 0;
             }
         }
-    } else {
-        // Normal kontrol - bugünkü ilerlemeler yok veya yeni gün
-        log.debug('🔄 Normal checkDailyTasks çağrılıyor...');
-        checkDailyTasks(); // Bu fonksiyon içinde zaten updateTasksDisplay() çağrılıyor
-    }
-}
 
-// Daha zorlu seviye hesaplama sistemi
-function calculateLevel(points) {
-    if (points < 1000) return 1;        // Level 1: 0-999 puan
-    if (points < 2500) return 2;        // Level 2: 1000-2499 puan  
-    if (points < 5000) return 3;        // Level 3: 2500-4999 puan
-    if (points < 8500) return 4;        // Level 4: 5000-8499 puan
-    if (points < 13000) return 5;       // Level 5: 8500-12999 puan
-    if (points < 19000) return 6;       // Level 6: 13000-18999 puan
-    if (points < 26500) return 7;       // Level 7: 19000-26499 puan
-    if (points < 35500) return 8;       // Level 8: 26500-35499 puan
-    if (points < 46000) return 9;       // Level 9: 35500-45999 puan
-    if (points < 58000) return 10;      // Level 10: 46000-57999 puan
-    
-    // Level 10'dan sonra her seviye için 15000 puan artış
-    const afterLevel10 = points - 58000;
-    return 10 + Math.floor(afterLevel10 / 15000);
-}
-
-// Bir sonraki seviye için gereken puan
-function getNextLevelRequiredPoints(currentLevel) {
-    const levelThresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
-    
-    // currentLevel 1-10 arasındaysa threshold'u döndür
-    if (currentLevel >= 1 && currentLevel <= 10) {
-        return levelThresholds[currentLevel];
-    }
-    
-    // Level 10'dan sonra - her seviye için 15000 puan artış
-    if (currentLevel > 10) {
-        return 58000 + ((currentLevel - 10) * 15000);
-    }
-    
-    // Level 0 veya geçersiz değerler için
-    return levelThresholds[1]; // Level 1 threshold'u
-}
-
-// ============ DEBOUNCE SİSTEMİ (Performans Optimizasyonu) ============
-// Not: saveStatsTimeout ve pendingSave yukarıda tanımlandı (beforeunload için)
-
-// Debounced saveStats - 500ms bekle, sonra kaydet
-function debouncedSaveStats() {
-    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
-    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-    if (statsJustReset) {
-        log.debug('🔄 İstatistikler yeni sıfırlandı, debouncedSaveStats atlanıyor');
-        return;
-    }
-    
-    window.pendingSave = true;
-    if (window.saveStatsTimeout) {
-        clearTimeout(window.saveStatsTimeout);
-    }
-    window.saveStatsTimeout = setTimeout(() => {
-        if (window.pendingSave) {
-            saveStats().catch(err => {
-                log.error('❌ saveStats hatası:', err);
-            });
-            window.pendingSave = false;
+        const savedWeeklyTasks = await loadFromIndexedDB('hasene_weeklyTasks');
+        if (savedWeeklyTasks) {
+            weeklyTasks = savedWeeklyTasks;
+            if (weeklyTasks.weekStats) {
+                weeklyTasks.weekStats.allModesPlayed = new Set(weeklyTasks.weekStats.allModesPlayed || []);
+            }
+        } else {
+            const localWeeklyTasks = safeGetItem('hasene_weeklyTasks', weeklyTasks);
+            weeklyTasks = localWeeklyTasks;
+            if (weeklyTasks.weekStats) {
+                weeklyTasks.weekStats.allModesPlayed = new Set(weeklyTasks.weekStats.allModesPlayed || []);
+            }
         }
-    }, 500);
-}
 
-// Acil kaydetme (oyun bitişi gibi kritik durumlar için)
-async function saveStatsImmediate() {
-    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
-    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-    if (statsJustReset) {
-        log.debug('🔄 İstatistikler yeni sıfırlandı, saveStatsImmediate atlanıyor');
-        return;
-    }
-    
-    if (window.saveStatsTimeout) {
-        clearTimeout(window.saveStatsTimeout);
-        window.saveStatsTimeout = null;
-    }
-    window.pendingSave = false;
-    return await saveStats();
-}
-
-async function saveStats() {
-    // Sıfırlama flag'ini kontrol et - eğer sıfırlama yapıldıysa kaydetme
-    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-    if (statsJustReset) {
-        log.debug('🔄 İstatistikler yeni sıfırlandı, saveStats atlanıyor');
-        return;
-    }
-    
-    try {
-        // ÇOKLU KAYDETME SİSTEMİ (Üçüncü taraf çerez sorunu için)
+        wordStats = safeGetItem('hasene_wordStats', {});
         
-        // KRİTİK: Bugünkü ilerlemeleri kontrol et ve kaydet
-        const today = getLocalDateString();
-        const isToday = dailyTasks.lastTaskDate === today;
-        
-        log.debug('💾 Veriler kaydediliyor:', {
-            bugün: today,
-            lastTaskDate: dailyTasks.lastTaskDate,
-            bugünküVeriMü: isToday,
-            todayStats: dailyTasks.todayStats,
-            completedTasks: dailyTasks.completedTasks?.length || 0
+        // Eski wordStats formatını yeni spaced repetition formatına migrate et
+        const todayForMigration = getLocalDateString();
+        Object.keys(wordStats).forEach(wordId => {
+            const stats = wordStats[wordId];
+            
+            // Eğer spaced repetition alanları yoksa, ekle
+            if (stats.easeFactor === undefined) {
+                stats.easeFactor = 2.5; // SM-2 başlangıç değeri
+            }
+            if (stats.interval === undefined) {
+                // Eski verilere göre interval hesapla
+                if (stats.attempts === 0) {
+                    stats.interval = 0;
+                } else if (stats.attempts === 1) {
+                    stats.interval = 1; // İlk öğrenme
+                } else if (stats.attempts === 2 && stats.correct === 2) {
+                    stats.interval = 6; // İkinci doğru cevap
+                } else {
+                    // Tahmini interval (başarı oranına göre)
+                    const estimatedInterval = Math.max(1, Math.floor(stats.attempts * stats.easeFactor));
+                    stats.interval = estimatedInterval;
+                }
+            }
+            if (stats.nextReviewDate === undefined) {
+                // Son yanlış cevap varsa, 1 gün sonra tekrar
+                if (stats.lastWrong) {
+                    stats.nextReviewDate = addDays(todayForMigration, 1);
+                } else if (stats.lastCorrect) {
+                    // Son doğru cevap varsa, interval kadar sonra
+                    stats.nextReviewDate = addDays(todayForMigration, stats.interval || 1);
+                } else {
+                    // Hiç veri yoksa, bugün tekrar et
+                    stats.nextReviewDate = todayForMigration;
+                }
+            }
+            if (stats.lastReview === undefined) {
+                // Son tekrar tarihi yoksa, son doğru veya yanlış tarihini kullan
+                stats.lastReview = stats.lastCorrect || stats.lastWrong || todayForMigration;
+            }
         });
+        // Eski format desteği: array of strings -> array of objects
+        const savedAchievements = safeGetItem('unlockedAchievements', []);
+        const savedUnlockedBadges = safeGetItem('unlockedBadges', []);
         
-        // 1. IndexedDB (ana sistem - çerez engellemelerinden etkilenmez)
-        if (db) {
-            saveToIndexedDB('hasene_totalPoints', totalPoints.toString());
-            saveToIndexedDB('hasene_badges', JSON.stringify(badges));
-            saveToIndexedDB('hasene_streak', JSON.stringify(streakData));
-            
-            // GÜNLÜK GÖREVLER - bugünkü ilerlemeleri mutlaka kaydet!
-            const tasksToSave = { 
-                ...dailyTasks, 
-                todayStats: {
-                    ...dailyTasks.todayStats,
-                    farklıZorluk: Array.from(dailyTasks.todayStats?.farklıZorluk || []),
-                    allGameModes: Array.from(dailyTasks.todayStats?.allGameModes || [])
-                }
-            };
-            saveToIndexedDB('hasene_dailyTasks', JSON.stringify(tasksToSave));
-            log.debug('✅ Günlük görevler IndexedDB\'ye kaydedildi:', {
-                lastTaskDate: tasksToSave.lastTaskDate,
-                todayStats: tasksToSave.todayStats,
-                completedTasks: tasksToSave.completedTasks?.length || 0
-            });
-            
-            // Haftalık görevler kaydet
-            const weeklyTasksToSave = {
-                ...weeklyTasks,
-                weekStats: {
-                    ...weeklyTasks.weekStats,
-                    allModesPlayed: Array.from(weeklyTasks.weekStats.allModesPlayed || [])
-                }
-            };
-            saveToIndexedDB('hasene_weeklyTasks', JSON.stringify(weeklyTasksToSave));
-            
-            // Oyun ayarları da kaydet (currentMode & currentDifficulty) - KRİTİK!
-            saveToIndexedDB('hasene_currentMode', currentMode);
-            saveToIndexedDB('hasene_currentDifficulty', currentDifficulty);
+        // Eski format kontrolü ve dönüştürme
+        if (savedAchievements.length > 0 && typeof savedAchievements[0] === 'string') {
+            // Eski format: string array -> object array (timestamp şimdiki zaman)
+            unlockedAchievements = savedAchievements.map((id, index) => ({
+                id: id,
+                unlockedAt: Date.now() - (savedAchievements.length - index) * 1000 // Sıraya göre timestamp
+            }));
+            safeSetItem('unlockedAchievements', unlockedAchievements);
+        } else {
+            unlockedAchievements = savedAchievements;
         }
         
-        // 2. localStorage (yedek sistem)
-        try {
-            localStorage.setItem('hasene_totalPoints', totalPoints.toString());
-            localStorage.setItem('hasene_badges', JSON.stringify(badges));
-            localStorage.setItem('hasene_streak', JSON.stringify(streakData));
-            
-            // GÜNLÜK GÖREVLER de localStorage'a kaydet (kritik!)
-            const tasksToSave = { 
-                ...dailyTasks, 
-                todayStats: {
-                    ...dailyTasks.todayStats,
-                    farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk || []),
-                    allGameModes: Array.from(dailyTasks.todayStats.allGameModes || [])
-                }
-            };
-            localStorage.setItem('hasene_dailyTasks', JSON.stringify(tasksToSave));
-            
-            // HAFTALIK GÖREVLER de localStorage'a kaydet
-            const weeklyTasksToSave = {
-                ...weeklyTasks,
-                weekStats: {
-                    ...weeklyTasks.weekStats,
-                    allModesPlayed: Array.from(weeklyTasks.weekStats.allModesPlayed || [])
-                }
-            };
-            localStorage.setItem('hasene_weeklyTasks', JSON.stringify(weeklyTasksToSave));
-            
-            // Oyun ayarları da localStorage'a kaydet - KRİTİK!
-            localStorage.setItem('hasene_currentMode', currentMode);
-            localStorage.setItem('hasene_currentDifficulty', currentDifficulty);
-        } catch(e) { log.error('localStorage failed:', e); }
-        
-        // 3. URL sistemi (son çare - mobil için)
-        try {
-            saveToURL();
-        } catch(e) { log.error('URL save failed:', e); }
-        
-        // 4. Liderlik tablosu güncelleme - KALDIRILDI
-        // NOT: updateLeaderboardScores sadece oyun bitiminde addToGlobalPoints içinde çağrılmalı
-        // Burada çağrılırsa her saveAllGameData çağrısında aynı sessionScore tekrar eklenir!
-        
-        // 5. Hedef tamamlama bildirimi kontrolü
-        if (typeof checkGoalCompletion === 'function') {
-            checkGoalCompletion();
+        if (savedUnlockedBadges.length > 0 && typeof savedUnlockedBadges[0] === 'string') {
+            // Eski format: string array -> object array (timestamp şimdiki zaman)
+            unlockedBadges = savedUnlockedBadges.map((id, index) => ({
+                id: id,
+                unlockedAt: Date.now() - (savedUnlockedBadges.length - index) * 1000 // Sıraya göre timestamp
+            }));
+            safeSetItem('unlockedBadges', unlockedBadges);
+        } else {
+            unlockedBadges = savedUnlockedBadges;
         }
+        perfectLessonsCount = parseInt(safeGetItem('perfectLessonsCount', 0)) || 0;
         
-        log.debug('💾 ÜÇLÜ KORUMA: IndexedDB + localStorage + URL ile kaydedildi!', totalPoints);
-        
+        const savedGameStats = safeGetItem('gameStats', gameStats);
+        // Güvenli bir şekilde gameStats'ı yükle
+        if (savedGameStats && typeof savedGameStats === 'object') {
+            gameStats = {
+                totalCorrect: savedGameStats.totalCorrect || 0,
+                totalWrong: savedGameStats.totalWrong || 0,
+                gameModeCounts: savedGameStats.gameModeCounts || {
+                    'kelime-cevir': 0,
+                    'dinle-bul': 0,
+                    'bosluk-doldur': 0,
+                    'ayet-oku': 0,
+                    'dua-et': 0,
+                    'hadis-oku': 0
+                }
+            };
+        } else {
+            gameStats = {
+                totalCorrect: 0,
+                totalWrong: 0,
+                gameModeCounts: {
+                    'kelime-cevir': 0,
+                    'dinle-bul': 0,
+                    'bosluk-doldur': 0,
+                    'ayet-oku': 0,
+                    'dua-et': 0,
+                    'hadis-oku': 0
+                }
+            };
+        }
+
+        // Günlük hedef
+        const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || CONFIG.DAILY_GOAL_DEFAULT.toString());
+        const dailyGoalLevel = localStorage.getItem('dailyGoalLevel') || 'normal';
+        localStorage.setItem('dailyGoalHasene', dailyGoalHasene.toString());
+        localStorage.setItem('dailyGoalLevel', dailyGoalLevel);
+
+        // Bugünkü istatistikler
+        const today = getLocalDateString();
+        const lastDailyGoalDate = localStorage.getItem('lastDailyGoalDate');
+        if (lastDailyGoalDate !== today) {
+            // Yeni gün, günlük istatistikleri sıfırla
+            localStorage.setItem('dailyCorrect', '0');
+            localStorage.setItem('dailyWrong', '0');
+            localStorage.setItem('dailyXP', '0');
+            localStorage.setItem('lastDailyGoalDate', today);
+        }
+
+        // Görevleri kontrol et
+        checkDailyTasks();
+        checkWeeklyTasks();
+
+        // UI'ı güncelle
+        updateStatsBar();
+        updateDailyGoalDisplay();
+        updateTasksDisplay(); // Görev sayacını güncelle
+
+        infoLog('İstatistikler yüklendi');
     } catch (error) {
-        log.error('❌ Kaydetme hatası:', error);
+        errorLog('İstatistik yükleme hatası:', error);
     }
 }
 
-async function resetAllStats() {
-    // =========================================
-    // 🔥 TEMEL SKORLAR
-    // =========================================
-    totalPoints = 0;
-    starPoints = 0;
-    level = 1;
+/**
+ * Tüm istatistikleri kaydeder
+ */
+async function saveStats() {
+    try {
+        // Set'leri array'e çevir
+        const dailyTasksToSave = {
+            ...dailyTasks,
+            todayStats: {
+                ...dailyTasks.todayStats,
+                allGameModes: Array.from(dailyTasks.todayStats.allGameModes || []),
+                farklıZorluk: Array.from(dailyTasks.todayStats.farklıZorluk || []),
+                reviewWords: Array.from(dailyTasks.todayStats.reviewWords || [])
+            }
+        };
+        
+        const weeklyTasksToSave = {
+            ...weeklyTasks,
+            weekStats: {
+                ...weeklyTasks.weekStats,
+                allModesPlayed: Array.from(weeklyTasks.weekStats.allModesPlayed || [])
+            }
+        };
+        
+        // API'ye kaydet (öncelikli) - eğer API client mevcutsa
+        if (typeof window !== 'undefined' && typeof saveUserStats === 'function') {
+            try {
+                const statsData = {
+                    totalPoints,
+                    badges,
+                    streakData,
+                    dailyTasks: dailyTasksToSave,
+                    weeklyTasks: weeklyTasksToSave,
+                    wordStats,
+                    unlockedAchievements,
+                    unlockedBadges,
+                    perfectLessonsCount,
+                    gameStats,
+                    favoriteWords: Array.from(favoriteWords || []),
+                    dailyGoalHasene: parseInt(localStorage.getItem('dailyGoalHasene') || '2700'),
+                    dailyGoalLevel: localStorage.getItem('dailyGoalLevel') || 'normal',
+                    dailyCorrect: parseInt(localStorage.getItem('dailyCorrect') || '0'),
+                    dailyWrong: parseInt(localStorage.getItem('dailyWrong') || '0'),
+                    dailyXP: parseInt(localStorage.getItem('dailyXP') || '0'),
+                    lastDailyGoalDate: localStorage.getItem('lastDailyGoalDate'),
+                    onboardingSeen: localStorage.getItem('hasene_onboarding_seen_v2') === 'true'
+                };
+                
+                await saveUserStats(statsData);
+                debugLog('İstatistikler API\'ye kaydedildi');
+                return;
+            } catch (error) {
+                // API hatası - fallback'e geç
+                warnLog('API\'ye kaydedilemedi, fallback kullanılıyor:', error);
+            }
+        }
+        
+        // Fallback: IndexedDB'ye kaydet
+        if (db) {
+            await saveToIndexedDB('hasene_totalPoints', totalPoints.toString());
+            await saveToIndexedDB('hasene_badges', badges);
+            await saveToIndexedDB('hasene_streakData', streakData);
+            await saveToIndexedDB('hasene_dailyTasks', dailyTasksToSave);
+            await saveToIndexedDB('hasene_weeklyTasks', weeklyTasksToSave);
+        }
+
+        // localStorage'a kaydet (yedek)
+        localStorage.setItem('hasene_totalPoints', totalPoints.toString());
+        safeSetItem('hasene_badges', badges);
+        safeSetItem('hasene_streakData', streakData);
+        safeSetItem('hasene_dailyTasks', dailyTasksToSave);
+        safeSetItem('hasene_weeklyTasks', weeklyTasksToSave);
+        safeSetItem('hasene_wordStats', wordStats);
+        safeSetItem('unlockedAchievements', unlockedAchievements);
+        safeSetItem('unlockedBadges', unlockedBadges);
+        safeSetItem('perfectLessonsCount', perfectLessonsCount);
+        safeSetItem('gameStats', gameStats);
+
+        debugLog('İstatistikler kaydedildi (fallback)');
+    } catch (error) {
+        errorLog('İstatistik kaydetme hatası:', error);
+    }
+}
+
+/**
+ * Debounced kaydetme
+ */
+const debouncedSaveStats = debounce(saveStats, CONFIG.DEBOUNCE_DELAY);
+
+/**
+ * Anında kaydetme (oyun bitişinde)
+ */
+async function saveStatsImmediate() {
+    await saveStats();
+}
+
+// ============================================
+// PUAN SİSTEMİ
+// ============================================
+
+/**
+ * Seviye hesaplar
+ */
+function calculateLevel(points) {
+    if (points < LEVELS.THRESHOLDS[2]) return 1;
+    if (points < LEVELS.THRESHOLDS[3]) return 2;
+    if (points < LEVELS.THRESHOLDS[4]) return 3;
+    if (points < LEVELS.THRESHOLDS[5]) return 4;
+    if (points < LEVELS.THRESHOLDS[10]) return 5;
+    
+    // Level 10'dan sonra
+    let level = 10;
+    let threshold = LEVELS.THRESHOLDS[10];
+    while (points >= threshold + LEVELS.INCREMENT_AFTER_10) {
+        threshold += LEVELS.INCREMENT_AFTER_10;
+        level++;
+    }
+    
+    return level;
+}
+
+/**
+ * Mertebe ismini döndürür
+ */
+function getLevelName(level) {
+    if (level <= 4) {
+        return LEVELS.NAMES[level] || 'Mübtedi';
+    } else if (level < 10) {
+        return LEVELS.NAMES[5] || 'Mütebahhir';
+    } else {
+        return LEVELS.NAMES[10] || 'Mütebahhir';
+    }
+}
+
+/**
+ * Rozetleri hesaplar
+ */
+function calculateBadges(points) {
+    const stars = Math.floor(points / 100);
+    const bronze = Math.floor(stars / 5);
+    const silver = Math.floor(bronze / 5);
+    const gold = Math.floor(silver / 5);
+    const diamond = Math.floor(gold / 5);
+    
+    return { stars, bronze, silver, gold, diamond };
+}
+
+/**
+ * Session puanı ekler
+ */
+function addSessionPoints(points) {
+    sessionScore += points;
+    updateUI();
+}
+
+/**
+ * Günlük XP ekler
+ */
+function addDailyXP(points) {
+    const currentXP = parseInt(localStorage.getItem('dailyXP') || '0');
+    const newXP = currentXP + points;
+    localStorage.setItem('dailyXP', newXP.toString());
+    updateDailyGoalDisplay();
+}
+
+/**
+ * Global puanlara ekler
+ */
+async function addToGlobalPoints(points, correctAnswers) {
+    const oldLevel = calculateLevel(totalPoints);
+    totalPoints += points;
+    const newLevel = calculateLevel(totalPoints);
+    
+    // Rozetleri güncelle
+    badges = calculateBadges(totalPoints);
+    
+    // Günlük XP ekle
+    addDailyXP(points);
+    
+    // Seviye atlama kontrolü
+    if (newLevel > oldLevel) {
+        showLevelUpModal(newLevel);
+    }
+    
+    // UI'ı güncelle
+    updateStatsBar();
+    
+    // Kaydet
+    await saveStatsImmediate();
+    
+    // Rozetleri kontrol et
+    checkBadges();
+    
+    // Başarımları kontrol et
+    checkAchievements();
+    
+    // Streak güncelle
+    if (correctAnswers > 0) {
+        updateDailyProgress(correctAnswers);
+    }
+}
+
+/**
+ * Üst barı güncelle
+ */
+function updateStatsBar() {
+    if (elements.totalPointsEl) {
+        elements.totalPointsEl.textContent = formatNumber(totalPoints);
+    }
+    
+    if (elements.starPointsEl) {
+        elements.starPointsEl.textContent = formatNumber(badges.stars);
+    }
+    
+    const level = calculateLevel(totalPoints);
+    if (elements.currentLevelEl) {
+        elements.currentLevelEl.textContent = level;
+    }
+}
+
+/**
+ * Günlük hedef görüntüsünü güncelle
+ */
+function updateDailyGoalDisplay() {
+    const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || CONFIG.DAILY_GOAL_DEFAULT.toString());
+    const dailyXP = parseInt(localStorage.getItem('dailyXP') || '0');
+    const percent = Math.min(100, Math.floor((dailyXP / dailyGoalHasene) * 100));
+    
+    if (elements.dailyGoalProgress) {
+        elements.dailyGoalProgress.style.width = percent + '%';
+    }
+    
+    if (elements.dailyGoalCurrent) {
+        elements.dailyGoalCurrent.textContent = formatNumber(dailyXP);
+    }
+    
+    if (elements.dailyGoalTarget) {
+        elements.dailyGoalTarget.textContent = formatNumber(dailyGoalHasene);
+    }
+    
+    if (elements.dailyGoalPercent) {
+        elements.dailyGoalPercent.textContent = `(${percent}%)`;
+    }
+    
+    // Günlük hedef tamamlandı mı?
+    if (dailyXP >= dailyGoalHasene && !localStorage.getItem('dailyGoalCompleted')) {
+        localStorage.setItem('dailyGoalCompleted', 'true');
+        const dailyGoalBonus = 1000;
+        addToGlobalPoints(dailyGoalBonus, 0); // Bonus
+        // Günlük vird bonusunu detaylı istatistiklere ekle
+        saveDetailedStats(dailyGoalBonus, 0, 0, 0, 0);
+        showSuccessMessage('🎉 Günlük virdi tamamladınız! +1,000 Hasene');
+    }
+}
+
+/**
+ * Streak görüntüsünü güncelle
+ */
+function updateStreakDisplay() {
+    if (elements.currentStreakEl) {
+        elements.currentStreakEl.textContent = streakData.currentStreak;
+    }
+    
+    // Bugün ilerlemesi artık "Günlük Vird" bölümünde gösteriliyor
+}
+
+// ============================================
+// OYUN FONKSİYONLARI - KELİME ÇEVİR
+// ============================================
+
+/**
+ * Kelime Çevir oyununu başlatır
+ */
+async function startKelimeCevirGame(subMode) {
+    currentGame = 'kelime-cevir';
+    currentSubMode = subMode;
+    window.currentGame = currentGame;
+    window.currentSubMode = currentSubMode;
+    currentQuestion = 0;
     sessionScore = 0;
     sessionCorrect = 0;
     sessionWrong = 0;
     comboCount = 0;
+    maxCombo = 0;
+    hintUsed = false;
+    // Can sistemi kaldırıldı
+    lives = -1;
+    
+    // Doğru cevap pozisyon takibini sıfırla
+    correctAnswerPositions = {
+        count: [0, 0, 0, 0],
+        total: 0
+    };
+    
+    // Verileri yükle
+    const allWords = await loadKelimeData();
+    if (!allWords || allWords.length === 0) {
+        showErrorMessage('Kelime verileri yüklenemedi!');
+        return;
+    }
+    
+    // Tüm kelime verilerini sakla (yanlış cevaplar için)
+    allWordsData = allWords;
+    
+    // Filtrele - Zorluk seviyesine göre
+    infoLog(`Kelime Çevir oyunu başlatılıyor - Zorluk: ${currentDifficulty}`);
+    let filteredWords = filterByDifficulty(allWords, currentDifficulty);
+    infoLog(`Filtrelenmiş kelime sayısı: ${filteredWords.length}`);
+    
+    let strugglingWordIds = [];
+    let isReviewMode = false;
+    
+    if (subMode === 'classic') {
+        // Klasik oyun: Sadece zorluk seviyesine göre filtreleme (ekstra filtre yok)
+        infoLog(`Klasik oyun modu: ${filteredWords.length} kelime`);
+    } else if (subMode === 'juz30') {
+        filteredWords = filterJuz30(filteredWords);
+        infoLog(`30.cüz filtresi uygulandı: ${filteredWords.length} kelime`);
+    } else if (subMode === 'review') {
+        // Zorlanılan kelimeleri al
+        strugglingWordIds = getStrugglingWords();
+        if (strugglingWordIds.length > 0) {
+            // Zorlanılan kelimelerin ID'lerini kullanarak gerçek kelime verilerini filtrele
+            const strugglingIdsSet = new Set(strugglingWordIds.map(w => w.id));
+            filteredWords = filteredWords.filter(w => strugglingIdsSet.has(w.id));
+            infoLog(`Tekrar et filtresi uygulandı: ${filteredWords.length} kelime (${strugglingWordIds.length} zorlanılan kelime bulundu)`);
+            
+            // Eğer zorlanılan kelimeler yeterli değilse uyarı ver
+            if (filteredWords.length < CONFIG.QUESTIONS_PER_GAME) {
+                showCustomAlert(`⚠️ Sadece ${filteredWords.length} zorlanılan kelime bulundu. Oyun normal kelimelerle devam edecek.`, 'info');
+                // Normal kelimelerle devam et
+                filteredWords = filterByDifficulty(allWords, currentDifficulty);
+                isReviewMode = false; // Yeterli kelime yoksa review mode'u kapat
+            } else {
+                isReviewMode = true; // Yeterli zorlanılan kelime varsa review mode aktif
+            }
+        } else {
+            // Zorlanılan kelime yoksa kullanıcıya bilgi ver
+            const hasPlayedBefore = Object.keys(wordStats).length > 0;
+            if (hasPlayedBefore) {
+                showCustomAlert('ℹ️ Henüz yanlış cevaplanan kelime bulunmuyor. Oyun normal kelimelerle devam edecek.', 'info');
+            } else {
+                showCustomAlert('ℹ️ İlk oyununuz! Oyunu oynadıkça yanlış cevapladığınız kelimeler bu modda tekrar edilecek.', 'info');
+            }
+            infoLog('Tekrar et modu: Zorlanılan kelime bulunamadı, normal moda geçiliyor');
+            // Normal kelimelerle devam et (filteredWords zaten doğru)
+            isReviewMode = false;
+        }
+    } else if (subMode === 'favorites') {
+        // Favori kelimeleri al
+        if (typeof getFavoriteWords === 'undefined' || typeof loadFavorites === 'undefined') {
+            showErrorMessage('Favori kelimeler modülü yüklenemedi!');
+            return;
+        }
+        
+        if (typeof loadFavorites === 'function') {
+            loadFavorites();
+        }
+        
+        const favoriteWordIds = getFavoriteWords();
+        if (favoriteWordIds.length === 0) {
+            showCustomAlert('⭐ Henüz favori kelime eklenmemiş. Kelime istatistikleri sayfasından kelimeleri favorilere ekleyebilirsiniz.', 'info');
+            return;
+        }
+        
+        // Favori kelimelerin ID'lerini kullanarak gerçek kelime verilerini filtrele
+        const favoriteIdsSet = new Set(favoriteWordIds);
+        filteredWords = filteredWords.filter(w => favoriteIdsSet.has(w.id));
+        infoLog(`Favori kelimeler filtresi uygulandı: ${filteredWords.length} kelime (${favoriteWordIds.length} favori kelime bulundu)`);
+        
+        // Eğer favori kelimeler yeterli değilse uyarı ver
+        if (filteredWords.length < CONFIG.QUESTIONS_PER_GAME) {
+            showCustomAlert(`⚠️ Sadece ${filteredWords.length} favori kelime bulundu. En az ${CONFIG.QUESTIONS_PER_GAME} favori kelime eklemeniz gerekiyor.`, 'warning');
+            return;
+        }
+    }
+    
+    if (filteredWords.length < CONFIG.QUESTIONS_PER_GAME) {
+        showErrorMessage('Yeterli kelime bulunamadı!');
+        return;
+    }
+    
+    // Soruları seç (akıllı algoritma ile)
+    // Review mode'da zorlanılan kelimelere ekstra öncelik ver
+    questions = selectIntelligentWords(filteredWords, CONFIG.QUESTIONS_PER_GAME, isReviewMode);
+    
+    // Ekranı göster
+    document.getElementById('kelime-submode-selection').style.display = 'none';
+    document.getElementById('kelime-game-content').style.display = 'block';
+    
+    // İlk soruyu yükle
+    loadKelimeQuestion();
+    
+    // Can gösterimi kaldırıldı
+    const livesDisplay = document.getElementById('lives-display');
+    if (livesDisplay) {
+        livesDisplay.style.display = 'none';
+    }
+}
 
-    // Rozetleri sıfırla
-    badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
+/**
+ * Kelime Çevir sorusu yükler
+ */
+function loadKelimeQuestion() {
+    if (currentQuestion >= questions.length) {
+        endGame();
+        return;
+    }
+    
+    currentQuestionData = questions[currentQuestion];
+    hintUsed = false;
+    
+    // Arapça kelimeyi göster
+    const arabicWordEl = document.getElementById('arabic-word');
+    if (arabicWordEl) {
+        arabicWordEl.textContent = currentQuestionData.kelime;
+    }
+    
+    // Kelime ID'sini göster
+    const kelimeIdEl = document.getElementById('kelime-id');
+    if (kelimeIdEl && currentQuestionData.id) {
+        kelimeIdEl.textContent = currentQuestionData.id;
+        kelimeIdEl.style.display = 'inline';
+    } else if (kelimeIdEl) {
+        kelimeIdEl.style.display = 'none';
+    }
+    
+    // Ses çal butonu - Audio Manager kullan
+    const playAudioBtn = document.getElementById('kelime-play-audio-btn');
+    if (playAudioBtn && typeof setupAudioButton === 'function') {
+        setupAudioButton(playAudioBtn, currentQuestionData.ses_dosyasi);
+    } else if (playAudioBtn) {
+        // Fallback: Eski yöntem (audio-manager yüklenmemişse)
+        if (currentQuestionData.ses_dosyasi) {
+            playAudioBtn.onclick = () => {
+                if (typeof playAudio === 'function') {
+                    playAudio(currentQuestionData.ses_dosyasi, playAudioBtn);
+                }
+            };
+            playAudioBtn.disabled = false;
+            playAudioBtn.style.opacity = '1';
+        } else {
+            playAudioBtn.style.opacity = '0.5';
+            playAudioBtn.disabled = true;
+        }
+    }
+    
+    // Seçenekleri oluştur
+    const correctAnswer = currentQuestionData.anlam;
+    // Tüm kelimelerden yanlış cevapları al ve rastgele seç
+    // Önce tüm kelime verilerinden, yoksa questions'dan
+    const sourceData = allWordsData || questions;
+    const uniqueWrongMeanings = sourceData
+        .filter(w => w.id !== currentQuestionData.id && w.anlam !== correctAnswer)
+        .map(w => w.anlam)
+        .filter((v, i, a) => a.indexOf(v) === i); // Tekrarları kaldır
+    
+    // Rastgele 3 yanlış cevap seç
+    const wrongAnswers = getRandomItems(uniqueWrongMeanings, 3);
+    
+    // Eşit dağılımlı karıştırma
+    const allOptions = [correctAnswer, ...wrongAnswers];
+    const shuffled = shuffleWithEqualDistribution(
+        allOptions,
+        correctAnswer,
+        correctAnswerPositions.count
+    );
+    const options = shuffled.options;
+    const correctIndex = shuffled.correctIndex;
+    
+    // Doğru cevap pozisyonunu sakla (yanlış cevap durumunda göstermek için)
+    currentQuestionData.correctIndex = correctIndex;
+    
+    // Pozisyon sayacını güncelle
+    correctAnswerPositions.count[correctIndex]++;
+    correctAnswerPositions.total++;
+    
+    // Butonları güncelle
+    const optionButtons = document.querySelectorAll('#kelime-cevir-screen .option-btn');
+    optionButtons.forEach((btn, index) => {
+        btn.textContent = options[index];
+        btn.classList.remove('correct', 'wrong', 'disabled');
+        btn.disabled = false;
+        btn.onclick = () => checkKelimeAnswer(index, index === correctIndex);
+    });
+    
+    // Soru numarası
+    const questionNumberEl = document.getElementById('question-number');
+    if (questionNumberEl) {
+        questionNumberEl.textContent = `${currentQuestion + 1}/${questions.length}`;
+    }
+    
+    // İpucu butonunu sıfırla
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) {
+        hintBtn.disabled = false;
+    }
+}
 
-    // =========================================
-    // 🔥 ACHIEVEMENT SİSTEMİ SIFIRLA
-    // =========================================
-    localStorage.removeItem('unlockedAchievements');
-    localStorage.setItem('achievementsJustReset', 'true'); // UI güncellemesi için flag
+/**
+ * Kelime Çevir cevabını kontrol eder
+ */
+function checkKelimeAnswer(selectedIndex, isCorrect) {
+    const optionButtons = document.querySelectorAll('#kelime-cevir-screen .option-btn');
+    
+    // Tüm butonları devre dışı bırak
+    optionButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.onclick = null;
+    });
+    
+    if (isCorrect) {
+        // Doğru cevap
+        optionButtons[selectedIndex].classList.add('correct');
+        sessionCorrect++;
+        comboCount++;
+        if (comboCount > maxCombo) maxCombo = comboCount;
+        
+        // Puan ekle - Kelimenin difficulty değerine göre
+        let points = currentQuestionData.difficulty ?? CONFIG.POINTS_CORRECT;
+        if (comboCount % 3 === 0) {
+            points += CONFIG.COMBO_BONUS;
+        }
+        addSessionPoints(points);
+        
+        // Kelime istatistiği
+        updateWordStats(currentQuestionData.id, true);
+        
+        // Combo göster
+        if (comboCount % 3 === 0) {
+            showComboBonus();
+        }
+        
+        playSound('correct');
+        
+        // Her soru cevaplandığında anında kaydet ve modal açıksa yenile
+        saveDetailedStats(points, 1, 0, comboCount % 3 === 0 ? comboCount : 0, 0);
+        if (typeof refreshDetailedStatsIfOpen === 'function') {
+            refreshDetailedStatsIfOpen();
+        }
+        
+        // Bir sonraki soruya geç
+        setTimeout(() => {
+            currentQuestion++;
+            loadKelimeQuestion();
+        }, 1500);
+    } else {
+        // Yanlış cevap
+        optionButtons[selectedIndex].classList.add('wrong');
+        
+        // Doğru cevabı göster
+        if (currentQuestionData.correctIndex !== undefined) {
+            optionButtons[currentQuestionData.correctIndex].classList.add('correct');
+        } else {
+            // Fallback: eski yöntem
+            optionButtons.forEach((btn, index) => {
+                const optionText = btn.textContent;
+                if (optionText === currentQuestionData.anlam) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        
+        sessionWrong++;
+        comboCount = 0;
+        
+        // Puan kaybı yok - sadece doğru cevap gösterilir
+        // addSessionPoints çağrılmıyor
+        
+        // Kelime istatistiği
+        updateWordStats(currentQuestionData.id, false);
+        
+        // Can sistemi kaldırıldı - oyun devam eder
+        
+        playSound('wrong');
+        
+        // Her soru cevaplandığında anında kaydet ve modal açıksa yenile
+        saveDetailedStats(0, 0, 1, 0, 0);
+        if (typeof refreshDetailedStatsIfOpen === 'function') {
+            refreshDetailedStatsIfOpen();
+        }
+        
+        // Bir sonraki soruya geç
+        setTimeout(() => {
+            currentQuestion++;
+            loadKelimeQuestion();
+        }, 2000);
+    }
+    
+    // Session skorunu güncelle
+    const sessionScoreEl = document.getElementById('session-score');
+    if (sessionScoreEl) {
+        sessionScoreEl.textContent = `Hasene: ${sessionScore}`;
+    }
+}
 
-    // =========================================
-    // 🔥 STREAK + GÜNLÜK HEDEF SIFIRLA
-    // =========================================
+/**
+ * İpucu kullanır
+ */
+function handleHint() {
+    if (hintUsed) return;
+    
+    hintUsed = true;
+    const optionButtons = document.querySelectorAll('#kelime-cevir-screen .option-btn');
+    const correctAnswer = currentQuestionData.anlam;
+    
+    // Yanlış bir seçeneği kaldır
+    const wrongButtons = Array.from(optionButtons).filter(btn => 
+        btn.textContent !== correctAnswer && !btn.disabled
+    );
+    
+    if (wrongButtons.length > 0) {
+        const randomWrong = getRandomItem(wrongButtons);
+        randomWrong.classList.add('disabled');
+        randomWrong.disabled = true;
+    }
+    
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) {
+        hintBtn.disabled = true;
+    }
+}
+
+/**
+ * Combo bonusu gösterir
+ */
+function showComboBonus() {
+    const comboDisplay = document.getElementById('combo-display');
+    if (comboDisplay) {
+        comboDisplay.style.display = 'block';
+        const comboCountEl = document.getElementById('combo-count');
+        if (comboCountEl) {
+            comboCountEl.textContent = comboCount;
+        }
+        // 2 saniye sonra otomatik gizle
+        setTimeout(() => {
+            comboDisplay.style.display = 'none';
+        }, 2000);
+    }
+}
+
+// ============================================
+// OYUN FONKSİYONLARI - DİNLE BUL
+// ============================================
+
+/**
+ * Dinle Bul oyununu başlatır
+ */
+async function startDinleBulGame() {
+    currentGame = 'dinle-bul';
+    window.currentGame = currentGame;
+    currentQuestion = 0;
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionWrong = 0;
+    comboCount = 0;
+    maxCombo = 0;
+    
+    const allWords = await loadKelimeData();
+    if (!allWords || allWords.length === 0) {
+        showErrorMessage('Kelime verileri yüklenemedi!');
+        return;
+    }
+    
+    // Tüm kelime verilerini sakla (yanlış cevaplar için)
+    allWordsData = allWords;
+    
+    // Filtrele - Zorluk seviyesine göre
+    infoLog(`Dinle Bul oyunu başlatılıyor - Zorluk: ${currentDifficulty}`);
+    let filteredWords = filterByDifficulty(allWords, currentDifficulty);
+    infoLog(`Filtrelenmiş kelime sayısı: ${filteredWords.length}`);
+    
+    if (filteredWords.length < CONFIG.QUESTIONS_PER_GAME) {
+        showErrorMessage('Yeterli kelime bulunamadı!');
+        return;
+    }
+    
+    // Soruları seç (akıllı algoritma ile)
+    questions = selectIntelligentWords(filteredWords, CONFIG.QUESTIONS_PER_GAME, false);
+    
+    loadDinleQuestion();
+}
+
+/**
+ * Dinle Bul sorusu yükler
+ */
+function loadDinleQuestion() {
+    if (currentQuestion >= questions.length) {
+        endGame();
+        return;
+    }
+    
+    currentQuestionData = questions[currentQuestion];
+    
+    // Kelime ID'sini göster
+    const dinleIdEl = document.getElementById('dinle-id');
+    if (dinleIdEl && currentQuestionData.id) {
+        dinleIdEl.textContent = currentQuestionData.id;
+        dinleIdEl.style.display = 'inline';
+    } else if (dinleIdEl) {
+        dinleIdEl.style.display = 'none';
+    }
+    
+    // Ses çal (otomatik) - Audio Manager kullan
+    if (typeof stopCurrentAudio === 'function') {
+        stopCurrentAudio();
+    }
+    if (typeof playAudio === 'function' && currentQuestionData.ses_dosyasi) {
+        playAudio(currentQuestionData.ses_dosyasi);
+    }
+    
+    // Ses çal butonunu güncelle - Audio Manager kullan
+    const playBtn = document.getElementById('play-audio-btn');
+    if (playBtn && typeof setupAudioButton === 'function') {
+        setupAudioButton(playBtn, currentQuestionData.ses_dosyasi);
+    } else if (playBtn) {
+        // Fallback: Eski yöntem (audio-manager yüklenmemişse)
+        if (currentQuestionData.ses_dosyasi) {
+            playBtn.onclick = () => {
+                if (typeof playAudio === 'function') {
+                    playAudio(currentQuestionData.ses_dosyasi, playBtn);
+                }
+            };
+            playBtn.disabled = false;
+            playBtn.style.opacity = '1';
+        } else {
+            playBtn.style.opacity = '0.5';
+            playBtn.disabled = true;
+        }
+    }
+    
+    // Seçenekleri oluştur
+    const correctAnswer = currentQuestionData.kelime;
+    // Tüm kelimelerden yanlış cevapları al ve rastgele seç
+    // Önce tüm kelime verilerinden, yoksa questions'dan
+    const sourceData = allWordsData || questions;
+    const uniqueWrongWords = sourceData
+        .filter(w => w.id !== currentQuestionData.id && w.kelime !== correctAnswer)
+        .map(w => w.kelime)
+        .filter((v, i, a) => a.indexOf(v) === i); // Tekrarları kaldır
+    
+    // Rastgele 3 yanlış cevap seç
+    const wrongAnswers = getRandomItems(uniqueWrongWords, 3);
+    
+    // Eşit dağılımlı karıştırma
+    const allOptions = [correctAnswer, ...wrongAnswers];
+    const shuffled = shuffleWithEqualDistribution(
+        allOptions,
+        correctAnswer,
+        correctAnswerPositions.count
+    );
+    const options = shuffled.options;
+    const correctIndex = shuffled.correctIndex;
+    
+    // Doğru cevap pozisyonunu sakla (yanlış cevap durumunda göstermek için)
+    currentQuestionData.correctIndex = correctIndex;
+    
+    // Pozisyon sayacını güncelle
+    correctAnswerPositions.count[correctIndex]++;
+    correctAnswerPositions.total++;
+    
+    // Butonları güncelle
+    const optionButtons = document.querySelectorAll('#dinle-bul-screen .option-btn');
+    optionButtons.forEach((btn, index) => {
+        btn.textContent = options[index];
+        btn.classList.remove('correct', 'wrong', 'disabled');
+        btn.disabled = false;
+        btn.onclick = () => checkDinleAnswer(index, index === correctIndex);
+    });
+    
+    // Soru numarası
+    const questionNumberEl = document.getElementById('dinle-question-number');
+    if (questionNumberEl) {
+        questionNumberEl.textContent = `${currentQuestion + 1}/${questions.length}`;
+    }
+}
+
+/**
+ * Dinle Bul cevabını kontrol eder
+ */
+function checkDinleAnswer(selectedIndex, isCorrect) {
+    const optionButtons = document.querySelectorAll('#dinle-bul-screen .option-btn');
+    
+    optionButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.onclick = null;
+    });
+    
+    if (isCorrect) {
+        optionButtons[selectedIndex].classList.add('correct');
+        sessionCorrect++;
+        comboCount++;
+        if (comboCount > maxCombo) maxCombo = comboCount;
+        
+        // Puan ekle - Kelimenin difficulty değerine göre
+        let points = currentQuestionData.difficulty ?? CONFIG.POINTS_CORRECT;
+        if (comboCount % 3 === 0) {
+            points += CONFIG.COMBO_BONUS;
+        }
+        addSessionPoints(points);
+        
+        updateWordStats(currentQuestionData.id, true);
+        
+        if (comboCount % 3 === 0) {
+            const comboDisplay = document.getElementById('dinle-combo-display');
+            if (comboDisplay) {
+                comboDisplay.style.display = 'block';
+                document.getElementById('dinle-combo-count').textContent = comboCount;
+                // 2 saniye sonra otomatik gizle
+                setTimeout(() => {
+                    comboDisplay.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        playSound('correct');
+        
+        // Her soru cevaplandığında anında kaydet ve modal açıksa yenile
+        saveDetailedStats(points, 1, 0, comboCount % 3 === 0 ? comboCount : 0, 0);
+        if (typeof refreshDetailedStatsIfOpen === 'function') {
+            refreshDetailedStatsIfOpen();
+        }
+        
+        setTimeout(() => {
+            currentQuestion++;
+            loadDinleQuestion();
+        }, 1500);
+    } else {
+        // Yanlış cevap - sadece doğru cevabı göster, puan kaybı yok
+        optionButtons[selectedIndex].classList.add('wrong');
+        
+        // Doğru cevabı göster
+        if (currentQuestionData.correctIndex !== undefined) {
+            optionButtons[currentQuestionData.correctIndex].classList.add('correct');
+        } else {
+            // Fallback: eski yöntem
+            optionButtons.forEach((btn, index) => {
+                if (btn.textContent === currentQuestionData.kelime) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        
+        sessionWrong++;
+        comboCount = 0;
+        // Puan kaybı yok - sadece doğru cevap gösterilir
+        updateWordStats(currentQuestionData.id, false);
+        playSound('wrong');
+        
+        // Her soru cevaplandığında anında kaydet ve modal açıksa yenile
+        saveDetailedStats(0, 0, 1, 0, 0);
+        if (typeof refreshDetailedStatsIfOpen === 'function') {
+            refreshDetailedStatsIfOpen();
+        }
+        
+        setTimeout(() => {
+            currentQuestion++;
+            loadDinleQuestion();
+        }, 2000);
+    }
+    
+    const sessionScoreEl = document.getElementById('dinle-session-score');
+    if (sessionScoreEl) {
+        sessionScoreEl.textContent = `Hasene: ${sessionScore}`;
+    }
+}
+
+// ============================================
+// OYUN FONKSİYONLARI - BOŞLUK DOLDUR
+// ============================================
+
+/**
+ * Boşluk Doldur oyununu başlatır
+ */
+async function startBoslukDoldurGame() {
+    currentGame = 'bosluk-doldur';
+    window.currentGame = currentGame;
+    currentQuestion = 0;
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionWrong = 0;
+    comboCount = 0;
+    maxCombo = 0;
+    
+    // Doğru cevap pozisyon takibini sıfırla
+    correctAnswerPositions = {
+        count: [0, 0, 0, 0],
+        total: 0
+    };
+    
+    const allAyet = await loadAyetData();
+    if (!allAyet || allAyet.length === 0) {
+        showErrorMessage('Ayet verileri yüklenemedi!');
+        return;
+    }
+    
+    // Zorluk seviyesine göre filtrele (meal metnindeki kelime sayısına göre)
+    infoLog(`Boşluk Doldur oyunu başlatılıyor - Zorluk: ${currentDifficulty}`);
+    let filteredAyet = allAyet;
+    
+    // Ayetleri meal metnindeki kelime sayısına göre filtrele
+    filteredAyet = allAyet.filter(ayet => {
+        if (!ayet.meal) return true; // Meal yoksa dahil et
+        
+        // Meal metnindeki kelime sayısını hesapla
+        const mealWords = ayet.meal.trim().split(/\s+/).filter(w => w.length > 0);
+        const wordCount = mealWords.length;
+        
+        // Zorluk seviyesine göre filtrele (kelime sayısına göre)
+        if (currentDifficulty === 'easy') {
+            // Kolay: 1-6 kelime (kısa mealler)
+            return wordCount >= 1 && wordCount <= 6;
+        } else if (currentDifficulty === 'medium') {
+            // Orta: 7-12 kelime (orta uzunlukta mealler)
+            return wordCount >= 7 && wordCount <= 12;
+        } else if (currentDifficulty === 'hard') {
+            // Zor: 13+ kelime (uzun mealler)
+            return wordCount >= 13;
+        }
+        return true;
+    });
+    
+    infoLog(`Filtrelenmiş ayet sayısı: ${filteredAyet.length} / ${allAyet.length}`);
+    
+    // Debug: Zorluk filtresi çalışıyor mu kontrol et
+    if (CONFIG.DEBUG) {
+        console.log(`🔍 Zorluk Filtresi Testi:`);
+        console.log(`- Seçilen zorluk: ${currentDifficulty}`);
+        console.log(`- Toplam ayet: ${allAyet.length}`);
+        console.log(`- Filtrelenmiş ayet: ${filteredAyet.length}`);
+        console.log(`- Filtreleme oranı: ${((filteredAyet.length / allAyet.length) * 100).toFixed(2)}%`);
+        
+        // İlk birkaç filtrelenmiş ayetin kelime sayısını göster
+        if (filteredAyet.length > 0) {
+            const sampleAyet = filteredAyet.slice(0, 3);
+            sampleAyet.forEach((ayet, idx) => {
+                if (ayet && ayet.meal && typeof ayet.meal === 'string') {
+                    const wordCount = ayet.meal.trim().split(/\s+/).filter(w => w.length > 0).length;
+                    const mealPreview = ayet.meal.length > 50 ? ayet.meal.substring(0, 50) + '...' : ayet.meal;
+                    console.log(`  Örnek ${idx + 1}: "${mealPreview}" - Kelime sayısı: ${wordCount}`);
+                }
+            });
+        }
+    }
+    
+    if (filteredAyet.length < CONFIG.QUESTIONS_PER_GAME) {
+        showErrorMessage(`Yeterli ayet bulunamadı! (${filteredAyet.length} ayet bulundu, ${CONFIG.QUESTIONS_PER_GAME} gerekiyor)`);
+        return;
+    }
+    
+    // Ayetlerden rastgele seç
+    questions = getRandomItems(filteredAyet, CONFIG.QUESTIONS_PER_GAME);
+    
+    // Kullanıcıya bilgi ver (her zaman göster)
+    const difficultyName = currentDifficulty === 'easy' ? 'Kolay' : currentDifficulty === 'medium' ? 'Orta' : 'Zor';
+    const filterRatio = ((filteredAyet.length / allAyet.length) * 100).toFixed(1);
+    showSuccessMessage(`✅ ${difficultyName} zorluk seviyesi aktif: ${filteredAyet.length} ayet (${filterRatio}%)`);
+    
+    loadBoslukQuestion();
+}
+
+/**
+ * Boşluk Doldur sorusu yükler
+ */
+async function loadBoslukQuestion() {
+    if (currentQuestion >= questions.length) {
+        endGame();
+        return;
+    }
+    
+    currentQuestionData = questions[currentQuestion];
+    
+    // Ayet metnini al ve bir kelimeyi boşlukla değiştir
+    const ayetText = currentQuestionData.ayet_metni;
+    if (!ayetText || typeof ayetText !== 'string') {
+        errorLog('Ayet metni bulunamadı veya geçersiz!');
+        endGame();
+        return;
+    }
+    const words = ayetText.split(' ').filter(w => w.trim().length > 0);
+    if (words.length === 0) {
+        errorLog('Ayet metninde kelime bulunamadı!');
+        endGame();
+        return;
+    }
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const missingWord = words[randomIndex];
+    words[randomIndex] = '_____';
+    const verseWithBlank = words.join(' ');
+    
+    // Verse text'i göster
+    const verseTextEl = document.getElementById('verse-text');
+    if (verseTextEl) {
+        verseTextEl.innerHTML = verseWithBlank.replace('_____', '<span class="blank" id="blank-word"></span>');
+    }
+    
+    // Ayet kimliğini göster (verse-info panelinde)
+    const verseIdEl = document.getElementById('bosluk-verse-id');
+    if (verseIdEl) {
+        if (currentQuestionData.ayet_kimligi) {
+            verseIdEl.textContent = currentQuestionData.ayet_kimligi;
+            verseIdEl.style.display = 'inline';
+        } else {
+            verseIdEl.style.display = 'none';
+        }
+    }
+    
+    // Meali göster
+    const verseMealEl = document.getElementById('verse-meal');
+    if (verseMealEl && currentQuestionData.meal) {
+        verseMealEl.textContent = currentQuestionData.meal;
+    }
+    
+    // Ses çal butonu - Audio Manager kullan
+    const playBtn = document.getElementById('bosluk-play-audio-btn');
+    if (playBtn && typeof setupAudioButton === 'function') {
+        setupAudioButton(playBtn, currentQuestionData.ayet_ses_dosyasi);
+    } else if (playBtn) {
+        // Fallback: Eski yöntem
+        if (currentQuestionData.ayet_ses_dosyasi) {
+            playBtn.onclick = () => {
+                if (typeof playAudio === 'function') {
+                    playAudio(currentQuestionData.ayet_ses_dosyasi, playBtn);
+                }
+            };
+            playBtn.disabled = false;
+            playBtn.style.opacity = '1';
+        } else {
+            playBtn.style.opacity = '0.5';
+            playBtn.disabled = true;
+        }
+    }
+    
+    // Seçenekleri oluştur (doğru kelime + 3 yanlış)
+    const allAyet = questions;
+    const uniqueWrongWords = allAyet
+        .filter(a => a && a.ayet_kimligi !== currentQuestionData.ayet_kimligi && a.ayet_metni)
+        .flatMap(a => {
+            const words = a.ayet_metni.split(' ').filter(w => w.trim().length > 0);
+            return words;
+        })
+        .filter((v, i, a) => a.indexOf(v) === i)
+        .filter(word => word && word.trim().length > 0 && word !== missingWord); // Doğru cevabı çıkar
+    
+    // Rastgele 3 yanlış cevap seç
+    const wrongWords = getRandomItems(uniqueWrongWords, 3);
+    
+    // Eşit dağılımlı karıştırma
+    const allOptions = [missingWord, ...wrongWords];
+    const shuffled = shuffleWithEqualDistribution(
+        allOptions,
+        missingWord,
+        correctAnswerPositions.count
+    );
+    const options = shuffled.options;
+    const correctIndex = shuffled.correctIndex;
+    
+    // Doğru cevap pozisyonunu sakla (yanlış cevap durumunda göstermek için)
+    currentQuestionData.correctIndex = correctIndex;
+    
+    // Pozisyon sayacını güncelle
+    correctAnswerPositions.count[correctIndex]++;
+    correctAnswerPositions.total++;
+    
+    // Butonları güncelle
+    const optionButtons = document.querySelectorAll('#bosluk-doldur-screen .option-btn');
+    optionButtons.forEach((btn, index) => {
+        btn.textContent = options[index];
+        btn.classList.remove('correct', 'wrong', 'disabled');
+        btn.disabled = false;
+        btn.onclick = () => checkBoslukAnswer(index, index === correctIndex);
+    });
+    
+    // Soru numarası
+    const questionNumberEl = document.getElementById('bosluk-question-number');
+    if (questionNumberEl) {
+        questionNumberEl.textContent = `${currentQuestion + 1}/${questions.length}`;
+    }
+    
+    // Doğru kelimeyi sakla
+    currentQuestionData.missingWord = missingWord;
+}
+
+/**
+ * Boşluk Doldur cevabını kontrol eder
+ */
+function checkBoslukAnswer(selectedIndex, isCorrect) {
+    const optionButtons = document.querySelectorAll('#bosluk-doldur-screen .option-btn');
+    
+    optionButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.onclick = null;
+    });
+    
+    if (isCorrect) {
+        optionButtons[selectedIndex].classList.add('correct');
+        sessionCorrect++;
+        comboCount++;
+        if (comboCount > maxCombo) maxCombo = comboCount;
+        
+        // Doğru kelimeyi boşluğa yerleştir
+        const blankWordEl = document.getElementById('blank-word');
+        if (blankWordEl) {
+            blankWordEl.textContent = currentQuestionData.missingWord;
+            blankWordEl.style.borderBottom = 'none';
+            blankWordEl.style.color = 'var(--accent-success)';
+            blankWordEl.style.fontWeight = '600';
+        }
+        
+        // Puan hesapla - Zorluk seviyesine göre (meal kelime sayısına göre)
+        let points = CONFIG.POINTS_CORRECT;
+        
+        // Meal metnindeki kelime sayısına göre puan çarpanı
+        if (currentQuestionData.meal) {
+            const mealWords = currentQuestionData.meal.trim().split(/\s+/).filter(w => w.length > 0);
+            const wordCount = mealWords.length;
+            
+            // Zorluk seviyesine göre puan çarpanı
+            if (wordCount >= 1 && wordCount <= 6) {
+                // Kolay: 1.0x (10 puan)
+                points = CONFIG.POINTS_CORRECT;
+            } else if (wordCount >= 7 && wordCount <= 12) {
+                // Orta: 1.5x (15 puan)
+                points = Math.round(CONFIG.POINTS_CORRECT * 1.5);
+            } else if (wordCount >= 13) {
+                // Zor: 2.0x (20 puan)
+                points = CONFIG.POINTS_CORRECT * 2;
+            }
+        }
+        
+        // Combo bonusu
+        if (comboCount % 3 === 0) {
+            points += CONFIG.COMBO_BONUS;
+        }
+        addSessionPoints(points);
+        
+        if (comboCount % 3 === 0) {
+            const comboDisplay = document.getElementById('bosluk-combo-display');
+            if (comboDisplay) {
+                comboDisplay.style.display = 'block';
+                document.getElementById('bosluk-combo-count').textContent = comboCount;
+                // 2 saniye sonra otomatik gizle
+                setTimeout(() => {
+                    comboDisplay.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
+        playSound('correct');
+        
+        // Her soru cevaplandığında anında kaydet ve modal açıksa yenile
+        saveDetailedStats(points, 1, 0, comboCount % 3 === 0 ? comboCount : 0, 0);
+        if (typeof refreshDetailedStatsIfOpen === 'function') {
+            refreshDetailedStatsIfOpen();
+        }
+        
+        // Audio çalıyorsa bitmesini bekle, yoksa normal süre sonra geç
+        const moveToNextQuestion = () => {
+            currentQuestion++;
+            loadBoslukQuestion();
+        };
+        
+        if (window.currentAudio && !window.currentAudio.paused && !window.currentAudio.ended) {
+            // Audio çalıyorsa, bitmesini bekle
+            // Mevcut onended handler'ını sakla
+            const originalOnEnded = window.currentAudio.onended;
+            // Yeni handler ekle (hem eski handler'ı çağır hem de sonraki soruya geç)
+            window.currentAudio.onended = () => {
+                if (originalOnEnded) {
+                    try {
+                        originalOnEnded();
+                    } catch (e) {
+                        console.error('Original onended handler error:', e);
+                    }
+                }
+                setTimeout(moveToNextQuestion, 500);
+            };
+        } else {
+            // Audio çalmıyorsa, normal süre sonra geç
+            setTimeout(moveToNextQuestion, 1500);
+        }
+    } else {
+        optionButtons[selectedIndex].classList.add('wrong');
+        
+        // Doğru cevabı göster
+        if (currentQuestionData.correctIndex !== undefined) {
+            optionButtons[currentQuestionData.correctIndex].classList.add('correct');
+        } else {
+            // Fallback: eski yöntem
+            optionButtons.forEach((btn, index) => {
+                if (btn.textContent === currentQuestionData.missingWord) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        
+        sessionWrong++;
+        comboCount = 0;
+        // Puan kaybı yok - sadece doğru cevap gösterilir
+        playSound('wrong');
+        
+        // Audio çalıyorsa bitmesini bekle, yoksa normal süre sonra geç
+        const moveToNextQuestion = () => {
+            currentQuestion++;
+            loadBoslukQuestion();
+        };
+        
+        if (window.currentAudio && !window.currentAudio.paused && !window.currentAudio.ended) {
+            // Audio çalıyorsa, bitmesini bekle
+            // Mevcut onended handler'ını sakla
+            const originalOnEnded = window.currentAudio.onended;
+            // Yeni handler ekle (hem eski handler'ı çağır hem de sonraki soruya geç)
+            window.currentAudio.onended = () => {
+                if (originalOnEnded) {
+                    try {
+                        originalOnEnded();
+                    } catch (e) {
+                        errorLog('Original onended handler error:', e);
+                    }
+                }
+                setTimeout(moveToNextQuestion, 500);
+            };
+        } else {
+            // Audio çalmıyorsa, normal süre sonra geç
+            setTimeout(moveToNextQuestion, 2000);
+        }
+    }
+    
+    const sessionScoreEl = document.getElementById('bosluk-session-score');
+    if (sessionScoreEl) {
+        sessionScoreEl.textContent = `Hasene: ${sessionScore}`;
+    }
+}
+
+// ============================================
+// OKUMA MODLARI - AYET OKU, DUA ET, HADİS OKU
+// ============================================
+
+let currentAyetIndex = 0;
+let currentDuaIndex = 0;
+let currentHadisIndex = 0;
+let shuffledAyet = [];
+let shuffledDua = [];
+let shuffledHadis = [];
+
+// ============================================
+// ORTAK YARDIMCI FONKSİYONLAR
+// ============================================
+
+/**
+ * Navigasyon butonlarını ayarlar (Ayet, Dua, Hadis için ortak)
+ * @param {string} prevBtnId - Önceki buton ID'si
+ * @param {string} nextBtnId - Sonraki buton ID'si
+ * @param {number} currentIndex - Mevcut index
+ * @param {Array} allItems - Tüm öğeler dizisi
+ * @param {Function} displayFunction - Gösterim fonksiyonu (item, allItems) => void
+ * @param {Object} indexRef - Index referansı { get: () => number, set: (val) => void }
+ */
+function setupNavigationButtons(prevBtnId, nextBtnId, currentIndex, allItems, displayFunction, indexRef) {
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+    
+    if (prevBtn) {
+        prevBtn.disabled = currentIndex === 0;
+        prevBtn.onclick = () => {
+            if (currentIndex > 0) {
+                const newIndex = currentIndex - 1;
+                indexRef.set(newIndex);
+                displayFunction(allItems[newIndex], allItems);
+            }
+        };
+    }
+    
+    if (nextBtn) {
+        // Her zaman bir sonraki rastgele öğeyi göster
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => {
+            // Yeni rastgele bir öğe seç
+            const randomIndex = Math.floor(Math.random() * allItems.length);
+            indexRef.set(randomIndex);
+            displayFunction(allItems[randomIndex], allItems);
+        };
+    }
+}
+
+/**
+ * Audio butonunu ayarlar (Ayet, Dua, Hadis için ortak)
+ * @param {string} buttonId - Buton ID'si
+ * @param {string} audioUrl - Ses dosyası URL'si
+ * @param {number|null} startTime - Başlangıç zamanı (opsiyonel)
+ */
+function setupAudioButtonForContent(buttonId, audioUrl, startTime = null) {
+    const playAudioBtn = document.getElementById(buttonId);
+    
+    if (!playAudioBtn) return;
+    
+    if (typeof setupAudioButton === 'function') {
+        // Audio Manager kullan
+        setupAudioButton(playAudioBtn, audioUrl, {
+            onEnded: () => {
+                // Ses bittiğinde özel işlemler (gerekirse)
+            },
+            onError: () => {
+                // Hata durumunda özel işlemler (gerekirse)
+            }
+        });
+        
+        // Başlangıç zamanı varsa ayarla
+        if (startTime && typeof window.currentAudio !== 'undefined' && window.currentAudio) {
+            // Not: Bu durumda playAudio çağrıldıktan sonra currentTime ayarlanmalı
+            // Bu özellik audio-manager.js'e eklenebilir
+        }
+    } else if (audioUrl) {
+        // Fallback: Eski yöntem
+        playAudioBtn.onclick = () => {
+            if (typeof playAudio === 'function') {
+                playAudio(audioUrl, playAudioBtn);
+                // Başlangıç zamanı varsa ayarla
+                if (startTime && window.currentAudio) {
+                    window.currentAudio.currentTime = startTime;
+                }
+            } else {
+                // Fallback fallback: Manuel audio handling
+                if (window.currentAudio) {
+                    window.currentAudio.pause();
+                    window.currentAudio.currentTime = 0;
+                }
+                window.currentAudio = new Audio(audioUrl);
+                if (startTime) {
+                    window.currentAudio.currentTime = startTime;
+                }
+                playAudioBtn.disabled = true;
+                playAudioBtn.style.opacity = '0.6';
+                window.currentAudio.play().catch(err => {
+                    errorLog('Ses çalınamadı:', err);
+                    showErrorMessage('Ses dosyası çalınamadı.');
+                    playAudioBtn.disabled = false;
+                    playAudioBtn.style.opacity = '1';
+                    window.currentAudio = null;
+                });
+                window.currentAudio.onended = () => {
+                    playAudioBtn.disabled = false;
+                    playAudioBtn.style.opacity = '1';
+                    window.currentAudio = null;
+                };
+                window.currentAudio.onerror = () => {
+                    playAudioBtn.disabled = false;
+                    playAudioBtn.style.opacity = '1';
+                    window.currentAudio = null;
+                };
+            }
+        };
+        playAudioBtn.disabled = false;
+        playAudioBtn.style.opacity = '1';
+    } else {
+        playAudioBtn.disabled = true;
+        playAudioBtn.style.opacity = '0.5';
+    }
+}
+
+/**
+ * Ayet Oku modunu başlatır
+ */
+async function startAyetOku() {
+    currentGame = 'ayet-oku';
+    window.currentGame = currentGame;
+    const allAyet = await loadAyetData();
+    if (!allAyet || allAyet.length === 0) {
+        showErrorMessage('Ayet verileri yüklenemedi!');
+        return;
+    }
+    
+    // Ayetleri karıştır (random)
+    shuffledAyet = shuffleArray([...allAyet]);
+    currentAyetIndex = 0;
+    displayAyet(shuffledAyet[currentAyetIndex], shuffledAyet);
+    
+    // Oyun sayacını artır
+    gameStats.gameModeCounts['ayet-oku']++;
+    
+    // Günlük görev ilerlemesini güncelle
+    updateTaskProgress('ayet-oku', {
+        correct: 0,
+        wrong: 0,
+        points: 0,
+        combo: 0
+    });
+}
+
+/**
+ * Ayet gösterir
+ */
+function displayAyet(ayet, allAyet) {
+    const sureNameEl = document.getElementById('ayet-sure-name');
+    const verseNumberEl = document.getElementById('ayet-verse-number');
+    const arabicTextEl = document.getElementById('ayet-arabic-text');
+    const translationEl = document.getElementById('ayet-translation');
+    
+    if (sureNameEl) sureNameEl.textContent = ayet.sure_adı || 'Bilinmeyen';
+    // Ayet numarası kaldırıldı - alt tarafta ayet kimliği gösteriliyor
+    if (arabicTextEl) arabicTextEl.textContent = ayet.ayet_metni || '';
+    if (translationEl) translationEl.textContent = ayet.meal || '';
+    
+    // Ayet kimliğini göster
+    const verseIdEl = document.getElementById('ayet-verse-id');
+    if (verseIdEl) {
+        if (ayet.ayet_kimligi) {
+            verseIdEl.textContent = ayet.ayet_kimligi;
+            verseIdEl.style.display = 'inline';
+        } else {
+            verseIdEl.style.display = 'none';
+        }
+    }
+    
+    // Ses çal butonu - Ortak fonksiyon kullan
+    setupAudioButtonForContent('ayet-play-audio-btn', ayet.ayet_ses_dosyasi);
+    
+    // Navigasyon butonları - Ortak fonksiyon kullan
+    setupNavigationButtons(
+        'ayet-prev-btn',
+        'ayet-next-btn',
+        currentAyetIndex,
+        allAyet,
+        displayAyet,
+        {
+            get: () => currentAyetIndex,
+            set: (val) => { currentAyetIndex = val; }
+        }
+    );
+}
+
+/**
+ * Dua Et modunu başlatır
+ */
+async function startDuaEt() {
+    currentGame = 'dua-et';
+    window.currentGame = currentGame;
+    const allDua = await loadDuaData();
+    if (!allDua || allDua.length === 0) {
+        showErrorMessage('Dua verileri yüklenemedi!');
+        return;
+    }
+    
+    // Duaları karıştır (random)
+    shuffledDua = shuffleArray([...allDua]);
+    currentDuaIndex = 0;
+    displayDua(shuffledDua[currentDuaIndex], shuffledDua);
+    
+    gameStats.gameModeCounts['dua-et']++;
+    
+    // Günlük görev ilerlemesini güncelle
+    updateTaskProgress('dua-et', {
+        correct: 0,
+        wrong: 0,
+        points: 0,
+        combo: 0
+    });
+}
+
+/**
+ * Dua gösterir
+ */
+function displayDua(dua, allDua) {
+    const verseEl = document.getElementById('dua-verse');
+    const arabicTextEl = document.getElementById('dua-arabic-text');
+    const translationEl = document.getElementById('dua-translation');
+    
+    if (verseEl) verseEl.textContent = dua.ayet || '';
+    if (arabicTextEl) arabicTextEl.textContent = dua.dua || '';
+    if (translationEl) translationEl.textContent = dua.tercume || '';
+    
+    // Ayet kimliğini göster (dua.ayet alanını kullan)
+    const verseIdEl = document.getElementById('dua-verse-id');
+    if (verseIdEl) {
+        if (dua.ayet) {
+            verseIdEl.textContent = dua.ayet;
+            verseIdEl.style.display = 'inline';
+        } else {
+            verseIdEl.style.display = 'none';
+        }
+    }
+    
+    // Ses çal butonu - Ortak fonksiyon kullan (dua.start zamanı ile)
+    setupAudioButtonForContent('dua-play-audio-btn', dua.ses_url, dua.start || null);
+    
+    // Navigasyon butonları - Ortak fonksiyon kullan
+    setupNavigationButtons(
+        'dua-prev-btn',
+        'dua-next-btn',
+        currentDuaIndex,
+        allDua,
+        displayDua,
+        {
+            get: () => currentDuaIndex,
+            set: (val) => { currentDuaIndex = val; }
+        }
+    );
+}
+
+/**
+ * Hadis Oku modunu başlatır
+ */
+async function startHadisOku() {
+    currentGame = 'hadis-oku';
+    window.currentGame = currentGame;
+    const allHadis = await loadHadisData();
+    if (!allHadis || allHadis.length === 0) {
+        showErrorMessage('Hadis verileri yüklenemedi!');
+        return;
+    }
+    
+    // Hadisleri karıştır (random)
+    shuffledHadis = shuffleArray([...allHadis]);
+    currentHadisIndex = 0;
+    displayHadis(shuffledHadis[currentHadisIndex], shuffledHadis);
+    
+    gameStats.gameModeCounts['hadis-oku']++;
+    
+    // Günlük görev ilerlemesini güncelle
+    updateTaskProgress('hadis-oku', {
+        correct: 0,
+        wrong: 0,
+        points: 0,
+        combo: 0
+    });
+}
+
+/**
+ * Hadis gösterir
+ */
+function displayHadis(hadis, allHadis) {
+    const categoryEl = document.getElementById('hadis-category');
+    const chapterEl = document.getElementById('hadis-chapter');
+    const headerEl = document.getElementById('hadis-header');
+    const textEl = document.getElementById('hadis-text');
+    const refEl = document.getElementById('hadis-ref');
+    
+    if (categoryEl) categoryEl.textContent = hadis.section || '';
+    if (chapterEl) chapterEl.textContent = hadis.chapterName || '';
+    if (headerEl) headerEl.textContent = hadis.header || '';
+    if (textEl) textEl.textContent = hadis.text || '';
+    if (refEl) refEl.textContent = hadis.refno || '';
+    
+    // Navigasyon butonları - Ortak fonksiyon kullan
+    setupNavigationButtons(
+        'hadis-prev-btn',
+        'hadis-next-btn',
+        currentHadisIndex,
+        allHadis,
+        displayHadis,
+        {
+            get: () => currentHadisIndex,
+            set: (val) => { currentHadisIndex = val; }
+        }
+    );
+}
+
+// ============================================
+// OYUN BAŞLATMA VE BİTİRME
+// ============================================
+
+/**
+ * Oyunu başlatır
+ */
+function startGame(gameMode) {
+    currentGameMode = gameMode;
+    
+    // Ana menüyü gizle
+    document.getElementById('main-menu').style.display = 'none';
+    
+    // İlgili ekranı göster
+    if (gameMode === 'kelime-cevir') {
+        document.getElementById('kelime-cevir-screen').style.display = 'block';
+        document.getElementById('kelime-submode-selection').style.display = 'block';
+        document.getElementById('kelime-game-content').style.display = 'none';
+    } else if (gameMode === 'dinle-bul') {
+        document.getElementById('dinle-bul-screen').style.display = 'block';
+        startDinleBulGame();
+    } else if (gameMode === 'bosluk-doldur') {
+        document.getElementById('bosluk-doldur-screen').style.display = 'block';
+        startBoslukDoldurGame();
+    } else if (gameMode === 'ayet-oku') {
+        document.getElementById('ayet-oku-screen').style.display = 'block';
+        startAyetOku();
+    } else if (gameMode === 'dua-et') {
+        document.getElementById('dua-et-screen').style.display = 'block';
+        startDuaEt();
+    } else if (gameMode === 'hadis-oku') {
+        document.getElementById('hadis-oku-screen').style.display = 'block';
+        startHadisOku();
+    }
+}
+
+/**
+ * Oyunu bitirir
+ */
+/**
+ * Mevcut oyun ilerlemesini kaydeder (oyun bitmeden çıkıldığında)
+ */
+async function saveCurrentGameProgress() {
+    // Oyun yoksa veya hiç soru cevaplanmamışsa kaydetme
+    if (!currentGame || (sessionCorrect === 0 && sessionWrong === 0)) {
+        return;
+    }
+    
+    infoLog('Oyun ilerlemesi kaydediliyor:', {
+        game: currentGame,
+        score: sessionScore,
+        correct: sessionCorrect,
+        wrong: sessionWrong
+    });
+    
+    // Global puanlara ekle
+    await addToGlobalPoints(sessionScore, sessionCorrect);
+    
+    // Günlük istatistikleri güncelle
+    const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect') || '0');
+    const dailyWrong = parseInt(localStorage.getItem('dailyWrong') || '0');
+    localStorage.setItem('dailyCorrect', (dailyCorrect + sessionCorrect).toString());
+    localStorage.setItem('dailyWrong', (dailyWrong + sessionWrong).toString());
+    
+    // Detaylı istatistikleri kaydet (günlük, haftalık, aylık)
+    saveDetailedStats(sessionScore, sessionCorrect, sessionWrong, maxCombo, 0);
+    
+    // Oyun istatistiklerini güncelle
+    gameStats.totalCorrect += sessionCorrect;
+    gameStats.totalWrong += sessionWrong;
+    
+    // currentGameMode yerine currentGame kullan
+    const gameModeKey = currentGame === 'kelime-cevir' ? 'kelime-cevir' :
+                        currentGame === 'dinle-bul' ? 'dinle-bul' :
+                        currentGame === 'bosluk-doldur' ? 'bosluk-doldur' : null;
+    
+    if (gameModeKey) {
+        gameStats.gameModeCounts[gameModeKey] = (gameStats.gameModeCounts[gameModeKey] || 0) + 1;
+    }
+    
+    // Görev ilerlemesini güncelle
+    updateTaskProgress(gameModeKey, {
+        correct: sessionCorrect,
+        wrong: sessionWrong,
+        points: sessionScore,
+        combo: maxCombo,
+        perfect: 0 // Oyun bitmeden çıkıldığı için perfect bonus yok
+    });
+    
+    // İstatistikleri kaydet
+    debouncedSaveStats();
+    
+    infoLog('Oyun ilerlemesi kaydedildi');
+    
+    // Rozetleri ve başarımları kontrol et (addToGlobalPoints içinde zaten çağrılıyor)
+    // Not: addToGlobalPoints() zaten checkBadges() ve checkAchievements() çağırıyor
+    
+    // Eğer detaylı istatistikler modalı açıksa, panelleri yenile
+    refreshDetailedStatsIfOpen();
+    
+    // İstatistikleri kaydet
+    saveStats();
+    
+    // Session değişkenlerini sıfırla
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionWrong = 0;
+    comboCount = 0;
+    maxCombo = 0;
+    currentQuestion = 0;
+    questions = [];
+    currentQuestionData = null;
+}
+
+async function endGame() {
+    // Perfect Lesson bonusu kontrolü
+    // Tüm sorular doğru cevaplanmış olmalı (hiç yanlış cevap yok ve tüm sorular cevaplanmış)
+    let perfectBonus = 0;
+    const totalQuestions = questions.length;
+    if (sessionWrong === 0 && sessionCorrect === totalQuestions && sessionScore > 0 && totalQuestions >= 3) {
+        perfectBonus = Math.floor(sessionScore * CONFIG.PERFECT_LESSON_BONUS_PERCENT);
+        sessionScore += perfectBonus;
+        // Mükemmel ders sayısını artır
+        perfectLessonsCount++;
+        safeSetItem('perfectLessonsCount', perfectLessonsCount);
+    }
+    
+    // Global puanlara ekle
+    await addToGlobalPoints(sessionScore, sessionCorrect);
+    
+    // Günlük istatistikleri güncelle
+    const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect') || '0');
+    const dailyWrong = parseInt(localStorage.getItem('dailyWrong') || '0');
+    localStorage.setItem('dailyCorrect', (dailyCorrect + sessionCorrect).toString());
+    localStorage.setItem('dailyWrong', (dailyWrong + sessionWrong).toString());
+    
+    // Not: Her soru cevaplandığında zaten saveDetailedStats() çağrılıyor
+    // Burada sadece perfect lesson bonusu ve oyun sayısını güncelle
+    const today = getLocalDateString();
+    const dailyKey = `hasene_daily_${today}`;
+    const dailyData = safeGetItem(dailyKey, {
+        correct: 0,
+        wrong: 0,
+        points: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        gameModes: {}
+    });
+    // Oyun sayısını artır (her soru zaten kaydedildi, sadece oyun sayısı eksik)
+    dailyData.gamesPlayed = (dailyData.gamesPlayed || 0) + 1;
+    // Perfect bonus'u detaylı istatistiklere ekle
+    if (perfectBonus > 0) {
+        dailyData.perfectLessons = (dailyData.perfectLessons || 0) + 1;
+        dailyData.points = (dailyData.points || 0) + perfectBonus;
+    }
+    safeSetItem(dailyKey, dailyData);
+    
+    // Haftalık ve aylık için de oyun sayısını güncelle
+    const weekStartStr = getWeekStartDateString(new Date());
+    const weeklyKey = `hasene_weekly_${weekStartStr}`;
+    const weeklyData = safeGetItem(weeklyKey, {
+        hasene: 0,
+        correct: 0,
+        wrong: 0,
+        daysPlayed: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        streakDays: 0,
+        playedDates: []
+    });
+    weeklyData.gamesPlayed = (weeklyData.gamesPlayed || 0) + 1;
+    // Perfect bonus'u detaylı istatistiklere ekle
+    if (perfectBonus > 0) {
+        weeklyData.perfectLessons = (weeklyData.perfectLessons || 0) + 1;
+        weeklyData.hasene = (weeklyData.hasene || 0) + perfectBonus;
+    }
+    safeSetItem(weeklyKey, weeklyData);
+    
+    const monthStr = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    const monthlyKey = `hasene_monthly_${monthStr}`;
+    const monthlyData = safeGetItem(monthlyKey, {
+        hasene: 0,
+        correct: 0,
+        wrong: 0,
+        daysPlayed: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        streakDays: 0,
+        bestStreak: 0,
+        playedDates: []
+    });
+    monthlyData.gamesPlayed = (monthlyData.gamesPlayed || 0) + 1;
+    // Perfect bonus'u detaylı istatistiklere ekle
+    if (perfectBonus > 0) {
+        monthlyData.perfectLessons = (monthlyData.perfectLessons || 0) + 1;
+        monthlyData.hasene = (monthlyData.hasene || 0) + perfectBonus;
+    }
+    safeSetItem(monthlyKey, monthlyData);
+    
+    // Modal açıksa yenile
+    if (typeof refreshDetailedStatsIfOpen === 'function') {
+        refreshDetailedStatsIfOpen();
+    }
+    
+    // Oyun istatistiklerini güncelle
+    gameStats.totalCorrect += sessionCorrect;
+    gameStats.totalWrong += sessionWrong;
+    if (currentGameMode) {
+        gameStats.gameModeCounts[currentGameMode] = (gameStats.gameModeCounts[currentGameMode] || 0) + 1;
+    }
+    
+    // Görev ilerlemesini güncelle
+    updateTaskProgress(currentGameMode, {
+        correct: sessionCorrect,
+        wrong: sessionWrong,
+        points: sessionScore,
+        combo: maxCombo,
+        perfect: perfectBonus > 0 ? 1 : 0
+    });
+    
+    // Rozetleri ve başarımları kontrol et (addToGlobalPoints içinde zaten çağrılıyor)
+    // Not: addToGlobalPoints() zaten checkBadges() ve checkAchievements() çağırıyor
+    // Burada tekrar çağırmaya gerek yok, performans için kaldırıldı
+    
+    // Eğer detaylı istatistikler modalı açıksa, panelleri yenile
+    refreshDetailedStatsIfOpen();
+    
+    // Sonuç modalını göster
+    showCustomConfirm(sessionCorrect, sessionWrong, sessionScore, perfectBonus);
+}
+
+/**
+ * Oyun sonu modalını gösterir
+ */
+function showCustomConfirm(correct, wrong, xp, perfectBonus = 0) {
+    document.getElementById('result-correct').textContent = correct;
+    document.getElementById('result-wrong').textContent = wrong;
+    document.getElementById('result-xp').textContent = formatNumber(xp);
+    
+    const perfectBonusEl = document.getElementById('perfect-lesson-bonus');
+    if (perfectBonus > 0) {
+        perfectBonusEl.style.display = 'block';
+        document.getElementById('perfect-bonus').textContent = formatNumber(perfectBonus);
+    } else {
+        perfectBonusEl.style.display = 'none';
+    }
+    
+    openModal('game-result-modal');
+}
+
+/**
+ * Oyunu yeniden başlatır
+ */
+function restartGame() {
+    closeModal('game-result-modal');
+    if (currentGame === 'kelime-cevir') {
+        startKelimeCevirGame(currentSubMode);
+    } else if (currentGame === 'dinle-bul') {
+        startDinleBulGame();
+    } else if (currentGame === 'bosluk-doldur') {
+        startBoslukDoldurGame();
+    }
+}
+
+// ============================================
+// GÖREV SİSTEMİ
+// ============================================
+
+/**
+ * Günlük görevleri kontrol eder
+ */
+function checkDailyTasks() {
+    const today = getLocalDateString();
+    
+    if (dailyTasks.lastTaskDate !== today) {
+        // Yeni gün, görevleri oluştur
+        generateDailyTasks(today);
+        dailyTasks.lastTaskDate = today;
+        dailyTasks.rewardsClaimed = false;
+        
+        // Bugünkü istatistikleri sıfırla
+        dailyTasks.todayStats = {
+            toplamDogru: 0,
+            toplamPuan: 0,
+            comboCount: 0,
+            allGameModes: new Set(),
+            farklıZorluk: new Set(),
+            perfectStreak: 0,
+            accuracy: 0,
+            reviewWords: new Set(),
+            streakMaintain: 0,
+            totalPlayTime: 0,
+            ayetOku: 0,
+            duaEt: 0,
+            hadisOku: 0
+        };
+        
+        saveStats();
+    } else {
+        // Aynı gün, mevcut görevleri template ile senkronize et (ad ve açıklama güncellemeleri için)
+        syncTasksWithTemplate();
+        saveStats(); // Değişiklikleri kaydet
+    }
+    
+    updateTasksDisplay();
+}
+
+/**
+ * Mevcut görevleri template ile senkronize eder (ad, açıklama ve target güncellemeleri için)
+ */
+function syncTasksWithTemplate() {
+    if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) return;
+    
+    // Template'den görevleri al
+    const templateMap = new Map();
+    DAILY_TASKS_TEMPLATE.forEach(t => templateMap.set(t.id, t));
+    DAILY_BONUS_TASKS_TEMPLATE.forEach(t => templateMap.set(t.id, t));
+    
+    // Mevcut görevleri güncelle
+    dailyTasks.tasks.forEach(task => {
+        const template = templateMap.get(task.id);
+        if (template) {
+            task.name = template.name;
+            task.description = template.description;
+            // Target değerini güncelle (eğer değiştiyse)
+            if (template.target !== undefined && task.target !== template.target) {
+                // Eğer görev tamamlanmamışsa target'ı güncelle
+                if (!task.completed) {
+                    task.target = template.target;
+                    // Progress'i yeni target'a göre ayarla (orantılı olarak)
+                    if (task.target > 0 && task.progress > task.target) {
+                        // Eğer progress yeni target'tan fazlaysa, target'a eşitle
+                        task.progress = Math.min(task.progress, task.target);
+                    }
+                }
+            }
+        }
+    });
+    
+    if (dailyTasks.bonusTasks) {
+        dailyTasks.bonusTasks.forEach(task => {
+            const template = templateMap.get(task.id);
+            if (template) {
+                task.name = template.name;
+                task.description = template.description;
+                // Target değerini güncelle (eğer değiştiyse)
+                if (template.target !== undefined && task.target !== template.target) {
+                    // Eğer görev tamamlanmamışsa target'ı güncelle
+                    if (!task.completed) {
+                        task.target = template.target;
+                        // Progress'i yeni target'a göre ayarla (orantılı olarak)
+                        if (task.target > 0 && task.progress > task.target) {
+                            // Eğer progress yeni target'tan fazlaysa, target'a eşitle
+                            task.progress = Math.min(task.progress, task.target);
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+/**
+ * Günlük görevler oluşturur
+ */
+function generateDailyTasks(date) {
+    dailyTasks.tasks = DAILY_TASKS_TEMPLATE.map(task => ({
+        ...task,
+        progress: 0,
+        completed: false
+    }));
+    
+    dailyTasks.bonusTasks = DAILY_BONUS_TASKS_TEMPLATE.map(task => ({
+        ...task,
+        progress: 0,
+        completed: false
+    }));
+    
+    dailyTasks.completedTasks = [];
+}
+
+/**
+ * Haftalık görevleri kontrol eder
+ */
+function checkWeeklyTasks() {
+    const today = new Date();
+    const weekStart = getWeekStartDateString(today);
+    const weekEnd = getWeekEndDateString(today);
+    
+    if (weeklyTasks.lastWeekStart !== weekStart) {
+        // Yeni hafta, görevleri oluştur
+        generateWeeklyTasks(weekStart);
+        weeklyTasks.lastWeekStart = weekStart;
+        weeklyTasks.weekStart = weekStart;
+        weeklyTasks.weekEnd = weekEnd;
+        weeklyTasks.rewardsClaimed = false;
+        
+        // Haftalık istatistikleri sıfırla
+        weeklyTasks.weekStats = {
+            totalHasene: 0,
+            totalCorrect: 0,
+            totalWrong: 0,
+            daysPlayed: 0,
+            streakDays: 0,
+            allModesPlayed: new Set(),
+            comboCount: 0
+        };
+        
+        saveStats();
+    } else {
+        // Aynı hafta, mevcut görevleri template ile senkronize et
+        syncWeeklyTasksWithTemplate();
+        saveStats(); // Değişiklikleri kaydet
+    }
+    
+    updateTasksDisplay();
+}
+
+/**
+ * Haftalık görevleri template ile senkronize eder (ad, açıklama ve target güncellemeleri için)
+ */
+function syncWeeklyTasksWithTemplate() {
+    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) return;
+    
+    // Template'den görevleri al
+    const templateMap = new Map();
+    WEEKLY_TASKS_TEMPLATE.forEach(t => templateMap.set(t.id, t));
+    
+    // Mevcut görevleri güncelle
+    weeklyTasks.tasks.forEach(task => {
+        const template = templateMap.get(task.id);
+        if (template) {
+            task.name = template.name;
+            task.description = template.description;
+            // Target değerini güncelle (eğer değiştiyse)
+            if (template.target !== undefined && task.target !== template.target) {
+                // Eğer görev tamamlanmamışsa target'ı güncelle
+                if (!task.completed) {
+                    task.target = template.target;
+                    // Progress'i yeni target'a göre ayarla (orantılı olarak)
+                    if (task.target > 0 && task.progress > task.target) {
+                        // Eğer progress yeni target'tan fazlaysa, target'a eşitle
+                        task.progress = Math.min(task.progress, task.target);
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Haftalık görevler oluşturur
+ */
+function generateWeeklyTasks(weekStart) {
+    weeklyTasks.tasks = WEEKLY_TASKS_TEMPLATE.map(task => ({
+        ...task,
+        progress: 0,
+        completed: false
+    }));
+    
+    weeklyTasks.completedTasks = [];
+}
+
+/**
+ * Görev ilerlemesini günceller
+ */
+function updateTaskProgress(gameType, data) {
+    // Günlük görevler - todayStats kontrolü
+    if (!dailyTasks.todayStats) {
+        dailyTasks.todayStats = {
+            toplamDogru: 0,
+            toplamPuan: 0,
+            comboCount: 0,
+            allGameModes: new Set(),
+            farklıZorluk: new Set(),
+            perfectStreak: 0,
+            accuracy: 0,
+            reviewWords: new Set(),
+            streakMaintain: 0,
+            totalPlayTime: 0,
+            ayetOku: 0,
+            duaEt: 0,
+            hadisOku: 0
+        };
+    }
+    
+    dailyTasks.todayStats.toplamDogru += data.correct || 0;
+    dailyTasks.todayStats.toplamPuan += data.points || 0;
+    dailyTasks.todayStats.comboCount = Math.max(dailyTasks.todayStats.comboCount || 0, data.combo || 0);
+    
+    if (gameType) {
+        dailyTasks.todayStats.allGameModes.add(gameType);
+        
+        // Spesifik mod görevleri için sayaçları güncelle
+        if (gameType === 'ayet-oku') {
+            dailyTasks.todayStats.ayetOku = (dailyTasks.todayStats.ayetOku || 0) + 1;
+        } else if (gameType === 'dua-et') {
+            dailyTasks.todayStats.duaEt = (dailyTasks.todayStats.duaEt || 0) + 1;
+        } else if (gameType === 'hadis-oku') {
+            dailyTasks.todayStats.hadisOku = (dailyTasks.todayStats.hadisOku || 0) + 1;
+        }
+    }
+    if (currentDifficulty) {
+        dailyTasks.todayStats.farklıZorluk.add(currentDifficulty);
+    }
+    
+    if (data.perfect) {
+        dailyTasks.todayStats.perfectStreak += data.perfect;
+    }
+    
+    // Görevleri kontrol et
+    dailyTasks.tasks.forEach(task => {
+        if (task.completed) return;
+        
+        let progress = 0;
+        if (task.type === 'correct') {
+            progress = dailyTasks.todayStats.toplamDogru;
+        } else if (task.type === 'hasene') {
+            progress = dailyTasks.todayStats.toplamPuan;
+        } else if (task.type === 'game_modes') {
+            progress = dailyTasks.todayStats.allGameModes.size;
+        } else if (task.type === 'difficulties') {
+            progress = dailyTasks.todayStats.farklıZorluk.size;
+        } else if (task.type === 'combo') {
+            progress = dailyTasks.todayStats.comboCount;
+        } else if (task.type === 'streak') {
+            progress = streakData.currentStreak > 0 ? 1 : 0;
+        } else if (task.type === 'ayet_oku') {
+            progress = dailyTasks.todayStats.ayetOku || 0;
+        } else if (task.type === 'dua_et') {
+            progress = dailyTasks.todayStats.duaEt || 0;
+        } else if (task.type === 'hadis_oku') {
+            progress = dailyTasks.todayStats.hadisOku || 0;
+        }
+        
+        task.progress = progress;
+        if (progress >= task.target) {
+            task.completed = true;
+            if (!dailyTasks.completedTasks.includes(task.id)) {
+                dailyTasks.completedTasks.push(task.id);
+            }
+        }
+    });
+    
+    // Fazilet vazifeleri
+    if (!dailyTasks.bonusTasks) return; // Bonus görevler yoksa çık
+    
+    dailyTasks.bonusTasks.forEach(task => {
+        if (task.completed) return;
+        
+        let progress = 0;
+        if (task.type === 'correct') {
+            progress = (dailyTasks.todayStats?.toplamDogru) || 0;
+        } else if (task.type === 'hasene') {
+            progress = (dailyTasks.todayStats?.toplamPuan) || 0;
+        } else if (task.type === 'game_modes') {
+            progress = (dailyTasks.todayStats?.allGameModes?.size) || 0;
+        } else if (task.type === 'combo') {
+            progress = (dailyTasks.todayStats?.comboCount) || 0;
+        } else if (task.type === 'ayet_oku') {
+            progress = (dailyTasks.todayStats?.ayetOku) || 0;
+        } else if (task.type === 'dua_et') {
+            progress = (dailyTasks.todayStats?.duaEt) || 0;
+        } else if (task.type === 'hadis_oku') {
+            progress = (dailyTasks.todayStats?.hadisOku) || 0;
+        }
+        
+        task.progress = progress;
+        if (progress >= task.target) {
+            task.completed = true;
+            if (!dailyTasks.completedTasks.includes(task.id)) {
+                dailyTasks.completedTasks.push(task.id);
+            }
+        }
+    });
+    
+    // Haftalık görevler
+    weeklyTasks.weekStats.totalHasene += data.points || 0;
+    weeklyTasks.weekStats.totalCorrect += data.correct || 0;
+    weeklyTasks.weekStats.totalWrong += data.wrong || 0;
+    weeklyTasks.weekStats.comboCount = Math.max(weeklyTasks.weekStats.comboCount, data.combo || 0);
+    
+    if (gameType) {
+        weeklyTasks.weekStats.allModesPlayed.add(gameType);
+    }
+    
+    weeklyTasks.tasks.forEach(task => {
+        if (task.completed) return;
+        
+        let progress = 0;
+        if (task.type === 'correct') {
+            progress = weeklyTasks.weekStats.totalCorrect;
+        } else if (task.type === 'hasene') {
+            progress = weeklyTasks.weekStats.totalHasene;
+        } else if (task.type === 'streak') {
+            progress = streakData.currentStreak;
+        } else if (task.type === 'game_modes') {
+            progress = weeklyTasks.weekStats.allModesPlayed.size;
+        } else if (task.type === 'combo') {
+            progress = weeklyTasks.weekStats.comboCount;
+        } else if (task.type === 'perfect_lessons') {
+            // Haftalık perfect lessons için perfectLessonsCount kullan
+            progress = perfectLessonsCount;
+        }
+        
+        task.progress = progress;
+        if (progress >= task.target) {
+            task.completed = true;
+            if (!weeklyTasks.completedTasks.includes(task.id)) {
+                weeklyTasks.completedTasks.push(task.id);
+            }
+        }
+    });
+    
+    updateTasksDisplay();
+    debouncedSaveStats();
+}
+
+/**
+ * Görev görüntüsünü günceller
+ */
+function updateTasksDisplay() {
+    // Günlük görevler
+    const dailyTasksList = document.getElementById('daily-tasks-list');
+    if (dailyTasksList) {
+        dailyTasksList.innerHTML = '';
+        
+        // Görevler yoksa kontrol et
+        if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
+            checkDailyTasks();
+        }
+        
+        // Bonus görevler yoksa kontrol et
+        if (!dailyTasks.bonusTasks || dailyTasks.bonusTasks.length === 0) {
+            checkDailyTasks();
+        }
+        
+        const allDailyTasks = [...(dailyTasks.tasks || []), ...(dailyTasks.bonusTasks || [])];
+        
+        if (allDailyTasks.length === 0) {
+            dailyTasksList.innerHTML = '<div style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">Görevler yükleniyor...</div>';
+        } else {
+            allDailyTasks.forEach(task => {
+            const progressPercent = task.target > 0 ? Math.min(100, Math.round((task.progress / task.target) * 100)) : 0;
+            const taskItem = document.createElement('div');
+            taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+            taskItem.innerHTML = `
+                <div class="task-info">
+                    <div class="task-name-row">
+                        <span class="task-name">${task.description || task.name}</span>
+                        ${task.completed ? '<span class="task-check">✓</span>' : `<span class="task-progress-text">${task.progress}/${task.target}</span>`}
+                    </div>
+                    ${!task.completed ? `
+                        <div class="task-progress-bar">
+                            <div class="task-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+                dailyTasksList.appendChild(taskItem);
+            });
+        }
+    }
+    
+    // Haftalık görevler
+    const weeklyTasksList = document.getElementById('weekly-tasks-list');
+    if (weeklyTasksList) {
+        weeklyTasksList.innerHTML = '';
+        
+        // Haftalık görevler yoksa kontrol et
+        if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
+            checkWeeklyTasks();
+        }
+        
+        const weeklyTasksArray = weeklyTasks.tasks || [];
+        
+        if (weeklyTasksArray.length === 0) {
+            weeklyTasksList.innerHTML = '<div style="text-align: center; padding: var(--spacing-md); color: var(--text-secondary);">Görevler yükleniyor...</div>';
+        } else {
+            weeklyTasksArray.forEach(task => {
+            const progressPercent = task.target > 0 ? Math.min(100, Math.round((task.progress / task.target) * 100)) : 0;
+            const taskItem = document.createElement('div');
+            taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+            taskItem.innerHTML = `
+                <div class="task-info">
+                    <div class="task-name-row">
+                        <span class="task-name">${task.description || task.name}</span>
+                        ${task.completed ? '<span class="task-check">✓</span>' : `<span class="task-progress-text">${task.progress}/${task.target}</span>`}
+                    </div>
+                    ${!task.completed ? `
+                        <div class="task-progress-bar">
+                            <div class="task-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+                weeklyTasksList.appendChild(taskItem);
+            });
+        }
+    }
+    
+    // Ödül butonlarını kontrol et
+    const allDailyCompleted = dailyTasks.tasks.every(t => t.completed) && 
+                              dailyTasks.bonusTasks.every(t => t.completed);
+    const claimDailyBtn = document.getElementById('claim-daily-reward');
+    if (claimDailyBtn) {
+        claimDailyBtn.disabled = !allDailyCompleted || dailyTasks.rewardsClaimed;
+    }
+    
+    const allWeeklyCompleted = weeklyTasks.tasks.every(t => t.completed);
+    const claimWeeklyBtn = document.getElementById('claim-weekly-reward');
+    if (claimWeeklyBtn) {
+        claimWeeklyBtn.disabled = !allWeeklyCompleted || weeklyTasks.rewardsClaimed;
+    }
+    
+    // Görev sayacını güncelle
+    const tasksCounter = document.getElementById('tasks-counter');
+    if (tasksCounter) {
+        const dailyTasksArray = [...(dailyTasks.tasks || []), ...(dailyTasks.bonusTasks || [])];
+        const weeklyTasksArray = weeklyTasks.tasks || [];
+        
+        const totalTasks = dailyTasksArray.length + weeklyTasksArray.length;
+        const completedDaily = dailyTasksArray.filter(t => t.completed).length;
+        const completedWeekly = weeklyTasksArray.filter(t => t.completed).length;
+        const totalCompleted = completedDaily + completedWeekly;
+        
+        tasksCounter.textContent = `${totalCompleted}/${totalTasks}`;
+        tasksCounter.style.display = totalTasks > 0 ? 'block' : 'none';
+    }
+    
+    // Bildirim rozeti
+    const tasksBadge = document.getElementById('tasks-badge');
+    if (tasksBadge) {
+        if (allDailyCompleted && !dailyTasks.rewardsClaimed) {
+            tasksBadge.style.display = 'block';
+        } else if (allWeeklyCompleted && !weeklyTasks.rewardsClaimed) {
+            tasksBadge.style.display = 'block';
+        } else {
+            tasksBadge.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Günlük ödülü alır
+ */
+async function claimDailyRewards() {
+    if (dailyTasks.rewardsClaimed) return;
+    
+    dailyTasks.rewardsClaimed = true;
+    const rewardPoints = 2500;
+    await addToGlobalPoints(rewardPoints, 0);
+    // Görev ödülünü detaylı istatistiklere ekle
+    saveDetailedStats(rewardPoints, 0, 0, 0, 0);
+    showSuccessMessage('🎉 Günlük görevler tamamlandı! +2,500 Hasene');
+    updateTasksDisplay();
+    saveStats();
+}
+
+/**
+ * Haftalık ödülü alır
+ */
+async function claimWeeklyRewards() {
+    if (weeklyTasks.rewardsClaimed) return;
+    
+    weeklyTasks.rewardsClaimed = true;
+    const rewardPoints = 5000;
+    await addToGlobalPoints(rewardPoints, 0);
+    // Görev ödülünü detaylı istatistiklere ekle
+    saveDetailedStats(rewardPoints, 0, 0, 0, 0);
+    showSuccessMessage('🎉 Haftalık görevler tamamlandı! +5,000 Hasene');
+    updateTasksDisplay();
+    saveStats();
+}
+
+// ============================================
+// STREAK SİSTEMİ
+// ============================================
+
+/**
+ * Günlük ilerlemeyi günceller
+ */
+function updateDailyProgress(correctAnswers) {
+    const today = getLocalDateString();
+    
+    // Bugünkü tarihi kontrol et
+    if (streakData.todayDate !== today) {
+        // Yeni gün
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = getLocalDateString(yesterday);
+        
+        // Dün hedef tamamlandı mı?
+        if (streakData.lastPlayDate === yesterdayStr && streakData.todayProgress >= streakData.dailyGoal) {
+            // Seri korundu/arttı
+            streakData.currentStreak++;
+            if (streakData.currentStreak > streakData.bestStreak) {
+                streakData.bestStreak = streakData.currentStreak;
+            }
+        } else if (streakData.lastPlayDate !== yesterdayStr && streakData.lastPlayDate !== today) {
+            // Seri kırıldı
+            streakData.currentStreak = 0;
+        }
+        
+        // Bugünkü ilerlemeyi sıfırla
+        streakData.todayProgress = 0;
+        streakData.todayDate = today;
+    }
+    
+    // İlerlemeyi artır
+    streakData.todayProgress += correctAnswers;
+    
+    // Günlük hedef tamamlandı mı?
+    if (streakData.todayProgress >= streakData.dailyGoal && streakData.lastPlayDate !== today) {
+        streakData.currentStreak++;
+        if (streakData.currentStreak > streakData.bestStreak) {
+            streakData.bestStreak = streakData.currentStreak;
+        }
+        streakData.lastPlayDate = today;
+        streakData.totalPlayDays++;
+        
+        if (!streakData.playDates.includes(today)) {
+            streakData.playDates.push(today);
+        }
+        
+        showSuccessMessage(`🔥 Seri: ${streakData.currentStreak} gün!`);
+    }
+    
+    updateStreakDisplay();
+    debouncedSaveStats();
+}
+
+// ============================================
+// KELİME İSTATİSTİKLERİ
+// ============================================
+
+/**
+ * Kelime istatistiğini günceller
+ */
+/**
+ * SM-2 Spaced Repetition Algoritması ile kelime istatistiklerini günceller
+ */
+// updateWordStats artık word-stats-manager.js modülünde
+// Fallback: Eğer modül yüklenmemişse
+if (typeof updateWordStats === 'undefined') {
+    function updateWordStats(wordId, isCorrect) {
+        // Basit fallback implementasyonu
+        const today = getLocalDateString();
+        if (!wordStats[wordId]) {
+            wordStats[wordId] = {
+                attempts: 0,
+                correct: 0,
+                wrong: 0,
+                successRate: 0,
+                masteryLevel: 0,
+                lastCorrect: null,
+                lastWrong: null
+            };
+        }
+        const stats = wordStats[wordId];
+        stats.attempts++;
+        if (isCorrect) {
+            stats.correct++;
+            stats.lastCorrect = today;
+        } else {
+            stats.wrong++;
+            stats.lastWrong = today;
+        }
+        stats.successRate = (stats.correct / stats.attempts) * 100;
+        stats.masteryLevel = Math.min(10, Math.floor(stats.successRate / 10));
+        debouncedSaveStats();
+    }
+    window.updateWordStats = updateWordStats;
+}
+
+/**
+ * Detaylı istatistikleri kaydeder (günlük, haftalık, aylık)
+ */
+function saveDetailedStats(points, correct, wrong, maxCombo, perfectLessons) {
+    const today = getLocalDateString();
+    const todayDate = new Date();
+    
+    // Günlük istatistikler
+    const dailyKey = `hasene_daily_${today}`;
+    const dailyData = safeGetItem(dailyKey, {
+        correct: 0,
+        wrong: 0,
+        points: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        gameModes: {}
+    });
+    
+    dailyData.correct = (dailyData.correct || 0) + correct;
+    dailyData.wrong = (dailyData.wrong || 0) + wrong;
+    dailyData.points = (dailyData.points || 0) + points;
+    dailyData.gamesPlayed = (dailyData.gamesPlayed || 0) + 1;
+    dailyData.perfectLessons = (dailyData.perfectLessons || 0) + perfectLessons;
+    if (maxCombo > (dailyData.maxCombo || 0)) {
+        dailyData.maxCombo = maxCombo;
+    }
+    if (currentGameMode) {
+        dailyData.gameModes[currentGameMode] = (dailyData.gameModes[currentGameMode] || 0) + 1;
+    }
+    
+    safeSetItem(dailyKey, dailyData);
+    
+    // Haftalık istatistikler
+    const weekStartStr = getWeekStartDateString(todayDate);
+    const weeklyKey = `hasene_weekly_${weekStartStr}`;
+    const weeklyData = safeGetItem(weeklyKey, {
+        hasene: 0,
+        correct: 0,
+        wrong: 0,
+        daysPlayed: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        streakDays: 0,
+        playedDates: []
+    });
+    
+    weeklyData.hasene = (weeklyData.hasene || 0) + points;
+    weeklyData.correct = (weeklyData.correct || 0) + correct;
+    weeklyData.wrong = (weeklyData.wrong || 0) + wrong;
+    weeklyData.gamesPlayed = (weeklyData.gamesPlayed || 0) + 1;
+    weeklyData.perfectLessons = (weeklyData.perfectLessons || 0) + perfectLessons;
+    if (maxCombo > (weeklyData.maxCombo || 0)) {
+        weeklyData.maxCombo = maxCombo;
+    }
+    
+    // Bugün oynandı mı kontrol et
+    const playedDates = weeklyData.playedDates || [];
+    if (!playedDates.includes(today)) {
+        playedDates.push(today);
+        weeklyData.daysPlayed = (weeklyData.daysPlayed || 0) + 1;
+        weeklyData.playedDates = playedDates;
+    }
+    
+    // Streak kontrolü
+    if (streakData.currentStreak > 0) {
+        weeklyData.streakDays = Math.max(weeklyData.streakDays || 0, streakData.currentStreak);
+    }
+    
+    safeSetItem(weeklyKey, weeklyData);
+    
+    // Aylık istatistikler
+    const monthStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}`;
+    const monthlyKey = `hasene_monthly_${monthStr}`;
+    const monthlyData = safeGetItem(monthlyKey, {
+        hasene: 0,
+        correct: 0,
+        wrong: 0,
+        daysPlayed: 0,
+        gamesPlayed: 0,
+        perfectLessons: 0,
+        maxCombo: 0,
+        streakDays: 0,
+        bestStreak: 0,
+        playedDates: []
+    });
+    
+    monthlyData.hasene = (monthlyData.hasene || 0) + points;
+    monthlyData.correct = (monthlyData.correct || 0) + correct;
+    monthlyData.wrong = (monthlyData.wrong || 0) + wrong;
+    monthlyData.gamesPlayed = (monthlyData.gamesPlayed || 0) + 1;
+    monthlyData.perfectLessons = (monthlyData.perfectLessons || 0) + perfectLessons;
+    if (maxCombo > (monthlyData.maxCombo || 0)) {
+        monthlyData.maxCombo = maxCombo;
+    }
+    
+    // Bugün oynandı mı kontrol et
+    const monthlyPlayedDates = monthlyData.playedDates || [];
+    if (!monthlyPlayedDates.includes(today)) {
+        monthlyPlayedDates.push(today);
+        monthlyData.daysPlayed = (monthlyData.daysPlayed || 0) + 1;
+        monthlyData.playedDates = monthlyPlayedDates;
+    }
+    
+    // Streak kontrolü
+    if (streakData.currentStreak > 0) {
+        monthlyData.streakDays = Math.max(monthlyData.streakDays || 0, streakData.currentStreak);
+        monthlyData.bestStreak = Math.max(monthlyData.bestStreak || 0, streakData.bestStreak || 0);
+    }
+    
+    safeSetItem(monthlyKey, monthlyData);
+}
+
+// getStrugglingWords ve selectIntelligentWords artık word-stats-manager.js modülünde
+// Fallback: Eğer modül yüklenmemişse
+if (typeof getStrugglingWords === 'undefined') {
+    function getStrugglingWords() {
+        const allWords = Object.keys(wordStats)
+            .filter(wordId => {
+                const stats = wordStats[wordId];
+                return stats.successRate < 50 && stats.attempts >= 2;
+            })
+            .map(wordId => {
+                return { id: wordId, ...wordStats[wordId] };
+            });
+        return allWords;
+    }
+    window.getStrugglingWords = getStrugglingWords;
+}
+
+/**
+ * Akıllı kelime seçimi algoritması
+ * Öncelik sırası:
+ * 1. Son yanlış cevap verilen kelimeler (100x, 50x, 25x, ...)
+ * 2. Zorlanılan kelimeler (3x)
+ * 3. Review mode'da zorlanılan kelimelere ekstra öncelik
+ * 4. Ustalık seviyesi düşük kelimeler
+ * 5. Rastgele seçim (ağırlıklı)
+ */
+function selectIntelligentWords(words, count, isReviewMode = false) {
+    if (words.length === 0) return [];
+    
+    const today = getLocalDateString();
+    const recentWrongWords = [];
+    const strugglingWords = [];
+    const lowMasteryWords = [];
+    const normalWords = [];
+    
+    // Son 10 yanlış cevabı al (tarih sırasına göre)
+    const wrongAnswers = Object.keys(wordStats)
+        .map(wordId => {
+            const stats = wordStats[wordId];
+            if (stats.lastWrong) {
+                const daysDiff = getDaysDifference(stats.lastWrong, today);
+                return {
+                    wordId,
+                    stats,
+                    daysDiff,
+                    priority: daysDiff <= 0 ? 100 : daysDiff === 1 ? 50 : daysDiff === 2 ? 25 : daysDiff === 3 ? 12 : 0
+                };
+            }
+            return null;
+        })
+        .filter(w => w && w.priority > 0)
+        .sort((a, b) => a.daysDiff - b.daysDiff)
+        .slice(0, 10);
+    
+    // Kelimeleri kategorilere ayır (Spaced Repetition önceliği ile)
+    words.forEach(word => {
+        const wordId = word.id;
+        const stats = wordStats[wordId];
+        
+        if (!stats) {
+            // Hiç denenmemiş kelime - yüksek öncelik
+            normalWords.push({ word, priority: 5 });
+            return;
+        }
+        
+        // SPACED REPETITION: Tekrar zamanı gelmiş kelimeler (en yüksek öncelik)
+        if (stats.nextReviewDate) {
+            const daysUntilReview = getDaysDifference(today, stats.nextReviewDate);
+            if (daysUntilReview <= 0) {
+                // Tekrar zamanı geçmiş veya bugün - çok yüksek öncelik
+                const overdueDays = Math.abs(daysUntilReview);
+                const priority = 200 + (overdueDays * 10); // Gecikme ne kadar fazlaysa o kadar öncelik
+                recentWrongWords.push({ word, priority, stats });
+                return;
+            }
+        }
+        
+        // Son yanlış cevap verilen kelimeler
+        const recentWrong = wrongAnswers.find(w => w.wordId === wordId);
+        if (recentWrong) {
+            recentWrongWords.push({ word, priority: recentWrong.priority });
+            return;
+        }
+        
+        // Zorlanılan kelimeler (başarı oranı < 50% ve en az 2 deneme)
+        if (stats.successRate < 50 && stats.attempts >= 2) {
+            const priority = isReviewMode ? 10 : 3; // Review mode'da ekstra öncelik
+            strugglingWords.push({ word, priority, stats });
+            return;
+        }
+        
+        // Ustalık seviyesi düşük kelimeler (0-3)
+        if (stats.masteryLevel <= 3 && stats.attempts > 0) {
+            lowMasteryWords.push({ word, priority: 2, stats });
+            return;
+        }
+        
+        // Normal kelimeler (tekrar zamanı henüz gelmemiş)
+        // Tekrar zamanı yaklaşan kelimelere hafif öncelik ver
+        let priority = 1;
+        if (stats.nextReviewDate) {
+            const daysUntilReview = getDaysDifference(today, stats.nextReviewDate);
+            if (daysUntilReview <= 2 && daysUntilReview > 0) {
+                // 1-2 gün içinde tekrar zamanı gelecek - hafif öncelik
+                priority = 1.5;
+            }
+        }
+        normalWords.push({ word, priority });
+    });
+    
+    // Öncelik sırasına göre birleştir
+    const allWordsWithPriority = [
+        ...recentWrongWords,
+        ...strugglingWords,
+        ...lowMasteryWords,
+        ...normalWords
+    ];
+    
+    // Ağırlıklı rastgele seçim
+    const selectedWords = [];
+    const usedIds = new Set();
+    
+    // Önce yüksek öncelikli kelimeleri seç
+    const highPriorityWords = allWordsWithPriority
+        .filter(w => w.priority >= 10 && !usedIds.has(w.word.id))
+        .sort((a, b) => b.priority - a.priority);
+    
+    // Yüksek öncelikli kelimelerden seç (en fazla count/2)
+    const highPriorityCount = Math.min(Math.floor(count / 2), highPriorityWords.length);
+    for (let i = 0; i < highPriorityCount && selectedWords.length < count; i++) {
+        selectedWords.push(highPriorityWords[i].word);
+        usedIds.add(highPriorityWords[i].word.id);
+    }
+    
+    // Kalan kelimeleri ağırlıklı rastgele seç
+    const remainingWords = allWordsWithPriority.filter(w => !usedIds.has(w.word.id));
+    
+    while (selectedWords.length < count && remainingWords.length > 0) {
+        // Toplam öncelik skorunu hesapla
+        const totalPriority = remainingWords.reduce((sum, w) => sum + w.priority, 0);
+        
+        // Rastgele bir sayı seç (0 - totalPriority arası)
+        let random = Math.random() * totalPriority;
+        
+        // Öncelik skoruna göre kelime seç
+        for (const item of remainingWords) {
+            random -= item.priority;
+            if (random <= 0) {
+                selectedWords.push(item.word);
+                usedIds.add(item.word.id);
+                // Seçilen kelimeyi listeden çıkar
+                const index = remainingWords.indexOf(item);
+                remainingWords.splice(index, 1);
+                break;
+            }
+        }
+    }
+    
+    // Eğer hala yeterli kelime yoksa, rastgele ekle
+    if (selectedWords.length < count) {
+        const remaining = words.filter(w => !usedIds.has(w.id));
+        const needed = count - selectedWords.length;
+        const randomWords = getRandomItems(remaining, needed);
+        selectedWords.push(...randomWords);
+    }
+    
+    // Son olarak karıştır (ama yüksek öncelikli kelimeler başta olsun)
+    const shuffled = shuffleArray(selectedWords);
+    
+    infoLog(`Akıllı kelime seçimi: ${recentWrongWords.length} son yanlış, ${strugglingWords.length} zorlanılan, ${lowMasteryWords.length} düşük ustalık, ${normalWords.length} normal`);
+    
+    return shuffled;
+}
+
+// ============================================
+// ROZET SİSTEMİ
+// ============================================
+
+/**
+ * Rozetleri kontrol eder
+ */
+function checkBadges() {
+    if (!BADGE_DEFINITIONS) return;
+    
+    // Tüm oyun modlarını say
+    const allModesPlayed = Object.values(gameStats.gameModeCounts).filter(count => count > 0).length;
+    
+    const stats = {
+        totalPoints,
+        totalCorrect: gameStats.totalCorrect,
+        totalWrong: gameStats.totalWrong,
+        level: calculateLevel(totalPoints),
+        currentStreak: streakData.currentStreak,
+        maxCombo,
+        perfectLessons: perfectLessonsCount,
+        allModesPlayed: allModesPlayed
+    };
+    
+    // Asr-ı Saadet rozetlerini kronolojik sıraya göre ayır
+    const asrBadges = BADGE_DEFINITIONS.filter(badge => badge.id.startsWith('asr_'));
+    const regularBadges = BADGE_DEFINITIONS.filter(badge => !badge.id.startsWith('asr_'));
+    
+    // Önce normal rozetleri kontrol et (kronolojik sıra gerekmez)
+    regularBadges.forEach(badge => {
+        // Yeni ve eski format desteği
+        const isUnlocked = unlockedBadges.some(b => {
+            if (typeof b === 'string') return b === badge.id;
+            return b.id === badge.id;
+        });
+        if (isUnlocked) {
+            return; // Zaten kazanılmış
+        }
+        
+        if (badge.check(stats)) {
+            unlockBadge(badge);
+        }
+    });
+    
+    // Asr-ı Saadet rozetlerini kronolojik sıraya göre kontrol et
+    // Rozetleri numaralarına göre sırala (asr_1, asr_2, ... asr_41)
+    asrBadges.sort((a, b) => {
+        const numA = parseInt(a.id.split('_')[1]);
+        const numB = parseInt(b.id.split('_')[1]);
+        return numA - numB;
+    });
+    
+    asrBadges.forEach((badge, index) => {
+        // Yeni ve eski format desteği
+        const isUnlocked = unlockedBadges.some(b => {
+            if (typeof b === 'string') return b === badge.id;
+            return b.id === badge.id;
+        });
+        if (isUnlocked) {
+            return; // Zaten kazanılmış
+        }
+        
+        // Kronolojik kontrol: Önceki tüm rozetler kazanılmış olmalı
+        let canUnlock = true;
+        if (index > 0) {
+            // Önceki rozetlerin hepsinin kazanılmış olup olmadığını kontrol et
+            for (let i = 0; i < index; i++) {
+                const previousBadge = asrBadges[i];
+                const previousUnlocked = unlockedBadges.some(b => {
+                    if (typeof b === 'string') return b === previousBadge.id;
+                    return b.id === previousBadge.id;
+                });
+                if (!previousUnlocked) {
+                    canUnlock = false;
+                    break;
+                }
+            }
+        }
+        
+        // Eğer önceki rozetler kazanılmışsa ve koşullar sağlanmışsa rozeti kazan
+        if (canUnlock && badge.check(stats)) {
+            unlockBadge(badge);
+        }
+    });
+}
+
+/**
+ * Rozeti açar
+ */
+function unlockBadge(badge) {
+    // Zaten kazanılmış mı kontrol et
+    const alreadyUnlocked = unlockedBadges.some(b => b.id === badge.id || (typeof b === 'string' && b === badge.id));
+    if (alreadyUnlocked) {
+        return;
+    }
+    
+    // Yeni format: object with timestamp
+    unlockedBadges.push({
+        id: badge.id,
+        unlockedAt: Date.now()
+    });
+    showBadgeUnlock(badge);
+    saveStats();
+}
+
+/**
+ * Rozet detay modalını gösterir
+ */
+function showBadgeDetail(badge, isUnlocked) {
+    if (!badge || !isUnlocked) return;
+    
+    const modal = document.getElementById('badge-detail-modal');
+    const titleEl = document.getElementById('badge-detail-title');
+    const contentEl = document.getElementById('badge-detail-content');
+    
+    if (!modal || !titleEl || !contentEl) return;
+    
+    // Rozet numarasını al (asr_1 -> 1, asr_2 -> 2, vb.)
+    const badgeNum = badge.id.startsWith('asr_') ? parseInt(badge.id.split('_')[1]) : null;
+    
+    // Rozet detay bilgilerini oluştur (responsive inline styles)
+    let detailHTML = `
+        <div style="margin-bottom: clamp(15px, 4vw, 20px);">
+            <img src="assets/badges/${badge.image}" alt="${badge.name}" 
+                 style="width: clamp(80px, 20vw, 120px); height: clamp(80px, 20vw, 120px); object-fit: contain; margin-bottom: clamp(12px, 3vw, 15px); border-radius: var(--radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.1);"
+                 onerror="this.style.display='none';">
+        </div>
+        <h3 style="color: var(--accent-primary); margin-bottom: clamp(8px, 2vw, 10px); font-size: clamp(1.2rem, 4vw, 1.5rem); word-wrap: break-word;">${badge.name}</h3>
+    `;
+    
+    // Asr-ı Saadet rozetleri için detaylı bilgi
+    if (badgeNum && badgeNum >= 1 && badgeNum <= 41) {
+        const badgeDetails = getBadgeDetailInfo(badgeNum);
+        if (badgeDetails) {
+            detailHTML += `
+                <div style="text-align: left; max-width: 100%; width: 100%; margin: 0 auto; padding: 0 clamp(5px, 2vw, 10px); box-sizing: border-box; word-wrap: break-word; overflow-wrap: break-word;">
+                    <div class="badge-detail-year" style="color: var(--accent-primary); font-weight: 600; margin-bottom: clamp(8px, 2vw, 10px); font-size: clamp(0.85rem, 2.5vw, 1rem); word-wrap: break-word; overflow-wrap: break-word;">
+                        ${badgeDetails.year}
+                    </div>
+                    <div class="badge-detail-description" style="color: var(--text-primary); line-height: 1.8; margin-bottom: clamp(15px, 3vw, 20px); font-size: clamp(0.9rem, 2.5vw, 1rem); word-wrap: break-word; overflow-wrap: break-word; text-align: justify; text-justify: inter-word; width: 100%; box-sizing: border-box;">
+                        ${badgeDetails.fullDescription}
+                    </div>
+                    ${badgeDetails.arabic ? `
+                        <div class="badge-detail-arabic" style="font-family: 'KFGQPC Uthmanic Script HAFS', 'Arial', sans-serif; 
+                                    font-size: clamp(1rem, 3vw, 1.2rem); color: var(--accent-primary); 
+                                    direction: rtl; text-align: right; 
+                                    padding: clamp(10px, 3vw, 15px); background: #f8f9fa; 
+                                    border-radius: 8px; margin-bottom: clamp(12px, 3vw, 15px); word-wrap: break-word; overflow-wrap: break-word; width: 100%; box-sizing: border-box;">
+                            ${badgeDetails.arabic}
+                        </div>
+                    ` : ''}
+                    <div class="badge-detail-significance" style="color: var(--text-secondary); font-size: clamp(0.8rem, 2.2vw, 0.9rem); font-style: italic; 
+                                padding-top: clamp(12px, 3vw, 15px); border-top: 1px solid #e5e7eb; word-wrap: break-word; overflow-wrap: break-word; text-align: justify; text-justify: inter-word; width: 100%; box-sizing: border-box;">
+                        📌 ${badgeDetails.significance}
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        // Normal rozetler için basit açıklama
+        detailHTML += `
+            <div style="text-align: left; max-width: 100%; width: 100%; margin: 0 auto; padding: 0 clamp(5px, 2vw, 10px); box-sizing: border-box; word-wrap: break-word; overflow-wrap: break-word;">
+                <div style="color: var(--text-primary); line-height: 1.8; font-size: clamp(0.9rem, 2.5vw, 1rem); word-wrap: break-word; overflow-wrap: break-word; text-align: justify; text-justify: inter-word; width: 100%; box-sizing: border-box;">
+                    ${badge.description}
+                </div>
+            </div>
+        `;
+    }
+    
+    titleEl.textContent = badge.name;
+    contentEl.innerHTML = detailHTML;
+    openModal('badge-detail-modal');
+}
+
+/**
+ * Rozet detay bilgilerini döndürür
+ */
+function getBadgeDetailInfo(badgeNum) {
+    const badgeDetails = {
+        1: { year: '571 - Miladi', fullDescription: 'Hz. Muhammed (s.a.v.) Mekke\'de doğdu. Fil Yılı olarak bilinen bu yıl, Ebrehe\'nin Kabe\'yi yıkmak için geldiği yıldır.', arabic: 'وُلِدَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ', significance: 'İslam tarihinin başlangıcı' },
+        2: { year: '575 - Miladi', fullDescription: 'Çocukluğunun ilk yıllarını çöl hayatında, sütannesi Halime bint Ebi Züeyb\'in yanında geçirdi. Bu dönemde göğsünün yarılması mucizesi gerçekleşti.', arabic: 'حَلِيمَةُ السَّعْدِيَّةُ', significance: 'Sağlıklı büyüme ve Arapça\'nın saf halini öğrenme' },
+        3: { year: '578 - Miladi', fullDescription: 'Annesi vefat ettikten sonra dedesi Abdülmuttalib\'in himayesine girdi. Dedesi onu çok sever ve korurdu.', arabic: 'عَبْدُ الْمُطَّلِبِ', significance: 'Kabile liderliği ve Mekke\'nin önemli ailelerini tanıma' },
+        4: { year: '579 - Miladi', fullDescription: 'Dedesi vefat edince amcası Ebu Talib\'in yanına alındı. Ebu Talib onu kendi çocuklarından daha çok severdi.', arabic: 'أَبُو طَالِبٍ', significance: 'Ticaret hayatına giriş ve Şam seyahati' },
+        5: { year: '595 - Miladi', fullDescription: 'Hz. Hatice validemizle evlendi. Bu evlilik 25 yıl sürdü ve Hz. Hatice, İslam\'ın ilk kadın mümini oldu.', arabic: 'خَدِيجَةُ بِنْتُ خُوَيْلِدٍ', significance: 'İlk ve en sadık destekçi, tüm çocuklarının annesi' },
+        6: { year: '610 - Miladi', fullDescription: 'Hira Mağarası\'nda ilk vahiy geldi: "Oku! Yaratan Rabbinin adıyla oku!" (Alak Suresi 1-5). Bu, peygamberliğin başlangıcıdır.', arabic: 'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ', significance: 'İslam\'ın başlangıcı, ilk ayetlerin inişi' },
+        7: { year: '610 - Miladi', fullDescription: 'Hz. Hatice, Hz. Ebu Bekir, Hz. Ali ve Hz. Zeyd ilk Müslümanlar oldu. İslam gizlice yayılmaya başladı.', arabic: 'أَوَّلُ الْمُسْلِمِينَ', significance: 'İslam toplumunun temelleri' },
+        8: { year: '613 - Miladi', fullDescription: '"En yakın akrabanı uyar" ayeti gelince, Safa Tepesi\'nde açıkça İslam\'a davet başladı. Mekke müşrikleri şiddetli tepki gösterdi.', arabic: 'وَأَنْذِرْ عَشِيرَتَكَ الْأَقْرَبِينَ', significance: 'İslam\'ın açıkça ilan edilmesi' },
+        9: { year: '615 - Miladi', fullDescription: 'Müşriklerin zulmünden kaçan ilk Müslümanlar Habeşistan\'a hicret etti. Necaşi onları korudu.', arabic: 'هِجْرَةُ الْحَبَشَةِ', significance: 'İlk hicret, İslam\'ın yayılması' },
+        10: { year: '619 - Miladi', fullDescription: 'Hz. Hatice ve Ebu Talib\'in vefatı. Peygamberimiz bu yıla "Hüzün Yılı" adını verdi. En büyük destekçilerini kaybetti.', arabic: 'عَامُ الْحُزْنِ', significance: 'En zor dönem, sabır ve metanet' },
+        11: { year: '620 - Miladi', fullDescription: 'Bir gecede Mescid-i Haram\'dan Mescid-i Aksa\'ya (İsra), oradan da göklere yükselme (Miraç) mucizesi. Beş vakit namaz farz kılındı.', arabic: 'الْإِسْرَاءُ وَالْمِعْرَاجُ', significance: 'En büyük mucizelerden biri, namazın farz kılınması' },
+        12: { year: '621 - Miladi', fullDescription: 'Medineli 12 kişi Akabe\'de Peygamberimizle görüştü ve İslam\'ı kabul etti. Medine\'ye İslam\'ı öğretmek için öğretmen gönderildi.', arabic: 'بَيْعَةُ الْعَقَبَةِ الْأُولَى', significance: 'Medine ile ilk bağlantı' },
+        13: { year: '622 - Miladi', fullDescription: '73 Medineli Müslüman Akabe\'de biat etti ve Peygamberimizi Medine\'ye davet ettiler. Hicret için izin verildi.', arabic: 'بَيْعَةُ الْعَقَبَةِ الثَّانِيَةُ', significance: 'Hicret kararı, Medine\'ye davet' },
+        14: { year: '622 - Miladi (Hicri 1)', fullDescription: 'Peygamberimiz ve Hz. Ebu Bekir Mekke\'den Medine\'ye hicret etti. Hicri takvimin başlangıcı. Kuba Mescidi inşa edildi.', arabic: 'الْهِجْرَةُ', significance: 'İslam devletinin kuruluşu, Hicri takvimin başlangıcı' },
+        15: { year: '622 - Miladi (Hicri 1)', fullDescription: 'Medine\'de Mescid-i Nebevi inşa edildi. Aynı zamanda Suffa (eğitim yeri) ve Hz. Aişe\'nin odaları yapıldı.', arabic: 'الْمَسْجِدُ النَّبَوِيُّ', significance: 'İslam\'ın merkezi, eğitim ve ibadet yeri' },
+        16: { year: '622 - Miladi (Hicri 1)', fullDescription: 'Muhacirler (Mekkeli Müslümanlar) ile Ensar (Medineli Müslümanlar) arasında kardeşlik antlaşması yapıldı.', arabic: 'الْمُؤَاخَاةُ بَيْنَ الْمُهَاجِرِينَ وَالْأَنْصَارِ', significance: 'İslam kardeşliğinin temelleri' },
+        17: { year: '624 - Miladi (Hicri 2)', fullDescription: 'İlk büyük savaş. 313 Müslüman, 1000 kişilik müşrik ordusunu yendi. Melekler yardım etti. Zafer kazanıldı.', arabic: 'غَزْوَةُ بَدْرٍ', significance: 'İlk büyük zafer, İslam\'ın gücünün kanıtı' },
+        18: { year: '624 - Miladi (Hicri 2)', fullDescription: 'Ramazan ayında oruç tutmak farz kılındı. Bedir Savaşı\'ndan sonra bu emir geldi.', arabic: 'صَوْمُ رَمَضَانَ', significance: 'İslam\'ın temel ibadetlerinden biri' },
+        19: { year: '625 - Miladi (Hicri 3)', fullDescription: 'Müşrikler intikam için geldi. Okçuların yerlerini terk etmesi sonucu zorlu bir savaş oldu. Hz. Hamza şehit oldu.', arabic: 'غَزْوَةُ أُحُدٍ', significance: 'İtaat ve sabır dersi, şehitler' },
+        20: { year: '627 - Miladi (Hicri 5)', fullDescription: 'Medine\'nin etrafına hendek kazıldı. 10.000 kişilik müşrik ordusu kuşatmayı kaldıramadı. Selman-ı Farisi\'nin önerisi.', arabic: 'غَزْوَةُ الْخَنْدَقِ', significance: 'Strateji zaferi, Medine\'nin korunması' },
+        21: { year: '628 - Miladi (Hicri 6)', fullDescription: 'Mekke\'ye umre için gidildi ama müşrikler engelledi. Hudeybiye\'de 10 yıllık barış antlaşması imzalandı. Görünüşte zor ama stratejik zafer.', arabic: 'صُلْحُ الْحُدَيْبِيَةِ', significance: 'Barış antlaşması, İslam\'ın yayılması için fırsat' },
+        22: { year: '629 - Miladi (Hicri 7)', fullDescription: 'Yahudilerin kalesi Hayber fethedildi. Hz. Ali\'nin kahramanlıkları. Yahudiler Medine\'den çıkarıldıktan sonra buraya yerleşmişlerdi.', arabic: 'فَتْحُ خَيْبَرَ', significance: 'Güçlü kalenin fethi, ganimetler' },
+        23: { year: '630 - Miladi (Hicri 8)', fullDescription: 'Hudeybiye Antlaşması\'nın ihlali üzerine 10.000 kişilik orduyla Mekke fethedildi. Kabe putlardan temizlendi. Genel af ilan edildi.', arabic: 'فَتْحُ مَكَّةَ', significance: 'En büyük zafer, Kabe\'nin temizlenmesi' },
+        24: { year: '630 - Miladi (Hicri 8)', fullDescription: 'Mekke\'nin fethinden sonra Hevazin ve Sakif kabileleri saldırdı. İlk başta zorluk yaşandı ama zafer kazanıldı.', arabic: 'غَزْوَةُ حُنَيْنٍ', significance: 'Son büyük savaş, ganimetlerin dağıtımı' },
+        25: { year: '630 - Miladi (Hicri 9)', fullDescription: 'Bizans\'a karşı son sefer. Çok zorlu bir yolculuk. Münafıklar geri kaldı. Savaş olmadı ama İslam\'ın gücü gösterildi.', arabic: 'غَزْوَةُ تَبُوكَ', significance: 'En uzak sefer, münafıkların ortaya çıkması' },
+        26: { year: '631 - Miladi (Hicri 9)', fullDescription: 'Peygamberimizin son haccı. 100.000\'den fazla Müslüman katıldı. Veda Hutbesi okundu. "Bugün dininizi kemale erdirdim" ayeti indi.', arabic: 'حَجَّةُ الْوَدَاعِ', significance: 'Son hacc, Veda Hutbesi, dinin tamamlanması' },
+        27: { year: '632 - Miladi (Hicri 11)', fullDescription: 'Peygamberimiz 63 yaşında vefat etti. Hz. Aişe\'nin odasında, başı Hz. Aişe\'nin göğsünde. "En yüce dosta" kavuştu.', arabic: 'وَفَاةُ رَسُولِ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ', significance: 'Asr-ı Saadet\'in sonu, tüm Müslümanlar için büyük kayıp' },
+        28: { year: '632 - Miladi (Hicri 11)', fullDescription: 'Peygamberimizin vefatından sonra Sakife\'de toplanıldı. Hz. Ebu Bekir ilk halife seçildi. "Sıddık" lakabıyla bilinir.', arabic: 'خِلَافَةُ أَبِي بَكْرٍ الصِّدِّيقِ', significance: 'İlk halife, İslam devletinin devamı' },
+        29: { year: '632-633 - Miladi (Hicri 11-12)', fullDescription: 'Peygamberimizin vefatından sonra bazı kabileler dinden döndü. Hz. Ebu Bekir bunlarla savaştı ve İslam\'ı korudu.', arabic: 'حُرُوبُ الرِّدَّةِ', significance: 'İslam\'ın korunması, devletin güçlenmesi' },
+        30: { year: '634 - Miladi (Hicri 13)', fullDescription: 'Hz. Ebu Bekir\'in vefatından sonra Hz. Ömer halife oldu. "Faruk" lakabıyla bilinir. Adalet ve cesaret timsali.', arabic: 'خِلَافَةُ عُمَرَ بْنِ الْخَطَّابِ', significance: 'Adalet dönemi, İslam\'ın genişlemesi' },
+        31: { year: '636 - Miladi (Hicri 15)', fullDescription: 'İran Sasani İmparatorluğu\'na karşı büyük zafer. Sa\'d bin Ebi Vakkas komutasında. İran\'ın fethi başladı.', arabic: 'مَعْرَكَةُ الْقَادِسِيَّةِ', significance: 'İran\'ın fethinin başlangıcı' },
+        32: { year: '637 - Miladi (Hicri 16)', fullDescription: 'Hz. Ömer bizzat geldi ve Kudüs\'ü teslim aldı. Mescid-i Aksa\'yı ziyaret etti. Adaletli yönetim örneği.', arabic: 'فَتْحُ بَيْتِ الْمَقْدِسِ', significance: 'Üç kutsal şehirden birinin fethi' },
+        33: { year: '638 - Miladi (Hicri 17)', fullDescription: 'Hz. Ömer, Hicri takvimi resmi takvim olarak kabul etti. Hicret yılı (622) başlangıç kabul edildi.', arabic: 'التَّقْوِيمُ الْهِجْرِيُّ', significance: 'İslam takvimi, tarihleme sistemi' },
+        34: { year: '644 - Miladi (Hicri 23)', fullDescription: 'Ebu Lü\'lü adlı bir köle tarafından sabah namazında şehit edildi. 10 yıl halifelik yaptı. Adalet dönemi sona erdi.', arabic: 'اسْتِشْهَادُ عُمَرَ بْنِ الْخَطَّابِ', significance: 'Büyük halifenin şehit olması' },
+        35: { year: '644 - Miladi (Hicri 23)', fullDescription: 'Şura heyeti Hz. Osman\'ı halife seçti. "Zinnureyn" (iki nur sahibi) lakabıyla bilinir. Kuran\'ın çoğaltılması.', arabic: 'خِلَافَةُ عُثْمَانَ بْنِ عَفَّانَ', significance: 'Kuran\'ın çoğaltılması, donanma kurulması' },
+        36: { year: '650 - Miladi (Hicri 30)', fullDescription: 'Hz. Osman döneminde Kuran-ı Kerim çoğaltıldı ve farklı bölgelere gönderildi. Standart Mushaf oluşturuldu.', arabic: 'جَمْعُ الْقُرْآنِ', significance: 'Kuran\'ın korunması, standart nüsha' },
+        37: { year: '656 - Miladi (Hicri 35)', fullDescription: 'Fitne dönemi. Asiler Medine\'yi kuşattı. Hz. Osman Kuran okurken şehit edildi. 12 yıl halifelik yaptı.', arabic: 'اسْتِشْهَادُ عُثْمَانَ بْنِ عَفَّانَ', significance: 'Fitne döneminin başlangıcı' },
+        38: { year: '656 - Miladi (Hicri 35)', fullDescription: 'Hz. Osman\'ın şehit edilmesinden sonra Hz. Ali halife seçildi. "Esedullah" (Allah\'ın Aslanı) lakabıyla bilinir.', arabic: 'خِلَافَةُ عَلِيِّ بْنِ أَبِي طَالِبٍ', significance: 'Dördüncü halife, ilim ve cesaret' },
+        39: { year: '656 - Miladi (Hicri 36)', fullDescription: 'Hz. Aişe, Talha ve Zübeyr ile Hz. Ali arasında savaş. Hz. Ali galip geldi. İslam tarihinde ilk iç savaş.', arabic: 'وَقْعَةُ الْجَمَلِ', significance: 'İlk iç savaş, fitne dönemi' },
+        40: { year: '657 - Miladi (Hicri 37)', fullDescription: 'Hz. Ali ile Muaviye arasında savaş. Hakem olayı gerçekleşti. İslam dünyasında ayrılık başladı.', arabic: 'مَعْرَكَةُ صِفِّينَ', significance: 'Büyük iç savaş, hakem olayı' },
+        41: { year: '661 - Miladi (Hicri 40)', fullDescription: 'Haricilerden İbn Mülcem tarafından sabah namazında zehirli kılıçla şehit edildi. Dört halife dönemi sona erdi.', arabic: 'اسْتِشْهَادُ عَلِيِّ بْنِ أَبِي طَالِبٍ', significance: 'Dört halife döneminin sonu, Emevi döneminin başlangıcı' }
+    };
+    
+    return badgeDetails[badgeNum] || null;
+}
+
+/**
+ * Rozet kazanma popup'ını gösterir
+ */
+function showBadgeUnlock(badge) {
+    // Başarım modalını kullan (aynı yapı)
+    document.getElementById('achievement-title').textContent = badge.name;
+    document.getElementById('achievement-desc').textContent = badge.description;
+    
+    const iconEl = document.getElementById('achievement-icon');
+    if (iconEl && iconEl.tagName === 'IMG') {
+        // Rozet görselini yükle, hata durumunda fallback göster
+        iconEl.src = `assets/badges/${badge.image}`;
+        iconEl.alt = badge.name;
+        iconEl.style.display = 'block';
+        iconEl.onerror = function() {
+            // Görsel yüklenemezse fallback icon'u göster
+            this.style.display = 'none';
+            const fallbackIcon = this.nextElementSibling;
+            if (fallbackIcon && fallbackIcon.classList.contains('achievement-icon')) {
+                fallbackIcon.style.display = 'block';
+                fallbackIcon.textContent = badge.name.split(' ')[0] || '🏆';
+            }
+        };
+        const fallbackIcon = iconEl.nextElementSibling;
+        if (fallbackIcon && fallbackIcon.classList.contains('achievement-icon')) {
+            fallbackIcon.style.display = 'none';
+        }
+    }
+    
+    openModal('achievement-modal');
+    
+    // 3 saniye sonra otomatik kapat
+    setTimeout(() => {
+        closeModal('achievement-modal');
+    }, 3000);
+}
+
+// ============================================
+// BAŞARIM SİSTEMİ
+// ============================================
+
+/**
+ * Başarımları kontrol eder
+ */
+function checkAchievements() {
+    const stats = {
+        totalPoints,
+        totalCorrect: gameStats.totalCorrect,
+        totalWrong: gameStats.totalWrong,
+        level: calculateLevel(totalPoints),
+        currentStreak: streakData.currentStreak,
+        maxCombo
+    };
+    
+        ACHIEVEMENTS.forEach(achievement => {
+        // Yeni ve eski format desteği
+        const isUnlocked = unlockedAchievements.some(a => {
+            if (typeof a === 'string') return a === achievement.id;
+            return a.id === achievement.id;
+        });
+        if (isUnlocked) {
+            return; // Zaten kazanılmış
+        }
+        
+        if (achievement.check(stats)) {
+            unlockAchievement(achievement);
+        }
+    });
+}
+
+/**
+ * Başarımı açar
+ */
+function unlockAchievement(achievement) {
+    // Zaten kazanılmış mı kontrol et
+    const alreadyUnlocked = unlockedAchievements.some(a => a.id === achievement.id || (typeof a === 'string' && a === achievement.id));
+    if (alreadyUnlocked) {
+        return;
+    }
+    
+    // Yeni format: object with timestamp
+    unlockedAchievements.push({
+        id: achievement.id,
+        unlockedAt: Date.now()
+    });
+    showAchievementUnlock(achievement);
+    saveStats();
+}
+
+/**
+ * Başarım kazanma popup'ını gösterir
+ */
+function showAchievementUnlock(achievement) {
+    document.getElementById('achievement-title').textContent = achievement.name;
+    document.getElementById('achievement-desc').textContent = achievement.description;
+    
+    // Başarım için rozet numarası bul (ACHIEVEMENTS array'indeki index'e göre)
+    const achievementIndex = ACHIEVEMENTS.findIndex(a => a.id === achievement.id);
+    if (achievementIndex !== -1) {
+        // Mevcut rozet dosyaları (eksik olanlar hariç)
+        const availableBadges = [6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 42];
+        // Mevcut rozetlerden döngüsel olarak seç
+        const badgeNumber = availableBadges[achievementIndex % availableBadges.length];
+        const badgeImage = `rozet${badgeNumber}.png`;
+        const iconEl = document.getElementById('achievement-icon');
+        if (iconEl && iconEl.tagName === 'IMG') {
+            // Sadece badges klasöründeki PNG rozetlerini kullan
+            iconEl.src = `assets/badges/${badgeImage}`;
+            iconEl.alt = achievement.name;
+            iconEl.style.display = 'block';
+            // Görsel yüklenemezse sadece görseli gizle, fallback gösterme
+            iconEl.onerror = function() {
+                this.style.display = 'none';
+            };
+        }
+    }
+    
+    openModal('achievement-modal');
+    
+    // 3 saniye sonra otomatik kapat
+    setTimeout(() => {
+        closeModal('achievement-modal');
+    }, 3000);
+}
+
+// ============================================
+// MODAL FONKSİYONLARI
+// ============================================
+
+/**
+ * İstatistikler modalını gösterir
+ */
+function showStatsModal() {
+    // Güvenli değer alma - NaN, undefined, null kontrolü
+    const dailyCorrect = parseInt(localStorage.getItem('dailyCorrect') || '0') || 0;
+    const dailyWrong = parseInt(localStorage.getItem('dailyWrong') || '0') || 0;
+    
+    const safeTotalPoints = totalPoints || 0;
+    const safeTotalCorrect = (gameStats && gameStats.totalCorrect) || 0;
+    const safeTotalWrong = (gameStats && gameStats.totalWrong) || 0;
+    const safeGameModeCounts = (gameStats && gameStats.gameModeCounts) || {};
+    
+    document.getElementById('stats-daily-correct').textContent = dailyCorrect;
+    document.getElementById('stats-daily-wrong').textContent = dailyWrong;
+    document.getElementById('stats-total-points').textContent = formatNumber(safeTotalPoints);
+    document.getElementById('stats-total-correct').textContent = formatNumber(safeTotalCorrect);
+    document.getElementById('stats-total-wrong').textContent = formatNumber(safeTotalWrong);
+    
+    const accuracy = safeTotalCorrect + safeTotalWrong > 0
+        ? Math.round((safeTotalCorrect / (safeTotalCorrect + safeTotalWrong)) * 100)
+        : 0;
+    document.getElementById('stats-accuracy').textContent = accuracy + '%';
+    
+    document.getElementById('stats-kelime-count').textContent = safeGameModeCounts['kelime-cevir'] || 0;
+    document.getElementById('stats-dinle-count').textContent = safeGameModeCounts['dinle-bul'] || 0;
+    document.getElementById('stats-bosluk-count').textContent = safeGameModeCounts['bosluk-doldur'] || 0;
+    document.getElementById('stats-ayet-count').textContent = safeGameModeCounts['ayet-oku'] || 0;
+    document.getElementById('stats-dua-count').textContent = safeGameModeCounts['dua-et'] || 0;
+    document.getElementById('stats-hadis-count').textContent = safeGameModeCounts['hadis-oku'] || 0;
+    
+    openModal('stats-modal');
+}
+
+/**
+ * Muvaffakiyetler modalını gösterir
+ */
+function showBadgesModal() {
+    // Rozetler - Her rozet için ilerleme göster
+    // Asr-ı Saadet rozetlerini kategorilere göre filtrele
+    const asrBadges = BADGE_DEFINITIONS.filter(badge => badge.id.startsWith('asr_'));
+    const regularBadges = BADGE_DEFINITIONS.filter(badge => !badge.id.startsWith('asr_'));
+    
+    // Sekmelere göre Asr-ı Saadet rozetlerini dağıt
+    const badgeTabs = [
+        { 
+            id: 'asr-saadet', 
+            gridId: 'badges-grid-asr-saadet', 
+            badgeIds: asrBadges.filter(b => {
+                const num = parseInt(b.id.split('_')[1]);
+                return num >= 1 && num <= 13; // Mekke dönemi
+            }).map(b => b.id)
+        },
+        { 
+            id: 'dort-halife', 
+            gridId: 'badges-grid-dort-halife', 
+            badgeIds: asrBadges.filter(b => {
+                const num = parseInt(b.id.split('_')[1]);
+                return num >= 14 && num <= 27; // Medine dönemi
+            }).map(b => b.id)
+        },
+        { 
+            id: 'uhud-sehitleri', 
+            gridId: 'badges-grid-uhud-sehitleri', 
+            badgeIds: asrBadges.filter(b => {
+                const num = parseInt(b.id.split('_')[1]);
+                return num >= 28 && num <= 35; // Hz. Ebu Bekir ve Hz. Ömer dönemi
+            }).map(b => b.id)
+        },
+        { 
+            id: 'osmanli', 
+            gridId: 'badges-grid-osmanli', 
+            badgeIds: asrBadges.filter(b => {
+                const num = parseInt(b.id.split('_')[1]);
+                return num >= 36 && num <= 38; // Hz. Osman dönemi
+            }).map(b => b.id)
+        },
+        { 
+            id: 'selcuklu', 
+            gridId: 'badges-grid-selcuklu', 
+            badgeIds: asrBadges.filter(b => {
+                const num = parseInt(b.id.split('_')[1]);
+                return num >= 39 && num <= 41; // Hz. Ali dönemi
+            }).map(b => b.id)
+        }
+    ];
+    
+    if (!BADGE_DEFINITIONS) {
+        openModal('badges-modal');
+        return;
+    }
+    
+    // Tüm badge grid'lerini temizle
+    badgeTabs.forEach(tab => {
+        const grid = document.getElementById(tab.gridId);
+        if (grid) grid.innerHTML = '';
+    });
+    
+    // Tüm oyun modlarını say
+    const allModesPlayed = Object.values(gameStats.gameModeCounts || {}).filter(count => count > 0).length;
+    
+    // Stats değerlerini güvenli hale getir (NaN, undefined, null kontrolü)
+    const stats = {
+        totalPoints: totalPoints || 0,
+        totalCorrect: gameStats.totalCorrect || 0,
+        totalWrong: gameStats.totalWrong || 0,
+        level: calculateLevel(totalPoints || 0),
+        currentStreak: streakData.currentStreak || 0,
+        maxCombo: maxCombo || 0,
+        perfectLessons: perfectLessonsCount || 0,
+        allModesPlayed: allModesPlayed || 0
+    };
+    
+    /**
+     * Rozet zorluk skorunu hesaplar (düşük skor = kolay, yüksek skor = zor)
+     */
+    function calculateBadgeDifficulty(badge) {
+        const desc = badge.description.toLowerCase();
+        let difficultyScore = 0;
+        
+        // Hasene gereksinimleri (logaritmik skorlama)
+        if (desc.includes('hasene')) {
+            const match = desc.match(/([\d,]+)\s*hasene/i);
+            if (match) {
+                const points = parseInt(match[1].replace(/,/g, ''));
+                // Logaritmik skorlama: 100=1, 500=2, 1000=3, 10000=4, 100000=5, 1000000=6
+                difficultyScore += Math.log10(points / 100) * 10 + 1;
+            }
+        }
+        
+        // Doğru cevap gereksinimleri
+        if (desc.includes('doğru')) {
+            const match = desc.match(/([\d,]+)\s*doğru/i);
+            if (match) {
+                const correct = parseInt(match[1].replace(/,/g, ''));
+                // 10=1, 50=2, 100=3, 500=4, 1000=5, 5000=6
+                difficultyScore += Math.log10(correct / 10) * 10 + 1;
+            }
+        }
+        
+        // Seri gün gereksinimleri
+        if (desc.includes('gün') || desc.includes('seri')) {
+            const match = desc.match(/(\d+)\s*gün/i);
+            if (match) {
+                const days = parseInt(match[1]);
+                // 3=1, 7=2, 14=3, 21=4, 30=5, 50=6, 100=7
+                difficultyScore += Math.log10(days / 3) * 10 + 1;
+            }
+        }
+        
+        // Combo gereksinimleri
+        if (desc.includes('combo') || desc.includes('x')) {
+            const match = desc.match(/(\d+)x/i);
+            if (match) {
+                const combo = parseInt(match[1]);
+                // 5=1, 10=2, 20=3
+                difficultyScore += Math.log10(combo / 5) * 10 + 1;
+            }
+        }
+        
+        // Mükemmel ders gereksinimleri
+        if (desc.includes('mükemmel')) {
+            const match = desc.match(/(\d+)\s*mükemmel/i);
+            if (match) {
+                const perfect = parseInt(match[1]);
+                // 1=1, 5=2, 10=3, 100=4
+                difficultyScore += Math.log10(perfect) * 10 + 1;
+            }
+        }
+        
+        // Mertebe gereksinimleri (Hasene bazlı hesaplama)
+        if (desc.includes('mertebe')) {
+            const match = desc.match(/mertebe\s*(\d+)/i);
+            if (match) {
+                const level = parseInt(match[1]);
+                let requiredPoints = 0;
+                
+                // Mertebe için gereken Hasene miktarını hesapla
+                if (level <= 5) {
+                    requiredPoints = LEVELS.THRESHOLDS[5] || 13000; // 13,000 Hasene
+                } else if (level <= 10) {
+                    requiredPoints = LEVELS.THRESHOLDS[10] || 46000; // 46,000 Hasene
+                } else {
+                    // Level 10'dan sonra her seviye için 15,000 Hasene eklenir
+                    requiredPoints = (LEVELS.THRESHOLDS[10] || 46000) + (level - 10) * (LEVELS.INCREMENT_AFTER_10 || 15000);
+                }
+                
+                // Hasene bazlı logaritmik skorlama (diğer Hasene rozetleriyle aynı mantık)
+                difficultyScore += Math.log10(requiredPoints / 100) * 10 + 1;
+            }
+        }
+        
+        // Oyun modu gereksinimleri (6 mod = orta zorluk)
+        if (desc.includes('mod')) {
+            difficultyScore += 3;
+        }
+        
+        return difficultyScore;
+    }
+    
+    // Sadece Asr-ı Saadet rozetlerini filtrele ve kronolojik sıraya göre sırala
+    const asrBadgeDefinitions = BADGE_DEFINITIONS.filter(badge => badge.id.startsWith('asr_'))
+        .sort((a, b) => {
+            // Kronolojik sıralama: asr_1, asr_2, asr_3, ... asr_41
+            const numA = parseInt(a.id.split('_')[1]);
+            const numB = parseInt(b.id.split('_')[1]);
+            return numA - numB;
+        });
+    
+    // Rozetleri kronolojik sıraya göre hazırla (kazanılanlar ve kazanılmayanlar ayrı)
+    const badgesWithUnlockInfo = asrBadgeDefinitions.map((badge, originalIndex) => {
+        // Yeni ve eski format desteği
+        const unlockInfo = unlockedBadges.find(b => {
+            if (typeof b === 'string') return b === badge.id;
+            return b.id === badge.id;
+        });
+        
+        // Rozet numarasını al (kronolojik sıralama için)
+        const badgeNum = parseInt(badge.id.split('_')[1]);
+        
+        return {
+            badge: badge,
+            originalIndex: originalIndex,
+            badgeNum: badgeNum,
+            difficultyScore: calculateBadgeDifficulty(badge),
+            isUnlocked: !!unlockInfo,
+            unlockedAt: unlockInfo ? (typeof unlockInfo === 'string' ? 0 : unlockInfo.unlockedAt) : null
+        };
+    });
+    
+    // Sırala: Önce kazanılanlar (kronolojik sıraya göre), sonra kazanılmayanlar (kronolojik sıraya göre)
+    badgesWithUnlockInfo.sort((a, b) => {
+        if (a.isUnlocked && b.isUnlocked) {
+            // Her ikisi de kazanılmış: kronolojik sıraya göre (asr_1, asr_2, ...)
+            return a.badgeNum - b.badgeNum;
+        } else if (a.isUnlocked && !b.isUnlocked) {
+            // A kazanılmış, B kazanılmamış: A önce
+            return -1;
+        } else if (!a.isUnlocked && b.isUnlocked) {
+            // A kazanılmamış, B kazanılmış: B önce
+            return 1;
+        } else {
+            // Her ikisi de kazanılmamış: kronolojik sıraya göre (asr_1, asr_2, ...)
+            return a.badgeNum - b.badgeNum;
+        }
+    });
+    
+    // Rozetleri sekmelere dağıt
+    badgesWithUnlockInfo.forEach(({badge, isUnlocked}) => {
+        // Hangi sekmede olduğunu bul (badge ID'sine göre)
+        const tabInfo = badgeTabs.find(tab => tab.badgeIds.includes(badge.id));
+        if (!tabInfo) return; // Bu sekmede değilse atla
+        
+        const badgesGrid = document.getElementById(tabInfo.gridId);
+        if (!badgesGrid) return;
+        
+        let progress = 0;
+        if (badge.progress) {
+            const calculatedProgress = badge.progress(stats);
+            // NaN, undefined veya negatif değerleri 0 yap
+            progress = (isNaN(calculatedProgress) || calculatedProgress === undefined || calculatedProgress < 0) 
+                ? 0 
+                : Math.round(Math.min(100, Math.max(0, calculatedProgress)));
+        }
+        
+        const badgeItem = document.createElement('div');
+        badgeItem.className = `badge-item ${isUnlocked ? 'unlocked' : ''}`;
+        
+        // Kazanılan rozetler için minimal görünüm (sadece ikon ve isim)
+        if (isUnlocked) {
+            badgeItem.innerHTML = `
+                <img src="assets/badges/${badge.image}" alt="${badge.name}" class="badge-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="achievement-icon" style="font-size: 3rem; display: none;">${badge.name.charAt(0)}</div>
+                <div class="badge-name">${badge.name}</div>
+            `;
+        } else {
+            // Kilitli rozetler için tam bilgi (açıklama ve ilerleme)
+            const progressBar = (progress > 0 && progress < 100) ? `
+                <div class="badge-progress-bar">
+                    <div class="badge-progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <div class="badge-progress-text">${progress}%</div>
+            ` : '';
+            
+            badgeItem.innerHTML = `
+                <img src="assets/badges/${badge.image}" alt="${badge.name}" class="badge-image" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="achievement-icon" style="font-size: 3rem; display: none;">${badge.name.charAt(0)}</div>
+                <div class="badge-name">${badge.name}</div>
+                <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.2;">${badge.description}</div>
+                ${progressBar}
+            `;
+        }
+        badgesGrid.appendChild(badgeItem);
+        
+        // Kazanılan rozetlere tıklama özelliği ekle
+        if (isUnlocked) {
+            badgeItem.style.cursor = 'pointer';
+            badgeItem.title = 'Detayları görmek için tıklayın';
+            badgeItem.addEventListener('click', () => {
+                showBadgeDetail(badge, isUnlocked);
+            });
+        }
+        
+        // Rozet görseli yüklendiğinde fallback icon'u gizle
+        const badgeImg = badgeItem.querySelector('.badge-image');
+        if (badgeImg) {
+            // Eğer görsel zaten yüklenmişse (cache'den)
+            if (badgeImg.complete && badgeImg.naturalHeight !== 0) {
+                const fallbackIcon = badgeImg.nextElementSibling;
+                if (fallbackIcon && fallbackIcon.classList.contains('achievement-icon')) {
+                    fallbackIcon.style.display = 'none';
+                }
+            } else {
+                // Görsel yükleniyor, onload event'i ekle
+                badgeImg.onload = function() {
+                    const fallbackIcon = this.nextElementSibling;
+                    if (fallbackIcon && fallbackIcon.classList.contains('achievement-icon')) {
+                        fallbackIcon.style.display = 'none';
+                    }
+                };
+            }
+        }
+    });
+    
+    // Sekme değiştirme işlevselliği
+    const badgeTabButtons = document.querySelectorAll('.badge-tab-btn');
+    const badgeTabContents = document.querySelectorAll('.badge-tab-content');
+    
+    badgeTabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            
+            // Tüm butonlardan active class'ını kaldır
+            badgeTabButtons.forEach(b => b.classList.remove('active'));
+            // Tıklanan butona active class'ı ekle
+            btn.classList.add('active');
+            
+            // Tüm tab içeriklerini gizle
+            badgeTabContents.forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            
+            // Hedef tab içeriğini göster
+            const targetContent = document.getElementById(`${targetTab}-tab`);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+                targetContent.classList.add('active');
+            }
+        });
+    });
+    
+    // Başarımlar - PNG dosyalarını kullan
+    const achievementsGrid = document.getElementById('achievements-grid');
+    if (achievementsGrid) {
+        achievementsGrid.innerHTML = '';
+        
+        // Mevcut rozet dosyaları (eksik olanlar hariç)
+        const availableBadges = [6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 42];
+        
+        /**
+         * Başarım zorluk skorunu hesaplar (düşük skor = kolay, yüksek skor = zor)
+         */
+        function calculateAchievementDifficulty(achievement) {
+            const desc = achievement.description.toLowerCase();
+            const name = achievement.name.toLowerCase();
+            let difficultyScore = 0;
+            
+            // "İlk Kelime" başarımı için özel kontrol (en kolay - mutlaka ilk sırada)
+            if (achievement.id === 'first_victory' || (name.includes('ilk') && name.includes('kelime'))) {
+                return 0; // En kolay, ilk sırada olmalı
+            }
+            
+            // "İlk Adım" gibi diğer "ilk" başarımları için de düşük skor
+            if (name.includes('ilk') && (name.includes('adım') || name.includes('zafer'))) {
+                difficultyScore += 0.1; // Çok kolay ama İlk Kelime'den sonra
+            }
+            
+            // Hasene gereksinimleri (logaritmik skorlama)
+            if (desc.includes('hasene')) {
+                const match = desc.match(/([\d,]+)\s*hasene/i);
+                if (match) {
+                    const points = parseInt(match[1].replace(/,/g, ''));
+                    difficultyScore += Math.log10(points / 100) * 10 + 1;
+                }
+            }
+            
+            // Doğru cevap gereksinimleri (sayıya göre)
+            if (desc.includes('doğru') || desc.includes('sahih')) {
+                const match = desc.match(/([\d,]+)\s*doğru/i) || desc.match(/([\d,]+)\s*sahih/i);
+                if (match) {
+                    const correct = parseInt(match[1].replace(/,/g, ''));
+                    // 1 doğru = 0, 10 doğru = 1, 50 doğru = 2, 100 doğru = 3, vb.
+                    if (correct === 1) {
+                        difficultyScore += 0; // En kolay
+                    } else {
+                        difficultyScore += Math.log10(correct / 10) * 10 + 1;
+                    }
+                } else if (desc.includes('ilk') && (desc.includes('sahih') || desc.includes('doğru'))) {
+                    // "İlk sahih cevap" gibi ifadeler için
+                    difficultyScore += 0; // En kolay
+                } else {
+                    // Sadece "doğru" veya "sahih" kelimesi geçiyorsa ama sayı yoksa
+                    difficultyScore += 0.5;
+                }
+            }
+            
+            // Günlük vird gereksinimleri
+            if (desc.includes('vird') || desc.includes('günlük')) {
+                difficultyScore += 2; // Günlük hedef = orta zorluk
+            }
+            
+            // Combo gereksinimleri
+            if (desc.includes('muvazebet') || desc.includes('combo')) {
+                const match = desc.match(/(\d+)x/i);
+                if (match) {
+                    const combo = parseInt(match[1]);
+                    difficultyScore += Math.log10(combo / 5) * 10 + 1;
+                }
+            }
+            
+            // Seri gün gereksinimleri
+            if (desc.includes('gün') && desc.includes('muvazebet')) {
+                const match = desc.match(/(\d+)\s*gün/i);
+                if (match) {
+                    const days = parseInt(match[1]);
+                    difficultyScore += Math.log10(days / 7) * 10 + 1;
+                }
+            }
+            
+            // Mertebe gereksinimleri (Hasene bazlı hesaplama)
+            if (desc.includes('mertebe')) {
+                const match = desc.match(/mertebe\s*(\d+)/i);
+                if (match) {
+                    const level = parseInt(match[1]);
+                    let requiredPoints = 0;
+                    
+                    // Mertebe için gereken Hasene miktarını hesapla
+                    if (level <= 5) {
+                        requiredPoints = LEVELS.THRESHOLDS[5] || 13000; // 13,000 Hasene
+                    } else if (level <= 10) {
+                        requiredPoints = LEVELS.THRESHOLDS[10] || 46000; // 46,000 Hasene
+                    } else {
+                        // Level 10'dan sonra her seviye için 15,000 Hasene eklenir
+                        requiredPoints = (LEVELS.THRESHOLDS[10] || 46000) + (level - 10) * (LEVELS.INCREMENT_AFTER_10 || 15000);
+                    }
+                    
+                    // Hasene bazlı logaritmik skorlama (diğer Hasene rozetleriyle aynı mantık)
+                    difficultyScore += Math.log10(requiredPoints / 100) * 10 + 1;
+                }
+            }
+            
+            // Bronz, Gümüş, Altın, Elmas gereksinimleri
+            if (desc.includes('bronz') || desc.includes('mübtedi')) {
+                difficultyScore += 2;
+            } else if (desc.includes('gümüş') || desc.includes('ikinci gümüş')) {
+                difficultyScore += 3.5;
+            } else if (desc.includes('altın') || desc.includes('ikinci altın')) {
+                difficultyScore += 4.5;
+            } else if (desc.includes('elmas') || desc.includes('ustalar ustası')) {
+                difficultyScore += 5.5;
+            } else if (desc.includes('hafiz')) {
+                difficultyScore += 7; // En zor
+            }
+            
+            return difficultyScore;
+        }
+        
+        // Başarımları kronolojik sıraya göre hazırla (kazanılanlar ve kazanılmayanlar ayrı)
+        const achievementsWithUnlockInfo = ACHIEVEMENTS.map((achievement, originalIndex) => {
+            // Yeni ve eski format desteği
+            const unlockInfo = unlockedAchievements.find(a => {
+                if (typeof a === 'string') return a === achievement.id;
+                return a.id === achievement.id;
+            });
+            
+            return {
+                achievement: achievement,
+                originalIndex: originalIndex,
+                difficultyScore: calculateAchievementDifficulty(achievement),
+                isUnlocked: !!unlockInfo,
+                unlockedAt: unlockInfo ? (typeof unlockInfo === 'string' ? 0 : unlockInfo.unlockedAt) : null
+            };
+        });
+        
+        // Sırala: Önce kazanılanlar (zorluk skoruna göre kolaydan zora), sonra kazanılmayanlar (zorluk skoruna göre kolaydan zora)
+        achievementsWithUnlockInfo.sort((a, b) => {
+            // Önce kazanılanlar, sonra kazanılmayanlar
+            if (a.isUnlocked && !b.isUnlocked) {
+                return -1; // A kazanılmış, B kazanılmamış: A önce
+            } else if (!a.isUnlocked && b.isUnlocked) {
+                return 1; // A kazanılmamış, B kazanılmış: B önce
+            } else {
+                // Aynı durumdaysa (ikisi de kazanılmış veya ikisi de kazanılmamış): zorluk skoruna göre (kolaydan zora)
+                // Eğer zorluk skorları eşitse, originalIndex'e göre (constants.js'teki sıraya göre)
+                if (a.difficultyScore === b.difficultyScore) {
+                    return a.originalIndex - b.originalIndex;
+                }
+                return a.difficultyScore - b.difficultyScore;
+            }
+        });
+        
+        achievementsWithUnlockInfo.forEach(({achievement, originalIndex, isUnlocked}) => {
+            // Mevcut rozetlerden döngüsel olarak seç
+            const badgeNumber = availableBadges[originalIndex % availableBadges.length];
+            const badgeImage = `rozet${badgeNumber}.png`;
+            
+            const achievementItem = document.createElement('div');
+            achievementItem.className = `achievement-item ${isUnlocked ? 'unlocked' : ''}`;
+            
+            // Kazanılan başarımlar için minimal görünüm (sadece ikon ve isim)
+            if (isUnlocked) {
+                achievementItem.innerHTML = `
+                    <img src="assets/badges/${badgeImage}" alt="${achievement.name}" class="achievement-image">
+                    <div class="achievement-name">${achievement.name}</div>
+                `;
+            } else {
+                // Kilitli başarımlar için tam bilgi (açıklama)
+                achievementItem.innerHTML = `
+                    <img src="assets/badges/${badgeImage}" alt="${achievement.name}" class="achievement-image">
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.2;">${achievement.description}</div>
+                `;
+            }
+            achievementsGrid.appendChild(achievementItem);
+            
+            // Kazanılan başarımlara tıklama özelliği ekle
+            if (isUnlocked) {
+                achievementItem.style.cursor = 'pointer';
+                achievementItem.title = 'Detayları görmek için tıklayın';
+                achievementItem.addEventListener('click', () => {
+                    // Başarımı badge formatına çevir ve detay göster
+                    const badgeFormat = {
+                        id: achievement.id,
+                        name: achievement.name,
+                        image: badgeImage,
+                        description: achievement.description
+                    };
+                    showBadgeDetail(badgeFormat, isUnlocked);
+                });
+            }
+        });
+    }
+    
+    openModal('badges-modal');
+}
+
+/**
+ * Takvim modalını gösterir
+ */
+function showCalendarModal() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    const calendarMonthYear = document.getElementById('calendar-month-year');
+    
+    if (calendarGrid) {
+        calendarGrid.innerHTML = '';
+        
+        // Bugünün tarihi
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Ay adını göster
+        const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 
+                           'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        const monthName = monthNames[today.getMonth()];
+        const year = today.getFullYear();
+        
+        if (calendarMonthYear) {
+            calendarMonthYear.textContent = `${monthName} ${year}`;
+        }
+        
+        // Ayın ilk günü ve hangi güne denk geliyor (0=Pazar, 1=Pazartesi, ...)
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        firstDayOfMonth.setHours(0, 0, 0, 0);
+        const firstDayWeekday = firstDayOfMonth.getDay(); // 0=Pazar, 1=Pazartesi, ...
+        // Pazartesi başlangıcı için: 0=Pazar -> 6, 1=Pazartesi -> 0, 2=Salı -> 1, ...
+        const startOffset = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+        
+        // Ayın son günü (bir sonraki ayın 0. günü = bu ayın son günü)
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        
+        // İlk hafta için boş hücreler ekle (ayın ilk günü Pazartesi değilse)
+        for (let i = 0; i < startOffset; i++) {
+            const emptyEl = document.createElement('div');
+            emptyEl.className = 'calendar-day empty';
+            calendarGrid.appendChild(emptyEl);
+        }
+        
+        // Ayın tüm günlerini göster (1'den son güne kadar)
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(today.getFullYear(), today.getMonth(), day);
+            date.setHours(0, 0, 0, 0);
+            const dateStr = getLocalDateString(date);
+            
+            // Bu gün oynanmış mı?
+            const isPlayed = streakData.playDates.includes(dateStr);
+            
+            // Bu gün gelecek bir gün mü?
+            const isFuture = date > today;
+            
+            // Seri kontrolü: Bugünden geriye doğru kesintisiz oynanan günler
+            let isStreak = false;
+            if (isPlayed && !isFuture && streakData.currentStreak > 0) {
+                const daysDiff = getDaysDifference(date, today);
+                // Bugünden geriye doğru seri uzunluğu kadar gün içinde mi?
+                if (daysDiff >= 0 && daysDiff < streakData.currentStreak) {
+                    // Kesintisiz kontrol: Bu günden bugüne kadar tüm günler oynanmış mı?
+                    let allDaysPlayed = true;
+                    for (let j = 0; j <= daysDiff; j++) {
+                        const checkDate = new Date(today);
+                        checkDate.setDate(checkDate.getDate() - j);
+                        const checkDateStr = getLocalDateString(checkDate);
+                        if (!streakData.playDates.includes(checkDateStr)) {
+                            allDaysPlayed = false;
+                            break;
+                        }
+                    }
+                    isStreak = allDaysPlayed;
+                }
+            }
+            
+            const dayEl = document.createElement('div');
+            let className = 'calendar-day';
+            if (isFuture) {
+                className += ' future'; // Gelecek günler için özel stil
+            } else if (isStreak) {
+                className += ' streak'; // Seri günler - turuncu/sarı
+            } else if (isPlayed) {
+                className += ' played'; // Oynanan günler - yeşil
+            }
+            // Oynanmayan geçmiş günler için sadece 'calendar-day' class'ı (gri)
+            
+            dayEl.className = className;
+            dayEl.textContent = day;
+            calendarGrid.appendChild(dayEl);
+        }
+    }
+    
+    document.getElementById('calendar-current-streak').textContent = streakData.currentStreak + ' gün';
+    document.getElementById('calendar-best-streak').textContent = streakData.bestStreak + ' gün';
+    document.getElementById('calendar-total-days').textContent = streakData.totalPlayDays;
+    
+    openModal('calendar-modal');
+}
+
+/**
+ * Günlük vazifeler modalını gösterir
+ */
+function showDailyTasksModal() {
+    // Görevleri kontrol et ve yükle (eğer yüklenmemişse)
+    checkDailyTasks();
+    checkWeeklyTasks();
+    
+    // Görevleri göster
+    updateTasksDisplay();
+    
+    // Modal'ı aç
+    openModal('tasks-modal');
+}
+
+/**
+ * Günlük vird ayarları modalını gösterir
+ */
+function showDailyGoalSettings() {
+    const currentLevel = localStorage.getItem('dailyGoalLevel') || 'normal';
+    document.querySelectorAll('.goal-level-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.level === currentLevel) {
+            btn.classList.add('active');
+        }
+    });
+    
+    openModal('daily-goal-modal');
+}
+
+/**
+ * Günlük hedef seviyesini ayarlar
+ */
+function setDailyGoalLevel(level) {
+    const goalAmount = CONFIG.DAILY_GOAL_LEVELS[level] || CONFIG.DAILY_GOAL_DEFAULT;
+    localStorage.setItem('dailyGoalHasene', goalAmount.toString());
+    localStorage.setItem('dailyGoalLevel', level);
+    updateDailyGoalDisplay();
+    closeModal('daily-goal-modal');
+    showSuccessMessage('Günlük hedef güncellendi!');
+}
+
+/**
+ * Özel günlük hedef ayarlar
+ */
+function setCustomGoal() {
+    const input = document.getElementById('custom-goal-input');
+    const value = parseInt(input.value);
+    if (value >= 100 && value <= 10000) {
+        localStorage.setItem('dailyGoalHasene', value.toString());
+        localStorage.setItem('dailyGoalLevel', 'custom');
+        updateDailyGoalDisplay();
+        closeModal('daily-goal-modal');
+        showSuccessMessage('Özel hedef ayarlandı!');
+    } else {
+        showErrorMessage('Hedef 100-10,000 arasında olmalıdır!');
+    }
+}
+
+/**
+ * Seviye atlama modalını gösterir
+ */
+function showLevelUpModal(level) {
+    const oldLevel = level - 1;
+    document.getElementById('old-level').textContent = oldLevel;
+    document.getElementById('new-level').textContent = level;
+    document.getElementById('level-name').textContent = getLevelName(level);
+    
+    openModal('level-up-modal');
+    playSound('levelup');
+}
+
+/**
+ * Veri durumu modalını gösterir
+ */
+async function showDataStatus() {
+    const indexeddbStatus = await checkIndexedDBStatus();
+    document.getElementById('indexeddb-status').textContent = indexeddbStatus.available 
+        ? '✅ Mevcut' 
+        : `❌ Bulunamadı: ${indexeddbStatus.error}`;
+    
+    const localStorageAvailable = typeof Storage !== 'undefined';
+    document.getElementById('localstorage-status').textContent = localStorageAvailable 
+        ? '✅ Mevcut' 
+        : '❌ Bulunamadı';
+    
+    const dailyTasksStatus = document.getElementById('daily-tasks-status');
+    dailyTasksStatus.innerHTML = `
+        <p>Son Tarih: ${dailyTasks.lastTaskDate || 'Yok'}</p>
+        <p>Tamamlanan: ${dailyTasks.completedTasks.length} / ${dailyTasks.tasks.length + dailyTasks.bonusTasks.length}</p>
+    `;
+    
+    const weeklyTasksStatus = document.getElementById('weekly-tasks-status');
+    weeklyTasksStatus.innerHTML = `
+        <p>Hafta: ${weeklyTasks.weekStart || 'Yok'} - ${weeklyTasks.weekEnd || 'Yok'}</p>
+        <p>Tamamlanan: ${weeklyTasks.completedTasks.length} / ${weeklyTasks.tasks.length}</p>
+    `;
+    
+    const streakStatus = document.getElementById('streak-status');
+    streakStatus.innerHTML = `
+        <p>Mevcut Seri: ${streakData.currentStreak} gün</p>
+        <p>En İyi Seri: ${streakData.bestStreak} gün</p>
+        <p>Toplam Oyun Günü: ${streakData.totalPlayDays}</p>
+        <p>Son Oyun: ${streakData.lastPlayDate || 'Yok'}</p>
+        <p>Bugünkü İlerleme: ${streakData.todayProgress}/${streakData.dailyGoal}</p>
+    `;
+    
+    openModal('data-status-modal');
+}
+
+/**
+ * Tüm verileri sıfırlar
+ */
+async function resetAllStats() {
+    if (!confirm('Tüm verileri sıfırlamak istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+        return;
+    }
+    
+    // LocalStorage temizle - Tüm hasene ile ilgili key'leri temizle
+    const keysToRemove = [];
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('hasene_') || 
+            key === 'unlockedAchievements' || 
+            key === 'unlockedBadges' || 
+            key === 'gameStats' || 
+            key === 'perfectLessonsCount' ||
+            key === 'dailyCorrect' ||
+            key === 'dailyWrong' ||
+            key === 'dailyXP' ||
+            key === 'lastDailyGoalDate' ||
+            // dailyGoalHasene ve dailyGoalLevel kullanıcı tercihleri olduğu için korunmalı
+            key === 'dailyGoalCompleted' ||
+            key === 'hasene_statsJustReset' ||
+            key === 'hasene_onboarding_seen_v2') {
+            keysToRemove.push(key);
+        }
+    });
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Günlük, haftalık, aylık istatistikleri temizle (hasene_daily_*, hasene_weekly_*, hasene_monthly_*)
+    // TÜM geçmiş verileri temizle (sadece son 30 gün değil, hepsi)
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('hasene_daily_') || 
+            key.startsWith('hasene_weekly_') || 
+            key.startsWith('hasene_monthly_')) {
+            localStorage.removeItem(key);
+        }
+    });
+    
+    // Favori kelimeleri de temizle
+    localStorage.removeItem('hasene_favoriteWords');
+    
+    // IndexedDB temizle
+    await clearIndexedDB();
+    
+    // IndexedDB'deki özel key'leri de manuel olarak sil (ekstra güvenlik)
+    try {
+        if (db) {
+            await deleteFromIndexedDB('hasene_totalPoints');
+            await deleteFromIndexedDB('hasene_badges');
+            await deleteFromIndexedDB('hasene_streakData');
+            await deleteFromIndexedDB('hasene_dailyTasks');
+            await deleteFromIndexedDB('hasene_weeklyTasks');
+            await deleteFromIndexedDB('hasene_wordStats');
+            
+            // Günlük, haftalık, aylık istatistikleri IndexedDB'den de temizle
+            // Son 30 günün günlük verilerini temizle
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = getLocalDateString(date);
+                await deleteFromIndexedDB(`hasene_daily_${dateStr}`);
+            }
+            
+            // Son 8 haftanın haftalık verilerini temizle
+            for (let i = 0; i < 8; i++) {
+                const weekStart = new Date();
+                weekStart.setDate(weekStart.getDate() - (i * 7));
+                const weekStartStr = getWeekStartDateString(weekStart);
+                await deleteFromIndexedDB(`hasene_weekly_${weekStartStr}`);
+            }
+            
+            // Son 6 ayın aylık verilerini temizle
+            for (let i = 0; i < 6; i++) {
+                const month = new Date();
+                month.setMonth(month.getMonth() - i);
+                const monthStr = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
+                await deleteFromIndexedDB(`hasene_monthly_${monthStr}`);
+            }
+        }
+    } catch (e) {
+        warnLog('IndexedDB temizleme hatası (normal olabilir):', e);
+    }
+    
+    // Global değişkenleri sıfırla
+    totalPoints = 0;
+    badges = { stars: 0, bronze: 0, silver: 0, gold: 0, diamond: 0 };
+    
+    // Session değişkenlerini sıfırla
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionWrong = 0;
+    comboCount = 0;
+    maxCombo = 0;
+    currentQuestion = 0;
+    questions = [];
+    currentQuestionData = null;
+    hintUsed = false;
+    lives = 3;
     streakData = {
         currentStreak: 0,
         bestStreak: 0,
-        lastPlayDate: '',
         totalPlayDays: 0,
+        lastPlayDate: '',
+        playDates: [],
         dailyGoal: 5,
         todayProgress: 0,
-        todayDate: '',
-        playDates: []
+        todayDate: ''
     };
-    window.streakData = streakData; // Global erişim için güncelle
-
-    // =========================================
-    // 🔥 DAILY TASKS SIFIRLA
-    // =========================================
     dailyTasks = {
-lastTaskDate: null,
-tasks: [],
-bonusTasks: [],
-completedTasks: [],
-rewardsClaimed: false,
-todayStats: {
-    kelimeCevir: 0,
-    dinleBul: 0,
-    boslukDoldur: 0,
-    ayetOku: 0,
-    duaOgre: 0,
-    hadisOku: 0,
-    toplamDogru: 0,
-    toplamYanlis: 0,
-    toplamPuan: 0,
-    perfectStreak: 0,
-    farklıZorluk: new Set(),
-    reviewWords: 0,
-    comboCount: 0,
-    accuracy: 0,
-    allGameModes: new Set(),
-    streakMaintain: 0,
-    totalPlayTime: 0
-}
+        lastTaskDate: '',
+        tasks: [],
+        bonusTasks: [],
+        completedTasks: [],
+        todayStats: {
+            toplamDogru: 0,
+            toplamPuan: 0,
+            comboCount: 0,
+            allGameModes: new Set(),
+            farklıZorluk: new Set(),
+            perfectStreak: 0,
+            accuracy: 0,
+            reviewWords: new Set(),
+            streakMaintain: 0,
+            totalPlayTime: 0,
+            ayetOku: 0,
+            duaEt: 0,
+            hadisOku: 0
+        },
+        rewardsClaimed: false
     };
-    window.dailyTasks = dailyTasks; // Global erişim için güncelle
-
-    // =========================================
-    // 🔥 HAFTALIK GÖREVLER SİSTEMİ SIFIRLA
-    // =========================================
     weeklyTasks = {
         lastWeekStart: '',
         weekStart: '',
         weekEnd: '',
         tasks: [],
         completedTasks: [],
-        rewardsClaimed: false,
         weekStats: {
             totalHasene: 0,
             totalCorrect: 0,
             totalWrong: 0,
             daysPlayed: 0,
-            // perfectDays ve reviewWordsCount görevleri kaldırıldı
             streakDays: 0,
             allModesPlayed: new Set(),
             comboCount: 0
-        }
+        },
+        rewardsClaimed: false
     };
-    window.weeklyTasks = weeklyTasks;
-
-    // ================================
-// 🔥 GÜNLÜK HEDEF (DAILY GOAL) TAM SIFIRLA (Storage Manager ile)
-// ================================
-const defaultGoalReset = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-storage.set("dailyGoalHasene", defaultGoalReset.toString());  // hedef sıfır → varsayılan
-storage.set("dailyHasene", "0");         // günlük kazanılan XP sıfır
-storage.set("dailyCorrect", "0");        // günlük doğru cevap sayısı sıfır (Bugünkü Amel için)
-storage.set("dailyWrong", "0");          // günlük yanlış cevap sayısı sıfır
-storage.set("dailyGoalLevel", "normal"); // varsayılan zorluk
-storage.remove("lastDailyXPReset");      // reset tarihi temizle
-storage.remove("lastDailyGoalDate");     // son günlük hedef tarihi temizle
-storage.set("dailyXP", "0");             // günlük XP sıfırla
-
-// UI Güncelle → Barları sıfırla
-const bar = document.getElementById("dailyGoalProgress");
-const barText = document.getElementById("dailyGoalProgressText");
-const goalText = document.getElementById("dailyGoalText");
-
-if (bar) bar.style.width = "0%";
-const defaultGoalDisplay = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-if (barText) barText.textContent = `0 / ${defaultGoalDisplay} Hasene`;
-if (goalText) goalText.textContent = `Günlük Vird: ${defaultGoalDisplay} Hasene`;
-
-    // Her 1 hedeften 540 XP geliyorsa — dilersen değiştir
-
-    // =========================================
-    // 🔥 INDEXED DB TEMİZLE - TÜM KEY'LERİ SİL
-    // =========================================
-    // IndexedDB'yi güvenli şekilde temizle (tek transaction içinde)
-    const clearIndexedDB = async () => {
-        if (!db) {
-            log.debug('⚠️ IndexedDB db yok, temizleme atlanıyor');
-            return;
-        }
-        
-        try {
-            // Database connection durumunu kontrol et
-            if (db.readyState !== 'open') {
-                log.warn('⚠️ IndexedDB connection kapalı, temizleme atlanıyor');
-                return;
-            }
-            
-            // Tek bir transaction içinde tüm işlemleri yap
-            const transaction = db.transaction(['gameData'], 'readwrite');
-            const store = transaction.objectStore('gameData');
-            
-            // Tüm key'leri sil
-            const keysToDelete = [
-                'hasene_totalPoints',
-                'hasene_badges',
-                'hasene_streak',
-                'hasene_streakData', // Streak data için ayrı key
-                'hasene_dailyTasks',
-                'hasene_weeklyTasks',
-                'hasene_currentMode',
-                'hasene_currentDifficulty',
-                'hasene_wordStats',
-                'gameStats'
-            ];
-            
-            // Tüm key'leri sil (tek transaction içinde)
-            const deletePromises = keysToDelete.map(key => {
-                return new Promise((resolve) => {
-                    try {
-                        const deleteRequest = store.delete(key);
-                        deleteRequest.onsuccess = () => resolve();
-                        deleteRequest.onerror = () => resolve(); // Hata olsa bile devam et
-                    } catch(e) {
-                        resolve(); // Hata olsa bile devam et
-                    }
-                });
-            });
-            
-            // Tüm silme işlemlerini bekle
-            await Promise.all(deletePromises);
-            
-            // Store'u temizle
-            const clearRequest = store.clear();
-            await new Promise((resolve, reject) => {
-                clearRequest.onsuccess = () => resolve();
-                clearRequest.onerror = () => reject(clearRequest.error);
-            });
-            
-            // Transaction'ın tamamlanmasını bekle
-            await new Promise((resolve) => {
-                transaction.oncomplete = () => resolve();
-                transaction.onerror = () => resolve(); // Hata olsa bile devam et
-            });
-            
-            log.debug('🗑️ IndexedDB temizlendi (tüm key\'ler ve store silindi)');
-        } catch(e) {
-            log.error('IndexedDB temizleme hatası:', e);
-        }
-    };
+    wordStats = {};
+    unlockedAchievements = [];
+    unlockedBadges = [];
+    perfectLessonsCount = 0;
     
-    // IndexedDB'yi temizle (await etme - arka planda tamamlanacak, click handler'ı bloklamasın)
-    // NOT: IndexedDB işlemleri arka planda tamamlanacak, click handler hemen dönecek
-    clearIndexedDB().then(() => {
-        log.debug('✅ IndexedDB temizleme tamamlandı');
-    }).catch(e => {
-        log.error('IndexedDB temizleme hatası:', e);
-    });
-
-    // =========================================
-    // 🔥 LOCAL STORAGE TEMİZLE - TÜM HASENE_ KEY'LERİ
-    // =========================================
-    // KRİTİK: Tüm hasene_ ile başlayan key'leri toplu olarak temizle
-    // Bu sayede hiçbir key kaçmaz
-    try {
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && (key.startsWith('hasene_') || key === 'dailyXP' || key === 'unlockedAchievements' || 
-                       key === 'dailyCorrect' || key === 'dailyWrong')) {
-                keysToRemove.push(key);
-            }
-        }
-        keysToRemove.forEach(key => {
-            try {
-                localStorage.removeItem(key);
-            } catch(e) {
-                // Sessizce devam et
-            }
+    // Favori kelimeleri de sıfırla (eğer favorites-manager.js yüklüyse)
+    if (typeof window.loadFavorites === 'function' && typeof window.removeFromFavorites === 'function') {
+        // Tüm favorileri temizlemek için loadFavorites çağır ve sonra temizle
+        window.loadFavorites();
+        const favoriteWords = window.getFavoriteWords ? window.getFavoriteWords() : [];
+        favoriteWords.forEach(wordId => {
+            window.removeFromFavorites(wordId);
         });
-        log.debug(`✅ ${keysToRemove.length} localStorage key'i temizlendi`);
-    } catch(e) {
-        log.error('localStorage toplu temizleme hatası:', e);
-        // Fallback: Manuel temizleme
-        localStorage.removeItem('hasene_totalPoints');
-        localStorage.removeItem('hasene_badges');
-        localStorage.removeItem('hasene_streak');
-        localStorage.removeItem('hasene_dailyTasks');
-        localStorage.removeItem('hasene_weeklyTasks');
-        localStorage.removeItem('hasene_currentMode');
-        localStorage.removeItem('hasene_currentDifficulty');
-        localStorage.removeItem('hasene_wordStats');
-        localStorage.removeItem('hasene_favorites');
-        localStorage.removeItem('hasene_reviewWords');
-        localStorage.removeItem('hasene_recentlyWrong');
-        localStorage.removeItem('dailyXP');
-        localStorage.removeItem('unlockedAchievements');
-        localStorage.removeItem('dailyCorrect');
-        localStorage.removeItem('dailyWrong');
     }
-    
-    // =========================================
-    // 🔥 LİDERLİK TABLOSU SIFIRLA (MOBİL UYUMLU)
-    // =========================================
-    // NOT: Bu key'ler yukarıdaki toplu temizleme ile zaten temizlendi
-    // Ama ekstra güvenlik için burada da kontrol ediyoruz
-    try {
-        // haseneLeaderboard key'i hasene_ ile başlamadığı için özel kontrol
-        localStorage.removeItem('haseneLeaderboard');
-    } catch(e) {
-        log.error('Liderlik tablosu sıfırlama hatası:', e);
-    }
-    
-    // =========================================
-    // 🔥 DETAYLI İSTATİSTİKLER SIFIRLA (MOBİL UYUMLU)
-    // =========================================
-    // NOT: dailyCorrect ve dailyWrong yukarıdaki toplu temizleme ile zaten temizlendi
-    // Tarih bazlı günlük verilerini temizle (hasene_daily_YYYY-MM-DD formatındaki tüm key'ler)
-    // NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
-    setTimeout(() => {
-        try {
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('hasene_daily_')) {
-                    keysToRemove.push(key);
-                }
-            }
-            keysToRemove.forEach(key => localStorage.removeItem(key));
-            if (keysToRemove.length > 0) {
-                log.debug(`✅ ${keysToRemove.length} tarih bazlı key temizlendi`);
-            }
-        } catch(e) {
-            log.error('Tarih bazlı key temizleme hatası:', e);
+    gameStats = {
+        totalCorrect: 0,
+        totalWrong: 0,
+        gameModeCounts: {
+            'kelime-cevir': 0,
+            'dinle-bul': 0,
+            'bosluk-doldur': 0,
+            'ayet-oku': 0,
+            'dua-et': 0,
+            'hadis-oku': 0
         }
-    }, 0);
+    };
     
-    // =========================================
-    // 🔥 BİLDİRİMLER VE SOSYAL PAYLAŞIM SIFIRLA
-    // =========================================
-    // NOT: Bu key'ler yukarıdaki toplu temizleme ile zaten temizlendi (hasene_ ile başlıyorlar)
-    // Ekstra güvenlik için burada da kontrol ediyoruz
-    try {
-        // hasene_ ile başlamayan key'ler için özel kontrol
-        // (şu an yok ama gelecekte eklenebilir)
-    } catch(e) {
-        log.error('Ekstra temizleme hatası:', e);
-    }
-
-    // =========================================
-    // 🔥 URL GEÇMİŞ TEMİZLE
-    // =========================================
-    try {
-if (window.history.replaceState) {
-    window.history.replaceState({}, '', window.location.pathname);
-}
-    } catch(e) {
-// URL temizleme hatası kritik değil, sessizce geç
-log.debug('URL geçmiş temizleme hatası (kritik değil):', e);
-    }
-
-    // =========================================
-    // 🔥 YENİ GÖREVLER ÜRETME - SIFIRLAMA SONRASI GÖREV OLUŞTURMA
-    // NOT: Görevler oluşturulmuyor, kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
-    // =========================================
-    // generateDailyTasks çağrılmıyor - sıfırlama sonrası görevler oluşturulmamalı
-    // Görevler checkDailyTasks/checkWeeklyTasks içinde otomatik oluşturulacak
+    // Günlük ilerlemeyi sıfırla (kullanıcı tercihleri korunur)
+    localStorage.setItem('dailyCorrect', '0');
+    localStorage.setItem('dailyWrong', '0');
+    localStorage.setItem('dailyXP', '0');
+    localStorage.setItem('lastDailyGoalDate', getLocalDateString());
     
-    // =========================================
-    // 🔥 SIFIRLAMA FLAG'İ SET ET
-    // =========================================
-    // Sıfırlama yapıldığını işaretle - loadStats ve checkDailyTasks bu flag'i kontrol edecek
+    // Eğer günlük hedef ayarları yoksa varsayılan değerleri ayarla
+    if (!localStorage.getItem('dailyGoalHasene')) {
+        localStorage.setItem('dailyGoalHasene', CONFIG.DAILY_GOAL_DEFAULT.toString());
+    }
+    if (!localStorage.getItem('dailyGoalLevel')) {
+        localStorage.setItem('dailyGoalLevel', 'normal');
+    }
+    
+    // UI'ı güncelle
+    updateStatsBar();
+    updateDailyGoalDisplay();
+    updateStreakDisplay();
+    
+    // Rozet modalını yenile (eğer açıksa)
+    if (document.getElementById('badges-modal') && document.getElementById('badges-modal').style.display !== 'none') {
+        showBadgesModal();
+    }
+    
+    // Flag set et
     localStorage.setItem('hasene_statsJustReset', 'true');
     
-    // NOT: Veriler zaten yukarıda temizlendi (IndexedDB ve localStorage)
-    // Bu flag sayesinde loadStats ve checkDailyTasks otomatik görev oluşturmayacak
-
-    // =========================================
-    // 🔥 UI GÜNCELLE - TÜM İSTATİSTİK ALANLARI
-    // =========================================
-    // NOT: updateStatsBar, updateUI gibi fonksiyonları daha sonra çağır (performans için)
-    // Bu fonksiyonlar kendi içlerinde DOM sorguları yapıyor, bu yüzden setTimeout ile erteleniyor
-    setTimeout(() => {
-        updateStatsBar();
-        updateUI();
-        if (typeof updateDailyGoalDisplay === "function") {
-            updateDailyGoalDisplay();
-        }
-    }, 0);
+    // Verileri kaydet
+    await saveStatsImmediate();
     
-    // NOT: saveStats çağrılmıyor - sıfırlama sonrası veriler kaydedilmemeli
-    // Kullanıcı ilk oyunu oynadığında otomatik kaydedilecek
-
-    // İstatistikler Modal - Tüm DOM güncellemeleri (performans için optimize edilmiş)
-    // NOT: DOM sorgularını önce yap, sonra güncellemeleri yap (Forced reflow'u azaltır)
-    // setTimeout kullanarak DOM güncellemelerini bir sonraki event loop'a erteliyoruz
-    setTimeout(() => {
-        // Tüm DOM sorgularını önce yap (tek seferde)
-        const elements = {
-            // Seviye İlerleme Barı
-            statsCurrentLevel: document.getElementById('statsCurrentLevel'),
-            statsNextLevel: document.getElementById('statsNextLevel'),
-            statsLevelProgress: document.getElementById('statsLevelProgress'),
-            statsLevelPointsNeeded: document.getElementById('statsLevelPointsNeeded'),
-            // Rozet Sistemi
-            statsBronze: document.getElementById('statsBronze'),
-            statsSilver: document.getElementById('statsSilver'),
-            statsGold: document.getElementById('statsGold'),
-            statsDiamond: document.getElementById('statsDiamond'),
-            // Başarılar Modal - Mertebe Rozetleri
-            diamondBadgeCount: document.getElementById('diamondBadgeCount'),
-            goldBadgeCount: document.getElementById('goldBadgeCount'),
-            silverBadgeCount: document.getElementById('silverBadgeCount'),
-            bronzeBadgeCount: document.getElementById('bronzeBadgeCount'),
-            // Başarı Analizi
-            statsSuccessRate: document.getElementById('statsSuccessRate'),
-            statsAvgPointsPerDay: document.getElementById('statsAvgPointsPerDay'),
-            statsPlayConsistency: document.getElementById('statsPlayConsistency'),
-            statsLevelProgressText: document.getElementById('statsLevelProgressText'),
-            // Muvazebet İstatistikleri
-            statsCurrentStreak: document.getElementById('statsCurrentStreak'),
-            statsBestStreak: document.getElementById('statsBestStreak'),
-            statsTotalDays: document.getElementById('statsTotalDays'),
-            statsTodayProgress: document.getElementById('statsTodayProgress'),
-            // Oyun Türü İstatistikleri
-            statsKelimeCevir: document.getElementById('statsKelimeCevir'),
-            statsDinleBul: document.getElementById('statsDinleBul'),
-            statsBoslukDoldur: document.getElementById('statsBoslukDoldur'),
-            statsAyetOku: document.getElementById('statsAyetOku'),
-            statsDuaOgre: document.getElementById('statsDuaOgre'),
-            statsHadisOku: document.getElementById('statsHadisOku'),
-            // Bugünkü Performans
-            statsTodayCorrect: document.getElementById('statsTodayCorrect'),
-            statsTodayPoints: document.getElementById('statsTodayPoints'),
-            statsPerfectStreak: document.getElementById('statsPerfectStreak'),
-            statsDifficultyCount: document.getElementById('statsDifficultyCount'),
-            // Kelime İstatistikleri
-            wordStatsTotal: document.getElementById('wordStatsTotal'),
-            wordStatsMastered: document.getElementById('wordStatsMastered'),
-            wordStatsStruggling: document.getElementById('wordStatsStruggling'),
-            // Kelime Ameli
-            analyticsAvgSuccess: document.getElementById('analyticsAvgSuccess'),
-            analyticsHardestWord: document.getElementById('analyticsHardestWord'),
-            // Başarılar Modal
-            badgesUnlockedCount: document.getElementById('badgesUnlockedCount'),
-            badgesTotalCount: document.getElementById('badgesTotalCount'),
-            badgesProgressPercent: document.getElementById('badgesProgressPercent'),
-            // Takvim Modal
-            calendarStreakCount: document.getElementById('calendarStreakCount'),
-            // Üst bar
-            gamePoints: document.getElementById('gamePoints'),
-            starPoints: document.getElementById('starPoints'),
-            playerLevel: document.getElementById('playerLevel'),
-            // Oyun ekranı
-            correct: document.getElementById('correct'),
-            wrong: document.getElementById('wrong'),
-            boslukCorrect: document.getElementById('boslukCorrect'),
-            boslukWrong: document.getElementById('boslukWrong'),
-            dinleCorrect: document.getElementById('dinleCorrect'),
-            dinleWrong: document.getElementById('dinleWrong'),
-            // Level Up Modal
-            newLevel: document.getElementById('newLevel'),
-            modalTotalPoints: document.getElementById('modalTotalPoints'),
-            modalNextLevelPoints: document.getElementById('modalNextLevelPoints'),
-            confirmCorrect: document.getElementById('confirmCorrect'),
-            confirmWrong: document.getElementById('confirmWrong')
-        };
-        
-        // Şimdi tüm güncellemeleri yap (tek seferde, DOM sorgusu yok)
-        if (elements.statsCurrentLevel) elements.statsCurrentLevel.textContent = '1';
-        if (elements.statsNextLevel) elements.statsNextLevel.textContent = '2';
-        if (elements.statsLevelProgress) elements.statsLevelProgress.style.width = '0%';
-        if (elements.statsLevelPointsNeeded) elements.statsLevelPointsNeeded.textContent = '1,000';
-        if (elements.statsBronze) elements.statsBronze.textContent = '0';
-        if (elements.statsSilver) elements.statsSilver.textContent = '0';
-        if (elements.statsGold) elements.statsGold.textContent = '0';
-        if (elements.statsDiamond) elements.statsDiamond.textContent = '0';
-        if (elements.diamondBadgeCount) elements.diamondBadgeCount.textContent = '0';
-        if (elements.goldBadgeCount) elements.goldBadgeCount.textContent = '0';
-        if (elements.silverBadgeCount) elements.silverBadgeCount.textContent = '0';
-        if (elements.bronzeBadgeCount) elements.bronzeBadgeCount.textContent = '0';
-        if (elements.statsSuccessRate) elements.statsSuccessRate.textContent = '0%';
-        if (elements.statsAvgPointsPerDay) elements.statsAvgPointsPerDay.textContent = '0';
-        if (elements.statsPlayConsistency) elements.statsPlayConsistency.textContent = '0%';
-        if (elements.statsLevelProgressText) elements.statsLevelProgressText.textContent = '0%';
-        if (elements.statsCurrentStreak) elements.statsCurrentStreak.textContent = '0';
-        if (elements.statsBestStreak) elements.statsBestStreak.textContent = '0';
-        if (elements.statsTotalDays) elements.statsTotalDays.textContent = '0';
-        if (elements.statsTodayProgress) elements.statsTodayProgress.textContent = '0';
-        if (elements.statsKelimeCevir) elements.statsKelimeCevir.textContent = '0';
-        if (elements.statsDinleBul) elements.statsDinleBul.textContent = '0';
-        if (elements.statsBoslukDoldur) elements.statsBoslukDoldur.textContent = '0';
-        if (elements.statsAyetOku) elements.statsAyetOku.textContent = '0';
-        if (elements.statsDuaOgre) elements.statsDuaOgre.textContent = '0';
-        if (elements.statsHadisOku) elements.statsHadisOku.textContent = '0';
-        if (elements.statsTodayCorrect) elements.statsTodayCorrect.textContent = '0';
-        if (elements.statsTodayPoints) elements.statsTodayPoints.textContent = '0';
-        if (elements.statsPerfectStreak) elements.statsPerfectStreak.textContent = '0';
-        if (elements.statsDifficultyCount) elements.statsDifficultyCount.textContent = '0';
-        if (elements.wordStatsTotal) elements.wordStatsTotal.textContent = '0';
-        if (elements.wordStatsMastered) elements.wordStatsMastered.textContent = '0';
-        if (elements.wordStatsStruggling) elements.wordStatsStruggling.textContent = '0';
-        if (elements.analyticsAvgSuccess) elements.analyticsAvgSuccess.textContent = '%0';
-        if (elements.analyticsHardestWord) elements.analyticsHardestWord.textContent = '-';
-        if (elements.badgesUnlockedCount) elements.badgesUnlockedCount.textContent = '0';
-        if (elements.badgesTotalCount) elements.badgesTotalCount.textContent = '20';
-        if (elements.badgesProgressPercent) elements.badgesProgressPercent.textContent = '0%';
-        if (elements.calendarStreakCount) elements.calendarStreakCount.textContent = '0';
-        if (elements.gamePoints) elements.gamePoints.textContent = '0';
-        if (elements.starPoints) elements.starPoints.textContent = '0';
-        if (elements.playerLevel) elements.playerLevel.textContent = '1. Mertebe';
-        if (elements.correct) elements.correct.textContent = '0';
-        if (elements.wrong) elements.wrong.textContent = '0';
-        if (elements.boslukCorrect) elements.boslukCorrect.textContent = '0';
-        if (elements.boslukWrong) elements.boslukWrong.textContent = '0';
-        if (elements.dinleCorrect) elements.dinleCorrect.textContent = '0';
-        if (elements.dinleWrong) elements.dinleWrong.textContent = '0';
-        if (elements.newLevel) elements.newLevel.textContent = '1';
-        if (elements.modalTotalPoints) elements.modalTotalPoints.textContent = '0';
-        if (elements.modalNextLevelPoints) elements.modalNextLevelPoints.textContent = '1,000';
-        if (elements.confirmCorrect) elements.confirmCorrect.textContent = '0';
-        if (elements.confirmWrong) elements.confirmWrong.textContent = '0';
-    }, 0);
-    
-    // Kelime istatistiklerini sıfırla (wordStats objesi)
-    try {
-        if (typeof saveWordStats === 'function') {
-            saveWordStats({}); // Boş obje kaydet
-        } else if (typeof window.saveWordStats === 'function') {
-            window.saveWordStats({}); // Boş obje kaydet
-        }
-        // localStorage'dan da sil (ek güvenlik)
-        localStorage.removeItem('hasene_wordStats');
-        // IndexedDB'den de sil (zaten yukarıda siliniyor ama emin olmak için)
-    } catch(e) {
-        log.error('Kelime istatistikleri sıfırlama hatası:', e);
-    }
-    
-    // Favoriler ve tekrar listesini sıfırla
-    try {
-        if (typeof secureSetItem === 'function') {
-            secureSetItem('hasene_favorites', []);
-        } else {
-            localStorage.setItem('hasene_favorites', JSON.stringify([]));
-        }
-        localStorage.setItem('hasene_reviewWords', JSON.stringify([]));
-        localStorage.setItem('hasene_recentlyWrong', JSON.stringify([]));
-        // Global değişkenleri de sıfırla
-        if (typeof window !== 'undefined') {
-            window.reviewWords = [];
-            window.favoriteWords = [];
-        }
-    } catch(e) {
-        log.error('Favoriler/tekrar listesi sıfırlama hatası:', e);
-    }
-
-    // =========================================
-    // 🔥 YENİ BADGES PANEL TASARIMI GÜNCELLEMELERİ
-    // =========================================
-    // Achievement sıfırlama flag'i set et (updateAllAchievements için)
-    localStorage.setItem('achievementsJustReset', 'true');
-    
-    // NOT: Bu fonksiyonları setTimeout ile erteleyerek click handler'ı bloklamayı önle
-    setTimeout(() => {
-        // Achievement kartlarını güncelle (yeni tasarım için - tüm rozetleri kilitli yap)
-        if (typeof updateAllAchievements === 'function') {
-            updateAllAchievements();
-        }
-        
-        // Başarılar Modal istatistiklerini güncelle (sıfırlanmış durumda)
-        if (typeof updateBadgesModalStats === 'function') {
-            updateBadgesModalStats();
-        }
-    }, 0);
-    
-    // =========================================
-    // 🔥 YENİ PANELLERİ GÜNCELLE (MOBİL UYUMLU)
-    // =========================================
-    
-    // Liderlik tablosunu güncelle (eğer açıksa)
-    try {
-if (typeof closeLeaderboard === 'function') {
-    // Liderlik tablosu modal'ı açıksa kapat
-    const leaderboardModal = document.getElementById('leaderboardModal');
-    if (leaderboardModal && leaderboardModal.style.display !== 'none') {
-        closeLeaderboard();
-    }
+    closeModal('data-status-modal');
+    showSuccessMessage('Tüm veriler sıfırlandı!');
 }
 
-// Liderlik tablosu verilerini zorla sıfırla (mobil için)
-if (typeof getWeeklyScores === 'function' && typeof getMonthlyScores === 'function') {
-    // Fonksiyonlar varsa, verileri manuel olarak sıfırla
-    localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
-    localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
-} else {
-    // Fonksiyonlar yoksa direkt sıfırla
-    localStorage.setItem('hasene_weeklyScores', JSON.stringify({}));
-    localStorage.setItem('hasene_monthlyScores', JSON.stringify({}));
-}
+// ============================================
+// UI GÜNCELLEME
+// ============================================
 
-// Liderlik tablosunu sıfırlanmış değerlerle güncelle (setTimeout ile ertele)
-setTimeout(() => {
-    if (typeof updateLeaderboard === 'function') {
-        updateLeaderboard();
-    }
-}, 0);
-    } catch(e) {
-log.error('Liderlik tablosu güncelleme hatası:', e);
-    }
-    
-    // Detaylı istatistikleri güncelle (eğer fonksiyon varsa) - setTimeout ile ertele
-    try {
-setTimeout(() => {
-    if (typeof updateDetailedStats === 'function') {
-        updateDetailedStats();
-    }
-}, 0);
-// Detaylı istatistik verilerini zorla sıfırla (mobil için)
-localStorage.setItem('dailyCorrect', '0');
-localStorage.setItem('dailyWrong', '0');
-localStorage.removeItem('hasene_streakData');
-    } catch(e) {
-log.error('Detaylı istatistikler güncelleme hatası:', e);
-    }
-    
-    // Bildirimleri güncelle (eğer fonksiyon varsa)
-    try {
-if (typeof updateNotifications === 'function') {
-    updateNotifications();
-}
-    } catch(e) {
-log.error('Bildirimler güncelleme hatası:', e);
-    }
-    
-    // Mobil cihazlarda localStorage'ı zorla temizle (tüm hasene_ ile başlayan key'ler)
-    // NOT: Bu işlemi setTimeout ile erteleyerek click handler'ı bloklamayı önle
-    try {
-setTimeout(() => {
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('hasene_weekly') || key.startsWith('hasene_monthly') || 
-                   key.startsWith('hasene_detailed') || key.startsWith('hasene_notification') ||
-                   key.startsWith('hasene_social') || key.startsWith('hasene_streakData'))) {
-            keysToRemove.push(key);
-        }
-    }
-    keysToRemove.forEach(key => {
-        try {
-            localStorage.removeItem(key);
-        } catch(e) {
-            log.debug('Key silme hatası (kritik değil):', key, e);
-        }
-    });
-}, 0);
-    } catch(e) {
-log.error('localStorage temizleme hatası:', e);
-    }
-
-    showCustomAlert("Tüm veriler tamamen sıfırlandı! 🔥", "success");
-}
-
-
-function updateStatsBar() {
-    // NULL KONTROL - Kritik elementler
-    const gamePointsEl = document.getElementById('gamePoints');
-    const starPointsEl = document.getElementById('starPoints');
-    const playerLevelEl = document.getElementById('playerLevel');
-    
-    if (!gamePointsEl || !starPointsEl || !playerLevelEl) {
-        log.error('❌ HATA: Stats bar elementleri bulunamadı!');
-        return;
-    }
-    
-    // Veri doğrulama - totalPoints kontrolü
-    if (typeof totalPoints !== 'number' || isNaN(totalPoints) || totalPoints < 0) {
-        log.warn('⚠️ totalPoints geçersiz, sıfırlanıyor:', totalPoints);
-        totalPoints = 0;
-    }
-    
-    // Üst bar güncelle
-    gamePointsEl.textContent = totalPoints;
-    
-    // Yıldız puanı güncelle (her 100 puana 1 yıldız - sık geri bildirim için)
-    const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-    starPoints = Math.floor(totalPoints / starThreshold);
-    starPointsEl.textContent = starPoints;
-    
-    // Rozet sistemini güncelle (null check ile)
-    if (typeof updateBadgeSystem === 'function') {
-        updateBadgeSystem();
-    }
-    
-    // Seviye güncelle (yeni hesaplama sistemi)
-    if (typeof calculateLevel === 'function') {
-        level = calculateLevel(totalPoints);
-    } else {
-        // Fallback: basit seviye hesaplama
-        level = Math.max(1, Math.floor(totalPoints / 1000) + 1);
-    }
-    playerLevelEl.textContent = level;
-    
-    // Seviye ilerleme çubuğunu güncelle
-    let currentLevelStart, nextLevelStart;
-    
-    if (level === 1) {
-        currentLevelStart = 0;
-        nextLevelStart = 1000;
-    } else if (level <= 10) {
-        const thresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
-        currentLevelStart = thresholds[level - 1];
-        nextLevelStart = thresholds[level];
-    } else {
-        // Level 10'dan sonra
-        currentLevelStart = 58000 + ((level - 11) * 15000);
-        nextLevelStart = 58000 + ((level - 10) * 15000);
-    }
-    
-    const currentLevelPoints = totalPoints - currentLevelStart;
-    const levelRequiredPoints = nextLevelStart - currentLevelStart;
-    // Division by zero check
-    const progressPercentage = levelRequiredPoints > 0 ? Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100)) : 100;
-    
-    const levelProgressElement = document.getElementById('levelProgress');
-    if (levelProgressElement) {
-        levelProgressElement.style.width = progressPercentage + '%';
-    }
-    
-    // Alt bar (oyun içi stats) güncelle
-    const scoreElement = document.getElementById('score');
-    if (scoreElement) scoreElement.textContent = totalPoints;
-    // level elementi artık yok (Mertebe kaldırıldı)
-    
-    // Kaydet
-    debouncedSaveStats(); // Debounced kaydetme
-    
-    // Debug için mevcut değerleri logla
-    log.debug('📊 Mevcut İstatistikler:', {
-        totalPoints: totalPoints,
-        starPoints: starPoints, 
-        level: level,
-        sessionScore: sessionScore,
-        sessionCorrect: sessionCorrect,
-        sessionWrong: sessionWrong
+/**
+ * Oyun içi UI'ı günceller
+ */
+function updateUI() {
+    // Session skorunu güncelle
+    const sessionScoreEls = document.querySelectorAll('#session-score, #dinle-session-score, #bosluk-session-score');
+    sessionScoreEls.forEach(el => {
+        if (el) el.textContent = `Hasene: ${sessionScore}`;
     });
 }
 
-// COMBO FONKSİYONLARI
-function updateCombo() {
-    const comboIndicator = document.getElementById('comboIndicator');
-    const comboCountEl = document.getElementById('comboCount');
-    const comboBonusEl = document.getElementById('comboBonus');
-    
-    // NULL KONTROL
-    if (!comboIndicator || !comboCountEl || !comboBonusEl) {
-        log.warn('⚠️ Combo elementleri bulunamadı');
-        return;
-    }
-    
-    if (comboCount >= 3) {
-        const bonusXP = Math.floor(comboCount / 3) * 5;
-        comboCountEl.textContent = comboCount;
-        comboBonusEl.textContent = bonusXP;
-        
-        comboIndicator.style.display = 'block';
-        comboIndicator.style.animation = 'comboPopIn 0.3s ease, comboShake 0.5s ease 0.3s';
-        
-        // Her 3 comboda mesaj göster (bonus zaten addSessionPoints'te eklendi)
-        if (comboCount % 3 === 0) {
-            // Combo sesi çal
-            playSound('combo');
-            
-            // Bonus mesajı göster
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+// Sayfa yüklendiğinde
+window.addEventListener('load', async () => {
+    // Loading screen'i gizle
+    if (elements.loadingScreen) {
+        setTimeout(() => {
+            elements.loadingScreen.classList.add('hidden');
             setTimeout(() => {
-                showSuccessMessage(`🔥 Maşallah! x${comboCount}! +${bonusXP} Bereketli Hasene!`);
-            }, 300);
-        }
-        
-        // 3 saniye sonra gizle
+                elements.loadingScreen.style.display = 'none';
+            }, 500);
+        }, 500);
+    }
+    
+    // İstatistikleri yükle
+    await loadStats();
+    
+    // Arka planda JSON verilerini önceden yükle (non-blocking)
+    if (typeof preloadAllDataBackground === 'function') {
+        preloadAllDataBackground();
+    }
+    
+    // Onboarding kontrolü
+    if (!localStorage.getItem('hasene_onboarding_seen_v2')) {
         setTimeout(() => {
-            hideCombo();
-        }, 3000);
-    }
-}
-
-function hideCombo() {
-    const comboIndicator = document.getElementById('comboIndicator');
-    comboIndicator.style.animation = 'slideUp 0.3s ease';
-    setTimeout(() => {
-        comboIndicator.style.display = 'none';
-    }, 300);
-}
-
-// SESSION PUAN FONKSİYONLARI
-function addSessionPoints(points) {
-    log.game(`💰 === addSessionPoints(${points}) ÇAĞRILDI ===`);
-    
-    // Her puan eklendiğinde liderlik tablosunu güncelle (anlık güncelleme)
-    if (typeof updateLeaderboardScores === 'function' && points > 0) {
-        updateLeaderboardScores(points);
-        log.game(`📊 Liderlik tablosu güncellendi: +${points} Hasene`);
-    }
-    log.game(`📊 Önce: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
-    
-    // Güvenli puan ekleme - NaN kontrolü
-    if (typeof points !== 'number' || isNaN(points)) {
-        log.error('❌ Geçersiz puan değeri:', points);
-        return;
-    }
-    
-    // Session puanlarını güncelle
-    sessionScore += points;
-    sessionCorrect++;
-    
-    // Global puanlara da ekle
-    totalPoints += points;
-    
-    // Bugünkü toplam puana da ekle (günlük performans için)
-    dailyTasks.todayStats.toplamPuan += points;
-    
-    // NOT: toplamDogru artık sadece updateTaskProgress içinde artırılıyor (çift ekleme önlemek için)
-    // Eski kod: dailyTasks.todayStats.toplamDogru++; // ÇİFT EKLEME - KALDIRILDI
-    
-    // Daily correct sayısını storage'a kaydet (detaylı istatistikler için)
-    const currentDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
-    storage.set('dailyCorrect', (currentDailyCorrect + 1).toString());
-    
-    // Günlük ve haftalık görevleri güncelle
-    // NOT: toplamPuan zaten yukarıda eklendi, updateTaskProgress içinde tekrar eklenmesin diye özel kontrol yapılıyor
-    if (typeof updateTaskProgress === 'function') {
-        // toplamPuan için updateTaskProgress çağrılmayacak (çift ekleme önlemek için)
-        // updateTaskProgress('toplamPuan', points); // ÇİFT EKLEME - KALDIRILDI
-        // toplamDogru artık sadece burada artırılıyor (updateTaskProgress içinde)
-        updateTaskProgress('toplamDogru', 1);
-    }
-    
-    // Daily XP ekle
-    addDailyXP(points);
-    
-    // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
-    saveDailyStats();
-    
-    // Doğru cevap sesi
-    playSound('correct');
-    
-    // Combo sistemi
-    comboCount++;
-    updateCombo();
-    
-    // Günlük görevler için combo takibi (en yüksek combo'yu takip et)
-    if (dailyTasks && dailyTasks.todayStats) {
-        dailyTasks.todayStats.comboCount = Math.max(dailyTasks.todayStats.comboCount || 0, comboCount);
-        // Combo görevlerini güncelle (her 3x combo için)
-        if (comboCount > 0 && comboCount % 3 === 0) {
-            if (typeof updateTaskProgress === 'function') {
-                updateTaskProgress('comboCount', 1);
+            if (typeof showOnboarding === 'function') {
+                showOnboarding();
             }
-        }
-    }
-    
-    // Her 3 doğru cevapda combo bonusu
-    if (comboCount > 0 && comboCount % 3 === 0) {
-        const comboBonus = 5;
-        sessionScore += comboBonus; // Session skoruna da ekle (oyun sonunda gösterilecek)
-        totalPoints += comboBonus;
-        dailyTasks.todayStats.toplamPuan += comboBonus; // Bugünkü puana da ekle!
-        
-        // Günlük ve haftalık görevleri güncelle (combo bonusu için)
-        // NOT: toplamPuan zaten yukarıda eklendi, updateTaskProgress içinde tekrar eklenmesin diye çağrılmıyor
-        // if (typeof updateTaskProgress === 'function') {
-        //     updateTaskProgress('toplamPuan', comboBonus); // ÇİFT EKLEME - KALDIRILDI
-        // }
-        
-        // COMBO BONUSUNU DAILY XP'YE DE EKLE
-        addDailyXP(comboBonus);
-        
-        // COMBO BONUSUNU LİDERLİK TABLOSUNA DA EKLE
-        if (typeof updateLeaderboardScores === 'function' && comboBonus > 0) {
-            updateLeaderboardScores(comboBonus);
-            log.game(`📊 Liderlik tablosu güncellendi (combo bonusu): +${comboBonus} Hasene`);
-        }
-        
-        log.game(`🔥 Combo bonusu: +${comboBonus} XP`);
-        
-        // COMBO BONUS SONRASI HEMEN UI GÜNCELLE
-        updateUI(); // Oyun içi barı güncelle
-        updateStatsBar(); // Üst barı hemen güncelle
-    }
-    
-    // Geriye uyumluluk için eski değişkenleri de güncelle
-    score = sessionScore;
-    correct = sessionCorrect;
-    
-    // UI güncelle
-    updateUI(); // Oyun içi barı güncelle
-    updateStatsBar(); // Üst barı güncelle
-    // Başarımları kontrol et (güvenli şekilde)
-    if (typeof checkAchievements === 'function') {
-        checkAchievements();
-    }
-    
-    log.game(`📊 Sonra: sessionScore=${sessionScore}, totalPoints=${totalPoints}, combo=${comboCount}`);
-    log.game(`✅ addSessionPoints tamamlandı!`);
-}
-
-function addSessionWrong() {
-    log.game(`❌ === addSessionWrong() ÇAĞRILDI ===`);
-    log.game(`📊 Önce: sessionWrong=${sessionWrong}, wrong=${wrong}`);
-    sessionWrong++;
-    
-    // Bugünkü toplam yanlış cevap sayısını güncelle
-    if (dailyTasks && dailyTasks.todayStats) {
-        dailyTasks.todayStats.toplamYanlis = (dailyTasks.todayStats.toplamYanlis || 0) + 1;
-    }
-    
-    // Daily wrong sayısını storage'a kaydet (detaylı istatistikler için)
-    const currentDailyWrong = parseInt(storage.get('dailyWrong', '0')) || 0;
-    storage.set('dailyWrong', (currentDailyWrong + 1).toString());
-    
-    // Günlük verileri tarih bazlı kaydet (Son 7 Gün Trendi için)
-    saveDailyStats();
-    
-    // Yanlış cevap sesi
-    playSound('wrong');
-    
-    // Combo kır
-    if (comboCount > 0) {
-        comboCount = 0;
-        hideCombo();
-    }
-    wrong = sessionWrong; // Geriye uyumluluk
-    log.debug(`📊 Sonra: sessionWrong=${sessionWrong}, wrong=${wrong}`);
-    log.debug(`🎨 updateUI() çağrılıyor...`);
-    updateUI();
-    log.debug(`✅ addSessionWrong tamamlandı!`);
-}
-
-// ============ ROZET SİSTEMİ ============
-function updateBadgeSystem() {
-    // 🎯 XP BAZLI ROZET SİSTEMİ (1 saat oyun = ~8500 XP)
-    // 🥉 Bronz: 2,000 XP = 1 bronz (~15 dk)
-    // 🥈 Gümüş: 8,500 XP = 1 gümüş (~1 saat, 1 günlük hedef)
-    // 🥇 Altın: 25,500 XP = 1 altın (~3 gün)
-    // 💎 Elmas: 85,000 XP = 1 elmas (~10 gün)
-    
-    const xp = totalPoints;
-    const newBronze = Math.floor(xp / 2000);
-    const newSilver = Math.floor(xp / 8500);
-    const newGold = Math.floor(xp / 25500);
-    const newDiamond = Math.floor(xp / 85000);
-    
-    // Rozet seviye kontrolü ve modal gösterimi (önce en yüksek rozetleri kontrol et)
-    if (newDiamond > badges.diamond) {
-        badges.diamond = newDiamond;
-        showBadgeUpModal('diamond', '💎 Mütebahhir');
-        playSound('levelup'); // Elmas çok önemli, levelup sesi çal
-    } else if (newGold > badges.gold) {
-        badges.gold = newGold;
-        showBadgeUpModal('gold', '🥇 Mütecaviz');
-        playSound('levelup');
-    } else if (newSilver > badges.silver) {
-        badges.silver = newSilver;
-        showBadgeUpModal('silver', '🥈 Müterakki');
-        playSound('correct');
-    } else if (newBronze > badges.bronze) {
-        badges.bronze = newBronze;
-        showBadgeUpModal('bronze', '🥉 Mübtedi');
-        playSound('correct');
-    }
-    
-    // Tüm rozet sayılarını güncelle
-    badges.bronze = newBronze;
-    badges.silver = newSilver;
-    badges.gold = newGold;
-    badges.diamond = newDiamond;
-}
-
-function showBadgeUpModal(badgeType, badgeName) {
-    // Rozet kazanma modalı - profesyonel UI
-    showCustomAlert(`${badgeName} nişanı kazandınız!`, 'success', 'Tebrikler');
-}
-
-function showBadgesModal() {
-    // Önce tüm modalları ve oyun ekranlarını kapat
-    closeAllModals();
-    if (typeof hideAllGameScreens === 'function') {
-        hideAllGameScreens();
-    }
-    if (typeof hideAllModes === 'function') {
-        hideAllModes();
-    }
-    
-    // Synchronization: Wait for DOM updates before opening new modal
-    requestAnimationFrame(() => {
-        // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-        if (typeof hideBottomNavBar === 'function') {
-            hideBottomNavBar();
-        }
-        
-        // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-        initBadgesModalTouchEvents();
-        
-        // Body scroll'u engelle
-        document.body.style.overflow = 'hidden';
-        
-        // Tüm rozet sayılarını güncelle
-        const diamondEl = document.getElementById('diamondBadgeCount');
-        const goldEl = document.getElementById('goldBadgeCount');
-        const silverEl = document.getElementById('silverBadgeCount');
-        const bronzeEl = document.getElementById('bronzeBadgeCount');
-        
-        if (diamondEl) diamondEl.textContent = badges.diamond;
-        if (goldEl) goldEl.textContent = badges.gold;
-        if (silverEl) silverEl.textContent = badges.silver;
-        if (bronzeEl) bronzeEl.textContent = badges.bronze;
-        
-        // Yeni tasarım için istatistikleri güncelle
-        updateBadgesModalStats();
-        
-        // Tüm achievement'ları güncelle
-        updateAllAchievements();
-        
-        // İlk kategoriyi göster (kısa bir gecikme ile, DOM'un hazır olması için)
-        setTimeout(() => {
-            showBadgeCategory('daily');
-        }, 50);
-        
-        // Modal'ı göster
-        const badgesModal = document.getElementById('badgesModal');
-        if (badgesModal) {
-            badgesModal.style.display = 'flex';
-            // Force reflow to ensure modal is visible
-            badgesModal.offsetHeight;
-        }
-    });
-}
-
-// Kategori değiştirme fonksiyonu
-function showBadgeCategory(category, clickedElement) {
-    // Remove active class from all tabs
-    document.querySelectorAll('.category-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // Add active class to clicked tab
-    if (clickedElement) {
-        clickedElement.classList.add('active');
-    } else {
-        const tab = document.querySelector(`.category-tab[data-category="${category}"]`);
-        if (tab) tab.classList.add('active');
-    }
-    
-    // Hide all badges
-    document.querySelectorAll('.badge-card').forEach(card => {
-        card.style.display = 'none';
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-    });
-    
-    // Show badges of selected category
-    const categoryCards = document.querySelectorAll(`.badge-card[data-category="${category}"]`);
-    categoryCards.forEach((card, index) => {
-        card.style.display = 'block';
-        // Animate cards
-        setTimeout(() => {
-            card.style.transition = 'all 0.3s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 50);
-    });
-}
-
-// Başarılar modal istatistiklerini güncelle
-function updateBadgesModalStats() {
-    const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-    const totalAchievements = 21; // Toplam achievement sayısı (HAFIZ ile birlikte)
-    const unlockedCount = unlockedAchievements.length;
-    const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
-
-    const unlockedEl = document.getElementById('badgesUnlockedCount');
-    const totalEl = document.getElementById('badgesTotalCount');
-    const progressEl = document.getElementById('badgesProgressPercent');
-
-    if (unlockedEl) unlockedEl.textContent = unlockedCount;
-    if (totalEl) totalEl.textContent = totalAchievements;
-    if (progressEl) progressEl.textContent = progressPercent + '%';
-}
-
-// Tüm achievement'ları güncelle
-function updateAllAchievements() {
-    const unlockedAchievements = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-    const achievements = [
-        { id: 'first_win', name: 'İlk Zafer', desc: 'İlk sahih cevabin', icon: '🎯', condition: () => sessionCorrect >= 1 },
-        { id: 'combo_master', name: 'Muvazebet Ustası', desc: '5x muvazebet yap', icon: '🔥', condition: () => comboCount >= 5, progress: () => Math.min(comboCount || 0, 5) },
-        { id: 'daily_goal', name: 'Günlük Kahraman', desc: 'Günlük virdi tamamla', icon: '⭐', condition: () => {
-            const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
-            return dailyHasene >= goalHasene;
-        }, progress: () => {
-            const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-            const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
-            // Division by zero check
-            return goalHasene > 0 ? Math.min((dailyHasene / goalHasene) * 100, 100) : 0;
-        }},
-        { id: 'streak_7', name: '7 Gün Muvazebet', desc: '7 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 7, progress: () => Math.min((streakData.currentStreak || 0) / 7 * 100, 100) },
-        { id: 'streak_14', name: '14 Gün Muvazebet', desc: '14 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 14, progress: () => Math.min((streakData.currentStreak || 0) / 14 * 100, 100) },
-        { id: 'streak_21', name: '21 Gün Muvazebet', desc: '21 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 21, progress: () => Math.min((streakData.currentStreak || 0) / 21 * 100, 100) },
-        { id: 'streak_30', name: '30 Gün Muvazebet', desc: '30 gün üst üste talebe et', icon: '🔥', condition: () => streakData.currentStreak >= 30, progress: () => Math.min((streakData.currentStreak || 0) / 30 * 100, 100) },
-        { id: 'level_5', name: 'Mertebe 5', desc: 'Mertebe 5\'e ulaş', icon: '🏆', condition: () => level >= 5, progress: () => {
-            // Level 1 ise 0% göster, 1/5 değil
-            if (level <= 1) return 0;
-            return Math.min((level / 5) * 100, 100);
-        }},
-        { id: 'level_10', name: 'Mertebe 10', desc: 'Mertebe 10\'a ulaş', icon: '💎', condition: () => level >= 10, progress: () => {
-            // Level 1 ise 0% göster, 1/10 değil
-            if (level <= 1) return 0;
-            return Math.min((level / 10) * 100, 100);
-        }},
-        { id: 'level_20', name: 'Mertebe 20', desc: 'Mertebe 20\'ye ulaş', icon: '🌟', condition: () => level >= 20, progress: () => {
-            // Level 1 ise 0% göster, 1/20 değil
-            if (level <= 1) return 0;
-            return Math.min((level / 20) * 100, 100);
-        }},
-        { id: 'xp_500', name: 'İlk Adım', desc: '500 Hasene topla', icon: '🌱', condition: () => totalPoints >= 500, progress: () => Math.min((totalPoints || 0) / 500 * 100, 100) },
-        { id: 'xp_2000', name: 'Mübtedi Yolcu', desc: '2,000 Hasene', icon: '🥉', condition: () => totalPoints >= 2000, progress: () => Math.min((totalPoints || 0) / 2000 * 100, 100) },
-        { id: 'xp_8500', name: 'Gümüş Ustası', desc: '8,500 Hasene', icon: '🥈', condition: () => totalPoints >= 8500, progress: () => Math.min((totalPoints || 0) / 8500 * 100, 100) },
-        { id: 'xp_25500', name: 'Altın Ustası', desc: '25,500 Hasene', icon: '🥇', condition: () => totalPoints >= 25500, progress: () => Math.min((totalPoints || 0) / 25500 * 100, 100) },
-        { id: 'xp_85000', name: 'Elmas Ustası', desc: '85,000 Hasene', icon: '💎', condition: () => totalPoints >= 85000, progress: () => Math.min((totalPoints || 0) / 85000 * 100, 100) },
-        { id: 'xp_1000000', name: 'HAFIZ', desc: '1,000,000 Hasene', icon: '📖', condition: () => totalPoints >= 1000000, progress: () => Math.min((totalPoints || 0) / 1000000 * 100, 100) }
-    ];
-
-    achievements.forEach(ach => {
-        const card = document.getElementById(`achievement-${ach.id}`);
-        if (!card) return;
-
-        const isUnlocked = unlockedAchievements.includes(ach.id);
-        const progressFill = card.querySelector('.badge-progress-fill');
-        const statusText = card.querySelector('.badge-status');
-        const iconEl = card.querySelector('.badge-icon');
-        const titleEl = card.querySelector('.badge-title');
-        const descEl = card.querySelector('.badge-desc');
-
-        // Icon, title, desc güncelle
-        if (iconEl) iconEl.textContent = ach.icon;
-        if (titleEl) titleEl.textContent = ach.name;
-        if (descEl) descEl.textContent = ach.desc;
-
-        if (isUnlocked) {
-            card.classList.add('unlocked');
-            card.classList.remove('locked');
-            // Inline style'ları temizle - CSS class'ları kullanılacak
-            card.style.background = '';
-            card.style.borderColor = '';
-            card.style.boxShadow = '';
-            card.style.opacity = '';
-            card.style.filter = '';
-            if (progressFill) {
-                progressFill.style.width = '100%';
-                progressFill.style.background = '';
-            }
-            if (statusText) {
-                statusText.textContent = 'Tamamlandı';
-                statusText.style.color = '';
-                statusText.style.fontWeight = '';
-            }
-        } else {
-            card.classList.remove('unlocked');
-            card.classList.add('locked');
-            // Inline style'ları temizle - CSS class'ları kullanılacak
-            card.style.background = '';
-            card.style.borderColor = '';
-            card.style.opacity = '';
-            card.style.filter = '';
-            
-            // İlerleme göster
-            if (ach.progress && progressFill) {
-                const progress = ach.progress();
-                // Level achievement'ları için özel kontrol: level 1 ise 0% göster
-                let finalProgress = progress;
-                if (ach.id.startsWith('level_') && level <= 1) {
-                    finalProgress = 0;
-                }
-                progressFill.style.width = finalProgress + '%';
-                progressFill.style.background = '';
-            }
-            
-            // İlerleme metni
-            if (statusText && ach.progress) {
-                const progress = ach.progress();
-                if (ach.id === 'combo_master') {
-                    statusText.textContent = `${comboCount || 0}/5`;
-                } else if (ach.id === 'daily_goal') {
-                    const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-                    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-                    const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
-                    statusText.textContent = `${dailyHasene}/${goalHasene}`;
-                } else if (ach.id === 'streak_7') {
-                    statusText.textContent = `${streakData.currentStreak || 0}/7`;
-                } else if (ach.id === 'streak_14') {
-                    statusText.textContent = `${streakData.currentStreak || 0}/14`;
-                } else if (ach.id === 'streak_21') {
-                    statusText.textContent = `${streakData.currentStreak || 0}/21`;
-                } else if (ach.id === 'streak_30') {
-                    statusText.textContent = `${streakData.currentStreak || 0}/30`;
-                } else if (ach.id.startsWith('level_')) {
-                    const targetLevel = parseInt(ach.id.split('_')[1]);
-                    // Level 1 ise 0/X göster, 1/X değil
-                    const currentLevel = (level <= 1) ? 0 : level;
-                    statusText.textContent = `Seviye ${currentLevel}/${targetLevel}`;
-                } else if (ach.id.startsWith('xp_')) {
-                    const targetXP = parseInt(ach.id.split('_')[1]);
-                    statusText.textContent = `${(totalPoints || 0).toLocaleString()}/${targetXP.toLocaleString()}`;
-                } else {
-                    statusText.textContent = 'Kilitli';
-                }
-                statusText.style.color = '';
-                statusText.style.fontWeight = '';
-            } else if (statusText) {
-                statusText.textContent = 'Kilitli';
-            }
-        }
-    });
-}
-
-function closeBadgesModal() {
-    const modal = document.getElementById('badgesModal');
-    if (modal) {
-        // Event listener'ları temizle (memory leak prevention)
-        const scrollableContent = document.getElementById('badgesScrollableContent');
-        eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
-        
-        modal.style.display = 'none';
-        modal.style.zIndex = '';
-        // Body scroll'u tekrar aktif et
-        document.body.style.overflow = '';
-        
-        // Bottom nav bar'ı tekrar göster (modal kapandığında)
-        if (typeof showBottomNavBar === 'function') {
-            showBottomNavBar();
-        }
-        
-        // Tüm oyun ekranlarını ve modlarını gizle
-        if (typeof hideAllGameScreens === 'function') {
-            hideAllGameScreens();
-        }
-        if (typeof hideAllModes === 'function') {
-            hideAllModes();
-        } else {
-            // Fallback: Manuel olarak modları gizle
-            const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
-            modeIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.display = 'none';
-                    el.style.zIndex = '';
-                }
-            });
-        }
-        
-        // Ana sayfanın görünür olduğundan emin ol
-        if (elements && elements.mainMenu) {
-            elements.mainMenu.style.display = 'block';
-        }
-        
-        log.debug('🔒 Badges Modal kapatıldı ve temizlendi');
-    }
-}
-
-// Touch event tracking for badges modal scroll detection
-let badgesModalTouchStart = { x: 0, y: 0, time: 0 };
-let badgesModalIsScrolling = false;
-
-// Badges modal için unified event handler sistemi
-function initBadgesModalTouchEvents() {
-    const badgesModal = document.getElementById('badgesModal');
-    const badgesScrollableContent = document.getElementById('badgesScrollableContent');
-    if (!badgesModal) return;
-    
-    // Unified event handler kullan
-    if (window.unifiedEventHandler) {
-        // Category tabs için unified handler
-        const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
-        if (categoryTabsContainer) {
-            window.unifiedEventHandler.initCategoryTabs(categoryTabsContainer, function(category, tab, e) {
-                showBadgeCategory(category, tab);
-            });
-        }
-        
-        // Modal overlay için unified handler (sadece bir kez initialize et)
-        if (!badgesModal.hasAttribute('data-unified-events-initialized')) {
-            badgesModal.setAttribute('data-unified-events-initialized', 'true');
-            
-            window.unifiedEventHandler.init(badgesModal, {
-                onTap: (e, target) => {
-                    // X butonuna tıklanmışsa ignore et
-                    if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
-                        return;
-                    }
-                    
-                    // Category tab'a tıklanmışsa ignore et (zaten category tabs handler'ı var)
-                    if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
-                        return;
-                    }
-                    
-                    // Category tabs container'ına tıklanmışsa ignore et
-                    if (target && target.closest('.category-tabs')) {
-                        return;
-                    }
-                    
-                    // Scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa ignore et
-                    if (target && badgesScrollableContent && (
-                        target === badgesScrollableContent || 
-                        target.id === 'badgesScrollableContent' || 
-                        badgesScrollableContent.contains(target)
-                    )) {
-                        return;
-                    }
-                    
-                    // Badge kartlarına tıklanmışsa ignore et
-                    if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
-                        return;
-                    }
-                    
-                    // Modal içeriğine tıklanmışsa ignore et
-                    if (target && target.closest('.modal-content')) {
-                        return;
-                    }
-                    
-                    // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
-                    closeBadgesModal();
-                },
-                ignoreSelectors: [
-                    'button[onclick="closeBadgesModal()"]',
-                    '.category-tab',
-                    '.category-tabs',
-                    '#badgesScrollableContent',
-                    '.badge-card',
-                    '.modal-content'
-                ],
-                scrollableContent: badgesScrollableContent
-            });
-        }
-    } else {
-        // Fallback: Eğer unifiedEventHandler yüklenmemişse eventManager kullanan sistemi kullan
-        log.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi (eventManager) kullanılıyor');
-        
-        // Önce eski listener'ları temizle
-        if (badgesModal.hasAttribute('data-fallback-events-initialized')) {
-            eventManager.cleanup(badgesModal);
-            const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
-            if (categoryTabsContainer) {
-                eventManager.cleanup(categoryTabsContainer);
-            }
-            log.debug('🔄 Badges Modal: Eski fallback listener\'lar temizlendi');
-        }
-        badgesModal.setAttribute('data-fallback-events-initialized', 'true');
-        
-        // Category tab event listener'larını ekle
-        const categoryTabsContainer = badgesModal.querySelector('.category-tabs');
-        if (categoryTabsContainer) {
-            eventManager.add(categoryTabsContainer, 'click', function(e) {
-                const tab = e.target.closest('.category-tab');
-                if (tab) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    const category = tab.getAttribute('data-category');
-                    if (category) {
-                        showBadgeCategory(category, tab);
-                    }
-                    return false;
-                }
-            }, { capture: true });
-            
-            eventManager.add(categoryTabsContainer, 'touchend', function(e) {
-                const tab = e.target.closest('.category-tab');
-                if (tab) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    const category = tab.getAttribute('data-category');
-                    if (category) {
-                        showBadgeCategory(category, tab);
-                    }
-                    return false;
-                }
-            }, { passive: false, capture: true });
-        }
-    }
-}
-
-// Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
-function handleBadgesModalClick(event) {
-    // X butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
-    const target = event.target;
-    if (target && target.closest('button[onclick="closeBadgesModal()"]')) {
-        return;
-    }
-    
-    // Category tab butonlarına tıklanırsa, kapatma (zaten kendi handler'ı var)
-    if (target && (target.classList.contains('category-tab') || target.closest('.category-tab'))) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        return;
-    }
-    
-    // Category tabs container'ına tıklanırsa
-    if (target && target.closest('.category-tabs')) {
-        return;
-    }
-    
-    // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
-    if (target && (target.closest('.modal-content'))) {
-        return;
-    }
-    
-    // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-    if (target && (target.id === 'badgesScrollableContent' || target.closest('#badgesScrollableContent'))) {
-        // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
-        return;
-    }
-    
-    // Badge kartlarına tıklanırsa, kapatma
-    if (target && (target.classList.contains('badge-card') || target.closest('.badge-card'))) {
-        return;
-    }
-    
-    // Sadece modal overlay'e (arka plana) tıklanırsa kapat
-    closeBadgesModal();
-}
-
-function showXPInfoModal() {
-    const modal = document.getElementById('xpInfoModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        // Touch event'leri başlat
-        initXPInfoModalTouchEvents();
-    }
-}
-
-function closeXPInfoModal() {
-    const modal = document.getElementById('xpInfoModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Global olarak erişilebilir yap
-window.closeXPInfoModal = closeXPInfoModal;
-window.showXPInfoModal = showXPInfoModal;
-
-// XP Info Modal için unified event handler sistemi
-function initXPInfoModalTouchEvents() {
-    const xpInfoModal = document.getElementById('xpInfoModal');
-    const xpInfoScrollableContent = document.getElementById('xpInfoScrollableContent');
-    if (!xpInfoModal) return;
-    
-    // Unified event handler kullan
-    if (window.unifiedEventHandler) {
-        if (!xpInfoModal.hasAttribute('data-unified-events-initialized')) {
-            xpInfoModal.setAttribute('data-unified-events-initialized', 'true');
-            
-            window.unifiedEventHandler.init(xpInfoModal, {
-                onTap: (e, target) => {
-                    // X butonuna tıklanmışsa ignore et
-                    if (target && (target.id === 'closeXPInfoBtn' || target.closest('#closeXPInfoBtn'))) {
-                        return;
-                    }
-                    
-                    // Scroll edilebilir içerik alanına tıklanmışsa ignore et
-                    if (target && (target.id === 'xpInfoScrollableContent' || target.closest('#xpInfoScrollableContent'))) {
-                        return;
-                    }
-                    
-                    // Modal içeriğine tıklanmışsa ignore et
-                    if (target && target.closest('.modal-content')) {
-                        return;
-                    }
-                    
-                    // Sadece modal overlay'e (arka plana) tap yapıldı, kapat
-                    closeXPInfoModal();
-                },
-                ignoreSelectors: [
-                    '#closeXPInfoBtn',
-                    '#xpInfoScrollableContent',
-                    '.modal-content'
-                ],
-                scrollableContent: xpInfoScrollableContent
-            });
-        }
-    } else {
-        // Fallback: Eğer unifiedEventHandler yüklenmemişse eski sistemi kullan
-        log.warn('⚠️ UnifiedEventHandler yüklenmemiş, fallback sistemi kullanılıyor (xpInfoModal)');
-        
-        if (xpInfoModal.hasAttribute('data-touch-events-initialized')) return;
-        xpInfoModal.setAttribute('data-touch-events-initialized', 'true');
-        
-        let xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-        let xpInfoModalIsScrolling = false;
-        
-        if (xpInfoScrollableContent) {
-            xpInfoScrollableContent.addEventListener('touchstart', function(e) {
-                xpInfoModalIsScrolling = false;
-            }, { passive: true });
-            
-            xpInfoScrollableContent.addEventListener('touchmove', function(e) {
-                xpInfoModalIsScrolling = true;
-            }, { passive: true });
-        }
-        
-        xpInfoModal.addEventListener('touchstart', function(e) {
-            if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
-                return;
-            }
-            
-            const touch = e.touches[0];
-            xpInfoModalTouchStart = {
-                x: touch.clientX,
-                y: touch.clientY,
-                time: Date.now()
-            };
-            xpInfoModalIsScrolling = false;
-        }, { passive: true });
-        
-        xpInfoModal.addEventListener('touchmove', function(e) {
-            if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
-                xpInfoModalIsScrolling = true;
-                return;
-            }
-            
-            if (xpInfoModalTouchStart.x !== 0 || xpInfoModalTouchStart.y !== 0) {
-                const touch = e.touches[0];
-                const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
-                const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
-                if (deltaX > 10 || deltaY > 10) {
-                    xpInfoModalIsScrolling = true;
-                }
-            }
-        }, { passive: true });
-        
-        xpInfoModal.addEventListener('touchend', function(e) {
-            if (xpInfoModalIsScrolling) {
-                xpInfoModalIsScrolling = false;
-                xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-                return;
-            }
-            
-            const touch = e.changedTouches[0];
-            const deltaTime = Date.now() - xpInfoModalTouchStart.time;
-            const deltaX = Math.abs(touch.clientX - xpInfoModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - xpInfoModalTouchStart.y);
-            
-            if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                if (e.target && (e.target.id === 'xpInfoScrollableContent' || e.target.closest('#xpInfoScrollableContent'))) {
-                    return;
-                }
-                if (e.target && (e.target.id === 'closeXPInfoBtn' || e.target.closest('#closeXPInfoBtn'))) {
-                    return;
-                }
-                if (e.target && e.target.closest('.modal-content')) {
-                    return;
-                }
-                closeXPInfoModal();
-            }
-            
-            xpInfoModalTouchStart = { x: 0, y: 0, time: 0 };
-        }, { passive: true });
-    }
-}
-
-// Her yere tıklayınca kapatma fonksiyonu
-function handleXPInfoModalClick(event) {
-    const target = event.target;
-    if (target && target.closest('button[onclick*="closeXPInfoModal"]')) {
-        return;
-    }
-    if (target && target.closest('.modal-content')) {
-        return;
-    }
-    if (target && (target.id === 'xpInfoScrollableContent' || target.closest('#xpInfoScrollableContent'))) {
-        return;
-    }
-    closeXPInfoModal();
-}
-
-// Global olarak erişilebilir yap
-window.handleXPInfoModalClick = handleXPInfoModalClick;
-
-// ============ İSTATİSTİKLER SİSTEMİ ============
-function showStatsModal() {
-    // Önce tüm modalları ve oyun ekranlarını kapat
-    closeAllModals();
-    if (typeof hideAllGameScreens === 'function') {
-        hideAllGameScreens();
-    }
-    if (typeof hideAllModes === 'function') {
-        hideAllModes();
-    }
-    
-    // dailyTasks değerlerini localStorage'dan tekrar yükle (güncel değerler için)
-    try {
-        const savedTasks = localStorage.getItem('hasene_dailyTasks');
-        if (savedTasks) {
-            const parsedTasks = JSON.parse(savedTasks);
-            if (parsedTasks && parsedTasks.todayStats) {
-                // todayStats değerlerini güncelle (mevcut değerleri koru, sadece eksikleri ekle)
-                dailyTasks.todayStats = {
-                    ...dailyTasks.todayStats,
-                    ...parsedTasks.todayStats
-                };
-                // Set nesnelerini yeniden oluştur (güvenli şekilde)
-                if (parsedTasks.todayStats.farklıZorluk) {
-                    const farkliZorlukValue = parsedTasks.todayStats.farklıZorluk;
-                    if (Array.isArray(farkliZorlukValue)) {
-                        dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
-                    } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
-                        dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
-                    } else {
-                        dailyTasks.todayStats.farklıZorluk = new Set([]);
-                    }
-                }
-                if (parsedTasks.todayStats.allGameModes) {
-                    const allGameModesValue = parsedTasks.todayStats.allGameModes;
-                    if (Array.isArray(allGameModesValue)) {
-                        dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
-                    } else if (allGameModesValue && typeof allGameModesValue === 'object') {
-                        dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
-                    } else {
-                        dailyTasks.todayStats.allGameModes = new Set([]);
-                    }
-                }
-                log.debug('📊 dailyTasks.todayStats localStorage\'dan yüklendi:', dailyTasks.todayStats);
-            }
-        }
-    } catch (e) {
-        log.error('❌ dailyTasks yükleme hatası:', e);
-    }
-    
-    // totalPoints değerini güncelle (güncel değer için - localStorage'dan senkron yükle)
-    try {
-        const localPoints = localStorage.getItem('hasene_totalPoints');
-        if (localPoints !== null && localPoints !== undefined) {
-            const parsedPoints = parseInt(localPoints);
-            if (!isNaN(parsedPoints) && parsedPoints >= 0) {
-                totalPoints = parsedPoints;
-            }
-        }
-    } catch (e) {
-        log.error('❌ totalPoints yükleme hatası:', e);
-    }
-    
-    // Synchronization: Wait for DOM updates before opening new modal
-    requestAnimationFrame(() => {
-        // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-        if (typeof hideBottomNavBar === 'function') {
-            hideBottomNavBar();
-        }
-        
-        // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-        initStatsModalTouchEvents();
-        
-        // Body scroll'u engelle
-        document.body.style.overflow = 'hidden';
-        
-        // Seviye değerini güncelle (totalPoints değişmiş olabilir)
-        if (typeof calculateLevel === 'function') {
-            level = calculateLevel(totalPoints);
-        }
-        
-        // Seviye ilerleme barını hesapla
-    let currentLevelStart, nextLevelStart;
-    const nextLevel = level + 1;
-    
-    if (level === 1) {
-        currentLevelStart = 0;
-        nextLevelStart = 1000;
-    } else if (level <= 10) {
-        const thresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
-        currentLevelStart = thresholds[level - 1];
-        nextLevelStart = thresholds[level] || (58000 + ((level - 10) * 15000));
-    } else {
-        // Level 10'dan sonra
-        currentLevelStart = 58000 + ((level - 11) * 15000);
-        nextLevelStart = 58000 + ((level - 10) * 15000);
-    }
-    
-    const currentLevelPoints = totalPoints - currentLevelStart;
-    const levelRequiredPoints = nextLevelStart - currentLevelStart;
-    // Division by zero check
-    const progressPercentage = levelRequiredPoints > 0 ? Math.max(0, Math.min((currentLevelPoints / levelRequiredPoints) * 100, 100)) : 100;
-    const pointsNeeded = Math.max(0, nextLevelStart - totalPoints);
-    
-    // Seviye bilgilerini güncelle (null check ile)
-    const statsCurrentLevelEl = document.getElementById('statsCurrentLevel');
-    const statsNextLevelEl = document.getElementById('statsNextLevel');
-    const statsLevelProgressEl = document.getElementById('statsLevelProgress');
-    const statsLevelPointsNeededEl = document.getElementById('statsLevelPointsNeeded');
-    if (statsCurrentLevelEl) statsCurrentLevelEl.textContent = level;
-    if (statsNextLevelEl) statsNextLevelEl.textContent = nextLevel;
-    if (statsLevelProgressEl) {
-        statsLevelProgressEl.style.width = progressPercentage + '%';
-        statsLevelProgressEl.setAttribute('aria-valuenow', Math.round(progressPercentage));
-    }
-    if (statsLevelPointsNeededEl) statsLevelPointsNeededEl.textContent = pointsNeeded.toLocaleString();
-    
-    // Rozet sayılarını güncelle (null check ile)
-    // badges kontrolü
-    if (!badges) {
-        log.warn('⚠️ badges bulunamadı, varsayılan değerler kullanılıyor');
-        badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
-    }
-    
-    const statsBronzeEl = document.getElementById('statsBronze');
-    const statsSilverEl = document.getElementById('statsSilver');
-    const statsGoldEl = document.getElementById('statsGold');
-    const statsDiamondEl = document.getElementById('statsDiamond');
-    if (statsBronzeEl) statsBronzeEl.textContent = badges.bronze || 0;
-    if (statsSilverEl) statsSilverEl.textContent = badges.silver || 0;
-    if (statsGoldEl) statsGoldEl.textContent = badges.gold || 0;
-    if (statsDiamondEl) statsDiamondEl.textContent = badges.diamond || 0;
-    
-    // Başarı analizi hesapla (null check ile)
-    // dailyTasks ve todayStats kontrolü
-    if (!dailyTasks || !dailyTasks.todayStats) {
-        log.warn('⚠️ dailyTasks.todayStats bulunamadı, varsayılan değerler kullanılıyor');
-        if (!dailyTasks) dailyTasks = {};
-        if (!dailyTasks.todayStats) {
-            dailyTasks.todayStats = {
-                kelimeCevir: 0, dinleBul: 0, boslukDoldur: 0,
-                ayetOku: 0, duaOgre: 0, hadisOku: 0,
-                toplamDogru: 0, toplamYanlis: 0, toplamPuan: 0,
-                perfectStreak: 0, farklıZorluk: new Set()
-            };
-        }
-    }
-    
-    // streakData kontrolü
-    if (!streakData) {
-        log.warn('⚠️ streakData bulunamadı, varsayılan değerler kullanılıyor');
-        streakData = {
-            currentStreak: 0, bestStreak: 0, totalPlayDays: 0,
-            todayProgress: 0, dailyGoal: 5
-        };
-    }
-    
-    // Başarı oranı hesaplama: Tüm zamanların genel başarı oranı
-    // Önce kelime istatistiklerinden genel başarı oranını hesapla
-    let totalCorrect = 0;
-    let totalWrong = 0;
-    
-    try {
-        const wordStats = typeof loadWordStats === 'function' ? loadWordStats() : {};
-        if (wordStats && typeof wordStats === 'object') {
-            Object.values(wordStats).forEach(stat => {
-                if (stat && typeof stat === 'object') {
-                    totalCorrect += (stat.correct || 0);
-                    totalWrong += (stat.wrong || 0);
-                }
-            });
-        }
-    } catch (e) {
-        log.error('❌ wordStats yükleme hatası:', e);
-    }
-    
-    // Eğer kelime istatistikleri yoksa veya yetersizse, bugünkü istatistikleri kullan
-    const todayAttempts = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
-    if (totalCorrect === 0 && totalWrong === 0 && todayAttempts > 0) {
-        totalCorrect = dailyTasks.todayStats.toplamDogru || 0;
-        totalWrong = dailyTasks.todayStats.toplamYanlis || 0;
-    }
-    
-    // Genel başarı oranı: Tüm zamanların toplam doğru / Tüm zamanların toplam deneme
-    const totalAttempts = totalCorrect + totalWrong;
-    const successRate = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-    
-    // Günlük Ort. Hasene hesaplama: Toplam Hasene / Oyun oynanan gün sayısı
-    // playDates.length kullan (totalPlayDays sadece hedefi tamamladığı günleri sayar)
-    const playDatesCount = (streakData.playDates && Array.isArray(streakData.playDates)) 
-        ? streakData.playDates.length 
-        : streakData.totalPlayDays || 0;
-    
-    // Eğer hiç oyun oynanmamışsa ama bugün oyun oynanmışsa, 1 gün say
-    const today = getLocalDateString();
-    const hasPlayedToday = dailyTasks.todayStats.toplamPuan > 0 || 
-                          (dailyTasks.todayStats.toplamDogru > 0 || dailyTasks.todayStats.toplamYanlis > 0);
-    const effectivePlayDays = playDatesCount > 0 
-        ? playDatesCount 
-        : (hasPlayedToday ? 1 : 0);
-    
-    const avgPointsPerDay = effectivePlayDays > 0 
-        ? Math.round(totalPoints / effectivePlayDays) 
-        : 0;
-    // Talim Tutarlılığı: Oyun oynanan gün sayısı / İlk oyundan bugüne kadar geçen gün sayısı
-    // playDates.length kullan (totalPlayDays sadece hedefi tamamlanan günleri sayar)
-    const daysPlayed = playDatesCount > 0 ? playDatesCount : (hasPlayedToday ? 1 : 0);
-    const daysSinceFirstPlay = typeof getDaysFromFirstPlay === 'function' 
-        ? getDaysFromFirstPlay() 
-        : (daysPlayed > 0 ? 1 : 0);
-    const playConsistency = daysSinceFirstPlay > 0 
-        ? Math.round((daysPlayed / daysSinceFirstPlay) * 100) 
-        : 0;
-    
-    // Mertebe ilerleme yüzdesini hesapla (statsLevelProgressText için)
-    // progressPercentage değişkeni showStatsModal içinde hesaplanıyor, burada yeniden hesaplıyoruz
-    const statsCurrentLevel = calculateLevel(totalPoints);
-    let statsLevelStart = 0;
-    let statsNextLevelStart = 0;
-    
-    if (statsCurrentLevel === 1) {
-        statsLevelStart = 0;
-        statsNextLevelStart = 1000;
-    } else if (statsCurrentLevel <= 10) {
-        const thresholds = [0, 1000, 2500, 5000, 8500, 13000, 19000, 26500, 35500, 46000, 58000];
-        statsLevelStart = thresholds[statsCurrentLevel - 1];
-        statsNextLevelStart = thresholds[statsCurrentLevel] || (58000 + ((statsCurrentLevel - 10) * 15000));
-    } else {
-        // Level 10'dan sonra
-        statsLevelStart = 58000 + ((statsCurrentLevel - 11) * 15000);
-        statsNextLevelStart = 58000 + ((statsCurrentLevel - 10) * 15000);
-    }
-    
-    const statsLevelPoints = totalPoints - statsLevelStart;
-    const statsLevelRequired = statsNextLevelStart - statsLevelStart;
-    const levelProgressPercentage = statsLevelRequired > 0 
-        ? Math.max(0, Math.min((statsLevelPoints / statsLevelRequired) * 100, 100)) 
-        : 100;
-    const levelProgressPercent = Math.round(levelProgressPercentage);
-    
-    // Başarı analizi güncelle (null check ile)
-    const statsSuccessRateEl = document.getElementById('statsSuccessRate');
-    const statsAvgPointsPerDayEl = document.getElementById('statsAvgPointsPerDay');
-    const statsPlayConsistencyEl = document.getElementById('statsPlayConsistency');
-    const statsLevelProgressTextEl = document.getElementById('statsLevelProgressText');
-    if (statsSuccessRateEl) statsSuccessRateEl.textContent = successRate + '%';
-    if (statsAvgPointsPerDayEl) statsAvgPointsPerDayEl.textContent = avgPointsPerDay.toLocaleString();
-    if (statsPlayConsistencyEl) statsPlayConsistencyEl.textContent = Math.min(100, playConsistency) + '%';
-    if (statsLevelProgressTextEl) statsLevelProgressTextEl.textContent = levelProgressPercent + '%';
-    
-    // Streak bilgilerini güncelle (null check ile)
-    // Önce streak doğruluğunu kontrol et ve gerekirse düzelt
-    const todayDate = getLocalDateString();
-    if (typeof validateCurrentStreak === 'function') {
-        const streakValidation = validateCurrentStreak(todayDate);
-        if (!streakValidation.isValid) {
-            log.debug(`🔴 Streak tutarsızlığı düzeltiliyor: ${streakData.currentStreak} → ${streakValidation.correctStreak}`);
-            streakData.currentStreak = streakValidation.correctStreak;
-        }
-    }
-    
-    // En iyi streak'i playDates'ten hesapla (tüm zamanların en uzun ardışık gün serisi)
-    let calculatedBestStreak = streakData.bestStreak || 0;
-    if (streakData.playDates && Array.isArray(streakData.playDates) && streakData.playDates.length > 0) {
-        const sortedDates = [...streakData.playDates].sort();
-        let maxStreak = 1; // En az 1 gün
-        let currentStreak = 1;
-        
-        for (let i = 1; i < sortedDates.length; i++) {
-            const prevDateStr = sortedDates[i - 1];
-            const currentDateStr = sortedDates[i];
-            
-            // Önceki tarih + 1 gün = mevcut tarih mi kontrol et
-            const prevDate = new Date(prevDateStr + 'T00:00:00');
-            prevDate.setDate(prevDate.getDate() + 1);
-            const nextDayStr = getLocalDateString(prevDate);
-            
-            if (currentDateStr === nextDayStr) {
-                // Ardışık gün, streak devam ediyor
-                currentStreak++;
-            } else {
-                // Streak kırıldı, maksimum streak'i güncelle
-                maxStreak = Math.max(maxStreak, currentStreak);
-                currentStreak = 1;
-            }
-        }
-        // Son streak'i de kontrol et
-        maxStreak = Math.max(maxStreak, currentStreak);
-        calculatedBestStreak = maxStreak;
-        
-        // Eğer hesaplanan değer kayıtlı değerden büyükse güncelle
-        if (calculatedBestStreak > (streakData.bestStreak || 0)) {
-            streakData.bestStreak = calculatedBestStreak;
-            log.debug(`🏆 En iyi streak güncellendi: ${calculatedBestStreak} gün`);
-        }
-    }
-    
-    // Toplam Amel Günü: playDates.length kullan (totalPlayDays sadece hedefi tamamlanan günleri sayar)
-    const totalPlayDaysCount = (streakData.playDates && Array.isArray(streakData.playDates)) 
-        ? streakData.playDates.length 
-        : (streakData.totalPlayDays || 0);
-    
-    const statsCurrentStreakEl = document.getElementById('statsCurrentStreak');
-    const statsBestStreakEl = document.getElementById('statsBestStreak');
-    const statsTotalDaysEl = document.getElementById('statsTotalDays');
-    const statsTodayProgressEl = document.getElementById('statsTodayProgress');
-    if (statsCurrentStreakEl) statsCurrentStreakEl.textContent = streakData.currentStreak || 0;
-    if (statsBestStreakEl) statsBestStreakEl.textContent = calculatedBestStreak;
-    if (statsTotalDaysEl) statsTotalDaysEl.textContent = totalPlayDaysCount;
-    if (statsTodayProgressEl) {
-        const todayProgress = streakData.todayProgress || 0;
-        const dailyGoal = streakData.dailyGoal || 5;
-        // Gerçek ilerlemeyi göster (hedefi aşsa bile)
-        statsTodayProgressEl.textContent = todayProgress + '/' + dailyGoal;
-    }
-    
-    // Bugünkü oyun türü istatistikleri (null check ile)
-    const statsKelimeCevirEl = document.getElementById('statsKelimeCevir');
-    const statsDinleBulEl = document.getElementById('statsDinleBul');
-    const statsBoslukDoldurEl = document.getElementById('statsBoslukDoldur');
-    const statsAyetOkuEl = document.getElementById('statsAyetOku');
-    const statsDuaOgreEl = document.getElementById('statsDuaOgre');
-    const statsHadisOkuEl = document.getElementById('statsHadisOku');
-    if (statsKelimeCevirEl) statsKelimeCevirEl.textContent = dailyTasks.todayStats.kelimeCevir || 0;
-    if (statsDinleBulEl) statsDinleBulEl.textContent = dailyTasks.todayStats.dinleBul || 0;
-    if (statsBoslukDoldurEl) statsBoslukDoldurEl.textContent = dailyTasks.todayStats.boslukDoldur || 0;
-    if (statsAyetOkuEl) statsAyetOkuEl.textContent = dailyTasks.todayStats.ayetOku || 0;
-    if (statsDuaOgreEl) statsDuaOgreEl.textContent = dailyTasks.todayStats.duaOgre || 0;
-    if (statsHadisOkuEl) statsHadisOkuEl.textContent = dailyTasks.todayStats.hadisOku || 0;
-    
-    // Bugünkü performans (null check ile)
-    const statsTodayCorrectEl = document.getElementById('statsTodayCorrect');
-    const statsTodayPointsEl = document.getElementById('statsTodayPoints');
-    const statsPerfectStreakEl = document.getElementById('statsPerfectStreak');
-    const statsDifficultyCountEl = document.getElementById('statsDifficultyCount');
-
-    // NOT: günlük sahih ve hasene için tek "gerçek kaynak" localStorage değerleri olsun.
-    // todayStats.toplamDogru / toplamPuan oyun içinde farklı yerlerde ekstra güncellenebiliyor
-    // ve bu da kartta 2x görünmeye sebep olabiliyor. Kartta doğrudan storage'taki günlük
-    // istatistikleri gösteriyoruz ki değerler daima tutarlı olsun.
-    const statsDailyCorrect = parseInt(storage.get('dailyCorrect', '0')) || 0;
-    const statsDailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-
-    if (statsTodayCorrectEl) statsTodayCorrectEl.textContent = statsDailyCorrect;
-    if (statsTodayPointsEl) statsTodayPointsEl.textContent = statsDailyHasene;
-    if (statsPerfectStreakEl) statsPerfectStreakEl.textContent = dailyTasks.todayStats.perfectStreak || 0;
-    if (statsDifficultyCountEl) {
-        const farkliZorluk = dailyTasks.todayStats.farklıZorluk;
-        if (farkliZorluk && typeof farkliZorluk.size === 'number') {
-            statsDifficultyCountEl.textContent = farkliZorluk.size;
-        } else {
-            statsDifficultyCountEl.textContent = 0;
-        }
-    }
-    
-        // Modal'ı göster (null check ile)
-        const statsModal = document.getElementById('statsModal');
-        if (statsModal) {
-            statsModal.style.display = 'flex';
-            // Force reflow to ensure modal is visible
-            statsModal.offsetHeight;
-        }
-        
-        // Kelime istatistiklerini güncelle (artık tek sayfa olduğu için her zaman göster)
-        if (typeof updateWordStatistics === 'function') {
-            updateWordStatistics();
-        }
-        
-        // ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
-        updateAnalyticsData();
-        
-        // ============ LİDERLİK TABLOSU VERİLERİNİ GÜNCELLE ============
-        updateLeaderboard();
-        
-        // Varsayılan olarak Detaylı sekmesini aktif et
-        switchStatsTab('detailed');
-        
-        log.debug('📊 İstatistikler modalı açıldı');
-    });
-}
-
-// ============ DETAYLI ANALİTİK VERİLERİNİ GÜNCELLE ============
-function updateAnalyticsData() {
-    // Zaman analizi
-    const todayTotalQuestions = (dailyTasks.todayStats.toplamDogru || 0) + (dailyTasks.todayStats.toplamYanlis || 0);
-    
-    // Gerçek oyun süresini kullan (milisaniye cinsinden)
-    const totalPlayTimeMs = dailyTasks.todayStats.totalPlayTime || 0;
-    let todayMinutes = 0;
-    let questionsPerHour = 0;
-    
-    if (totalPlayTimeMs > 0) {
-        // Gerçek süre varsa kullan
-        todayMinutes = Math.round(totalPlayTimeMs / (1000 * 60)); // Milisaniyeyi dakikaya çevir
-        questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions * 60) / todayMinutes) : 0;
-    } else if (todayTotalQuestions > 0) {
-        // Gerçek süre yoksa tahmini kullan (ortalama 10 saniye/soru)
-        todayMinutes = Math.round((todayTotalQuestions * 10) / 60);
-        questionsPerHour = todayMinutes > 0 ? Math.round((todayTotalQuestions * 60) / todayMinutes) : 0;
-    }
-    
-    const analyticsTodayTime = document.getElementById('analyticsTodayTime');
-    const analyticsQuestionPerHour = document.getElementById('analyticsQuestionPerHour');
-    if (analyticsTodayTime) analyticsTodayTime.textContent = todayMinutes + ' dk';
-    if (analyticsQuestionPerHour) analyticsQuestionPerHour.textContent = questionsPerHour;
-    
-    // Günlük hedef durumu
-    const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-    const dailyGoalHasene = parseInt(localStorage.getItem('dailyGoalHasene') || defaultGoal.toString());
-
-    // ANALITIK KARTTA DA TEK KAYNAK: storage'daki dailyHasene
-    // todayStats.toplamPuan bazı bonus senaryolarında farklı hesaplandığı için
-    // burada da doğrudan dailyHasene'yi kullanıyoruz.
-    const todayProgress = parseInt(localStorage.getItem('dailyHasene') || '0');
-    const goalProgressPercent = dailyGoalHasene > 0 ? Math.min(100, Math.round((todayProgress / dailyGoalHasene) * 100)) : 0;
-    
-    const analyticsDailyGoal = document.getElementById('analyticsDailyGoal');
-    const analyticsTodayProgress = document.getElementById('analyticsTodayProgress');
-    const analyticsDailyGoalTotal = document.getElementById('analyticsDailyGoalTotal');
-    const analyticsGoalProgressBar = document.getElementById('analyticsGoalProgressBar');
-    const analyticsTimeToGoal = document.getElementById('analyticsTimeToGoal');
-    
-    if (analyticsDailyGoal) analyticsDailyGoal.textContent = dailyGoalHasene.toLocaleString();
-    if (analyticsTodayProgress) analyticsTodayProgress.textContent = todayProgress.toLocaleString();
-    if (analyticsDailyGoalTotal) analyticsDailyGoalTotal.textContent = dailyGoalHasene.toLocaleString();
-    if (analyticsGoalProgressBar) analyticsGoalProgressBar.style.width = goalProgressPercent + '%';
-    
-    // Hedef için tahmini süre hesapla
-    if (analyticsTimeToGoal) {
-        const remainingPoints = Math.max(0, dailyGoalHasene - todayProgress);
-        if (remainingPoints === 0) {
-            analyticsTimeToGoal.textContent = '🎉 Hedef tamamlandı!';
-        } else if (questionsPerHour > 0 && todayProgress > 0 && todayTotalQuestions > 0) {
-            // Ortalama puan/soru: bugünkü puan / bugünkü soru sayısı
-            const avgPointsPerQuestion = todayProgress / todayTotalQuestions;
-            const remainingQuestions = Math.ceil(remainingPoints / avgPointsPerQuestion);
-            
-            // Gerçek soru/saat hızını kullan (questionsPerHour zaten hesaplandı)
-            // Kalan soru sayısı / saatte çözülen soru sayısı * 60 = dakika
-            const estimatedMinutes = Math.ceil((remainingQuestions / questionsPerHour) * 60);
-            
-            if (estimatedMinutes < 60) {
-                analyticsTimeToGoal.textContent = `Tahmini: ${estimatedMinutes} dakika kaldı`;
-            } else {
-                const hours = Math.floor(estimatedMinutes / 60);
-                const mins = estimatedMinutes % 60;
-                analyticsTimeToGoal.textContent = `Tahmini: ${hours} saat ${mins} dakika kaldı`;
-            }
-        } else {
-            analyticsTimeToGoal.textContent = 'Ders talebe ederek başla!';
-        }
-    }
-    
-    // Kelime performansı
-    const allWordStats = loadWordStats();
-    const allWordStatsArray = Object.values(allWordStats);
-    
-    if (allWordStatsArray.length > 0) {
-        // Ortalama başarı oranı - tüm kelimelerin successRate ortalaması
-        const totalSuccessRate = allWordStatsArray.reduce((sum, stat) => {
-            // Eğer successRate yoksa, hesapla
-            let successRate = stat.successRate;
-            if (typeof successRate === 'undefined' || successRate === null) {
-                const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
-                successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
-            }
-            return sum + successRate;
-        }, 0);
-        const avgSuccessRate = allWordStatsArray.length > 0 ? Math.round((totalSuccessRate / allWordStatsArray.length) * 100) : 0;
-        
-        // En zor kelime (SON 7 GÜN) - en düşük başarı oranı ve en çok deneme
-        // Object.entries kullanarak wordId'yi de al
-        const wordStatsWithId = Object.entries(allWordStats)
-            .map(([wordId, stat]) => {
-                // successRate yoksa hesapla
-                let successRate = stat.successRate;
-                if (typeof successRate === 'undefined' || successRate === null) {
-                    const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
-                    successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
-                }
-                return { wordId, ...stat, successRate };
-            })
-            .filter(s => (s.attempts || 0) > 0 || ((s.correct || 0) + (s.wrong || 0)) > 0);
-        
-        // En zor kelime: Son 7 günde en düşük başarı oranı + en fazla deneme
-        // Minimum 3 deneme şartı (yeterli veri için)
-        const MIN_ATTEMPTS_FOR_HARDEST = 3;
-
-        // Kelime istatistikleri tarih tutmuyorsa, şimdilik global istatistikler üzerinden
-        // son 7 gün için bir approx yaklaşımı kullanılır. İleride tarih bazlı kelime istatistiği
-        // eklenirse burası doğrudan son 7 gün verisine bağlanabilir.
-        const hardestWord = wordStatsWithId.length > 0
-            ? wordStatsWithId
-                .filter(s => {
-                    const attempts = (s.attempts || 0) || ((s.correct || 0) + (s.wrong || 0));
-                    return attempts >= MIN_ATTEMPTS_FOR_HARDEST;
-                })
-                .sort((a, b) => {
-                    const attemptsA = (a.attempts || 0) || ((a.correct || 0) + (a.wrong || 0));
-                    const attemptsB = (b.attempts || 0) || ((b.correct || 0) + (b.wrong || 0));
-                    const wrongA = (a.wrong || 0);
-                    const wrongB = (b.wrong || 0);
-                    const successRateA = a.successRate || 0;
-                    const successRateB = b.successRate || 0;
-                    
-                    // Önce başarı oranına göre sırala (düşük = zor)
-                    if (Math.abs(successRateA - successRateB) > 0.1) {
-                        return successRateA - successRateB;
-                    }
-                    // Başarı oranları yakınsa, yanlış cevap sayısına göre sırala (fazla = zor)
-                    return wrongB - wrongA;
-                })[0] || wordStatsWithId[0] // Eğer minimum attempts şartını sağlayan yoksa, ilk kelimeyi al
-            : null;
-        
-        const analyticsAvgSuccess = document.getElementById('analyticsAvgSuccess');
-        const analyticsHardestWord = document.getElementById('analyticsHardestWord');
-        
-        if (analyticsAvgSuccess) analyticsAvgSuccess.textContent = '%' + avgSuccessRate;
-        if (analyticsHardestWord) {
-            if (hardestWord && hardestWord.wordId) {
-                // Kelime verisini bul (null kontrolü ile)
-                let wordData = null;
-                if (window.kelimeCevirData && Array.isArray(window.kelimeCevirData)) {
-                    wordData = window.kelimeCevirData.find(w => w.id === hardestWord.wordId);
-                }
-                // Eğer kelimeCevirData'da bulunamazsa, kelimeBulData'da ara
-                if (!wordData && typeof kelimeBulData !== 'undefined' && Array.isArray(kelimeBulData)) {
-                    wordData = kelimeBulData.find(w => w.id === hardestWord.wordId);
-                }
-                if (wordData && wordData.kelime) {
-                    analyticsHardestWord.textContent = wordData.kelime;
-                } else {
-                    analyticsHardestWord.textContent = '-';
-                }
-            } else {
-                analyticsHardestWord.textContent = '-';
-            }
-        }
-    }
-    
-    // Öğrenme haritası - successRate ve masteryLevel değerlerini normalize et
-    const normalizedWordStats = allWordStatsArray.map(stat => {
-        // successRate yoksa hesapla
-        let successRate = stat.successRate;
-        if (typeof successRate === 'undefined' || successRate === null) {
-            const attempts = (stat.attempts || 0) || ((stat.correct || 0) + (stat.wrong || 0));
-            successRate = attempts > 0 ? ((stat.correct || 0) / attempts) : 0;
-        }
-        // masteryLevel yoksa 0 kabul et
-        const masteryLevel = (typeof stat.masteryLevel !== 'undefined' && stat.masteryLevel !== null) 
-            ? parseFloat(stat.masteryLevel) || 0 
-            : 0;
-        
-        return { ...stat, successRate, masteryLevel };
-    });
-    
-    // Öğrenilmiş kelimeler: masteryLevel >= 3.0 VE successRate >= 0.6
-    const masteredWords = normalizedWordStats.filter(s => s.masteryLevel >= 3.0 && s.successRate >= 0.6).length;
-    
-    // Pratik yapılan kelimeler: masteryLevel 1.5-3.0 arası VE successRate >= 0.5
-    const practiceWords = normalizedWordStats.filter(s => 
-        s.masteryLevel >= 1.5 && s.masteryLevel < 3.0 && s.successRate >= 0.5
-    ).length;
-    
-    // Zorlanılan kelimeler: successRate < 0.6 VEYA masteryLevel < 1.0
-    const strugglingWords = normalizedWordStats.filter(s => 
-        s.successRate < 0.6 || s.masteryLevel < 1.0
-    ).length;
-    
-    const analyticsLearnedCount = document.getElementById('analyticsLearnedCount');
-    const analyticsPracticeCount = document.getElementById('analyticsPracticeCount');
-    const analyticsStrugglingCount = document.getElementById('analyticsStrugglingCount');
-    
-    if (analyticsLearnedCount) analyticsLearnedCount.textContent = masteredWords;
-    if (analyticsPracticeCount) analyticsPracticeCount.textContent = practiceWords;
-    if (analyticsStrugglingCount) analyticsStrugglingCount.textContent = strugglingWords;
-}
-
-// ============ LİDERLİK TABLOSU SİSTEMİ ============
-// Liderlik tablosu verisini yükle
-function loadLeaderboard() {
-    try {
-        const data = localStorage.getItem('haseneLeaderboard');
-        if (data) {
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        log.error('Liderlik tablosu yükleme hatası:', error);
-    }
-    return [];
-}
-
-// Liderlik tablosu verisini kaydet
-function saveLeaderboard(leaderboard) {
-    try {
-        // Maksimum 100 kayıt tut
-        const sorted = leaderboard
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 100);
-        localStorage.setItem('haseneLeaderboard', JSON.stringify(sorted));
-        return sorted;
-    } catch (error) {
-        log.error('Liderlik tablosu kaydetme hatası:', error);
-        return leaderboard;
-    }
-}
-
-// Liderlik tablosuna kullanıcı ekle/güncelle
-function updateLeaderboardEntry(userName, score) {
-    const leaderboard = loadLeaderboard();
-    const now = new Date().toISOString();
-    
-    // Kullanıcı adını localStorage'dan al veya varsayılan kullan
-    const defaultName = userName || 'Kullanıcı';
-    
-    // Mevcut kullanıcıyı bul
-    let userIndex = leaderboard.findIndex(entry => entry.name === defaultName);
-    
-    if (userIndex >= 0) {
-        // Güncelle
-        if (score > leaderboard[userIndex].score) {
-            leaderboard[userIndex].score = score;
-            leaderboard[userIndex].updatedAt = now;
-        }
-    } else {
-        // Yeni ekle
-        leaderboard.push({
-            name: defaultName,
-            score: score,
-            createdAt: now,
-            updatedAt: now
-        });
-    }
-    
-    return saveLeaderboard(leaderboard);
-}
-
-// Liderlik tablosunu güncelle ve göster
-function updateLeaderboard() {
-    // Önce mevcut kullanıcıyı güncelle
-    const userName = localStorage.getItem('haseneUserName') || 'Kullanıcı';
-    updateLeaderboardEntry(userName, totalPoints);
-    
-    // Liderlik tablosunu yükle
-    const leaderboard = loadLeaderboard();
-    const sortedLeaderboard = leaderboard.sort((a, b) => b.score - a.score);
-    
-    // Kullanıcının sıralamasını bul
-    const userIndex = sortedLeaderboard.findIndex(entry => entry.name === userName);
-    const userRank = userIndex >= 0 ? userIndex + 1 : '-';
-    const userScore = totalPoints;
-    
-    // Kullanıcı bilgilerini güncelle
-    const leaderboardYourRank = document.getElementById('leaderboardYourRank');
-    const leaderboardYourScore = document.getElementById('leaderboardYourScore');
-    
-    if (leaderboardYourRank) {
-        if (userRank === 1) {
-            leaderboardYourRank.textContent = '🥇 ' + userRank;
-        } else if (userRank === 2) {
-            leaderboardYourRank.textContent = '🥈 ' + userRank;
-        } else if (userRank === 3) {
-            leaderboardYourRank.textContent = '🥉 ' + userRank;
-        } else {
-            leaderboardYourRank.textContent = '#' + userRank;
-        }
-    }
-    if (leaderboardYourScore) {
-        leaderboardYourScore.textContent = 'Hasene: ' + userScore.toLocaleString();
-    }
-    
-    // Liderlik listesini göster
-    const leaderboardList = document.getElementById('leaderboardList');
-    if (leaderboardList) {
-        if (sortedLeaderboard.length === 0) {
-            leaderboardList.innerHTML = `
-                <div style="text-align: center; padding: 20px; color: #666; font-size: 0.9em;">
-                    Henüz liderlik tablosu verisi yok. Ders talebe ederek sıralamaya katıl!
-                </div>
-            `;
-        } else {
-            leaderboardList.innerHTML = sortedLeaderboard.slice(0, 10).map((entry, index) => {
-                const rank = index + 1;
-                const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-                const isCurrentUser = entry.name === userName;
-                
-                return `
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: ${isCurrentUser ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8f9fa'}; border-radius: 8px; border: ${isCurrentUser ? '2px solid #667eea' : '1px solid #e0e0e0'};">
-                        <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                            <div style="font-size: 1.2em; font-weight: bold; color: ${isCurrentUser ? 'white' : '#667eea'}; min-width: 40px; text-align: center;">
-                                ${rankEmoji || '#' + rank}
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-weight: ${isCurrentUser ? 'bold' : '600'}; color: ${isCurrentUser ? 'white' : '#333'}; font-size: 0.9em;">
-                                    ${sanitizeHTML(entry.name)}${isCurrentUser ? ' (Sen)' : ''}
-                                </div>
-                                <div style="font-size: 0.75em; color: ${isCurrentUser ? 'rgba(255,255,255,0.9)' : '#666'}; margin-top: 2px;">
-                                    ${new Date(entry.updatedAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-size: 1.1em; font-weight: bold; color: ${isCurrentUser ? 'white' : '#667eea'};">
-                            ${entry.score.toLocaleString()}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
-}
-
-function getDaysFromFirstPlay() {
-    if (!streakData || !streakData.playDates || streakData.playDates.length === 0) {
-        // Eğer hiç oyun oynanmamışsa, bugünü say (1 gün)
-        return 1;
-    }
-    
-    // İlk oyun tarihi (YYYY-MM-DD formatında)
-    const firstPlayDateStr = streakData.playDates[0];
-    const firstPlayDate = new Date(firstPlayDateStr + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Bugün - İlk oyun tarihi (gün cinsinden)
-    const diffTime = today - firstPlayDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // En az 1 gün (bugün oyun oynanmışsa)
-    return Math.max(1, diffDays);
-}
-
-function closeStatsModal() {
-    const modal = document.getElementById('statsModal');
-    if (modal) {
-        // Event listener'ları temizle (memory leak prevention)
-        const scrollableContent = document.getElementById('statsScrollableContent');
-        eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
-        
-        modal.style.display = 'none';
-        modal.style.zIndex = '';
-        // Body scroll'u tekrar aktif et
-        document.body.style.overflow = '';
-        
-        // Bottom nav bar'ı tekrar göster (modal kapandığında)
-        if (typeof showBottomNavBar === 'function') {
-            showBottomNavBar();
-        }
-        
-        // Tüm oyun ekranlarını ve modlarını gizle
-        if (typeof hideAllGameScreens === 'function') {
-            hideAllGameScreens();
-        }
-        if (typeof hideAllModes === 'function') {
-            hideAllModes();
-        } else {
-            // Fallback: Manuel olarak modları gizle
-            const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
-            modeIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.display = 'none';
-                    el.style.zIndex = '';
-                }
-            });
-        }
-        
-        // Ana sayfanın görünür olduğundan emin ol
-        if (elements && elements.mainMenu) {
-            elements.mainMenu.style.display = 'block';
-        }
-        
-        log.debug('🔒 Stats Modal kapatıldı ve temizlendi');
-    }
-}
-
-// Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
-// Touch event tracking for scroll detection
-let statsModalTouchStart = { x: 0, y: 0, time: 0 };
-let statsModalIsScrolling = false;
-
-// Stats modal için touch event'leri - DOMContentLoaded içinde ekleniyor
-function initStatsModalTouchEvents() {
-    const statsModal = document.getElementById('statsModal');
-    const statsScrollableContent = document.getElementById('statsScrollableContent');
-    if (!statsModal) return;
-    
-    // Eğer zaten eklenmişse, önce temizle
-    if (statsModal.hasAttribute('data-touch-events-initialized')) {
-        eventManager.cleanupMultiple([statsModal, statsScrollableContent].filter(Boolean));
-        log.debug('🔄 Stats Modal: Eski listener\'lar temizlendi, yeni eklenecek');
-    }
-    statsModal.setAttribute('data-touch-events-initialized', 'true');
-    
-    // Scroll edilebilir içerik alanında scroll algılama
-    if (statsScrollableContent) {
-        eventManager.add(statsScrollableContent, 'touchstart', function(e) {
-            statsModalIsScrolling = false;
-        }, { passive: true });
-        
-        eventManager.add(statsScrollableContent, 'touchmove', function(e) {
-            // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-            statsModalIsScrolling = true;
-        }, { passive: true });
-    }
-    
-    // Modal overlay için touch event'leri
-    eventManager.add(statsModal, 'touchstart', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
-        const target = e.target;
-        if (target && statsScrollableContent && (
-            target === statsScrollableContent || 
-            target.id === 'statsScrollableContent' || 
-            statsScrollableContent.contains(target)
-        )) {
-            return;
-        }
-        
-        const touch = e.touches[0];
-        statsModalTouchStart = {
-            x: touch.clientX,
-            y: touch.clientY,
-            time: Date.now()
-        };
-        statsModalIsScrolling = false;
-    }, { passive: true });
-    
-    eventManager.add(statsModal, 'touchmove', function(e) {
-        // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
-        const target = e.target;
-        if (target && statsScrollableContent && (
-            target === statsScrollableContent || 
-            target.id === 'statsScrollableContent' || 
-            statsScrollableContent.contains(target)
-        )) {
-            statsModalIsScrolling = true;
-            return;
-        }
-        
-        if (statsModalTouchStart.x !== 0 || statsModalTouchStart.y !== 0) {
-            const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - statsModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - statsModalTouchStart.y);
-            // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-            if (deltaX > 10 || deltaY > 10) {
-                statsModalIsScrolling = true;
-            }
-        }
-    }, { passive: true });
-    
-    eventManager.add(statsModal, 'touchend', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
-        const target = e.target;
-        if (target && statsScrollableContent && (
-            target === statsScrollableContent || 
-            target.id === 'statsScrollableContent' || 
-            statsScrollableContent.contains(target)
-        )) {
-            statsModalIsScrolling = false;
-            statsModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Touch end'de scroll kontrolü yap
-        if (statsModalIsScrolling) {
-            // Scroll oldu, kapatma
-            statsModalIsScrolling = false;
-            statsModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Scroll değilse, normal click gibi davran
-        const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - statsModalTouchStart.time;
-        const deltaX = Math.abs(touch.clientX - statsModalTouchStart.x);
-        const deltaY = Math.abs(touch.clientY - statsModalTouchStart.y);
-        
-        // Kısa süre (300ms) ve küçük hareket (10px) = tap
-        if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-            // X butonuna tıklanmışsa ignore et
-            if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
-                statsModalTouchStart = { x: 0, y: 0, time: 0 };
-                return;
-            }
-            
-            // Panel üzerine veya dış arka plana tap yapıldı, kapat
-            closeStatsModal();
-        }
-        
-        statsModalTouchStart = { x: 0, y: 0, time: 0 };
-    }, { passive: true });
-}
-
-function handleStatsModalClick(event) {
-    // X butonuna tıklanırsa kapatma (zaten kendi handler'ı var)
-    const target = event.target;
-    if (target && (target.id === 'closeStatsBtn' || target.closest('#closeStatsBtn'))) {
-        return;
-    }
-    
-    // Detaylı butonuna tıklanırsa kapatma (mobil için özel kontrol)
-    if (target && (target.id === 'detailedStatsBtn' || target.closest('#detailedStatsBtn'))) {
-        return;
-    }
-    
-    // Filtre butonlarına tıklanırsa paneli kapatma
-    if (target && (
-        target.id === 'filterAll' || 
-        target.id === 'filterMastered' || 
-        target.id === 'filterStruggling' || 
-        target.id === 'filterRecent' ||
-        target.closest('#filterAll') ||
-        target.closest('#filterMastered') ||
-        target.closest('#filterStruggling') ||
-        target.closest('#filterRecent')
-    )) {
-        // Filtre butonlarının kendi onclick handler'ları çalışsın
-        return;
-    }
-    
-    // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
-    if (target && (target.closest('.modal-content'))) {
-        return;
-    }
-    
-    // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-    if (target && (target.id === 'statsScrollableContent' || target.closest('#statsScrollableContent'))) {
-        // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
-        return;
-    }
-    
-    // Sadece modal overlay'e (arka plana) tıklanırsa kapat
-    closeStatsModal();
-}
-
-async function confirmResetStats() {
-    const confirmed = confirm('🚨 DİKKAT!\n\nTüm ders verilerini sıfırlamak istediğinden emin misin?\n\n• Tüm puanlar (0\'a döner)\n• Tüm nişanlar (silinir)\n• Tüm muvaffakiyetler (sıfırlanır)\n• Muvaffakiyet terakki barları (0%\'a döner)\n• Mertebe nişanları (Mütebahhir, Mütecaviz, Müterakki, Mübtedi - sıfırlanır)\n• Tüm streak verileri (sıfırlanır)\n• Tüm günlük vazifeler (yenilenir)\n• Tüm istatistikler (temizlenir)\n• İstatistikler paneli tüm alanları (sıfırlanır)\n• KELİME PANELİ istatistikleri (sıfırlanır)\n• GÜNLÜK VİRD XP (0\'a döner)\n• Muvaffakiyetler modal istatistikleri (sıfırlanır)\n• Takvim modal streak bilgisi (sıfırlanır)\n\nBu işlem GERİ ALINMAZ!\n\nDevam etmek istiyor musun?');
-    
-    if (confirmed) {
-        // İkinci onay
-        const doubleConfirmed = confirm('🔥 SON UYARI!\n\nGerçekten TÜM VERİLERİ sıfırlamak istiyor musun?\n\nBu işlemden sonra oyuna sıfırdan başlayacaksın!\n\n✅ EVET = Sıfırla\n❌ HAYIR = İptal et');
-        
-        if (doubleConfirmed) {
-            closeStatsModal(); // Modal'ı kapat
-            // NOT: resetAllStats'ı await etmeden çağır (click handler'ı bloklamasın)
-            // IndexedDB işlemleri arka planda tamamlanacak
-            resetAllStats().catch(err => {
-                log.error('❌ resetAllStats hatası:', err);
-            });
-        }
-    }
-}
-
-// Global fonksiyonlar (window'a ekle)
-window.showStatsModal = showStatsModal;
-window.closeStatsModal = closeStatsModal;
-window.handleStatsModalClick = handleStatsModalClick;
-window.handleCalendarModalClick = handleCalendarModalClick;
-window.handleBadgesModalClick = handleBadgesModalClick;
-window.handleDailyTasksModalClick = handleDailyTasksModalClick;
-window.confirmResetStats = confirmResetStats;
-window.showBadgeCategory = showBadgeCategory;
-window.showBadgesModal = showBadgesModal;
-window.closeBadgesModal = closeBadgesModal;
-
-// ============ ONBOARDING/TUTORIAL SİSTEMİ ============
-// NOT: Onboarding sistemi artık js/onboarding.js dosyasında yönetiliyor.
-// Bu dosyadaki eski onboarding fonksiyonları kaldırıldı.
-// window.showOnboarding fonksiyonu onboarding.js'den geliyor ve localStorage kontrolü yapıyor.
-
-// ============ TAKVİM SİSTEMİ ============
-function checkDailyProgress() {
-    const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-    
-    // Eğer bugün ilk defa açılıyorsa
-    if (streakData.todayDate !== today) {
-        log.debug(`🕐 Gün değişikliği algılandı: ${streakData.todayDate} → ${today}`);
-        
-        // Gelişmiş streak kontrolü
-        const streakValidation = validateCurrentStreak(today);
-        if (!streakValidation.isValid) {
-            log.debug(`🔴 Streak tutarsızlığı: ${streakValidation.reason}`);
-            streakData.currentStreak = streakValidation.correctStreak;
-        }
-        
-        // Bugünün verilerini sıfırla
-        streakData.todayDate = today;
-        streakData.todayProgress = 0;
-        
-        log.debug(`📅 Yeni gün başladı: ${today}, mevcut streak: ${streakData.currentStreak}`);
-    }
-}
-
-// 🔍 Streak doğruluğunu kapsamlı kontrol eden fonksiyon
-function validateCurrentStreak(today) {
-    if (streakData.playDates.length === 0) {
-        return { isValid: true, correctStreak: 0, reason: 'Hiç oyun oynammış' };
-    }
-
-    // Tarihleri sırala (en yeniden eskiye)
-    const sortedDates = [...streakData.playDates].sort().reverse();
-    
-    // Bugünden başlayarak geriye doğru ardışık günleri say
-    let consecutiveDays = 0;
-    let currentDate = today;
-    
-    for (let i = 0; i < sortedDates.length; i++) {
-        if (sortedDates[i] === currentDate) {
-            consecutiveDays++;
-            // Bir önceki günü hesapla
-            const prevDate = new Date(currentDate);
-            prevDate.setDate(prevDate.getDate() - 1);
-            currentDate = getLocalDateString(prevDate);
-        } else {
-            // Ardışık olmayan tarih bulundu, streak burada bitiyor
-            break;
-        }
-    }
-
-    const isValid = consecutiveDays === streakData.currentStreak;
-    const reason = isValid ? 'Streak doğru' : 
-                  `Hesaplanan: ${consecutiveDays}, kayıtlı: ${streakData.currentStreak}`;
-
-    return { 
-        isValid, 
-        correctStreak: consecutiveDays, 
-        reason: reason
-    };
-}
-
-// 📅 Mevcut streak'in gerçek tarihlerini hesapla
-function calculateCurrentStreakDates() {
-    if (streakData.playDates.length === 0 || streakData.currentStreak === 0) {
-        return [];
-    }
-
-    // Son oyun tarihinden başlayarak geriye doğru ardışık tarihleri bul
-    const sortedDates = [...streakData.playDates].sort().reverse();
-    const streakDates = [];
-    let currentDate = sortedDates[0]; // En son oyun tarihi
-
-    for (let i = 0; i < sortedDates.length && streakDates.length < streakData.currentStreak; i++) {
-        if (sortedDates[i] === currentDate) {
-            streakDates.push(currentDate);
-            // Bir önceki günü hesapla
-            const prevDate = new Date(currentDate);
-            prevDate.setDate(prevDate.getDate() - 1);
-            currentDate = getLocalDateString(prevDate);
-        } else {
-            // Ardışık olmayan tarih, streak burada bitiyor
-            break;
-        }
-    }
-
-    log.debug(`🔥 Streak tarihleri hesaplandı: [${streakDates.join(', ')}]`);
-    return streakDates;
-}
-
-function updateDailyProgress(correctAnswers) {
-    const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-    
-    // Günlük ilerleme güncelle
-    streakData.todayProgress += correctAnswers;
-    
-    // Takvim açıksa bugünkü hedefi gerçek zamanlı güncelle
-    const todayProgressElement = document.getElementById('todayProgress');
-    const todayProgressIconElement = document.getElementById('todayProgressIcon');
-    
-    if (todayProgressElement) {
-        const currentProgress = Math.min(streakData.todayProgress, streakData.dailyGoal);
-        todayProgressElement.textContent = currentProgress;
-        
-        // İlerlemeye göre dinamik emoji
-        if (todayProgressIconElement) {
-            if (currentProgress >= 5) {
-                todayProgressIconElement.textContent = '✅'; // Tamamlandı
-            } else if (currentProgress >= 3) {
-                todayProgressIconElement.textContent = '🔥'; // İyi gidiyor  
-            } else if (currentProgress >= 1) {
-                todayProgressIconElement.textContent = '💪'; // Başlamış
-            } else {
-                todayProgressIconElement.textContent = '⏳'; // Henüz başlamamış
-            }
-        }
-    }
-    
-    // Günlük hedef tamamlandı mı?
-    if (streakData.todayProgress >= streakData.dailyGoal && streakData.lastPlayDate !== today) {
-        log.debug(`🎯 Günlük hedef tamamlandı! İlerleme: ${streakData.todayProgress}/${streakData.dailyGoal}`);
-        
-        // İlk defa bugün hedefi tamamladı
-        streakData.lastPlayDate = today;
-        streakData.totalPlayDays++;
-        
-        log.debug(`📈 Toplam oyun günü: ${streakData.totalPlayDays}, önceki streak: ${streakData.currentStreak}`);
-        
-        // Oyun tarihi listesine ekle
-        if (!streakData.playDates.includes(today)) {
-            streakData.playDates.push(today);
-            streakData.playDates.sort();
-        }
-        
-        // Streak güncelle - bugün ilk kez hedefi tamamladı
-        if (streakData.currentStreak === 0) {
-            // İlk gün veya streak kırılmışsa 1'den başla
-            streakData.currentStreak = 1;
-        } else {
-            // Streak devam ediyorsa artır
-            streakData.currentStreak++;
-        }
-        
-        // En iyi streak'i güncelle
-        if (streakData.currentStreak > streakData.bestStreak) {
-            streakData.bestStreak = streakData.currentStreak;
-            log.debug(`🏆 Yeni rekor streak: ${streakData.bestStreak} gün!`);
-        }
-        
-        log.debug(`🔥 Streak güncellendi: ${streakData.currentStreak} gün (en iyi: ${streakData.bestStreak})`);
-        
-        // Streak doğruluğunu kontrol et
-        const validation = validateCurrentStreak(today);
-        if (!validation.isValid) {
-            log.debug(`⚠️ Streak otomatik düzeltme: ${streakData.currentStreak} → ${validation.correctStreak}`);
-            streakData.currentStreak = validation.correctStreak;
-        }
-
-        // Veriyi kaydet
-        debouncedSaveStats(); // Debounced kaydetme
-        
-        // Eğer takvim açıksa otomatik yenile (mavi -> yeşil)
-        const calendarModal = document.getElementById('calendarModal');
-        if (calendarModal && calendarModal.style.display === 'flex') {
-            generateWeeklyStreakDisplay();
-            generateMonthlyCalendar();
-        }
-    }
-}
-
-function showCalendarModal() {
-    // Önce tüm modalları ve oyun ekranlarını kapat
-    closeAllModals();
-    if (typeof hideAllGameScreens === 'function') {
-        hideAllGameScreens();
-    }
-    if (typeof hideAllModes === 'function') {
-        hideAllModes();
-    }
-    
-    // Synchronization: Wait for DOM updates before opening new modal
-    requestAnimationFrame(() => {
-        // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-        if (typeof hideBottomNavBar === 'function') {
-            hideBottomNavBar();
-        }
-        
-        // Body scroll'u engelle
-        document.body.style.overflow = 'hidden';
-        
-        // Haftalık streak gösterimini oluştur
-        generateWeeklyStreakDisplay();
-        
-        // Aylık takvimi oluştur
-        generateMonthlyCalendar();
-        
-        // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-        initCalendarModalTouchEvents();
-        
-        // Validasyon kontrolü (sadece debug modunda)
-        if (typeof log !== 'undefined' && log.debug) {
-            // Sessiz validasyon - hataları logla ama kullanıcıya gösterme
-            try {
-                const todayStr = getLocalDateString();
-                const validation = validateCurrentStreak(todayStr);
-                if (!validation.isValid) {
-                    log.warn('⚠️ Takvim validasyon uyarısı:', validation.reason);
-                }
-            } catch (e) {
-                log.debug('Takvim validasyon hatası (kritik değil):', e);
-            }
-        }
-        
-        // Modal'ı göster
-        const calendarModal = document.getElementById('calendarModal');
-        if (calendarModal) {
-            calendarModal.style.display = 'flex';
-            // Force reflow to ensure modal is visible
-            calendarModal.offsetHeight;
-        }
-    });
-}
-
-function closeCalendarModal() {
-    const modal = document.getElementById('calendarModal');
-    if (modal) {
-        // Event listener'ları temizle (memory leak prevention)
-        const scrollableContent = document.getElementById('calendarScrollableContent');
-        eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
-        
-        modal.style.display = 'none';
-        modal.style.zIndex = '';
-        // Body scroll'u tekrar aktif et
-        document.body.style.overflow = '';
-        
-        // Tüm oyun ekranlarını ve modlarını gizle
-        if (typeof hideAllGameScreens === 'function') {
-            hideAllGameScreens();
-        }
-        if (typeof hideAllModes === 'function') {
-            hideAllModes();
-        } else {
-            // Fallback: Manuel olarak modları gizle
-            const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
-            modeIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.display = 'none';
-                    el.style.zIndex = '';
-                }
-            });
-        }
-        
-        // Ana sayfanın görünür olduğundan emin ol
-        if (elements && elements.mainMenu) {
-            elements.mainMenu.style.display = 'block';
-        }
-        
-        log.debug('🔒 Calendar Modal kapatıldı ve temizlendi');
-    }
-}
-
-// Touch event tracking for calendar modal scroll detection
-let calendarModalTouchStart = { x: 0, y: 0, time: 0 };
-let calendarModalIsScrolling = false;
-
-// Touch event tracking for daily tasks modal scroll detection
-let dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-let dailyTasksModalIsScrolling = false;
-
-// Daily tasks modal için touch event'leri
-function initDailyTasksModalTouchEvents() {
-    const dailyTasksModal = document.getElementById('dailyTasksModal');
-    const dailyTasksScrollableContent = document.getElementById('dailyTasksScrollableContent');
-    if (!dailyTasksModal) return;
-    
-    // Eğer zaten eklenmişse, önce temizle
-    if (dailyTasksModal.hasAttribute('data-touch-events-initialized')) {
-        eventManager.cleanupMultiple([dailyTasksModal, dailyTasksScrollableContent].filter(Boolean));
-        log.debug('🔄 Daily Tasks Modal: Eski listener\'lar temizlendi, yeni eklenecek');
-    }
-    dailyTasksModal.setAttribute('data-touch-events-initialized', 'true');
-    
-    // Scroll edilebilir içerik alanında scroll algılama
-    if (dailyTasksScrollableContent) {
-        eventManager.add(dailyTasksScrollableContent, 'touchstart', function(e) {
-            dailyTasksModalIsScrolling = false;
-        }, { passive: true });
-        
-        eventManager.add(dailyTasksScrollableContent, 'touchmove', function(e) {
-            // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-            dailyTasksModalIsScrolling = true;
-        }, { passive: true });
-    }
-    
-    // Modal overlay için touch event'leri
-    eventManager.add(dailyTasksModal, 'touchstart', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
-        const target = e.target;
-        if (target && dailyTasksScrollableContent && (
-            target === dailyTasksScrollableContent || 
-            target.id === 'dailyTasksScrollableContent' || 
-            dailyTasksScrollableContent.contains(target)
-        )) {
-            return;
-        }
-        
-        const touch = e.touches[0];
-        dailyTasksModalTouchStart = {
-            x: touch.clientX,
-            y: touch.clientY,
-            time: Date.now()
-        };
-        dailyTasksModalIsScrolling = false;
-    }, { passive: true });
-    
-    eventManager.add(dailyTasksModal, 'touchmove', function(e) {
-        // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
-        const target = e.target;
-        if (target && dailyTasksScrollableContent && (
-            target === dailyTasksScrollableContent || 
-            target.id === 'dailyTasksScrollableContent' || 
-            dailyTasksScrollableContent.contains(target)
-        )) {
-            dailyTasksModalIsScrolling = true;
-            return;
-        }
-        
-        if (dailyTasksModalTouchStart.x !== 0 || dailyTasksModalTouchStart.y !== 0) {
-            const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-            // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-            if (deltaX > 10 || deltaY > 10) {
-                dailyTasksModalIsScrolling = true;
-            }
-        }
-    }, { passive: true });
-    
-    eventManager.add(dailyTasksModal, 'touchend', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
-        const target = e.target;
-        if (target && dailyTasksScrollableContent && (
-            target === dailyTasksScrollableContent || 
-            target.id === 'dailyTasksScrollableContent' || 
-            dailyTasksScrollableContent.contains(target)
-        )) {
-            dailyTasksModalIsScrolling = false;
-            dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Touch end'de scroll kontrolü yap
-        if (dailyTasksModalIsScrolling) {
-            // Scroll oldu, kapatma
-            dailyTasksModalIsScrolling = false;
-            dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Scroll değilse, normal click gibi davran
-        const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - dailyTasksModalTouchStart.time;
-        const deltaX = Math.abs(touch.clientX - dailyTasksModalTouchStart.x);
-        const deltaY = Math.abs(touch.clientY - dailyTasksModalTouchStart.y);
-        
-        // Kısa süre (300ms) ve küçük hareket (10px) = tap
-        if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-            // X butonuna veya claim butonuna tıklanmışsa ignore et
-            if (target && (target.id === 'closeDailyTasksBtn' || target.closest('#closeDailyTasksBtn') || target.closest('button[onclick="closeDailyTasksModal()"]') || target.id === 'claimRewardsBtn' || target.closest('#claimRewardsBtn'))) {
-                dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-                return;
-            }
-            
-            // Panel üzerine veya dış arka plana tap yapıldı, kapat
-            closeDailyTasksModal();
-        }
-        
-        dailyTasksModalTouchStart = { x: 0, y: 0, time: 0 };
-    }, { passive: true });
-}
-
-// Calendar modal için touch event'leri
-function initCalendarModalTouchEvents() {
-    const calendarModal = document.getElementById('calendarModal');
-    const calendarScrollableContent = document.getElementById('calendarScrollableContent');
-    if (!calendarModal) return;
-    
-    // Eğer zaten eklenmişse, önce temizle
-    if (calendarModal.hasAttribute('data-touch-events-initialized')) {
-        eventManager.cleanupMultiple([calendarModal, calendarScrollableContent].filter(Boolean));
-        log.debug('🔄 Calendar Modal: Eski listener\'lar temizlendi, yeni eklenecek');
-    }
-    calendarModal.setAttribute('data-touch-events-initialized', 'true');
-    
-    // Scroll edilebilir içerik alanında scroll algılama
-    if (calendarScrollableContent) {
-        eventManager.add(calendarScrollableContent, 'touchstart', function(e) {
-            calendarModalIsScrolling = false;
-        }, { passive: true });
-        
-        eventManager.add(calendarScrollableContent, 'touchmove', function(e) {
-            // Scroll edilebilir içerik alanında hareket varsa, bu bir scroll'dur
-            calendarModalIsScrolling = true;
-        }, { passive: true });
-    }
-    
-    // Modal overlay için touch event'leri
-    eventManager.add(calendarModal, 'touchstart', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente tıklanmışsa, ignore et
-        const target = e.target;
-        if (target && calendarScrollableContent && (
-            target === calendarScrollableContent || 
-            target.id === 'calendarScrollableContent' || 
-            calendarScrollableContent.contains(target)
-        )) {
-            return;
-        }
-        
-        const touch = e.touches[0];
-        calendarModalTouchStart = {
-            x: touch.clientX,
-            y: touch.clientY,
-            time: Date.now()
-        };
-        calendarModalIsScrolling = false;
-    }, { passive: true });
-    
-    eventManager.add(calendarModal, 'touchmove', function(e) {
-        // Eğer scroll edilebilir içerik alanında veya içindeki herhangi bir elementte hareket varsa, bu bir scroll'dur
-        const target = e.target;
-        if (target && calendarScrollableContent && (
-            target === calendarScrollableContent || 
-            target.id === 'calendarScrollableContent' || 
-            calendarScrollableContent.contains(target)
-        )) {
-            calendarModalIsScrolling = true;
-            return;
-        }
-        
-        if (calendarModalTouchStart.x !== 0 || calendarModalTouchStart.y !== 0) {
-            const touch = e.touches[0];
-            const deltaX = Math.abs(touch.clientX - calendarModalTouchStart.x);
-            const deltaY = Math.abs(touch.clientY - calendarModalTouchStart.y);
-            // Eğer 10px'den fazla hareket varsa, bu bir scroll'dur
-            if (deltaX > 10 || deltaY > 10) {
-                calendarModalIsScrolling = true;
-            }
-        }
-    }, { passive: true });
-    
-    eventManager.add(calendarModal, 'touchend', function(e) {
-        // Eğer scroll edilebilir içerik alanına veya içindeki herhangi bir elemente dokunulmuşsa, ignore et
-        const target = e.target;
-        if (target && calendarScrollableContent && (
-            target === calendarScrollableContent || 
-            target.id === 'calendarScrollableContent' || 
-            calendarScrollableContent.contains(target)
-        )) {
-            calendarModalIsScrolling = false;
-            calendarModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Touch end'de scroll kontrolü yap
-        if (calendarModalIsScrolling) {
-            // Scroll oldu, kapatma
-            calendarModalIsScrolling = false;
-            calendarModalTouchStart = { x: 0, y: 0, time: 0 };
-            return;
-        }
-        
-        // Scroll değilse, normal click gibi davran
-        const touch = e.changedTouches[0];
-        const deltaTime = Date.now() - calendarModalTouchStart.time;
-        const deltaX = Math.abs(touch.clientX - calendarModalTouchStart.x);
-        const deltaY = Math.abs(touch.clientY - calendarModalTouchStart.y);
-        
-        // Kısa süre (300ms) ve küçük hareket (10px) = tap
-        if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-            // X butonuna tıklanmışsa ignore et
-            if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
-                calendarModalTouchStart = { x: 0, y: 0, time: 0 };
-                return;
-            }
-            
-            // Panel üzerine veya dış arka plana tap yapıldı, kapat
-            closeCalendarModal();
-        }
-        
-        calendarModalTouchStart = { x: 0, y: 0, time: 0 };
-    }, { passive: true });
-}
-
-// Her yere tıklayınca kapatma fonksiyonu (Panel üzerine de tıklanınca kapanır)
-function handleCalendarModalClick(event) {
-    // X butonuna veya kapat butonuna tıklanırsa kapatma
-    const target = event.target;
-    if (target && (target.id === 'closeCalendarBtn' || target.closest('#closeCalendarBtn') || target.closest('button[onclick="closeCalendarModal()"]'))) {
-        return;
-    }
-    
-    // Modal içeriğine (modal-content) tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
-    if (target && (target.closest('.modal-content'))) {
-        return;
-    }
-    
-    // Scroll edilebilir içerik alanına tıklanırsa, scroll kontrolü yap
-    if (target && (target.id === 'calendarScrollableContent' || target.closest('#calendarScrollableContent'))) {
-        // Scroll yapıldıysa veya scroll edilebilir içerik alanına tıklanırsa, kapatma
-        return;
-    }
-    
-    // Sadece modal overlay'e (arka plana) tıklanırsa kapat
-    closeCalendarModal();
-}
-
-function generateWeeklyStreakDisplay() {
-    try {
-        // Null kontrolü
-        if (!streakData || !streakData.playDates) {
-            log.warn('⚠️ streakData veya playDates bulunamadı, varsayılan değerler kullanılıyor');
-            streakData = streakData || {};
-            streakData.playDates = streakData.playDates || [];
-        }
-        
-        // Dark mode kontrolü
-        const isDarkMode = document.body.classList.contains('dark-mode') || 
-                         window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        // Son 7 günü hesapla (Pazartesi'den başlayacak şekilde)
-        const today = new Date();
-        const weekDays = [];
-        // Pazartesi'den başlayan gün isimleri (aylık takvim ile uyumlu)
-        const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
-        
-        // Bugünün haftanın hangi günü olduğunu bul (Pazartesi = 0)
-        const todayDayOfWeek = (today.getDay() + 6) % 7; // 0=Pazartesi, 6=Pazar
-        
-        // Bu haftanın Pazartesi'sini bul
-        const monday = new Date(today);
-        monday.setDate(today.getDate() - todayDayOfWeek);
-        
-        // Son 7 günü Pazartesi'den başlayarak hesapla
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(monday);
-            date.setDate(monday.getDate() + i);
-            const dateStr = getLocalDateString(date);
-            if (!dateStr) {
-                log.error('❌ getLocalDateString null döndü!');
-                continue;
-            }
-            weekDays.push({
-                date: date,
-                dateStr: dateStr,
-                dayName: dayNames[i], // Pazartesi'den başlayarak sırayla
-                isToday: dateStr === getLocalDateString(today)
-            });
-        }
-        
-        // PlayDates set'ini oluştur
-        const playDatesSet = new Set(streakData.playDates || []);
-        const currentStreakDates = calculateCurrentStreakDates();
-        const currentStreakSet = new Set(currentStreakDates || []);
-    
-    // HTML oluştur - modern oyun takvim stili
-    let html = '';
-    
-    // Gün isimleri (üst satır)
-    html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;">';
-    weekDays.forEach(day => {
-        const dayColor = day.isToday ? '#58cc02' : (isDarkMode ? '#b0b0b0' : '#999');
-        const fontWeight = day.isToday ? '700' : '400';
-        html += `<div style="text-align: center; font-size: 0.75em; color: ${dayColor}; font-weight: ${fontWeight};">${day.dayName}</div>`;
-    });
-    html += '</div>';
-    
-    // Günler (alt satır) - kare kutu stili
-    html += '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">';
-    weekDays.forEach(day => {
-        const hasPlayed = playDatesSet.has(day.dateStr);
-        const isInStreak = currentStreakSet.has(day.dateStr);
-        
-        let boxStyle = 'aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2em; font-weight: 600; transition: transform 0.2s;';
-        
-        if (day.isToday) {
-            if (hasPlayed) {
-                // Bugün tamamlandı - yeşil (Duolingo style)
-                boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02;';
-            } else {
-                // Bugün henüz oynanmadı - mavi kenarlık
-                const todayBg = isDarkMode ? '#1e3a1e' : '#e5f4e3';
-                boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
-            }
-        } else if (isInStreak && hasPlayed) {
-            // Streak günü - alev rengi (kırmızı/turuncu gradient)
-            boxStyle += ' background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: 2px solid #ff6b35;';
-        } else if (hasPlayed) {
-            // Oynandı ama streak dışında - yeşil
-            const playedBg = isDarkMode ? '#4db300' : '#58cc02';
-            boxStyle += ` background: ${playedBg}; color: white; border: 2px solid ${playedBg};`;
-        } else {
-            // Oynanmadı - gri
-            const emptyBg = isDarkMode ? '#2a2a2a' : '#e5e5e5';
-            const emptyColor = isDarkMode ? '#666' : '#999';
-            boxStyle += ` background: ${emptyBg}; color: ${emptyColor}; border: 2px solid ${emptyBg};`;
-        }
-        
-        const icon = hasPlayed ? '✓' : '';
-        html += `<div style="${boxStyle}" title="${day.dateStr}">${icon}</div>`;
-    });
-    html += '</div>';
-    
-    // HTML'i yerleştir
-    const weeklyDisplay = document.getElementById('weeklyStreakDisplay');
-    if (!weeklyDisplay) {
-        log.error('❌ weeklyStreakDisplay elementi bulunamadı!');
-        return;
-    }
-    weeklyDisplay.innerHTML = html;
-    
-    // Streak sayısını güncelle
-    const streakCountEl = document.getElementById('calendarStreakCount');
-    if (streakCountEl) {
-        streakCountEl.textContent = streakData.currentStreak || 0;
-    } else {
-        log.warn('⚠️ calendarStreakCount elementi bulunamadı');
-    }
-    
-        // Debug: Haftalık takvim oluşturuldu
-        log.debug('✅ Haftalık takvim oluşturuldu:', {
-            weekDays: weekDays.length,
-            playedDays: weekDays.filter(d => playDatesSet.has(d.dateStr)).length,
-            streakDays: weekDays.filter(d => currentStreakSet.has(d.dateStr)).length
-        });
-    } catch (error) {
-        log.error('❌ generateWeeklyStreakDisplay hatası:', error);
-        const weeklyDisplay = document.getElementById('weeklyStreakDisplay');
-        if (weeklyDisplay) {
-            weeklyDisplay.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;">❌ Haftalık takvim yüklenirken hata oluştu</div>';
-        }
-    }
-}
-
-function generateMonthlyCalendar() {
-    try {
-        // Null kontrolü
-        if (!streakData || !streakData.playDates) {
-            log.warn('⚠️ streakData veya playDates bulunamadı, varsayılan değerler kullanılıyor');
-            streakData = streakData || {};
-            streakData.playDates = streakData.playDates || [];
-        }
-        
-        // Dark mode kontrolü
-        const isDarkMode = document.body.classList.contains('dark-mode') || 
-                         window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
-        const todayDate = today.getDate();
-        const todayStr = getLocalDateString();
-        
-        if (!todayStr) {
-            log.error('❌ getLocalDateString null döndü!');
-            return;
-        }
-        
-        // Ay adını güncelle
-        const monthNames = [
-            'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-            'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-        ];
-        
-        const calendarMonthEl = document.getElementById('calendarMonth');
-        if (calendarMonthEl) {
-            calendarMonthEl.textContent = `${monthNames[month]} ${year}`;
-        } else {
-            log.warn('⚠️ calendarMonth elementi bulunamadı');
-        }
-        
-        // Takvim grid'ini temizle ve yeni HTML oluştur
-        const grid = document.getElementById('calendarGrid');
-        if (!grid) {
-            log.error('❌ calendarGrid elementi bulunamadı!');
-            return;
-        }
-    
-    // HTML string olarak oluştur
-    let html = '';
-    
-    // Haftanın günlerini ekle (üst satır)
-    // Pazartesi'den başlayan gün isimleri (haftalık takvim ile uyumlu)
-    const dayNames = ['Pt', 'Sl', 'Çr', 'Pr', 'Cm', 'Ct', 'Pz'];
-    const dayNameColor = isDarkMode ? '#b0b0b0' : '#999';
-    dayNames.forEach(day => {
-        html += `<div style="text-align: center; font-weight: 600; font-size: 0.75em; color: ${dayNameColor}; padding: 8px 0; display: flex; align-items: center; justify-content: center;">${day}</div>`;
-    });
-    
-    // Ayın ilk gününün haftanın hangi günü olduğunu bul
-    const firstDay = new Date(year, month, 1);
-    const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Pazartesi = 0
-    
-    // Boş günler ekle
-    for (let i = 0; i < startingDayOfWeek; i++) {
-        html += '<div></div>';
-    }
-    
-    // Mevcut streak'in gerçek tarih aralığını hesapla
-    const currentStreakDates = calculateCurrentStreakDates();
-    const currentStreakSet = new Set(currentStreakDates);
-
-    // playDates array'ini Set'e çevir
-    const playDatesSet = new Set(streakData.playDates);
-    
-    // Ayın günlerini ekle (kare kutu stili)
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const hasPlayed = playDatesSet.has(dateStr);
-        const isInStreak = currentStreakSet.has(dateStr);
-        const isToday = dateStr === todayStr;
-        
-        // Kare kutu görünümü
-        let boxStyle = 'aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;';
-        
-        if (isToday) {
-            if (hasPlayed) {
-                // Bugün tamamlandı - yeşil (Duolingo style)
-                boxStyle += ' background: #58cc02; color: white; border: 2px solid #58cc02; box-shadow: 0 2px 8px rgba(88, 204, 2, 0.3);';
-            } else {
-                // Bugün henüz oynanmadı - mavi kenarlık
-                const todayBg = isDarkMode ? '#1e3a1e' : '#e5f4e3';
-                boxStyle += ` background: ${todayBg}; color: #58cc02; border: 2px solid #58cc02;`;
-            }
-        } else if (isInStreak && hasPlayed) {
-            // Streak günü - alev rengi (kırmızı/turuncu gradient)
-            boxStyle += ' background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: 2px solid #ff6b35; box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);';
-        } else if (hasPlayed) {
-            // Oynandı ama streak dışında - yeşil
-            const playedBg = isDarkMode ? '#4db300' : '#58cc02';
-            boxStyle += ` background: ${playedBg}; color: white; border: 2px solid ${playedBg};`;
-        } else if (day < todayDate) {
-            // Geçmiş gün - oynanmadı - gri
-            const pastBg = isDarkMode ? '#2a2a2a' : '#e5e5e5';
-            const pastColor = isDarkMode ? '#666' : '#999';
-            boxStyle += ` background: ${pastBg}; color: ${pastColor}; border: 2px solid ${pastBg};`;
-        } else {
-            // Gelecek gün - açık gri
-            const futureBg = isDarkMode ? '#1a1a1a' : '#f7f7f7';
-            const futureColor = isDarkMode ? '#555' : '#ccc';
-            boxStyle += ` background: ${futureBg}; color: ${futureColor}; border: 2px solid ${futureBg};`;
-        }
-        
-        const content = hasPlayed ? '✓' : day;
-        const tooltip = `${dateStr}${hasPlayed ? ' - Tamamlandı' : isToday ? ' - Bugün' : ''}${isInStreak && hasPlayed ? ' - Streak!' : ''}`;
-        
-        html += `<div style="${boxStyle}" title="${tooltip}" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">${content}</div>`;
-    }
-    
-    // HTML'i yerleştir
-    if (!grid) {
-        log.error('❌ calendarGrid elementi bulunamadı!');
-        return;
-    }
-    grid.innerHTML = html;
-    
-        // Debug: Aylık takvim oluşturuldu
-        log.debug('✅ Aylık takvim oluşturuldu:', {
-            month: `${monthNames[month]} ${year}`,
-            daysInMonth: daysInMonth,
-            startingDayOfWeek: startingDayOfWeek,
-            totalBoxes: Math.ceil((startingDayOfWeek + daysInMonth) / 7) * 7
-        });
-    } catch (error) {
-        log.error('❌ generateMonthlyCalendar hatası:', error);
-        const grid = document.getElementById('calendarGrid');
-        if (grid) {
-            grid.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;">❌ Aylık takvim yüklenirken hata oluştu</div>';
-        }
-    }
-}
-
-
-// Global fonksiyonlar (window'a ekle ki HTML onclick çalışsın)
-window.showCalendarModal = showCalendarModal;
-window.closeCalendarModal = closeCalendarModal;
-
-// 🔍 STREAK ANALİZ SİSTEMİ - DEBUG TOOLS
-function analyzeStreakSystem() {
-    log.stats('🔍 STREAK SİSTEMİ ANALİZ RAPORU');
-    log.stats('=====================================');
-    
-    const today = getLocalDateString();
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = getLocalDateString(yesterday);
-    
-    // Mevcut streak verilerini analiz et
-    log.stats('📊 Mevcut Veriler:');
-    log.stats(`├── Bugün: ${today}`);
-    log.stats(`├── Dün: ${yesterdayStr}`);
-    log.stats(`├── Son oyun tarihi: ${streakData.lastPlayDate}`);
-    log.stats(`├── Mevcut streak: ${streakData.currentStreak} gün`);
-    log.stats(`├── En iyi streak: ${streakData.bestStreak} gün`);
-    log.stats(`├── Bugünkü ilerleme: ${streakData.todayProgress}/${streakData.dailyGoal}`);
-    log.stats(`├── Toplam oyun günü: ${streakData.totalPlayDays}`);
-    log.stats(`└── Oyun tarihleri: [${streakData.playDates.join(', ')}]`);
-    
-    // Streak mantık kontrolü
-    log.stats('\n🧠 Streak Mantık Kontrolü:');
-    const streakShouldBreak = streakData.lastPlayDate !== yesterdayStr && 
-                             streakData.lastPlayDate !== today && 
-                             streakData.lastPlayDate !== '';
-    
-    log.stats(`├── Streak kırılmalı mı? ${streakShouldBreak ? '✅ EVET' : '❌ HAYIR'}`);
-    log.stats(`├── Bugün oynanmış mı? ${streakData.playDates.includes(today) ? '✅ EVET' : '❌ HAYIR'}`);
-    log.stats(`├── Dün oynanmış mı? ${streakData.playDates.includes(yesterdayStr) ? '✅ EVET' : '❌ HAYIR'}`);
-    
-    // Ardışık gün analizi (gelişmiş)
-    log.stats('\n📅 Ardışık Gün Analizi:');
-    const validation = validateCurrentStreak(today);
-    log.stats(`├── Hesaplanan ardışık gün: ${validation.correctStreak}`);
-    log.stats(`├── Kayıtlı streak: ${streakData.currentStreak}`);
-    log.stats(`├── Tutarlılık: ${validation.isValid ? '✅ DOĞRU' : '❌ YANLIŞ'}`);
-    log.stats(`└── Açıklama: ${validation.reason}`);
-    
-    // Takvim görünümü kontrolü
-    log.stats('\n📆 Takvim Görünümü Test:');
-    const currentStreakDates = calculateCurrentStreakDates();
-    log.stats(`├── Streak tarih aralığı: [${currentStreakDates.join(', ')}]`);
-    log.stats(`├── Takvimde 🔥 gösterilecek günler: ${currentStreakDates.length}`);
-    
-    // Öneriler
-    log.stats('\n💡 Öneriler:');
-    if (consecutiveDays !== streakData.currentStreak) {
-        log.stats('├── ⚠️ Streak hesaplaması düzeltilmeli');
-        log.stats(`├── 🔧 Doğru değer: ${consecutiveDays} olmalı`);
-    } else {
-        log.stats('├── ✅ Streak hesaplaması doğru');
-    }
-    
-    if (streakData.playDates.includes(today) && streakData.todayProgress < streakData.dailyGoal) {
-        log.stats('├── ⚠️ Bugün oynanmış ama hedef tamamlanmamış - veri tutarsızlığı');
-    }
-    
-    log.stats('\n=====================================');
-    log.stats('🔍 Analiz tamamlandı!');
-}
-
-// Test fonksiyonları - sadece debug modunda çalışır
-function testStreakScenarios() {
-    // Debug modu kontrolü
-    if (typeof CONFIG === 'undefined' || !CONFIG.debugTest) {
-        if (typeof log !== 'undefined' && log.error) {
-            log.error('❌ Test fonksiyonları sadece debug modunda çalışır. Konsolda: CONFIG.debugTest = true; yapın.');
-        }
-        return;
-    }
-    
-    log.stats('🧪 STREAK TEST SENARYOLARİ');
-    log.stats('=============================');
-    
-    // Backup mevcut veri
-    const backup = {
-        currentStreak: streakData.currentStreak,
-        bestStreak: streakData.bestStreak,
-        lastPlayDate: streakData.lastPlayDate,
-        totalPlayDays: streakData.totalPlayDays,
-        todayProgress: streakData.todayProgress,
-        playDates: [...streakData.playDates]
-    };
-    
-    log.stats('Test 1: Streak kırılması simülasyonu');
-    streakData.lastPlayDate = '2025-11-08'; // 2 gün önce
-    checkDailyProgress();
-    log.stats(`├── Streak kırıldı mı? ${streakData.currentStreak === 0 ? '✅ EVET' : '❌ HAYIR'}`);
-    
-    log.stats('\nTest 2: Hedef tamamlama simülasyonu');
-    streakData.todayProgress = 0;
-    updateDailyProgress(5); // 5 doğru cevap ekle
-    log.stats(`├── Hedef tamamlandı mı? ${streakData.todayProgress >= streakData.dailyGoal ? '✅ EVET' : '❌ HAYIR'}`);
-    
-    // Restore backup
-    Object.assign(streakData, backup);
-    log.stats('\n🔄 Veriler geri yüklendi');
-    log.stats('=============================');
-}
-
-// Geliştirici araçları - console'da çağırılabilir (sadece debug modunda çalışır)
-window.analyzeStreak = analyzeStreakSystem;
-window.testStreak = testStreakScenarios;
-
-// ============ GÜNLİK GÖREVLER SİSTEMİ ============
-function checkDailyTasks() {
-    const today = getLocalDateString(); // Yerel tarih (YYYY-MM-DD)
-    
-    // Güvenlik kontrolü: dailyTasks objesi var mı?
-    if (!dailyTasks) {
-        log.warn('⚠️ dailyTasks objesi bulunamadı, başlatılıyor...');
-        dailyTasks = {
-            lastTaskDate: '',
-            tasks: [],
-            bonusTasks: [],
-            completedTasks: [],
-            rewardsClaimed: false,
-            todayStats: {
-                kelimeCevir: 0,
-                dinleBul: 0,
-                boslukDoldur: 0,
-                ayetOku: 0,
-                duaOgre: 0,
-                hadisOku: 0,
-                toplamDogru: 0,
-                toplamYanlis: 0,
-                toplamPuan: 0,
-                perfectStreak: 0,
-                farklıZorluk: new Set(),
-                reviewWords: 0,
-                comboCount: 0,
-                accuracy: 0,
-                allGameModes: new Set(),
-                streakMaintain: 0,
-                totalPlayTime: 0
-            }
-        };
-        window.dailyTasks = dailyTasks;
-    }
-    
-    // lastTaskDate kontrolü - boş, null veya undefined ise bugünün tarihiyle karşılaştır
-    const lastTaskDate = dailyTasks.lastTaskDate || '';
-    const isNewDay = lastTaskDate !== today && lastTaskDate !== '';
-    
-    log.debug('🔍 Günlük görev kontrolü:', {
-        bugün: today,
-        sonGörevTarihi: lastTaskDate,
-        yeniGünMü: isNewDay,
-        mevcutTamamlananlar: dailyTasks.completedTasks?.length || 0,
-        bugünküStats: dailyTasks.todayStats
-    });
-    
-    // Eğer yeni gün başladıysa görevleri yenile
-    // NOT: lastTaskDate boş ise (ilk yükleme), bugünün tarihiyle başlat ama mevcut ilerlemeleri koru
-    if (isNewDay) {
-        log.debug('🔄 Yeni gün başladı, görevler yenileniyor...');
-        generateDailyTasks(today);
-        // Görevler oluşturulduktan sonra badge'i güncelle
-        if (typeof updateTasksDisplay === 'function') {
-            updateTasksDisplay();
-        }
-    } else if (lastTaskDate === '') {
-        // İlk yükleme - bugünün tarihiyle başlat ama mevcut ilerlemeleri koru
-        log.debug('🔄 İlk yükleme, bugünün tarihiyle başlatılıyor (ilerlemeler korunuyor)...');
-        // NOT: lastTaskDate'i generateDailyTasks çağrılmadan ÖNCE set etme!
-        // generateDailyTasks içinde lastTaskDate kontrolü yapılıyor, bu yüzden boş bırak
-        // Görevler yoksa oluştur (ama bugünkü ilerlemeleri koruyarak)
-        if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
-            // generateDailyTasks bugünkü ilerlemeleri koruyacak şekilde çağrılıyor
-            // lastTaskDate === '' olduğu için shouldPreserveStats true olacak
-            generateDailyTasks(today);
-        } else {
-            // Görevler varsa sadece lastTaskDate'i güncelle
-            dailyTasks.lastTaskDate = today;
-        }
-        // Badge'i güncelle
-        if (typeof updateTasksDisplay === 'function') {
-            updateTasksDisplay();
-        }
-    } else {
-        log.debug('✅ Aynı gün, mevcut görevler korunuyor');
-        // Mevcut görevler için de badge'i güncelle
-        if (typeof updateTasksDisplay === 'function') {
-            updateTasksDisplay();
-        }
-    }
-    
-    // Haftalık görevleri de kontrol et
-    if (typeof checkWeeklyTasks === 'function') {
-        checkWeeklyTasks();
-    }
-}
-
-function generateDailyTasks(date) {
-    const today = getLocalDateString();
-    const isToday = date === today;
-    
-    // KRİTİK: lastTaskDate'i kontrol etmeden ÖNCE bugünkü ilerlemeleri yedekle!
-    // Eğer bugünün tarihiyle çağrılıyorsa ve mevcut todayStats varsa, onu koru!
-    // lastTaskDate === today VEYA lastTaskDate === '' (ilk yükleme) ise bugünkü ilerlemeleri koru
-    const currentLastTaskDate = dailyTasks.lastTaskDate || '';
-    const shouldPreserveStats = isToday && dailyTasks.todayStats && (currentLastTaskDate === today || currentLastTaskDate === '');
-    
-    // Mevcut todayStats, completedTasks ve rewardsClaimed'i yedekle (eğer korunacaksa)
-    const preservedStats = shouldPreserveStats ? { ...dailyTasks.todayStats } : null;
-    const preservedCompletedTasks = shouldPreserveStats && Array.isArray(dailyTasks.completedTasks) ? [...dailyTasks.completedTasks] : null;
-    const preservedRewardsClaimed = shouldPreserveStats ? dailyTasks.rewardsClaimed : null;
-    
-    // Temel görevler listesi (tüm oyun modlarını kapsayacak şekilde genişletildi)
-    const baseTasks = [
-        { id: 'kelime5', name: '5 kelime çevir', target: 5, current: 0, type: 'kelimeCevir', reward: 1 },
-        { id: 'ayet3', name: '3 ayet oku', target: 3, current: 0, type: 'ayetOku', reward: 1 },
-        { id: 'dua2', name: '2 dua öğren', target: 2, current: 0, type: 'duaOgre', reward: 1 },
-        { id: 'hadis1', name: '1 hadis oku', target: 1, current: 0, type: 'hadisOku', reward: 1 },
-        { id: 'dinle2', name: '2 kelime dinle', target: 2, current: 0, type: 'dinleBul', reward: 1 },
-        { id: 'bosluk1', name: '1 boşluk doldur', target: 1, current: 0, type: 'boslukDoldur', reward: 1 },
-        { id: 'dogru10', name: '10 doğru cevap ver', target: 10, current: 0, type: 'toplamDogru', reward: 1 },
-        { id: 'puan100', name: '100 puan topla', target: 100, current: 0, type: 'toplamPuan', reward: 1 }
-    ];
-
-    // Genişletilmiş bonus görevler listesi (daha fazla çeşitlilik)
-    const bonusTasksList = [
-        { id: 'perfect5', name: 'Hiç yanlış yapmadan 5 perfect oyun tamamla', target: 5, current: 0, type: 'perfectStreak', reward: 2 },
-        { id: 'allDiff', name: '3 farklı zorlukta oyna', target: 3, current: 0, type: 'farklıZorluk', reward: 2 },
-        { id: 'combo15', name: '15 doğru cevap ver (bonus)', target: 15, current: 0, type: 'toplamDogru', reward: 2 },
-        { id: 'dinle5', name: '5 kelime dinle (bonus)', target: 5, current: 0, type: 'dinleBul', reward: 2 },
-        { id: 'bosluk3', name: '3 boşluk doldur (bonus)', target: 3, current: 0, type: 'boslukDoldur', reward: 2 },
-        { id: 'kelime10', name: '10 kelime çevir (bonus)', target: 10, current: 0, type: 'kelimeCevir', reward: 2 },
-        { id: 'puan200', name: '200 puan topla (bonus)', target: 200, current: 0, type: 'toplamPuan', reward: 2 },
-        { id: 'dogru20', name: '20 doğru cevap ver (bonus)', target: 20, current: 0, type: 'toplamDogru', reward: 2 },
-        // Yeni çeşitli görevler
-        { id: 'review5', name: '5 zorlanılan kelimeyi tekrar et', target: 5, current: 0, type: 'reviewWords', reward: 2 },
-        { id: 'combo3x', name: '3x muvazebet yap', target: 3, current: 0, type: 'comboCount', reward: 2 },
-        { id: 'accuracy80', name: '%80 başarı oranı yakala', target: 80, current: 0, type: 'accuracy', reward: 2 },
-        { id: 'allModes', name: 'Tüm oyun modlarını dene', target: 4, current: 0, type: 'allGameModes', reward: 3 },
-        { id: 'streakMaintain', name: 'Serini koru (günlük hedef)', target: 1, current: 0, type: 'streakMaintain', reward: 2 },
-        { id: 'puan500', name: '500 puan topla (mega bonus)', target: 500, current: 0, type: 'toplamPuan', reward: 3 }
-    ];
-
-    // Rastgele 4 bonus görev seç (3'ten 4'e çıkarıldı - daha fazla çeşitlilik)
-    const selectedBonus = bonusTasksList.sort(() => 0.5 - Math.random()).slice(0, 4);
-
-    // lastTaskDate'i güncelle
-    dailyTasks.lastTaskDate = date;
-    dailyTasks.tasks = baseTasks;
-    dailyTasks.bonusTasks = selectedBonus;
-    
-    // KRİTİK: completedTasks ve rewardsClaimed'i koru (eğer bugünkü ilerlemeler korunuyorsa)
-    if (shouldPreserveStats && preservedCompletedTasks !== null) {
-        dailyTasks.completedTasks = preservedCompletedTasks;
-        dailyTasks.rewardsClaimed = preservedRewardsClaimed !== null ? preservedRewardsClaimed : false;
-        log.debug('✅ Tamamlanan görevler ve ödüller korundu:', {
-            completedTasks: dailyTasks.completedTasks.length,
-            rewardsClaimed: dailyTasks.rewardsClaimed
-        });
-    } else {
-        // Yeni gün başladı - sıfırla
-        dailyTasks.completedTasks = [];
-        dailyTasks.rewardsClaimed = false;
-    }
-    
-    // KRİTİK: todayStats'ı sadece gerçekten yeni gün başladığında sıfırla
-    if (shouldPreserveStats && preservedStats) {
-        // Bugünkü ilerlemeleri koru - sadece Set nesnelerini yeniden oluştur
-        dailyTasks.todayStats = {
-            ...preservedStats,
-            farklıZorluk: preservedStats.farklıZorluk instanceof Set 
-                ? preservedStats.farklıZorluk 
-                : new Set(Array.isArray(preservedStats.farklıZorluk) ? preservedStats.farklıZorluk : []),
-            allGameModes: preservedStats.allGameModes instanceof Set
-                ? preservedStats.allGameModes
-                : new Set(Array.isArray(preservedStats.allGameModes) ? preservedStats.allGameModes : [])
-        };
-        log.debug('✅ Bugünkü ilerlemeler korundu:', dailyTasks.todayStats);
-    } else {
-        // Yeni gün başladı - todayStats'ı sıfırla
-        dailyTasks.todayStats = {
-            kelimeCevir: 0,
-            dinleBul: 0,
-            boslukDoldur: 0,
-            ayetOku: 0,
-            duaOgre: 0,
-            hadisOku: 0,
-            toplamDogru: 0,
-            toplamYanlis: 0,
-            toplamPuan: 0,
-            perfectStreak: 0,
-            farklıZorluk: new Set(),
-            reviewWords: 0,      // Yeni: Review mode kelime sayısı
-            comboCount: 0,       // Yeni: Combo sayısı
-            accuracy: 0,         // Yeni: Başarı oranı (%)
-            allGameModes: new Set(), // Yeni: Oynanan oyun modları
-            streakMaintain: 0,   // Yeni: Seri koruma
-            totalPlayTime: 0     // Yeni: Toplam oyun süresi
-        };
-    }
-
-    log.debug('🎯 Yeni günlük görevler oluşturuldu:', {
-        tarih: date,
-        temelGörevler: baseTasks.length,
-        bonusGörevler: selectedBonus.length,
-        toplamGörevler: baseTasks.length + selectedBonus.length,
-        tamamlananlar: dailyTasks.completedTasks.length,
-        stats: dailyTasks.todayStats
-    });
-
-    debouncedSaveStats(); // Debounced kaydetme
-    
-    // Haftalık görevleri de kontrol et
-    checkWeeklyTasks();
-    
-    // Görevler oluşturulduktan sonra badge'i güncelle
-    // Not: checkDailyTasks() içinde de çağrılıyor ama burada da çağırmak daha güvenli
-    setTimeout(() => {
-        if (typeof updateTasksDisplay === 'function') {
-            updateTasksDisplay();
-        }
-    }, 100);
-}
-
-// ============ HAFTALIK GÖREVLER SİSTEMİ ============
-/**
- * Haftanın başlangıç tarihini hesapla (Pazartesi)
- * @param {Date} date - Tarih (varsayılan: bugün)
- * @returns {string} Hafta başlangıç tarihi (YYYY-MM-DD)
- */
-function getWeekStartDate(date = new Date()) {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
-    const weekStart = new Date(d.setDate(diff));
-    return getLocalDateString(weekStart);
-}
-
-/**
- * Haftanın bitiş tarihini hesapla (Pazar)
- * @param {Date} date - Tarih (varsayılan: bugün)
- * @returns {string} Hafta bitiş tarihi (YYYY-MM-DD)
- */
-function getWeekEndDate(date = new Date()) {
-    const weekStart = new Date(getWeekStartDate(date));
-    weekStart.setHours(0, 0, 0, 0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    return getLocalDateString(weekEnd);
-}
-
-// Global erişim için window objesine ekle
-if (typeof window !== 'undefined') {
-    window.getWeekStartDate = getWeekStartDate;
-    window.getWeekEndDate = getWeekEndDate;
-}
-
-/**
- * Haftalık görevleri kontrol et ve gerekirse oluştur
- */
-function checkWeeklyTasks() {
-    // KRİTİK: Sıfırlama flag'ini kontrol et
-    const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-    if (statsJustReset) {
-        log.debug('🔄 İstatistikler yeni sıfırlandı, checkWeeklyTasks atlanıyor (görevler oluşturulmayacak)');
-        // Flag'i temizleme - loadStats içinde zaten temizlendi
-        // Görevler oluşturulmayacak - kullanıcı ilk oyunu oynadığında otomatik oluşturulacak
-        return;
-    }
-    
-    const today = getLocalDateString();
-    const weekStart = getWeekStartDate();
-    
-    // Güvenlik kontrolü: weeklyTasks objesi var mı?
-    if (!weeklyTasks) {
-        log.warn('⚠️ weeklyTasks objesi bulunamadı, başlatılıyor...');
-        weeklyTasks = {
-            lastWeekStart: '',
-            weekStart: '',
-            weekEnd: '',
-            tasks: [],
-            completedTasks: [],
-            rewardsClaimed: false,
-            weekStats: {
-                totalHasene: 0,
-                totalCorrect: 0,
-                totalWrong: 0,
-                daysPlayed: 0,
-                streakDays: 0,
-                allModesPlayed: new Set(),
-                comboCount: 0
-            }
-        };
-        window.weeklyTasks = weeklyTasks;
-    }
-    
-    // lastWeekStart kontrolü - boş, null veya undefined ise bugünün haftasıyla karşılaştır
-    const lastWeekStart = weeklyTasks.lastWeekStart || '';
-    const isNewWeek = lastWeekStart !== weekStart && lastWeekStart !== '';
-    
-    log.debug('🔍 Haftalık görev kontrolü:', {
-        bugün: today,
-        haftaBaşlangıç: weekStart,
-        sonHaftaBaşlangıç: lastWeekStart,
-        yeniHaftaMü: isNewWeek
-    });
-    
-    // Eğer yeni hafta başladıysa görevleri yenile
-    // NOT: lastWeekStart boş ise (ilk yükleme), bugünün haftasıyla başlat ama mevcut ilerlemeleri koru
-    if (isNewWeek) {
-        log.debug('🔄 Yeni hafta başladı, haftalık görevler yenileniyor...');
-        generateWeeklyTasks(weekStart);
-        // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
-        // updateTasksDisplay zaten showDailyTasksModal içinde çağrılıyor
-    } else if (lastWeekStart === '') {
-        // İlk yükleme - bugünün haftasıyla başlat ama mevcut ilerlemeleri koru
-        log.debug('🔄 İlk yükleme, bugünün haftasıyla başlatılıyor (ilerlemeler korunuyor)...');
-        // NOT: lastWeekStart'i generateWeeklyTasks çağrılmadan ÖNCE set etme!
-        // generateWeeklyTasks içinde lastWeekStart kontrolü yapılıyor, bu yüzden boş bırak
-        // Görevler yoksa oluştur (ama bu haftanın ilerlemelerini koruyarak)
-        if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
-            // generateWeeklyTasks bu haftanın ilerlemelerini koruyacak şekilde çağrılıyor
-            // lastWeekStart === '' olduğu için shouldPreserveStats true olacak
-            generateWeeklyTasks(weekStart);
-        } else {
-            // Görevler varsa sadece lastWeekStart'i güncelle
-            weeklyTasks.lastWeekStart = weekStart;
-            weeklyTasks.weekStart = weekStart;
-            weeklyTasks.weekEnd = getWeekEndDate();
-        }
-    } else {
-        log.debug('✅ Aynı hafta, mevcut görevler korunuyor');
-        // NOT: updateTasksDisplay burada çağrılmıyor çünkü sonsuz döngü oluşturur
-    }
-}
-
-/**
- * Haftalık görevleri oluştur
- * @param {string} weekStart - Hafta başlangıç tarihi (YYYY-MM-DD)
- */
-function generateWeeklyTasks(weekStart) {
-    const weekEnd = getWeekEndDate(new Date(weekStart));
-    const currentWeekStart = getWeekStartDate();
-    const isCurrentWeek = weekStart === currentWeekStart;
-    
-    // KRİTİK: lastWeekStart'i kontrol etmeden ÖNCE bu haftanın ilerlemelerini yedekle!
-    // Eğer mevcut hafta ile çağrılıyorsa ve mevcut weekStats varsa, onu koru!
-    // lastWeekStart === currentWeekStart VEYA lastWeekStart === '' (ilk yükleme) ise bu haftanın ilerlemelerini koru
-    const currentLastWeekStart = weeklyTasks.lastWeekStart || '';
-    const shouldPreserveStats = isCurrentWeek && weeklyTasks.weekStats && (currentLastWeekStart === currentWeekStart || currentLastWeekStart === '');
-    
-    // Mevcut weekStats, completedTasks ve rewardsClaimed'i yedekle (eğer korunacaksa)
-    const preservedStats = shouldPreserveStats ? { ...weeklyTasks.weekStats } : null;
-    const preservedCompletedTasks = shouldPreserveStats && Array.isArray(weeklyTasks.completedTasks) ? [...weeklyTasks.completedTasks] : null;
-    const preservedRewardsClaimed = shouldPreserveStats ? weeklyTasks.rewardsClaimed : null;
-    
-    // Haftalık görevler listesi (daha uzun vadeli hedefler)
-    const weeklyTasksList = [
-        { id: 'week_hasene5000', name: '5,000 Hasene topla', target: 5000, current: 0, type: 'totalHasene', reward: 5 },
-        { id: 'week_correct200', name: '200 doğru cevap ver', target: 200, current: 0, type: 'totalCorrect', reward: 5 },
-        { id: 'week_days5', name: '5 gün üst üste oyna', target: 5, current: 0, type: 'daysPlayed', reward: 5 },
-        { id: 'week_allmodes', name: 'Tüm oyun modlarını oyna', target: 6, current: 0, type: 'allModesPlayed', reward: 7 },
-        { id: 'week_combo30', name: '30x muvazebet yap', target: 30, current: 0, type: 'comboCount', reward: 5 },
-        { id: 'week_streak7', name: '7 gün seri koru', target: 7, current: 0, type: 'streakDays', reward: 8 }
-    ];
-    
-    // lastWeekStart'i güncelle
-    weeklyTasks.lastWeekStart = weekStart;
-    weeklyTasks.weekStart = weekStart;
-    weeklyTasks.weekEnd = weekEnd;
-    weeklyTasks.tasks = weeklyTasksList;
-    
-    // KRİTİK: completedTasks ve rewardsClaimed'i koru (eğer bu haftanın ilerlemeleri korunuyorsa)
-    if (shouldPreserveStats && preservedCompletedTasks !== null) {
-        weeklyTasks.completedTasks = preservedCompletedTasks;
-        weeklyTasks.rewardsClaimed = preservedRewardsClaimed !== null ? preservedRewardsClaimed : false;
-        log.debug('✅ Tamamlanan haftalık görevler ve ödüller korundu:', {
-            completedTasks: weeklyTasks.completedTasks.length,
-            rewardsClaimed: weeklyTasks.rewardsClaimed
-        });
-    } else {
-        // Yeni hafta başladı - sıfırla
-        weeklyTasks.completedTasks = [];
-        weeklyTasks.rewardsClaimed = false;
-    }
-    
-    // KRİTİK: weekStats'ı sadece gerçekten yeni hafta başladığında sıfırla
-    if (shouldPreserveStats && preservedStats) {
-        // Bu haftanın ilerlemelerini koru - sadece Set nesnelerini yeniden oluştur
-        weeklyTasks.weekStats = {
-            ...preservedStats,
-            allModesPlayed: preservedStats.allModesPlayed instanceof Set
-                ? preservedStats.allModesPlayed
-                : new Set(Array.isArray(preservedStats.allModesPlayed) ? preservedStats.allModesPlayed : [])
-        };
-        log.debug('✅ Bu haftanın ilerlemeleri korundu:', weeklyTasks.weekStats);
-    } else {
-        // Yeni hafta başladı - weekStats'ı sıfırla
-        weeklyTasks.weekStats = {
-            totalHasene: 0,
-            totalCorrect: 0,
-            totalWrong: 0,
-            daysPlayed: 0,
-            // perfectDays ve reviewWordsCount görevleri kaldırıldı
-            streakDays: 0,
-            allModesPlayed: new Set(),
-            comboCount: 0
-        };
-    }
-    
-    log.debug('🎯 Yeni haftalık görevler oluşturuldu:', {
-        haftaBaşlangıç: weekStart,
-        haftaBitiş: weekEnd,
-        görevler: weeklyTasksList.length,
-        tamamlananlar: weeklyTasks.completedTasks.length,
-        stats: weeklyTasks.weekStats
-    });
-    
-    debouncedSaveStats(); // Debounced kaydetme
-    
-    // Görevler oluşturulduktan sonra badge'i güncelle
-    setTimeout(() => {
-        if (typeof updateTasksDisplay === 'function') {
-            updateTasksDisplay();
-        }
-    }, 100);
-}
-
-/**
- * Haftalık görev ilerlemesini güncelle
- * @param {string} statType - İstatistik tipi
- * @param {number} amount - Miktar
- */
-function updateWeeklyTaskProgress(statType, amount = 1) {
-    log.debug(`📋 updateWeeklyTaskProgress çağrıldı: ${statType} +${amount}`);
-    
-    // Güvenlik kontrolü: weeklyTasks.weekStats'ın varlığını kontrol et
-    if (!weeklyTasks.weekStats) {
-        log.warn('⚠️ weeklyTasks.weekStats bulunamadı, başlatılıyor...');
-        weeklyTasks.weekStats = {
-            totalHasene: 0,
-            totalCorrect: 0,
-            totalWrong: 0,
-            daysPlayed: 0,
-            // perfectDays ve reviewWordsCount görevleri kaldırıldı
-            streakDays: 0,
-            allModesPlayed: new Set(),
-            comboCount: 0
-        };
-    }
-    
-    // Haftalık istatistikleri güncelle
-    if (weeklyTasks.weekStats[statType] !== undefined) {
-        if (statType === 'allModesPlayed' && weeklyTasks.weekStats[statType] instanceof Set) {
-            // Set için özel işlem
-            if (typeof amount === 'string') {
-                weeklyTasks.weekStats[statType].add(amount);
-            }
-        } else {
-            const eskiDeger = weeklyTasks.weekStats[statType];
-            weeklyTasks.weekStats[statType] = (weeklyTasks.weekStats[statType] || 0) + amount;
-            log.debug(`📊 Haftalık ${statType}: ${eskiDeger} → ${weeklyTasks.weekStats[statType]}`);
-        }
-    } else {
-        log.warn(`⚠️ weeklyTasks.weekStats[${statType}] tanımlı değil!`);
-    }
-    
-    // Haftalık görevleri kontrol et ve güncelle
-    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
-        log.warn('⚠️ weeklyTasks.tasks boş, haftalık görevler oluşturuluyor...');
-        if (typeof checkWeeklyTasks === 'function') {
-            checkWeeklyTasks();
-        }
-    }
-    
-    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
-        log.warn('⚠️ Haftalık görevler oluşturulamadı, güncelleme atlanıyor');
-        return;
-    }
-    
-    weeklyTasks.tasks.forEach(task => {
-        const eskiCurrent = task.current;
-        
-        // Görev tipine göre ilerlemeyi güncelle
-        if (task.type === statType) {
-            if (task.type === 'allModesPlayed') {
-                task.current = weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0;
-            } else if (task.type === 'daysPlayed') {
-                // Günlük oynama: Bugün oynandıysa 1 gün ekle
-                const today = getLocalDateString();
-                const weekStart = getWeekStartDate();
-                const weekEnd = getWeekEndDate();
-                // Bu hafta içinde oynanan günleri say
-                if (streakData && streakData.playDates) {
-                    const weekDays = streakData.playDates.filter(date => 
-                        date >= weekStart && date <= weekEnd
-                    );
-                    task.current = Math.min(task.target, weekDays.length);
-                } else {
-                    task.current = 0;
-                }
-            } else if (task.type === 'streakDays') {
-                // Seri günler: Mevcut streak'i kullan
-                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
-            } else {
-                // totalHasene, totalCorrect, reviewWordsCount, comboCount için
-                task.current = Math.min(task.target, weeklyTasks.weekStats[statType] || 0);
-            }
-        } else {
-            // Diğer görev tipleri için de kontrol et (statType değişmese bile)
-            if (task.type === 'totalHasene') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.totalHasene || 0);
-            } else if (task.type === 'totalCorrect') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.totalCorrect || 0);
-            } else if (task.type === 'daysPlayed') {
-                const today = getLocalDateString();
-                const weekStart = getWeekStartDate();
-                const weekEnd = getWeekEndDate();
-                if (streakData && streakData.playDates) {
-                    const weekDays = streakData.playDates.filter(date => 
-                        date >= weekStart && date <= weekEnd
-                    );
-                    task.current = Math.min(task.target, weekDays.length);
-                } else {
-                    task.current = 0;
-                }
-            } else if (task.type === 'streakDays') {
-                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
-            } else if (task.type === 'allModesPlayed') {
-                task.current = weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0;
-            } else if (task.type === 'reviewWordsCount') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.reviewWordsCount || 0);
-            } else if (task.type === 'comboCount') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.comboCount || 0);
-            }
-        }
-        
-        // Görev tamamlandı mı?
-        if (task.current >= task.target && !weeklyTasks.completedTasks.includes(task.id)) {
-            weeklyTasks.completedTasks.push(task.id);
-            log.debug(`✅ Haftalık görev tamamlandı: ${task.id} (${task.name})`);
-        }
-        
-        if (task.current !== eskiCurrent) {
-            log.debug(`📈 Haftalık görev ilerleme: ${task.id} → ${task.current}/${task.target}`);
-        }
-    });
-    
-    debouncedSaveStats(); // Debounced kaydetme
-    
-    // UI'ı güncelle (eğer modal açıksa ve haftalık sekme aktifse)
-    if (typeof updateWeeklyTasksDisplay === 'function') {
-        // Modal açık mı kontrol et
-        const dailyTasksModal = document.getElementById('dailyTasksModal');
-        if (dailyTasksModal && dailyTasksModal.style.display === 'flex') {
-            // Haftalık sekme aktif mi kontrol et
-            const weeklyTab = document.getElementById('weeklyTasksTab');
-            if (weeklyTab && weeklyTab.style.display === 'block') {
-                // Haftalık sekme aktifse UI'ı anında güncelle
-                updateWeeklyTasksDisplay();
-            }
-        }
-    }
-}
-
-function updateTaskProgress(gameType, amount = 1) {
-    log.debug(`📋 updateTaskProgress çağrıldı: ${gameType} +${amount}`);
-    
-    // Oyun modu mapping (fonksiyon başında tanımla)
-    const gameModeMap = {
-        'kelimeCevir': 'kelimeCevir',
-        'dinleBul': 'dinleBul',
-        'boslukDoldur': 'boslukDoldur',
-        'ayetOku': 'ayetOku',
-        'duaOgre': 'duaOgre',
-        'hadisOku': 'hadisOku'
-    };
-    
-    // Oyun tipine göre istatistiği güncelle
-    // NOT: toplamPuan addSessionPoints içinde zaten ekleniyor, burada tekrar eklenmesin (çift ekleme önlemek için)
-    if (gameType === 'toplamPuan') {
-        log.debug(`⚠️ updateTaskProgress('toplamPuan') çağrıldı ama çift ekleme önlemek için atlandı (zaten addSessionPoints içinde eklendi)`);
-        // toplamPuan için burada ekleme yapma, sadece görev ilerlemesini güncelle
-    } else if (dailyTasks.todayStats[gameType] !== undefined) {
-        // Set tipi için özel işlem
-        if (dailyTasks.todayStats[gameType] instanceof Set) {
-            if (typeof amount === 'string') {
-                dailyTasks.todayStats[gameType].add(amount);
-            }
-        } else {
-            const eskiDeger = dailyTasks.todayStats[gameType];
-            dailyTasks.todayStats[gameType] += amount;
-            log.debug(`📊 ${gameType}: ${eskiDeger} → ${dailyTasks.todayStats[gameType]}`);
-        }
-    }
-
-    // Zorluk takibi - Sadece Kelime Çevir oyununda (görev açıklamasına göre)
-    if (currentDifficulty && gameType === 'kelimeCevir') {
-        dailyTasks.todayStats.farklıZorluk.add(currentDifficulty);
-        log.debug(`🎯 Zorluk eklendi: ${currentDifficulty}, toplam: ${dailyTasks.todayStats.farklıZorluk.size} (sadece Kelime Çevir)`);
-    }
-    
-    // Oyun modu takibi (allGameModes için)
-    if (gameType && typeof gameType === 'string' && gameModeMap[gameType]) {
-        if (dailyTasks.todayStats.allGameModes instanceof Set) {
-            dailyTasks.todayStats.allGameModes.add(gameModeMap[gameType]);
-        }
-    }
-    
-    // Başarı oranı hesapla (accuracy için)
-    if (dailyTasks.todayStats.toplamDogru > 0 || dailyTasks.todayStats.toplamYanlis > 0) {
-        const total = dailyTasks.todayStats.toplamDogru + dailyTasks.todayStats.toplamYanlis;
-        if (total > 0) {
-            dailyTasks.todayStats.accuracy = Math.round((dailyTasks.todayStats.toplamDogru / total) * 100);
-        }
-    }
-
-    // Görevleri kontrol et ve güncelle
-    const allTasks = [...dailyTasks.tasks, ...dailyTasks.bonusTasks];
-    
-    allTasks.forEach(task => {
-        const eskiCurrent = task.current;
-        
-        // Görev tipine göre ilerlemeyi güncelle
-        if (task.type === gameType) {
-            if (task.type === 'allGameModes') {
-                task.current = dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0;
-            } else if (task.type === 'farklıZorluk') {
-                task.current = dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0;
-            } else if (task.type === 'accuracy') {
-                task.current = dailyTasks.todayStats.accuracy || 0;
-            } else if (task.type === 'comboCount') {
-                // Combo görevleri: En yüksek combo sayısını kullan
-                task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
-            } else if (task.type === 'reviewWords') {
-                task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
-            } else if (task.type === 'streakMaintain') {
-                // Seri koruma: Günlük hedef tamamlandıysa 1
-                const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-                const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
-                const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-                task.current = dailyHasene >= goalHasene ? 1 : 0;
-            } else if (task.type === 'toplamPuan') {
-                // toplamPuan görevleri: Bugünkü toplam puandan al
-                task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
-            } else {
-                task.current = Math.min(task.target, dailyTasks.todayStats[gameType] || 0);
-            }
-        } else {
-            // Diğer görev tipleri için de kontrol et (gameType değişmese bile)
-            if (task.type === 'toplamPuan') {
-                // toplamPuan görevleri: Bugünkü toplam puandan al
-                task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
-            } else if (task.type === 'comboCount') {
-                task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
-            } else if (task.type === 'reviewWords') {
-                task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
-            } else if (task.type === 'accuracy') {
-                task.current = dailyTasks.todayStats.accuracy || 0;
-            } else if (task.type === 'streakMaintain') {
-                const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-                const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
-                const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-                task.current = dailyHasene >= goalHasene ? 1 : 0;
-            } else if (task.type === 'allGameModes') {
-                task.current = dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0;
-            } else if (task.type === 'farklıZorluk') {
-                task.current = dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0;
-            }
-        }
-
-        // Görev tamamlandı mı?
-        if (task.current >= task.target && !dailyTasks.completedTasks.includes(task.id)) {
-            dailyTasks.completedTasks.push(task.id);
-            log.debug(`✅ Görev tamamlandı: ${task.id} (${task.name})`);
-        }
-        
-        if (eskiCurrent !== task.current) {
-            log.debug(`🎯 Görev ilerleme: ${task.id} ${eskiCurrent}/${task.target} → ${task.current}/${task.target}`);
-        }
-    });
-    
-    // Haftalık görevleri de güncelle
-    if (typeof updateWeeklyTaskProgress === 'function') {
-        // Haftalık görevler için uygun mapping
-        const weeklyStatMap = {
-            'toplamPuan': 'totalHasene',
-            'toplamDogru': 'totalCorrect',
-            'toplamYanlis': 'totalWrong',
-            'comboCount': 'comboCount'
-        };
-        
-        if (weeklyStatMap[gameType]) {
-            updateWeeklyTaskProgress(weeklyStatMap[gameType], amount);
-        }
-        
-        // Oyun modu için
-        if (gameType && gameModeMap[gameType]) {
-            updateWeeklyTaskProgress('allModesPlayed', gameModeMap[gameType]);
-        }
-    }
-
-    log.debug(`📋 Toplam tamamlanan görev: ${dailyTasks.completedTasks.length}`);
-    debouncedSaveStats(); // Debounced kaydetme
-    
-    // Badge'i güncelle (modal açıksa UI'ı da güncelle)
-    const dailyTasksModal = document.getElementById('dailyTasksModal');
-    if (dailyTasksModal && dailyTasksModal.style.display === 'flex') {
-        // Modal açıksa UI'ı anında güncelle
-        updateTasksDisplay();
-    } else {
-        // Modal kapalıysa sadece badge'i güncelle (performans için)
-        const tasksBadge = document.getElementById('tasksBadge');
-        if (tasksBadge) {
-            const incompleteCount = (dailyTasks.tasks.length + dailyTasks.bonusTasks.length) - dailyTasks.completedTasks.length;
-            if (incompleteCount > 0 && !dailyTasks.rewardsClaimed) {
-                tasksBadge.style.display = 'flex';
-                tasksBadge.textContent = incompleteCount.toString();
-            } else {
-                tasksBadge.style.display = 'none';
-            }
-        }
-    }
-}
-
-function showDailyTasksModal() {
-    // Önce tüm modalları ve oyun ekranlarını kapat
-    closeAllModals();
-    if (typeof hideAllGameScreens === 'function') {
-        hideAllGameScreens();
-    }
-    if (typeof hideAllModes === 'function') {
-        hideAllModes();
-    }
-    
-    // Synchronization: Wait for DOM updates before opening new modal
-    requestAnimationFrame(() => {
-        // Bottom nav bar'ı gizle (modal açıkken görünmemeli)
-        if (typeof hideBottomNavBar === 'function') {
-            hideBottomNavBar();
-        }
-        
-        // Touch event'lerini başlat (eğer henüz başlatılmadıysa)
-        initDailyTasksModalTouchEvents();
-        
-        // Body scroll'u engelle
-        document.body.style.overflow = 'hidden';
-        
-        // Günlük görevleri kontrol et ve güncelle
-        checkDailyTasks();
-        
-        // Haftalık görevleri kontrol et (eğer henüz oluşturulmadıysa)
-        if (typeof checkWeeklyTasks === 'function') {
-            checkWeeklyTasks();
-        }
-        
-        // Debug: Görev durumunu logla
-        log.debug('📋 Daily Tasks Debug:', {
-            tasks: dailyTasks.tasks.length,
-            bonusTasks: dailyTasks.bonusTasks.length,
-            completed: dailyTasks.completedTasks.length,
-            lastDate: dailyTasks.lastTaskDate,
-            today: getLocalDateString(),
-            weeklyTasks: weeklyTasks.tasks ? weeklyTasks.tasks.length : 0
-        });
-        
-        // Görev verilerini güncelle
-        updateTasksDisplay();
-        
-        // Haftalık görevleri de güncelle (modal açıldığında)
-        if (typeof updateWeeklyTasksDisplay === 'function') {
-            updateWeeklyTasksDisplay();
-        }
-        
-        // Varsayılan olarak günlük sekmesini göster
-        if (typeof switchTasksTab === 'function') {
-            switchTasksTab('daily');
-        }
-        
-        // Modal'ı göster (null check ile)
-        const modal = document.getElementById('dailyTasksModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            // Force reflow to ensure modal is visible
-            modal.offsetHeight;
-        } else {
-            log.error('❌ dailyTasksModal elementi bulunamadı!');
-        }
-    });
-}
-
-function closeDailyTasksModal() {
-    const modal = document.getElementById('dailyTasksModal');
-    if (modal) {
-        // Event listener'ları temizle (memory leak prevention)
-        const scrollableContent = document.getElementById('dailyTasksScrollableContent');
-        eventManager.cleanupMultiple([modal, scrollableContent].filter(Boolean));
-        
-        modal.style.display = 'none';
-        modal.style.zIndex = '';
-        // Body scroll'u tekrar aktif et
-        document.body.style.overflow = '';
-        
-        // Bottom nav bar'ı tekrar göster (modal kapandığında)
-        if (typeof showBottomNavBar === 'function') {
-            showBottomNavBar();
-        }
-        
-        // Tüm oyun ekranlarını ve modlarını gizle
-        if (typeof hideAllGameScreens === 'function') {
-            hideAllGameScreens();
-        }
-        if (typeof hideAllModes === 'function') {
-            hideAllModes();
-        } else {
-            // Fallback: Manuel olarak modları gizle
-            const modeIds = ['gameScreen', 'modeSelector', 'ayetMode', 'duaMode', 'hadisMode', 'boslukMode', 'dinleMode'];
-            modeIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.style.display = 'none';
-                    el.style.zIndex = '';
-                }
-            });
-        }
-        
-        // Ana sayfanın görünür olduğundan emin ol
-        if (elements && elements.mainMenu) {
-            elements.mainMenu.style.display = 'block';
-        }
-        
-        log.debug('🔒 Daily Tasks Modal kapatıldı ve temizlendi');
-    }
-}
-
-// Her yere tıklayınca kapatma fonksiyonu (Hasene Nasıl Kazanılır paneli ile aynı mantık)
-function handleDailyTasksModalClick(event) {
-    const target = event.target;
-    // Close button veya claim rewards button kontrolü
-    if (target && target.closest('button[onclick*="closeDailyTasksModal"]')) {
-        return;
-    }
-    if (target && (target.id === 'claimRewardsBtn' || target.closest('#claimRewardsBtn'))) {
-        return;
-    }
-    // Modal içeriğine tıklanırsa, kapatma (sadece arka plana tıklanınca kapat)
-    if (target && target.closest('.modal-content')) {
-        return;
-    }
-    // Scroll edilebilir içerik alanına tıklanırsa, kapatma
-    if (target && (target.id === 'dailyTasksScrollableContent' || target.closest('#dailyTasksScrollableContent'))) {
-        return;
-    }
-    // Arka plana tıklanırsa, modal'ı kapat
-    closeDailyTasksModal();
-}
-
-function updateTasksDisplay() {
-    // Güvenlik kontrolü: dailyTasks.todayStats'ın varlığını kontrol et ve başlat
-    if (!dailyTasks.todayStats) {
-        log.warn('⚠️ dailyTasks.todayStats bulunamadı, başlatılıyor...');
-        dailyTasks.todayStats = {
-            kelimeCevir: 0,
-            dinleBul: 0,
-            boslukDoldur: 0,
-            ayetOku: 0,
-            duaOgre: 0,
-            hadisOku: 0,
-            toplamDogru: 0,
-            toplamYanlis: 0,
-            toplamPuan: 0,
-            perfectStreak: 0,
-            farklıZorluk: new Set(),
-            allGameModes: new Set(),
-            reviewWords: 0,
-            comboCount: 0,
-            accuracy: 0,
-            totalPlayTime: 0
-        };
-    }
-    
-    // Set nesnelerini kontrol et ve yeniden oluştur (JSON.parse sonrası Set'ler array'e dönüşür)
-    if (!(dailyTasks.todayStats.farklıZorluk instanceof Set)) {
-        // Array kontrolü: Eğer array değilse, boş array kullan veya array'e çevir
-        const farkliZorlukValue = dailyTasks.todayStats.farklıZorluk;
-        if (Array.isArray(farkliZorlukValue)) {
-            dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
-        } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
-            // Eğer object ise, Object.values() ile array'e çevir
-            dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
-        } else {
-            dailyTasks.todayStats.farklıZorluk = new Set([]);
-        }
-    }
-    if (!(dailyTasks.todayStats.allGameModes instanceof Set)) {
-        // Array kontrolü: Eğer array değilse, boş array kullan veya array'e çevir
-        const allGameModesValue = dailyTasks.todayStats.allGameModes;
-        if (Array.isArray(allGameModesValue)) {
-            dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
-        } else if (allGameModesValue && typeof allGameModesValue === 'object') {
-            // Eğer object ise, Object.values() ile array'e çevir
-            dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
-        } else {
-            dailyTasks.todayStats.allGameModes = new Set([]);
-        }
-    }
-    
-    // localStorage'dan en güncel todayStats değerlerini yükle ve birleştir
-    // ÖNEMLİ: Mevcut değerleri koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
-    try {
-        const savedTasks = localStorage.getItem('hasene_dailyTasks');
-        if (savedTasks) {
-            const parsedTasks = JSON.parse(savedTasks);
-            if (parsedTasks && parsedTasks.todayStats) {
-                // Mevcut todayStats değerlerini koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
-                // Ancak sayısal değerler için localStorage'daki değerler daha güncel olabilir, bu yüzden birleştirme yapıyoruz
-                const currentStats = { ...dailyTasks.todayStats };
-                dailyTasks.todayStats = {
-                    ...parsedTasks.todayStats,
-                    ...currentStats // Mevcut değerler öncelikli (en güncel)
-                };
-                // Set nesnelerini yeniden oluştur (güvenli şekilde)
-                if (parsedTasks.todayStats.farklıZorluk) {
-                    const farkliZorlukValue = parsedTasks.todayStats.farklıZorluk;
-                    if (Array.isArray(farkliZorlukValue)) {
-                        dailyTasks.todayStats.farklıZorluk = new Set(farkliZorlukValue);
-                    } else if (farkliZorlukValue && typeof farkliZorlukValue === 'object') {
-                        dailyTasks.todayStats.farklıZorluk = new Set(Object.values(farkliZorlukValue));
-                    } else {
-                        dailyTasks.todayStats.farklıZorluk = new Set([]);
-                    }
-                }
-                if (parsedTasks.todayStats.allGameModes) {
-                    const allGameModesValue = parsedTasks.todayStats.allGameModes;
-                    if (Array.isArray(allGameModesValue)) {
-                        dailyTasks.todayStats.allGameModes = new Set(allGameModesValue);
-                    } else if (allGameModesValue && typeof allGameModesValue === 'object') {
-                        dailyTasks.todayStats.allGameModes = new Set(Object.values(allGameModesValue));
-                    } else {
-                        dailyTasks.todayStats.allGameModes = new Set([]);
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        log.error('❌ updateTasksDisplay içinde dailyTasks yükleme hatası:', e);
-    }
-    
-    // Güvenlik kontrolü: Eğer görevler boşsa, yeniden oluştur
-    if (!dailyTasks.tasks || dailyTasks.tasks.length === 0) {
-        log.debug('⚠️ Tasks boş, yeniden oluşturuluyor...');
-        generateDailyTasks(getLocalDateString());
-    }
-    
-    // Güvenlik kontrolü: Eğer bonus görevler boşsa, yeniden oluştur
-    if (!dailyTasks.bonusTasks || dailyTasks.bonusTasks.length === 0) {
-        log.debug('⚠️ Bonus tasks boş, yeniden oluşturuluyor...');
-        generateDailyTasks(getLocalDateString());
-    }
-    
-    const completedCount = dailyTasks.completedTasks.length;
-    const totalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
-    const incompleteCount = totalCount - completedCount;
-    
-    log.debug('📊 updateTasksDisplay:', { 
-        completedCount, 
-        totalCount, 
-        incompleteCount,
-        baseTasks: dailyTasks.tasks.length,
-        bonusTasks: dailyTasks.bonusTasks.length,
-        rewardsClaimed: dailyTasks.rewardsClaimed
-    });
-    
-    // Genel ilerleme
-    const completedTasksEl = document.getElementById('completedTasks');
-    const totalTasksEl = document.getElementById('totalTasks');
-    const taskProgressBar = document.getElementById('taskProgress');
-    
-    if (completedTasksEl) {
-        completedTasksEl.textContent = completedCount;
-    } else {
-        log.error('❌ completedTasks elementi bulunamadı!');
-    }
-    
-    if (totalTasksEl) {
-        totalTasksEl.textContent = totalCount;
-    } else {
-        log.error('❌ totalTasks elementi bulunamadı!');
-    }
-    
-    const progressPercent = totalCount > 0 ? Math.min((completedCount / totalCount) * 100, 100) : 0;
-    if (taskProgressBar) {
-        taskProgressBar.style.width = progressPercent + '%';
-    } else {
-        log.error('❌ taskProgress elementi bulunamadı!');
-    }
-    
-    // Badge güncelle (tamamlanmamış görev varsa göster)
-    const tasksBadge = document.getElementById('tasksBadge');
-    if (tasksBadge) {
-        if (incompleteCount > 0 && !dailyTasks.rewardsClaimed) {
-            tasksBadge.style.display = 'flex';
-            // Tam sayıyı göster (9+ limiti kaldırıldı)
-            tasksBadge.textContent = incompleteCount.toString();
-            log.debug('🏷️ Badge güncellendi:', { incompleteCount, badgeText: incompleteCount.toString() });
-        } else {
-            tasksBadge.style.display = 'none';
-            log.debug('🏷️ Badge gizlendi:', { incompleteCount, rewardsClaimed: dailyTasks.rewardsClaimed });
-        }
-    } else {
-        log.error('❌ tasksBadge elementi bulunamadı!');
-    }
-
-    // Görevlerin current değerlerini güncelle (dailyTasks.todayStats'tan)
-    const allTasks = [...dailyTasks.tasks, ...dailyTasks.bonusTasks];
-    log.debug('📊 updateTasksDisplay - Görevler güncelleniyor:', {
-        todayStats: dailyTasks.todayStats,
-        tasksCount: allTasks.length
-    });
-    allTasks.forEach(task => {
-        const oldCurrent = task.current;
-        if (task.type === 'toplamPuan') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.toplamPuan || 0);
-        } else if (task.type === 'toplamDogru') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.toplamDogru || 0);
-        } else if (task.type === 'kelimeCevir') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.kelimeCevir || 0);
-        } else if (task.type === 'dinleBul') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.dinleBul || 0);
-        } else if (task.type === 'boslukDoldur') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.boslukDoldur || 0);
-        } else if (task.type === 'ayetOku') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.ayetOku || 0);
-        } else if (task.type === 'duaOgre') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.duaOgre || 0);
-        } else if (task.type === 'hadisOku') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.hadisOku || 0);
-        } else if (task.type === 'perfectStreak') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.perfectStreak || 0);
-        } else if (task.type === 'farklıZorluk') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.farklıZorluk ? dailyTasks.todayStats.farklıZorluk.size : 0);
-        } else if (task.type === 'reviewWords') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.reviewWords || 0);
-        } else if (task.type === 'comboCount') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.comboCount || 0);
-        } else if (task.type === 'accuracy') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.accuracy || 0);
-        } else if (task.type === 'allGameModes') {
-            task.current = Math.min(task.target, dailyTasks.todayStats.allGameModes ? dailyTasks.todayStats.allGameModes.size : 0);
-        } else if (task.type === 'streakMaintain') {
-            // Seri koruma: Günlük hedef tamamlandıysa 1
-            const dailyHasene = parseInt(storage.get('dailyHasene', '0')) || 0;
-            const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700;
-            const goalHasene = parseInt(storage.get('dailyGoalHasene', defaultGoal.toString())) || defaultGoal;
-            task.current = dailyHasene >= goalHasene ? 1 : 0;
-        }
-        
-        // Görev tamamlandı mı?
-        if (task.current >= task.target && !dailyTasks.completedTasks.includes(task.id)) {
-            dailyTasks.completedTasks.push(task.id);
-            log.debug(`✅ Görev tamamlandı: ${task.id} (${task.name})`);
-        }
-        
-        // Debug: Görev güncellemesi
-        if (oldCurrent !== task.current) {
-            log.debug(`🔄 Görev güncellendi: ${task.id} (${task.name}) - ${oldCurrent}/${task.target} → ${task.current}/${task.target}`);
-        }
-    });
-    
-    // Tamamlanan görev sayısını güncelle
-    const updatedCompletedCount = dailyTasks.completedTasks.length;
-    const updatedTotalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
-    
-    // Genel ilerleme güncelle
-    if (completedTasksEl) {
-        completedTasksEl.textContent = updatedCompletedCount;
-    }
-    if (totalTasksEl) {
-        totalTasksEl.textContent = updatedTotalCount;
-    }
-    const updatedProgressPercent = updatedTotalCount > 0 ? Math.min((updatedCompletedCount / updatedTotalCount) * 100, 100) : 0;
-    // taskProgressBar zaten yukarıda tanımlı, tekrar tanımlamaya gerek yok
-    if (taskProgressBar) {
-        taskProgressBar.style.width = updatedProgressPercent + '%';
-    }
-
-    // Temel görevleri göster
-    const dailyList = document.getElementById('dailyTasksList');
-    if (dailyList) {
-        dailyList.innerHTML = '';
-        
-        if (dailyTasks.tasks && dailyTasks.tasks.length > 0) {
-            dailyTasks.tasks.forEach(task => {
-                const taskElement = createTaskElement(task);
-                dailyList.appendChild(taskElement);
-            });
-        }
-    } else {
-        log.error('❌ dailyTasksList elementi bulunamadı!');
-    }
-
-    // Bonus görevleri göster
-    const bonusList = document.getElementById('bonusTasksList');
-    if (bonusList) {
-        bonusList.innerHTML = '';
-        
-        if (dailyTasks.bonusTasks && dailyTasks.bonusTasks.length > 0) {
-            log.debug('📋 Bonus görevler gösteriliyor:', {
-                count: dailyTasks.bonusTasks.length,
-                tasks: dailyTasks.bonusTasks.map(t => t.id)
-            });
-            dailyTasks.bonusTasks.forEach(task => {
-                const taskElement = createTaskElement(task);
-                bonusList.appendChild(taskElement);
-            });
-        } else {
-            log.warn('⚠️ Bonus görevler boş veya tanımsız:', {
-                bonusTasks: dailyTasks.bonusTasks,
-                hasBonusTasks: !!dailyTasks.bonusTasks,
-                length: dailyTasks.bonusTasks?.length || 0
-            });
-            // Bonus görevler yoksa, yeniden oluştur
-            if (!dailyTasks.bonusTasks || dailyTasks.bonusTasks.length === 0) {
-                log.debug('🔄 Bonus görevler yeniden oluşturuluyor...');
-                generateDailyTasks(getLocalDateString());
-                // Tekrar göster
-                if (dailyTasks.bonusTasks && dailyTasks.bonusTasks.length > 0) {
-                    dailyTasks.bonusTasks.forEach(task => {
-                        const taskElement = createTaskElement(task);
-                        bonusList.appendChild(taskElement);
-                    });
-                }
-            }
-        }
-    } else {
-        log.error('❌ bonusTasksList elementi bulunamadı!');
-    }
-
-    // Ödül bölümü
-    const rewardsSection = document.getElementById('rewardsSection');
-    if (rewardsSection) {
-        if (completedCount === totalCount && totalCount > 0 && !dailyTasks.rewardsClaimed) {
-            rewardsSection.style.display = 'block';
-        } else {
-            rewardsSection.style.display = 'none';
-        }
-    }
-    
-    // Haftalık görevleri göster
-    updateWeeklyTasksDisplay();
-}
-
-function updateWeeklyTasksDisplay() {
-    // Güvenlik kontrolü: weeklyTasks objesi var mı?
-    if (!weeklyTasks) {
-        log.error('❌ weeklyTasks objesi bulunamadı!');
-        return;
-    }
-    
-    // Güvenlik kontrolü: completedTasks ve rewardsClaimed başlat
-    if (!Array.isArray(weeklyTasks.completedTasks)) {
-        weeklyTasks.completedTasks = [];
-    }
-    if (typeof weeklyTasks.rewardsClaimed !== 'boolean') {
-        weeklyTasks.rewardsClaimed = false;
-    }
-    
-    // Haftalık görevler yoksa oluştur (sadece bir kez, sonsuz döngü olmaz)
-    if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
-        log.debug('⚠️ Haftalık görevler boş, yeniden oluşturuluyor...');
-        if (typeof checkWeeklyTasks === 'function') {
-            checkWeeklyTasks();
-        } else if (typeof generateWeeklyTasks === 'function') {
-            const weekStart = getWeekStartDate();
-            generateWeeklyTasks(weekStart);
-        }
-    }
-    
-    // Güvenlik kontrolü: weeklyTasks.weekStats'ın varlığını kontrol et ve başlat
-    if (!weeklyTasks.weekStats) {
-        log.warn('⚠️ weeklyTasks.weekStats bulunamadı, başlatılıyor...');
-        weeklyTasks.weekStats = {
-            totalHasene: 0,
-            totalCorrect: 0,
-            totalWrong: 0,
-            daysPlayed: 0,
-            perfectDays: 0,
-            streakDays: 0,
-            allModesPlayed: new Set(),
-            reviewWordsCount: 0,
-            comboCount: 0
-        };
-    }
-    
-    // Set nesnelerini kontrol et ve yeniden oluştur (JSON.parse sonrası Set'ler array'e dönüşür)
-    if (!(weeklyTasks.weekStats.allModesPlayed instanceof Set)) {
-        const allModesValue = weeklyTasks.weekStats.allModesPlayed;
-        if (Array.isArray(allModesValue)) {
-            weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
-        } else if (allModesValue && typeof allModesValue === 'object') {
-            weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
-        } else {
-            weeklyTasks.weekStats.allModesPlayed = new Set([]);
-        }
-    }
-    
-    // localStorage'dan en güncel weeklyTasks değerlerini yükle ve birleştir
-    // ÖNEMLİ: Mevcut değerleri koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
-    try {
-        const savedWeeklyTasks = localStorage.getItem('hasene_weeklyTasks');
-        if (savedWeeklyTasks) {
-            const parsedWeeklyTasks = JSON.parse(savedWeeklyTasks);
-            if (parsedWeeklyTasks && parsedWeeklyTasks.weekStats) {
-                // Mevcut weekStats değerlerini koru, localStorage'daki değerler sadece eksik alanlar için kullanılsın
-                // Ancak sayısal değerler için localStorage'daki değerler daha güncel olabilir, bu yüzden birleştirme yapıyoruz
-                const currentWeekStats = { ...weeklyTasks.weekStats };
-                weeklyTasks.weekStats = {
-                    ...parsedWeeklyTasks.weekStats,
-                    ...currentWeekStats // Mevcut değerler öncelikli (en güncel)
-                };
-                // Set nesnelerini yeniden oluştur
-                if (parsedWeeklyTasks.weekStats.allModesPlayed) {
-                    const allModesValue = parsedWeeklyTasks.weekStats.allModesPlayed;
-                    if (Array.isArray(allModesValue)) {
-                        weeklyTasks.weekStats.allModesPlayed = new Set(allModesValue);
-                    } else if (allModesValue && typeof allModesValue === 'object') {
-                        weeklyTasks.weekStats.allModesPlayed = new Set(Object.values(allModesValue));
-                    } else {
-                        weeklyTasks.weekStats.allModesPlayed = new Set([]);
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        log.error('❌ updateWeeklyTasksDisplay içinde weeklyTasks yükleme hatası:', e);
-    }
-    
-    // Haftalık görevler listesi
-    const weeklyList = document.getElementById('weeklyTasksList');
-    const weeklyPeriod = document.getElementById('weeklyTasksPeriod');
-    const weeklyCompletedCount = document.getElementById('weeklyCompletedCount');
-    const weeklyTotalCount = document.getElementById('weeklyTotalCount');
-    const weeklyRewardsSection = document.getElementById('weeklyRewardsSection');
-    
-    if (!weeklyList || !weeklyPeriod || !weeklyCompletedCount || !weeklyTotalCount) {
-        log.debug('⚠️ Haftalık görevler elementi bulunamadı, atlanıyor...');
-        return;
-    }
-    
-    // Hafta bilgisi
-    if (weeklyTasks.weekStart && weeklyTasks.weekEnd) {
-        const startDate = new Date(weeklyTasks.weekStart);
-        const endDate = new Date(weeklyTasks.weekEnd);
-        const startStr = startDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
-        const endStr = endDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
-        weeklyPeriod.textContent = `${startStr} - ${endStr}`;
-    } else {
-        weeklyPeriod.textContent = 'Yükleniyor...';
-    }
-    
-    // Görevlerin current değerlerini güncelle (weeklyTasks.weekStats'tan)
-    if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
-        weeklyTasks.tasks.forEach(task => {
-            const oldCurrent = task.current;
-            
-            if (task.type === 'totalHasene') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.totalHasene || 0);
-            } else if (task.type === 'totalCorrect') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.totalCorrect || 0);
-            } else if (task.type === 'daysPlayed') {
-                // Bu hafta içinde oynanan günleri say
-                const weekStart = getWeekStartDate();
-                const weekEnd = getWeekEndDate();
-                if (streakData && streakData.playDates) {
-                    const weekDays = streakData.playDates.filter(date => 
-                        date >= weekStart && date <= weekEnd
-                    );
-                    task.current = Math.min(task.target, weekDays.length);
-                } else {
-                    task.current = 0;
-                }
-            } else if (task.type === 'streakDays') {
-                task.current = Math.min(task.target, streakData ? streakData.currentStreak : 0);
-            } else if (task.type === 'allModesPlayed') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.allModesPlayed ? weeklyTasks.weekStats.allModesPlayed.size : 0);
-            } else if (task.type === 'comboCount') {
-                task.current = Math.min(task.target, weeklyTasks.weekStats.comboCount || 0);
-            }
-            
-            // Görev tamamlandı mı?
-            if (task.current >= task.target && !weeklyTasks.completedTasks.includes(task.id)) {
-                weeklyTasks.completedTasks.push(task.id);
-                log.debug(`✅ Haftalık görev tamamlandı: ${task.id} (${task.name})`);
-            }
-            
-            // Debug: Görev güncellemesi
-            if (oldCurrent !== task.current) {
-                log.debug(`🔄 Haftalık görev güncellendi: ${task.id} (${task.name}) - ${oldCurrent}/${task.target} → ${task.current}/${task.target}`);
-            }
-        });
-    }
-    
-    // Haftalık görevleri göster (günlük görevler gibi)
-    weeklyList.innerHTML = '';
-    
-    if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
-        log.debug('📋 Haftalık görevler gösteriliyor:', {
-            count: weeklyTasks.tasks.length,
-            tasks: weeklyTasks.tasks.map(t => t.id)
-        });
-        weeklyTasks.tasks.forEach(task => {
-            // Günlük görevler gibi aynı stili kullan
-            const taskElement = createWeeklyTaskElement(task);
-            weeklyList.appendChild(taskElement);
-        });
-        
-        // Tamamlanan görev sayısı
-        const completedWeekly = weeklyTasks.completedTasks.length;
-        const totalWeekly = weeklyTasks.tasks.length;
-        weeklyCompletedCount.textContent = completedWeekly;
-        weeklyTotalCount.textContent = totalWeekly;
-        
-        // Ödül bölümü
-        if (weeklyRewardsSection) {
-            if (completedWeekly === totalWeekly && totalWeekly > 0 && !weeklyTasks.rewardsClaimed) {
-                weeklyRewardsSection.style.display = 'block';
-            } else {
-                weeklyRewardsSection.style.display = 'none';
-            }
-        }
-    } else {
-        log.warn('⚠️ Haftalık görevler boş veya tanımsız:', {
-            tasks: weeklyTasks.tasks,
-            hasTasks: !!weeklyTasks.tasks,
-            length: weeklyTasks.tasks?.length || 0
-        });
-        // Haftalık görevler yoksa, yeniden oluştur
-        if (!weeklyTasks.tasks || weeklyTasks.tasks.length === 0) {
-            log.debug('🔄 Haftalık görevler yeniden oluşturuluyor...');
-            const weekStart = getWeekStartDate();
-            if (typeof generateWeeklyTasks === 'function') {
-                generateWeeklyTasks(weekStart);
-                // Tekrar göster
-                if (weeklyTasks.tasks && weeklyTasks.tasks.length > 0) {
-                    weeklyTasks.tasks.forEach(task => {
-                        const taskElement = createWeeklyTaskElement(task);
-                        weeklyList.appendChild(taskElement);
-                    });
-                    // Tamamlanan görev sayısı
-                    const completedWeekly = weeklyTasks.completedTasks.length;
-                    const totalWeekly = weeklyTasks.tasks.length;
-                    weeklyCompletedCount.textContent = completedWeekly;
-                    weeklyTotalCount.textContent = totalWeekly;
-                } else {
-                    weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
-                }
-            } else {
-                weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
-            }
-        } else {
-            weeklyList.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.7;">Haftalık görevler yükleniyor...</div>';
-        }
-    }
-}
-
-function createWeeklyTaskElement(task) {
-    const isCompleted = weeklyTasks.completedTasks.includes(task.id);
-    // task.current değerinin tanımlı olduğundan emin ol
-    if (typeof task.current === 'undefined' || task.current === null) {
-        task.current = 0;
-    }
-    // Sıfıra bölünme kontrolü
-    const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
-    
-    // Debug: İlerleme çubuğu için log
-    if (task.type === 'totalHasene') {
-        log.debug(`📊 Haftalık görev ilerleme çubuğu: ${task.id} - current: ${task.current}, target: ${task.target}, percent: ${progressPercent}%`);
-    }
-    
-    // Haftalık görev icon mapping
-    const weeklyTaskIcons = {
-        'week_hasene5000': '💰',
-        'week_correct200': '⭐',
-        'week_days5': '📅',
-        'week_perfect3': '🔥',
-        'week_allmodes': '🎮',
-        'week_review50': '🔄',
-        'week_combo30': '⚡',
-        'week_streak7': '🔥'
-    };
-    
-    const taskIcon = weeklyTaskIcons[task.id] || '📋';
-    
-    // Günlük görevlerle aynı yapıyı kullan
-    const div = document.createElement('div');
-    div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
-    
-    // Tooltip için unique ID (onclick handler'dan önce tanımlanmalı)
-    const tooltipId = 'weekly-task-tooltip-' + task.id + '-' + Date.now();
-    
-    // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
-    // Ama help icon'a tıklanırsa engelleme (bilgi paneli açılabilir)
-    div.onclick = function(e) {
-        // Help icon veya tooltip'e tıklanmadıysa engelle
-        const clickedElement = e.target;
-        const isHelpIcon = clickedElement.classList.contains('daily-task-help-icon') || 
-                          clickedElement.closest('.daily-task-help-icon');
-        const isTooltip = clickedElement.classList.contains('daily-task-tooltip') || 
-                         clickedElement.closest('.daily-task-tooltip') ||
-                         clickedElement.closest('.daily-task-tooltip-content');
-        
-        if (!isHelpIcon && !isTooltip) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-    };
-    div.addEventListener('touchstart', function(e) {
-        // Help icon'a dokunulmadıysa engelle
-        const touchedElement = e.target;
-        const isHelpIcon = touchedElement.classList.contains('daily-task-help-icon') || 
-                          touchedElement.closest('.daily-task-help-icon');
-        const isTooltip = touchedElement.classList.contains('daily-task-tooltip') || 
-                         touchedElement.closest('.daily-task-tooltip') ||
-                         touchedElement.closest('.daily-task-tooltip-content');
-        
-        if (!isHelpIcon && !isTooltip) {
-            e.stopPropagation();
-        }
-        // preventDefault kaldırıldı - scroll'u engellemesin
-    }, { passive: true });
-    
-    // Hover efekti
-    div.onmouseover = function() {
-        if (!isCompleted) {
-            this.style.transform = 'translateX(4px)';
-            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-        }
-    };
-    div.onmouseout = function() {
-        this.style.transform = '';
-        this.style.boxShadow = '';
-    };
-    
-    // Günlük görevlerle aynı HTML yapısı
-    const weeklyDescription = getWeeklyTaskDescription(task);
-    const taskHelp = getWeeklyTaskDetailedHelp(task);
-    
-    div.innerHTML = `
-        ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
-        <div class="daily-task-header">
-            <div class="daily-task-info">
-                <div class="daily-task-icon">${taskIcon}</div>
-                <div class="daily-task-name">${task.name}</div>
-                ${weeklyDescription && weeklyDescription !== task.name ? `<div class="daily-task-desc">${weeklyDescription}</div>` : ''}
-            </div>
-            <div class="daily-task-reward">+${task.reward * 1000} Hasene</div>
-        </div>
-        <div class="daily-task-progress">
-            <div class="daily-task-progress-bar">
-                <div class="daily-task-progress-fill" style="width: ${progressPercent}%;"></div>
-            </div>
-            <div class="daily-task-progress-text">${task.current}/${task.target}</div>
-        </div>
-        <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
-    `;
-    
-    // Tooltip açma/kapama - Tooltip body'de oluşturulacak
-    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
-    
-    // Tooltip'i body'de oluştur (görev panelinin dışında açılsın)
-    let tooltip = document.getElementById(tooltipId);
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.className = 'daily-task-tooltip';
-        tooltip.id = tooltipId;
-        tooltip.innerHTML = `
-            <div class="daily-task-tooltip-content">
-                <div class="daily-task-tooltip-title">${task.name}</div>
-                <div class="daily-task-tooltip-text">${taskHelp}</div>
-                <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
-            </div>
-        `;
-        document.body.appendChild(tooltip);
-    }
-    
-    const closeBtn = tooltip.querySelector(`#${tooltipId}-close`);
-    
-    if (helpIcon && tooltip) {
-        helpIcon.onclick = function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            // Bu tooltip'in şu anki durumunu kontrol et
-            const wasOpen = tooltip.classList.contains('show');
-            
-            // TÜM açık tooltip'leri anında kapat (bu tooltip dahil)
-            const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
-            openTooltips.forEach(t => {
-                // Transition'ı geçici olarak kaldır, anında kapat
-                t.style.transition = 'none';
-                t.classList.remove('show');
-                // Transition'ı geri ekle
-                setTimeout(() => {
-                    t.style.transition = '';
-                }, 10);
-            });
-            
-            // Eğer bu tooltip kapalıydıysa, onu aç (eğer açıktıysa zaten kapattık, tekrar açma)
-            if (!wasOpen) {
-                // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
-                if (openTooltips.length > 0) {
-                    setTimeout(() => {
-                        tooltip.classList.add('show');
-                    }, 50);
-                } else {
-                    tooltip.classList.add('show');
-                }
-            }
-        };
-        
-        // Close butonuna tıklanınca kapat
-        if (closeBtn) {
-            closeBtn.onclick = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                tooltip.classList.remove('show');
-            };
-        }
-        
-        // Tooltip dışına tıklanınca kapat (sadece tooltip background'una)
-        tooltip.onclick = function(e) {
-            if (e.target === tooltip) {
-                tooltip.classList.remove('show');
-            }
-        };
-        
-        // ESC tuşu ile kapat (global listener - sadece açık tooltip varsa çalışır)
-        const handleEscKey = function(e) {
-            if (e.key === 'Escape') {
-                const openTooltip = document.querySelector('.daily-task-tooltip.show');
-                if (openTooltip) {
-                    openTooltip.classList.remove('show');
-                }
-            }
-        };
-        
-        // Tooltip açıldığında ESC listener ekle
-        helpIcon.addEventListener('click', function() {
-            setTimeout(function() {
-                if (tooltip.classList.contains('show')) {
-                    document.addEventListener('keydown', handleEscKey, { once: true });
-                }
-            }, 10);
-        });
-    }
-    
-    return div;
-}
-
-function getWeeklyTaskDescription(task) {
-    const descriptions = {
-        'week_hasene5000': 'Bu hafta toplam 5,000 Hasene kazan',
-        'week_correct200': 'Bu hafta 200 doğru cevap ver',
-        'week_days5': '5 gün üst üste oyun oyna',
-        'week_allmodes': '6 farklı oyun modunu oyna',
-        'week_combo30': 'Üst üste 30 doğru cevap ver',
-        'week_streak7': '7 gün üst üste günlük hedefini tamamla'
-    };
-    const description = descriptions[task.id];
-    // Eğer açıklama yoksa veya task.name ile aynıysa boş döndür
-    if (!description || description === task.name) {
-        return '';
-    }
-    return description;
-}
-
-// Haftalık görev için detaylı açıklama (tooltip için)
-function getWeeklyTaskDetailedHelp(task) {
-    const helpTexts = {
-        'week_hasene5000': '💰 Bu hafta toplam 5,000 Hasene puanı kazan.\n\n' +
-                          '📝 Nasıl puan kazanabilirsin:\n' +
-                          '• Oyunlarda doğru cevap vererek\n' +
-                          '• Combo bonusu alarak (her 3 doğru cevapta +5)\n' +
-                          '• Perfect lesson bonusu alarak\n' +
-                          '• Günlük ve haftalık görevleri tamamlayarak\n\n' +
-                          '💡 İpucu: Haftalık toplam puan üst barda gösterilir. Hafta başından itibaren tüm puanlar sayılır.',
-        'week_correct200': '⭐ Bu hafta toplam 200 doğru cevap ver.\n\n' +
-                          '📝 Nasıl çalışır:\n' +
-                          '• Herhangi bir oyun modunda verdiğin doğru cevaplar sayılır\n' +
-                          '• Yanlış cevaplar sayılmaz\n' +
-                          '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n\n' +
-                          '💡 İpucu: Hafta başından itibaren tüm doğru cevaplar sayılır. Günlük görevlerle birlikte ilerler.',
-        'week_days5': '📅 5 gün üst üste oyun oyna.\n\n' +
-                     '📝 Nasıl çalışır:\n' +
-                     '• Her gün en az bir oyun oynaman gerekir\n' +
-                     '• Gün atlarsan seri sıfırlanır\n' +
-                     '• 5 gün üst üste oynadığında görev tamamlanır\n\n' +
-                     '💡 İpucu: Her gün en az bir soru cevaplamak yeterli. Oyunu bitirmen gerekmez.',
-        'week_allmodes': '🎮 6 farklı oyun modunu oyna.\n\n' +
-                        '📝 Oyun modları:\n' +
-                        '1. 📚 Kelime Çevir\n' +
-                        '2. 🎧 Dinle ve Bul\n' +
-                        '3. ✏️ Boşluk Doldur\n' +
-                        '4. 📖 Ayet Oku\n' +
-                        '5. 🤲 Dua Et\n' +
-                        '6. 📚 Hadis Oku\n\n' +
-                        '💡 İpucu: Her modu en az bir kez oynaman gerekir. Aynı modu birden fazla oynaman sayılmaz.',
-        'week_combo30': '⚡ Üst üste 30 doğru cevap ver.\n\n' +
-                       '📝 Nasıl çalışır:\n' +
-                       '• Doğru cevaplar peş peşe gelmeli\n' +
-                       '• Yanlış cevap verirsen seri sıfırlanır\n' +
-                       '• Tekrar baştan başlaman gerekir\n' +
-                       '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n\n' +
-                       '✅ Örnek: 10 Kelime Çevir + 10 Dinle Bul + 10 Boşluk Doldur (hiç yanlış yok) = 30 doğru\n' +
-                       '❌ Örnek: 15 doğru → 1 yanlış → 15 doğru = Sıfırlandı (yanlış var)\n\n' +
-                       '💡 İpucu: Bu görev zor! Dikkatli oyna ve yanlış yapmamaya çalış.',
-        'week_streak7': '🔥 7 gün üst üste günlük hedefini tamamla.\n\n' +
-                       '📝 Nasıl çalışır:\n' +
-                       '• Her gün günlük hedefi tamamlaman gerekir\n' +
-                       '• Günlük hedef üst barda gösterilir\n' +
-                       '• Bir gün hedefi tamamlamazsan seri sıfırlanır\n' +
-                       '• 7 gün üst üste tamamladığında görev tamamlanır\n\n' +
-                       '💡 İpucu: Günlük hedefi tamamlamak için yeterli Hasene puanı kazanman gerekir. Her gün düzenli oyna!'
-    };
-    return helpTexts[task.id] || 'Bu görevi tamamlamak için ilgili oyun modunu oyna.';
-}
-
-function createTaskElement(task) {
-    const isCompleted = dailyTasks.completedTasks.includes(task.id);
-    // task.current değerinin tanımlı olduğundan emin ol
-    if (typeof task.current === 'undefined' || task.current === null) {
-        task.current = 0;
-    }
-    // Sıfıra bölünme kontrolü
-    const progressPercent = task.target > 0 ? Math.min((task.current / task.target) * 100, 100) : 0;
-    
-    // Task icon mapping
-    const taskIcons = {
-        'kelime5': '🔄', 'kelime10': '🔄',
-        'ayet3': '📖', 'ayetOku': '📖',
-        'dua2': '🤲', 'duaOgre': '🤲',
-        'hadis1': '📚', 'hadisOku': '📚',
-        'dinle2': '🎧', 'dinle3': '🎧', 'dinle5': '🎧', 'dinleBul': '🎧',
-        'bosluk1': '✏️', 'bosluk2': '✏️', 'bosluk3': '✏️', 'boslukDoldur': '✏️',
-        'dogru10': '⭐', 'dogru20': '⭐', 'toplamDogru': '⭐',
-        'puan100': '💰', 'puan200': '💰', 'toplamPuan': '💰',
-        'perfect5': '🔥', 'perfectStreak': '🔥',
-        'allDiff': '💎', 'farklıZorluk': '💎',
-        'combo15': '⚡'
-    };
-    
-    const taskIcon = taskIcons[task.id] || taskIcons[task.type] || '📋';
-    
-    const div = document.createElement('div');
-    div.className = 'daily-task-card' + (isCompleted ? ' completed' : '');
-    
-    // Tooltip için unique ID (onclick handler'dan önce tanımlanmalı)
-    const tooltipId = 'task-tooltip-' + task.id + '-' + Date.now();
-    
-    // Tıklama event'lerini durdur (yanlışlıkla oyun modu açılmasın)
-    // Ama help icon'a tıklanırsa engelleme (bilgi paneli açılabilir)
-    div.onclick = function(e) {
-        // Help icon veya tooltip'e tıklanmadıysa engelle
-        const clickedElement = e.target;
-        const isHelpIcon = clickedElement.classList.contains('daily-task-help-icon') || 
-                          clickedElement.closest('.daily-task-help-icon');
-        const isTooltip = clickedElement.classList.contains('daily-task-tooltip') || 
-                         clickedElement.closest('.daily-task-tooltip') ||
-                         clickedElement.closest('.daily-task-tooltip-content');
-        
-        if (!isHelpIcon && !isTooltip) {
-            e.stopPropagation();
-            e.preventDefault();
-        }
-    };
-    // Touch event'leri - scroll'u engellemeden sadece click'i engelle
-    div.addEventListener('touchstart', function(e) {
-        // Help icon'a dokunulmadıysa engelle
-        const touchedElement = e.target;
-        const isHelpIcon = touchedElement.classList.contains('daily-task-help-icon') || 
-                          touchedElement.closest('.daily-task-help-icon');
-        const isTooltip = touchedElement.classList.contains('daily-task-tooltip') || 
-                         touchedElement.closest('.daily-task-tooltip') ||
-                         touchedElement.closest('.daily-task-tooltip-content');
-        
-        if (!isHelpIcon && !isTooltip) {
-            e.stopPropagation();
-        }
-        // preventDefault kaldırıldı - scroll'u engellemesin
-    }, { passive: true }); // Scroll performansı için passive: true
-    
-    // Hover efekti
-    div.onmouseover = function() {
-        if (!isCompleted) {
-            this.style.transform = 'translateX(4px)';
-            this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-        }
-    };
-    div.onmouseout = function() {
-        this.style.transform = '';
-        this.style.boxShadow = '';
-    };
-    
-    const taskDescription = getTaskDescription(task);
-    const taskHelp = getTaskDetailedHelp(task);
-    
-    div.innerHTML = `
-        ${isCompleted ? '<div class="daily-task-completed-badge">✓</div>' : ''}
-        <div class="daily-task-header">
-            <div class="daily-task-info">
-                <div class="daily-task-icon">${taskIcon}</div>
-                <div class="daily-task-name">${getTaskDisplayName(task)}</div>
-                ${taskDescription ? `<div class="daily-task-desc">${taskDescription}</div>` : ''}
-            </div>
-            <div class="daily-task-reward">+${task.reward * 100} Hasene</div>
-        </div>
-        <div class="daily-task-progress">
-            <div class="daily-task-progress-bar">
-                <div class="daily-task-progress-fill" style="width: ${progressPercent}%;"></div>
-            </div>
-            <div class="daily-task-progress-text">${task.current}/${task.target}</div>
-        </div>
-        <div class="daily-task-help-icon" id="${tooltipId}-icon" title="Nasıl tamamlanır?">ℹ️</div>
-    `;
-    
-    // Tooltip açma/kapama - Tooltip body'de oluşturulacak
-    const helpIcon = div.querySelector(`#${tooltipId}-icon`);
-    
-    // Tooltip'i body'de oluştur (görev panelinin dışında açılsın)
-    let tooltip = document.getElementById(tooltipId);
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.className = 'daily-task-tooltip';
-        tooltip.id = tooltipId;
-        tooltip.innerHTML = `
-            <div class="daily-task-tooltip-content">
-                <div class="daily-task-tooltip-title">${getTaskDisplayName(task)}</div>
-                <div class="daily-task-tooltip-text">${taskHelp}</div>
-                <div class="daily-task-tooltip-close" id="${tooltipId}-close">✕</div>
-            </div>
-        `;
-        document.body.appendChild(tooltip);
-    }
-    
-    const closeBtn = tooltip.querySelector(`#${tooltipId}-close`);
-    
-    if (helpIcon && tooltip) {
-        helpIcon.onclick = function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            // Bu tooltip'in şu anki durumunu kontrol et
-            const wasOpen = tooltip.classList.contains('show');
-            
-            // TÜM açık tooltip'leri anında kapat (bu tooltip dahil)
-            const openTooltips = document.querySelectorAll('.daily-task-tooltip.show');
-            openTooltips.forEach(t => {
-                // Transition'ı geçici olarak kaldır, anında kapat
-                t.style.transition = 'none';
-                t.classList.remove('show');
-                // Transition'ı geri ekle
-                setTimeout(() => {
-                    t.style.transition = '';
-                }, 10);
-            });
-            
-            // Eğer bu tooltip kapalıydıysa, onu aç (eğer açıktıysa zaten kapattık, tekrar açma)
-            if (!wasOpen) {
-                // Kısa bir gecikme ile yeni tooltip'i aç (animasyon çakışmasını önlemek için)
-                if (openTooltips.length > 0) {
-                    setTimeout(() => {
-                        tooltip.classList.add('show');
-                    }, 50);
-                } else {
-                    tooltip.classList.add('show');
-                }
-            }
-        };
-        
-        // Close butonuna tıklanınca kapat
-        if (closeBtn) {
-            closeBtn.onclick = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                tooltip.classList.remove('show');
-            };
-        }
-        
-        // Tooltip dışına tıklanınca kapat (sadece tooltip background'una)
-        tooltip.onclick = function(e) {
-            if (e.target === tooltip) {
-                tooltip.classList.remove('show');
-            }
-        };
-        
-        // ESC tuşu ile kapat (global listener - sadece açık tooltip varsa çalışır)
-        const handleEscKey = function(e) {
-            if (e.key === 'Escape') {
-                const openTooltip = document.querySelector('.daily-task-tooltip.show');
-                if (openTooltip) {
-                    openTooltip.classList.remove('show');
-                }
-            }
-        };
-        
-        // Tooltip açıldığında ESC listener ekle
-        helpIcon.addEventListener('click', function() {
-            setTimeout(function() {
-                if (tooltip.classList.contains('show')) {
-                    document.addEventListener('keydown', handleEscKey, { once: true });
-                }
-            }, 10);
-        });
-    }
-    
-    return div;
-}
-
-function getTaskDescription(task) {
-    const descriptions = {
-        'kelime5': 'Kelime Çevir oyununda 5 kelimeyi doğru çevir',
-        'kelime10': 'Kelime Çevir oyununda 10 kelimeyi doğru çevir',
-        'ayet3': 'Ayet Oku modunda 3 farklı ayet oku',
-        'dua2': 'Dua Et modunda 2 farklı dua öğren',
-        'hadis1': 'Hadis Oku modunda 1 hadis oku',
-        'dinle2': 'Dinle ve Bul oyununda 2 kelimeyi doğru bul',
-        'dinle5': 'Dinle ve Bul oyununda 5 kelimeyi doğru bul',
-        'bosluk1': 'Boşluk Doldur oyununda 1 soruyu doğru çöz',
-        'bosluk3': 'Boşluk Doldur oyununda 3 soruyu doğru çöz',
-        'dogru10': 'Herhangi bir oyun modunda toplam 10 doğru cevap ver',
-        'dogru20': 'Herhangi bir oyun modunda toplam 20 doğru cevap ver',
-        'puan100': 'Günlük toplam 100 Hasene puanı kazan',
-        'puan200': 'Günlük toplam 200 Hasene puanı kazan',
-        'perfect5': '5 perfect oyun tamamla (hiç yanlış yapmadan en az 3 soru çöz)',
-        'allDiff': 'Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna (Kolay, Orta, Zor) - Sadece Kelime Çevir sayılır',
-        'combo15': 'Herhangi bir oyun modunda toplam 15 doğru cevap ver',
-        // Yeni görevler için açıklamalar
-        'review5': 'İstatistikler > Tekrar Et modunda 5 zorlanılan kelimeyi pratik yap',
-        'combo3x': 'Herhangi bir oyun modunda üst üste 3 doğru cevap ver',
-        'accuracy80': 'Oyun bitiminde %80 veya daha yüksek başarı oranı yakala',
-        'allModes': '6 farklı moddan en az 4\'ünü oyna (Kelime, Dinle, Boşluk, Ayet, Dua, Hadis)',
-        'streakMaintain': 'Günlük oyun hedefini tamamlayarak serini koru',
-        'puan500': 'Günlük toplam 500 Hasene puanı kazan'
-    };
-    const description = descriptions[task.id];
-    // Eğer açıklama yoksa veya display name ile aynıysa boş döndür
-    if (!description) {
-        return '';
-    }
-    const displayName = getTaskDisplayName(task);
-    // Eğer açıklama display name ile aynıysa boş döndür
-    if (description === displayName || description === task.name) {
-        return '';
-    }
-    return description;
-}
-
-// Görev için detaylı açıklama (tooltip için)
-function getTaskDetailedHelp(task) {
-    const helpTexts = {
-        'kelime5': '📚 Kelime Çevir oyununu oyna. Herhangi bir mod seçebilirsin (Klasik, Hızlı, 3 Can veya Zorluk). 5 kelimeyi doğru çevirerek görevi tamamla.',
-        'kelime10': '📚 Kelime Çevir oyununu oyna. Herhangi bir mod seçebilirsin (Klasik, Hızlı, 3 Can veya Zorluk). 10 kelimeyi doğru çevirerek görevi tamamla.',
-        'ayet3': '📖 Ana menüden "Ayet Oku" modunu seç. 3 farklı ayeti okuyarak görevi tamamla. Her ayet okunduğunda ilerleme sayılır.',
-        'dua2': '🤲 Ana menüden "Dua Et" modunu seç. 2 farklı duayı öğrenerek görevi tamamla. Her dua öğrenildiğinde ilerleme sayılır.',
-        'hadis1': '📚 Ana menüden "Hadis Oku" modunu seç. 1 hadisi okuyarak görevi tamamla.',
-        'dinle2': '🎧 Ana menüden "Dinle ve Bul" oyununu seç. Kelimeyi dinle ve doğru seçeneği bul. 2 kelimeyi doğru bularak görevi tamamla.',
-        'dinle5': '🎧 Ana menüden "Dinle ve Bul" oyununu seç. Kelimeyi dinle ve doğru seçeneği bul. 5 kelimeyi doğru bularak görevi tamamla.',
-        'bosluk1': '✏️ Ana menüden "Boşluk Doldur" oyununu seç. Ayetteki eksik kelimeyi tamamla. 1 soruyu doğru çözerek görevi tamamla.',
-        'bosluk3': '✏️ Ana menüden "Boşluk Doldur" oyununu seç. Ayetteki eksik kelimeyi tamamla. 3 soruyu doğru çözerek görevi tamamla.',
-        'dogru10': '⭐ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) 10 doğru cevap ver. Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır.',
-        'dogru20': '⭐ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) 20 doğru cevap ver. Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır.',
-        'puan100': '💰 Günlük toplam 100 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
-        'puan200': '💰 Günlük toplam 200 Hasene puanı kazan. Oyunlarda doğru cevap vererek, combo bonusu alarak veya görevleri tamamlayarak puan kazanabilirsin.',
-        'perfect5': '🔥 Kelime Çevir, Dinle Bul veya Boşluk Doldur oyunlarında 5 perfect oyun tamamla.\n\n' +
-                    '💡 Nasıl çalışır:\n' +
-                    '• Her oyunda hiç yanlış yapmadan en az 3 soru çöz\n' +
-                    '• Doğru cevapların peş peşe olması gerekmez, sadece oyun içinde hiç yanlış yapmamış olman yeterli\n' +
-                    '• Her perfect oyun için 1 sayı artar\n\n' +
-                    '📝 Örnek: 3 doğru, 1 yanlış, 2 doğru → Sayılmaz (yanlış var)\n' +
-                    '✅ Örnek: 3 doğru, 0 yanlış → Sayılır (1 perfect oyun)\n\n' +
-                    '🎯 Bu şekilde 5 perfect oyun tamamladığında görev tamamlanır. Oyunu bitirmeden çıkarsan da sayılır (geri butonuna basıp onaylarsan).',
-        'allDiff': '💎 Kelime Çevir oyununda 3 farklı zorluk seviyesinde oyna: Kolay, Orta ve Zor.\n\n' +
-                    '📝 Nasıl yapılır:\n' +
-                    '1. Ana menüden zorluk seviyesini değiştir (Kolay/Orta/Zor butonları)\n' +
-                    '2. Kelime Çevir oyununu başlat ve en az bir doğru cevap ver\n' +
-                    '3. Bu işlemi 3 farklı zorluk seviyesinde (Kolay, Orta, Zor) tekrarla\n' +
-                    '4. Her zorluk seviyesinde en az bir doğru cevap vermen gerekir\n\n' +
-                    '💡 İpucu: Sadece Kelime Çevir oyununda sayılır. Dinle Bul ve Boşluk Doldur sayılmaz.\n' +
-                    '💡 İpucu: Aynı gün içinde farklı zorluk seviyelerinde oynayabilirsin.',
-        'combo15': '⚡ Herhangi bir oyun modunda (Kelime Çevir, Dinle Bul veya Boşluk Doldur) toplam 15 doğru cevap ver.\n\n' +
-                   '📝 Nasıl çalışır:\n' +
-                   '• Yanlış cevaplar sayılmaz, sadece doğru cevaplar ilerlemeyi artırır\n' +
-                   '• Farklı oyun modlarında verdiğin doğru cevaplar toplanır\n' +
-                   '• Örnek: 5 Kelime Çevir + 5 Dinle Bul + 5 Boşluk Doldur = 15 doğru',
-        'review5': '🔄 İstatistikler bölümünden "Tekrar Et" modunu kullan.\n\n' +
-                   '📝 Nasıl yapılır:\n' +
-                   '1. Ana menüden "İstatistikler" butonuna tıkla\n' +
-                   '2. "Tekrar Et" sekmesine geç\n' +
-                   '3. Zorlanılan kelimeleri pratik yap\n' +
-                   '4. 5 zorlanılan kelimeyi tekrar ettiğinde görev tamamlanır\n\n' +
-                   '💡 İpucu: Zorlanılan kelimeler otomatik olarak listelenir.',
-        'combo3x': '⚡ Herhangi bir oyun modunda üst üste 3 doğru cevap ver.\n\n' +
-                   '📝 Nasıl çalışır:\n' +
-                   '• Doğru cevaplar peş peşe gelmeli\n' +
-                   '• Yanlış cevap verirsen seri sıfırlanır\n' +
-                   '• Tekrar baştan başlaman gerekir\n\n' +
-                   '✅ Örnek: Doğru → Doğru → Doğru = Tamamlandı\n' +
-                   '❌ Örnek: Doğru → Yanlış → Doğru → Doğru = Sıfırlandı',
-        'accuracy80': '🎯 Herhangi bir oyun modunda oyunu bitirdiğinde %80 veya daha yüksek başarı oranı yakala.\n\n' +
-                      '📝 Nasıl hesaplanır:\n' +
-                      'Başarı Oranı = (Doğru Cevap / Toplam Soru) × 100\n\n' +
-                      '✅ Örnek: 8 doğru / 10 soru = %80 → Tamamlandı\n' +
-                      '✅ Örnek: 9 doğru / 10 soru = %90 → Tamamlandı\n' +
-                      '❌ Örnek: 7 doğru / 10 soru = %70 → Tamamlanmadı\n\n' +
-                      '💡 İpucu: Oyunu bitirmen gerekir (geri butonuna basmak yeterli değil).',
-        'allModes': '🌟 6 farklı oyun modundan en az 4\'ünü oyna.\n\n' +
-                    '📝 Oyun modları:\n' +
-                    '1. 📚 Kelime Çevir\n' +
-                    '2. 🎧 Dinle ve Bul\n' +
-                    '3. ✏️ Boşluk Doldur\n' +
-                    '4. 📖 Ayet Oku\n' +
-                    '5. 🤲 Dua Et\n' +
-                    '6. 📚 Hadis Oku\n\n' +
-                    '💡 İpucu: En az 4 farklı modu oynadığında görev tamamlanır. Aynı modu birden fazla oynaman sayılmaz.',
-        'streakMaintain': '🔥 Günlük oyun hedefini tamamlayarak serini koru.\n\n' +
-                          '📝 Nasıl çalışır:\n' +
-                          '• Her gün oyun oynayarak serini devam ettir\n' +
-                          '• Günlük hedefi tamamladığında görev tamamlanır\n' +
-                          '• Günlük hedef üst barda gösterilir\n\n' +
-                          '💡 İpucu: Günlük hedefi tamamlamak için yeterli Hasene puanı kazanman gerekir.',
-        'puan500': '💰 Günlük toplam 500 Hasene puanı kazan.\n\n' +
-                   '📝 Nasıl puan kazanabilirsin:\n' +
-                   '• Oyunlarda doğru cevap vererek\n' +
-                   '• Combo bonusu alarak (her 3 doğru cevapta +5)\n' +
-                   '• Perfect lesson bonusu alarak (tüm soruları doğru cevaplarsan %50 ekstra)\n' +
-                   '• Görevleri tamamlayarak\n\n' +
-                   '💡 İpucu: Günlük toplam puan üst barda gösterilir.'
-    };
-    return helpTexts[task.id] || 'Bu görevi tamamlamak için ilgili oyun modunu oyna.';
-}
-
-function getTaskDisplayName(task) {
-    // Görev tipine göre uygun isim döndür
-    const taskNames = {
-        'kelime5': '5 Kelime Çevir',
-        'kelime10': '10 Kelime Çevir (Fazilet)',
-        'ayet3': '3 Ayet Oku', 
-        'dua2': '2 Dua Öğren',
-        'hadis1': '1 Hadis Oku',
-        'dinle2': '2 Kelime Dinle',
-        'dinle3': '3 Kelime Dinle (Fazilet)',
-        'dinle5': '5 Kelime Dinle (Fazilet)',
-        'bosluk1': '1 Boşluk Doldur',
-        'bosluk2': '2 Boşluk Doldur (Fazilet)',
-        'bosluk3': '3 Boşluk Doldur (Fazilet)',
-        'dogru10': '10 Doğru Cevap',
-        'dogru20': '20 Doğru Cevap (Fazilet)',
-        'puan100': '100 Puan Topla',
-        'puan200': '200 Puan Topla (Fazilet)',
-        'perfect5': 'Mükemmel Seri (5 Oyun)',
-        'allDiff': '3 Farklı Zorlukta Talebe Et',
-        'combo15': '15 Doğru Cevap (Muvazebet)',
-        // Yeni görevler
-        'review5': '5 Zorlanılan Kelimeyi Tekrar Et',
-        'combo3x': '3x Muvazebet Yap',
-        'accuracy80': '%80 Başarı Oranı Yakala',
-        'allModes': 'Tüm Oyun Modlarını Dene',
-        'streakMaintain': 'Serini Koru',
-        'puan500': '500 Puan Topla (Mega Bonus)'
-    };
-    
-    return taskNames[task.id] || task.name;
-}
-
-function claimDailyRewards() {
-    const completedCount = dailyTasks.completedTasks.length;
-    const totalCount = dailyTasks.tasks.length + dailyTasks.bonusTasks.length;
-    
-    if (completedCount === totalCount && !dailyTasks.rewardsClaimed) {
-        // 2500 Hasene ihsan ver (5 yıldız değerinde)
-        const bonusXP = 2500;
-        totalPoints += bonusXP;
-        
-        // Bugünkü toplam puana da ekle (istatistikler için)
-        dailyTasks.todayStats.toplamPuan += bonusXP;
-        
-        // NOT: Bonus hasene günlük vird'e (dailyHasene) eklenmez
-        // Çünkü vird hedefi "aktif oyun oynama" ölçütüdür, bonuslar ise "başarı ödülü"
-        
-        // Günlük görev ödülünü liderlik tablosuna da ekle
-        if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
-            updateLeaderboardScores(bonusXP);
-            log.game(`📊 Liderlik tablosu güncellendi (günlük görev ödülü): +${bonusXP} Hasene`);
-        }
-        
-        dailyTasks.rewardsClaimed = true;
-        debouncedSaveStats(); // Debounced kaydetme
-        updateStatsBar();
-        // Başarımları kontrol et (güvenli şekilde)
-        if (typeof checkAchievements === 'function') {
-            checkAchievements();
-        }
-        
-        // Ödül modalı göster
-        showSuccessMessage('🎉 Tüm günlük vazifeleri tamamladın! +2,500 Hasene ihsan!');
-        
-        updateTasksDisplay();
-    }
-}
-
-// Ödül butonu event listener
-document.addEventListener('DOMContentLoaded', () => {
-    const claimBtn = document.getElementById('claimRewardsBtn');
-    if (claimBtn) {
-        claimBtn.addEventListener('click', claimDailyRewards);
-    }
-    
-    // Sayfa yüklendiğinde badge'i güncelle
-    if (typeof updateTasksDisplay === 'function') {
-        updateTasksDisplay();
+        }, 1000);
     }
 });
 
-function claimWeeklyRewards() {
-    const completedCount = weeklyTasks.completedTasks.length;
-    const totalCount = weeklyTasks.tasks.length;
-    
-    if (completedCount === totalCount && !weeklyTasks.rewardsClaimed) {
-        // 5000 Hasene ihsan ver
-        const bonusXP = 5000;
-        totalPoints += bonusXP;
-        
-        // Bugünkü toplam puana da ekle (istatistikler için)
-        dailyTasks.todayStats.toplamPuan += bonusXP;
-        
-        // Daily XP'ye de ekle
-        addDailyXP(bonusXP);
-        
-        // Haftalık görev ödülünü liderlik tablosuna da ekle
-        if (typeof updateLeaderboardScores === 'function' && bonusXP > 0) {
-            updateLeaderboardScores(bonusXP);
-            log.game(`📊 Liderlik tablosu güncellendi (haftalık görev ödülü): +${bonusXP} Hasene`);
-        }
-        
-        weeklyTasks.rewardsClaimed = true;
-        debouncedSaveStats();
-        
-        // Başarı mesajı göster
-        if (typeof showCustomAlert === 'function') {
-            showCustomAlert(`🎉 Haftalık görevler tamamlandı! +${bonusXP} Hasene kazandın!`, 'success');
-        }
-        
-        // Görevleri güncelle
-        updateWeeklyTasksDisplay();
+// Oyun kartları
+document.querySelectorAll('.game-card').forEach(card => {
+    card.addEventListener('click', () => {
+        const gameMode = card.dataset.game;
+        startGame(gameMode);
+    });
+});
+
+// Zorluk seçici
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDifficulty = btn.dataset.difficulty;
+        // Zorluk değiştiğinde kullanıcıya bilgi ver
+        infoLog(`Zorluk seviyesi değiştirildi: ${currentDifficulty}`);
+        // Pop-up mesajı kaldırıldı - sadece log tutuluyor
+    });
+});
+
+// Sayfa yüklendiğinde aktif zorluk seviyesini JS'e senkronize et
+function syncDifficultyFromHTML() {
+    const activeBtn = document.querySelector('.difficulty-btn.active');
+    if (activeBtn) {
+        currentDifficulty = activeBtn.dataset.difficulty || 'medium';
+        infoLog(`Zorluk seviyesi HTML'den senkronize edildi: ${currentDifficulty}`);
     }
 }
 
-// Tab değiştirme fonksiyonu
-function switchTasksTab(tab) {
-    const dailyTabBtn = document.getElementById('dailyTabBtn');
-    const weeklyTabBtn = document.getElementById('weeklyTabBtn');
-    const dailyTab = document.getElementById('dailyTasksTab');
-    const weeklyTab = document.getElementById('weeklyTasksTab');
-    const dailyProgress = document.getElementById('dailyProgressCard');
-    const weeklyProgress = document.getElementById('weeklyProgressCard');
-    
-    if (tab === 'daily') {
-        // Günlük sekmesi aktif
-        if (dailyTabBtn) {
-            dailyTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            dailyTabBtn.style.color = 'white';
-            dailyTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
-        }
-        if (weeklyTabBtn) {
-            weeklyTabBtn.style.background = '#f3f4f6';
-            weeklyTabBtn.style.color = '#6b7280';
-            weeklyTabBtn.style.boxShadow = 'none';
-        }
-        if (dailyTab) dailyTab.style.display = 'block';
-        if (weeklyTab) weeklyTab.style.display = 'none';
-        if (dailyProgress) dailyProgress.style.display = 'block';
-        if (weeklyProgress) weeklyProgress.style.display = 'none';
-    } else {
-        // Haftalık sekmesi aktif
-        if (dailyTabBtn) {
-            dailyTabBtn.style.background = '#f3f4f6';
-            dailyTabBtn.style.color = '#6b7280';
-            dailyTabBtn.style.boxShadow = 'none';
-        }
-        if (weeklyTabBtn) {
-            weeklyTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            weeklyTabBtn.style.color = 'white';
-            weeklyTabBtn.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
-        }
-        if (dailyTab) dailyTab.style.display = 'none';
-        if (weeklyTab) weeklyTab.style.display = 'block';
-        if (dailyProgress) dailyProgress.style.display = 'none';
-        if (weeklyProgress) weeklyProgress.style.display = 'block';
-        
-        // Haftalık görevleri güncelle
-        if (typeof updateWeeklyTasksDisplay === 'function') {
-            updateWeeklyTasksDisplay();
-        }
-    }
-}
-
-// İstatistikler sekme değiştirme fonksiyonu (Vazifeler paneli gibi)
-function switchStatsTab(tab) {
-    const detailedTabBtn = document.getElementById('detailedStatsTabBtn');
-    const haseneInfoTabBtn = document.getElementById('haseneInfoTabBtn');
-    const detailedTab = document.getElementById('statsTabContent');
-    const haseneInfoTab = document.getElementById('haseneInfoTabContent');
-    
-    if (tab === 'detailed') {
-        // Detaylı sekmesi aktif
-        if (detailedTabBtn) {
-            detailedTabBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            detailedTabBtn.style.color = 'white';
-            detailedTabBtn.style.boxShadow = '0 2px 6px rgba(102, 126, 234, 0.3)';
-        }
-        if (haseneInfoTabBtn) {
-            haseneInfoTabBtn.style.background = '#f3f4f6';
-            haseneInfoTabBtn.style.color = '#6b7280';
-            haseneInfoTabBtn.style.boxShadow = 'none';
-        }
-        if (detailedTab) detailedTab.style.display = 'block';
-        if (haseneInfoTab) haseneInfoTab.style.display = 'none';
-    } else {
-        // Hasene Bilgi sekmesi aktif
-        if (detailedTabBtn) {
-            detailedTabBtn.style.background = '#f3f4f6';
-            detailedTabBtn.style.color = '#6b7280';
-            detailedTabBtn.style.boxShadow = 'none';
-        }
-        if (haseneInfoTabBtn) {
-            haseneInfoTabBtn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-            haseneInfoTabBtn.style.color = 'white';
-            haseneInfoTabBtn.style.boxShadow = '0 2px 6px rgba(245, 158, 11, 0.3)';
-        }
-        if (detailedTab) detailedTab.style.display = 'none';
-        if (haseneInfoTab) haseneInfoTab.style.display = 'block';
-    }
-}
-
-// Global fonksiyonlar
-window.showDailyTasksModal = showDailyTasksModal;
-window.closeDailyTasksModal = closeDailyTasksModal;
-window.claimDailyRewards = claimDailyRewards;
-window.claimWeeklyRewards = claimWeeklyRewards;
-window.switchTasksTab = switchTasksTab;
-window.switchStatsTab = switchStatsTab;
-
-// OYUN BİTİŞ FONKSİYONU (Oyun bitince çağrılır)
-// NOT: Puanlar zaten addSessionPoints() ile eklendi, burada sadece kontrol yapıyoruz
-function addToGlobalPoints(points, correctAnswers = 0) {
-    // Seviye kontrol et (puanlar zaten totalPoints'e eklendi)
-    const oldLevel = level;
-    const newLevel = calculateLevel(totalPoints);
-    
-    // Seviye atlama kontrolü
-    if (newLevel > oldLevel) {
-        level = newLevel;
-        showLevelUpModal(newLevel);
-        playSound('levelup');
-    }
-    
-    // NOT: updateDailyProgress artık her doğru cevapta çağrılıyor (checkAnswer, checkDinleAnswer, checkBoslukAnswer içinde)
-    // Burada tekrar çağırmaya gerek yok, çift sayımı önlemek için kaldırıldı
-    // Eski kod: if (correctAnswers > 0) { updateDailyProgress(correctAnswers); }
-    
-    // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor (satır 4230)
-    // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-    // updateTaskProgress('toplamDogru', correctAnswers);
-    // NOT: toplamPuan zaten addSessionPoints'te eklendi, burada tekrar ekleme!
-    
-    // Perfect streak kontrolü - Oyun bitiminde: hiç yanlış yapılmamışsa ve yeterli soru cevaplandıysa
-    // Oyun başına 1 perfect streak (her doğru cevap için değil)
-    // Koşullar: sessionWrong = 0 (hiç yanlış yok) ve sessionCorrect >= 3 (en az 3 doğru)
-    const isPerfectStreak = sessionWrong === 0 && sessionCorrect >= 3;
-    
-    if (isPerfectStreak) {
-        const oldPerfectStreak = dailyTasks.todayStats.perfectStreak || 0;
-        dailyTasks.todayStats.perfectStreak = oldPerfectStreak + 1;
-        log.game(`🔥 Perfect streak artırıldı! Eski: ${oldPerfectStreak}, Yeni: ${dailyTasks.todayStats.perfectStreak} (sessionCorrect: ${sessionCorrect}, sessionWrong: ${sessionWrong})`);
-        
-        // Görevleri hemen güncelle (perfect streak görevleri için)
-        if (typeof updateTasksDisplay === 'function') {
-            setTimeout(() => updateTasksDisplay(), 100);
-        }
-    } else {
-        log.debug(`⚠️ Perfect streak sayılmadı: sessionWrong=${sessionWrong}, sessionCorrect=${sessionCorrect} (en az 3 doğru ve 0 yanlış gerekiyor)`);
-    }
-    
-    // Oyun süresi takibi - gameState.session.startTime varsa süreyi hesapla ve ekle
-    if (gameState && gameState.session && gameState.session.startTime) {
-        const sessionDuration = Date.now() - gameState.session.startTime;
-        if (sessionDuration > 0) {
-            dailyTasks.todayStats.totalPlayTime = (dailyTasks.todayStats.totalPlayTime || 0) + sessionDuration;
-            log.game(`⏱️ Oyun süresi eklendi: ${Math.round(sessionDuration / 1000)} saniye`);
-        }
-        // Oyun bitince startTime'ı sıfırla
-        gameState.session.startTime = null;
-    }
-    
-    // NOT: Liderlik tablosu artık addSessionPoints içinde her puan eklendiğinde güncelleniyor
-    // Burada tekrar güncellemeye gerek yok (çift ekleme önlenir)
-    
-    updateStatsBar(); // Global barı güncelle
-    // Başarımları kontrol et (güvenli şekilde)
-    if (typeof checkAchievements === 'function') {
-        checkAchievements();
-    }
-    
-    // NOT: Oyun oynandıktan sonra sıfırlama flag'ini temizle
-    // Bu sayede veriler kaydedilebilir
-    if (localStorage.getItem('hasene_statsJustReset') === 'true') {
-        localStorage.removeItem('hasene_statsJustReset');
-        log.debug('🔄 Oyun oynandı, sıfırlama flag\'i temizlendi');
-    }
-    
-    debouncedSaveStats(); // Debounced kaydetme // Verileri kaydet
-    
-    // Görevleri güncelle (perfect streak gibi görevler için)
-    if (typeof updateTasksDisplay === 'function') {
-        updateTasksDisplay();
-    }
-}
-
-// ============ ZORLUK UI GÜNCELLEYICI - YENİ TASARIM ============
-function updateDifficultyUI() {
-    // Kaydedilen zorluk seviyesine göre UI'yı ayarla
-    log.debug(`🎯 Zorluk UI güncelleniyor: ${currentDifficulty}`);
-    
-    // Tüm butonlardan active class'ını kaldır
-    document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // Seçili zorluk seviyesini vurgula
-    if (currentDifficulty === 'kolay') {
-        document.getElementById('mainDiffKolay').classList.add('active');
-    } else if (currentDifficulty === 'orta') {
-        document.getElementById('mainDiffOrta').classList.add('active');
-    } else if (currentDifficulty === 'zor') {
-        document.getElementById('mainDiffZor').classList.add('active');
-    }
-}
-
-// ============ ANA MENÜ ZORLUK BUTONLARI ============
-function initMainMenuDifficultyButtons() {
-    // (commented) initMainMenuDifficultyButtons called log removed during cleanup
-    
-    // Kaydedilen zorluk seviyesini UI'da göster
-    updateDifficultyUI();
-    
-    document.getElementById('mainDiffKolay').onclick = () => {
-        log.debug("===== ZORLUK DEĞİŞTİ =====");
-        log.debug("YENİ ZORLUK: KOLAY");
-        log.debug("Aralık: 5-9");
-        log.debug("Çarpan: 2x");
-        log.debug("=======================");
-        currentDifficulty = 'kolay';
-        debouncedSaveStats(); // Debounced kaydetme // Zorluk değiştiğinde kaydet!
-        // Active class'ları güncelle (yeni tasarım için)
-        document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mainDiffKolay').classList.add('active');
-    };
-    
-    document.getElementById('mainDiffOrta').onclick = () => {
-        log.debug("===== ZORLUK DEĞİŞTİ =====");
-        log.debug("YENİ ZORLUK: ORTA");
-        log.debug("Aralık: 10-11");
-        log.debug("Çarpan: 2x");
-        log.debug("=======================");
-        currentDifficulty = 'orta';
-        debouncedSaveStats(); // Debounced kaydetme // Zorluk değiştiğinde kaydet!
-        // Active class'ları güncelle (yeni tasarım için)
-        document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mainDiffOrta').classList.add('active');
-    };
-    
-    document.getElementById('mainDiffZor').onclick = () => {
-        log.debug("===== ZORLUK DEĞİŞTİ =====");
-        log.debug("YENİ ZORLUK: ZOR");
-        log.debug("Aralık: 12-21");
-        log.debug("Çarpan: 2x");
-        log.debug("=======================");
-        currentDifficulty = 'zor';
-        debouncedSaveStats(); // Debounced kaydetme // Zorluk değiştiğinde kaydet!
-        // Active class'ları güncelle (yeni tasarım için)
-        document.querySelectorAll('#mainMenu .diff-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mainDiffZor').classList.add('active');
-    };
-}
-
-// ============ ANA MENÜ NAVİGASYONU ============
-// Kelime Çevir modu - oyun modları seçici ile başlar
-elements.kelimeCevirBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('kelime-cevir', async () => {
-        log.game('📚 === KELİME ÇEVİR OYUNU BAŞLATILIYOR ===');
-        log.game('📋 1. Veri kontrol ediliyor...');
-        
-        // Lazy loading: Kelime verilerini yükle
-        try {
-            await loadKelimeData();
-        } catch (error) {
-            log.warn('❌ Kelime verileri yüklenemedi!');
-            showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-            return;
-        }
-        
-        if (!kelimeBulData || kelimeBulData.length === 0) {
-            log.warn('❌ Kelime verileri yüklenemedi!');
-            showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-            return;
-        }
-        log.game(`✅ Kelime verileri OK: ${kelimeBulData.length} kelime mevcut`);
-        log.game(`🎯 Mevcut zorluk: ${currentDifficulty}`);
-        
-        // Önce tüm modalları kapat
-        closeAllModals();
-        
-        log.game('📋 2. Mode Selector açılıyor...');
-        hideAllModes();
-        // Main menu'yu gizle
-        if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-        if (elements.modeSelector) elements.modeSelector.style.display = 'block';
-        if (elements.settingsBtn) elements.settingsBtn.style.display = 'block';
-        log.game('✅ Mode Selector açıldı!');
-    });
-};
-
-// Dinle ve Bul modu - Doğrudan başlat
-elements.dinleBulBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('dinle-bul', async () => {
-        // Önce tüm modalları kapat
-        closeAllModals();
-        
-        log.game('🔥 === DINLE VE BUL OYUNU BAŞLATILIYOR ===');
-    log.game('📋 1. Veri kontrol ediliyor...');
-    
-    // Lazy loading: Kelime verilerini yükle
-    try {
-        await loadKelimeData();
-    } catch (error) {
-        log.warn('❌ Kelime verileri yüklenemedi!');
-        showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    
-    if (!kelimeBulData || kelimeBulData.length === 0) {
-        log.warn('❌ Kelime verileri yüklenemedi!');
-        showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    log.game(`✅ Kelime verileri OK: ${kelimeBulData.length} kelime mevcut`);
-    
-    log.game('📋 2. Zorluk seviyesi kontrol ediliyor...');
-    log.game(`🎯 Mevcut zorluk: ${currentDifficulty}`);
-    log.game(`🎯 Zorluk config:`, CONFIG.difficultyLevels[currentDifficulty]);
-    
-    log.game('📋 3. UI değiştiriliyor...');
-    hideAllModes();
-    // Main menu'yu de gizle
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.dinleMode) {
-        elements.dinleMode.style.display = 'block';
-        
-        // Navigasyon bar'ı gizle (oyun başladığında)
-        hideBottomNavBar();
-        
-        // Ses tanıma sistemini başlat
-        initSpeechRecognition();
-        elements.dinleMode.style.zIndex = '';
-    }
-    log.game('✅ UI değişikliği tamamlandı');
-    
-    log.game('📋 4. Oyun değişkenleri sıfırlanıyor...');
-    log.game(`🔄 Önceki değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
-    // Dinle modunu başlat
-    dinleScore = 0;
-    dinleCorrect = 0;
-    dinleWrong = 0;
-    dinleQuestionCount = 0;
-    log.game(`✅ Yeni değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
-    log.game(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-    
-    // Header score güncelle (oyun başında)
-    const dinleHeaderScore = document.getElementById('dinleHeaderScore');
-    if (dinleHeaderScore) {
-        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-        const currentStarPoints = Math.floor(totalPoints / starThreshold);
-        dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
-    }
-    
-    // Audio butonu event handler
-    if (elements.dinleAudioBtn) {
-        // Masaüstü için onclick
-        elements.dinleAudioBtn.onclick = () => {
-            if (currentDinleQuestion && currentDinleQuestion.ses_dosyasi) {
-                playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
-            }
-        };
-        // Mobil için touchend
-        elements.dinleAudioBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (currentDinleQuestion && currentDinleQuestion.ses_dosyasi) {
-                playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
-            }
-        }, { passive: false });
-    }
-    
-    // Mikrofon butonu event listener
-    const dinleMicBtn = document.getElementById('dinleMicBtn');
-    if (dinleMicBtn) {
-        const isMobile = isMobileDevice();
-        let micButtonClicked = false; // Çift tıklamayı önlemek için
-        
-        const handleMicClick = async (e) => {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            // Çift tıklamayı önle
-            if (micButtonClicked) {
-                log.debug('⏭️ Mikrofon butonu zaten tıklandı, atlanıyor');
-                return;
-            }
-            
-            micButtonClicked = true;
-            setTimeout(() => {
-                micButtonClicked = false;
-            }, 1000); // 1 saniye içinde tekrar tıklamayı engelle
-            
-            await startSpeechRecognition();
-        };
-        
-        // Mobilde sadece touchend, masaüstünde sadece onclick
-        if (isMobile) {
-            dinleMicBtn.addEventListener('touchend', handleMicClick, { passive: false });
-        } else {
-            dinleMicBtn.onclick = handleMicClick;
-        }
-    }
-    
-    // Next butonu event handler'ını buraya taşıdık
-    if (elements.dinleNextBtn) {
-        // Masaüstü için onclick
-        elements.dinleNextBtn.onclick = () => {
-            log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
-            log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
-            
-            // 10 soru kontrolü - butona tıklamadan önce kontrol et
-            if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-                log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
-                log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-                
-                // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-                // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-                // updateTaskProgress('dinleBul', sessionCorrect);
-                
-                // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
-                
-                // ============ PERFECT LESSON BONUS (DINLE BUL) ============
-                const PERFECT_LESSON_TEST_MODE = true;
-                const MIN_QUESTIONS_FOR_PERFECT = 3;
-                
-                if (PERFECT_LESSON_TEST_MODE && 
-                    dinleWrong === 0 && 
-                    dinleCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
-                    dinleScore > 0) {
-                    
-                    const perfectBonus = Math.floor(dinleScore * 0.5);
-                    
-                    if (perfectBonus > 0) {
-                        totalPoints += perfectBonus;
-                        dailyTasks.todayStats.toplamPuan += perfectBonus;
-                        addDailyXP(perfectBonus);
-                        
-                        if (typeof updateLeaderboardScores === 'function') {
-                            updateLeaderboardScores(perfectBonus);
-                        }
-                        
-                        setTimeout(() => {
-                            if (typeof showSuccessMessage === 'function') {
-                                showSuccessMessage(
-                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
-                                    `Tüm soruları doğru cevapladın!\n` +
-                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
-                                    5000
-                                );
-                            }
-                            
-                            if (typeof triggerConfetti === 'function') {
-                                triggerConfetti();
-                            }
-                            
-                            if (typeof playSound === 'function') {
-                                playSound('success');
-                            }
-                        }, 500);
-                        
-                        log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
-                    }
-                }
-                // ============ PERFECT LESSON BONUS SONU ============
-                
-                // Oyun sonu modal'ını göster
-                log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
-                showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
-                    if (!confirmed) {
-                        log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
-                    }
-                    
-                    // Modal kapandıktan sonra ana menüye dön
-                    elements.dinleMode.style.display = 'none';
-                    elements.mainMenu.style.display = 'block';
-                    
-                    // Navigasyon bar'ı göster
-                    showBottomNavBar();
-                    
-                    // Oyun değişkenlerini temizle
-                    dinleScore = 0;
-                    dinleCorrect = 0;
-                    dinleWrong = 0;
-                    dinleQuestionCount = 0;
-                    updateDinleUI();
-                    log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
-                });
-                return;
-            }
-            
-            log.debug(`🎯 Bir sonraki soru yükleniyor...`);
-            // Butonu hemen gizle
-            if (elements.dinleNextBtn) {
-                elements.dinleNextBtn.style.display = 'none';
-                elements.dinleNextBtn.classList.remove("next-appear");
-            }
-            loadDinleQuestion();
-        };
-        // Mobil için touchend
-        elements.dinleNextBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            log.debug(`🔄 === NEXT BUTONU TIKLANDI! ===`);
-            log.debug(`📊 Mevcut durum: dinleQuestionCount=${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
-            
-            // 10 soru kontrolü - butona tıklamadan önce kontrol et
-            if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-                log.game(`🏁 === OYUN BİTİŞİ (NEXT BUTONU) ===`);
-                log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-                
-                // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-                // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-                // updateTaskProgress('dinleBul', sessionCorrect);
-                
-                // Session puanlarını global'e aktar
-                addToGlobalPoints(sessionScore, sessionCorrect);
-                
-                // ============ PERFECT LESSON BONUS (DINLE BUL) ============
-                const PERFECT_LESSON_TEST_MODE = true;
-                const MIN_QUESTIONS_FOR_PERFECT = 3;
-                
-                if (PERFECT_LESSON_TEST_MODE && 
-                    dinleWrong === 0 && 
-                    dinleCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
-                    dinleScore > 0) {
-                    
-                    const perfectBonus = Math.floor(dinleScore * 0.5);
-                    
-                    if (perfectBonus > 0) {
-                        totalPoints += perfectBonus;
-                        dailyTasks.todayStats.toplamPuan += perfectBonus;
-                        addDailyXP(perfectBonus);
-                        
-                        if (typeof updateLeaderboardScores === 'function') {
-                            updateLeaderboardScores(perfectBonus);
-                        }
-                        
-                        setTimeout(() => {
-                            if (typeof showSuccessMessage === 'function') {
-                                showSuccessMessage(
-                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
-                                    `Tüm soruları doğru cevapladın!\n` +
-                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
-                                    5000
-                                );
-                            }
-                            
-                            if (typeof triggerConfetti === 'function') {
-                                triggerConfetti();
-                            }
-                            
-                            if (typeof playSound === 'function') {
-                                playSound('success');
-                            }
-                        }, 500);
-                        
-                        log.game(`⭐ PERFECT LESSON BONUS (Dinle Bul): +${perfectBonus} Hasene`);
-                    }
-                }
-                // ============ PERFECT LESSON BONUS SONU ============
-                
-                // Oyun sonu modal'ını göster
-                log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
-                showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
-                    if (!confirmed) {
-                        log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
-                    }
-                    
-                    // Modal kapandıktan sonra ana menüye dön
-                    elements.dinleMode.style.display = 'none';
-                    elements.mainMenu.style.display = 'block';
-                    
-                    // Navigasyon bar'ı göster
-                    showBottomNavBar();
-                    
-                    // Oyun değişkenlerini temizle
-                    dinleScore = 0;
-                    dinleCorrect = 0;
-                    dinleWrong = 0;
-                    dinleQuestionCount = 0;
-                    updateDinleUI();
-                    log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
-                });
-                return;
-            }
-            
-            log.debug(`🎯 Bir sonraki soru yükleniyor...`);
-            // Butonu hemen gizle
-            if (elements.dinleNextBtn) {
-                elements.dinleNextBtn.style.display = 'none';
-                elements.dinleNextBtn.classList.remove("next-appear");
-            }
-            loadDinleQuestion();
-        }, { passive: false });
-    }
-    
-        updateDinleUI();
-        loadDinleQuestion();
-    });
-};
-
-// Boşluk Doldur modu
-elements.boslukDoldurBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('bosluk-doldur', async () => {
-        // Önce tüm modalları kapat
-        closeAllModals();
-        
-        log.debug('📋 === BOŞLUK DOLDUR OYUNU BAŞLATILIYOR ===');
-    log.debug('📋 1. Veri kontrol ediliyor...');
-
-    // Lazy loading: Ayet verilerini yükle
-    try {
-        await loadAyetData();
-    } catch (error) {
-        log.error('❌ Ayet verileri yüklenemedi!');
-        showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    
-    if (!ayetOkuData || ayetOkuData.length === 0) {
-        log.error('❌ Ayet verileri yüklenemedi!');
-        showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    log.debug(`✅ Ayet verileri OK: ${ayetOkuData.length} ayet mevcut`);
-    log.debug(`🎯 Mevcut zorluk: ${currentDifficulty}`);
-
-    log.debug('📋 2. UI değiştiriliyor...');
-    hideAllModes();
-    // Main menu'yu de gizle
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.boslukMode) {
-        elements.boslukMode.style.display = 'block';
-        
-        // Navigasyon bar'ı gizle (oyun başladığında)
-        hideBottomNavBar();
-        
-        elements.boslukMode.style.zIndex = '';
-    }
-    log.debug('✅ UI değişikliği tamamlandı');
-
-    log.debug('📋 3. Oyun değişkenleri sıfırlanıyor...');
-    log.debug(`🔄 Önceki değerler: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
-    // Boşluk modunu başlat
-    boslukScore = 0;
-    boslukCorrect = 0;
-    boslukWrong = 0;
-    log.debug(`✅ Yeni değerler: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
-    
-    // Header score güncelle (oyun başında)
-    const boslukHeaderScore = document.getElementById('boslukHeaderScore');
-    if (boslukHeaderScore) {
-        const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-        const currentStarPoints = Math.floor(totalPoints / starThreshold);
-        boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
-    }
-    log.debug(`📊 Session değerler: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-    
-        updateBoslukUI();
-        loadBoslukQuestion();
-    });
-};
-
-// Dua Et modu
-elements.duaEtBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('dua-ogren', async () => {
-        // Önce tüm modalları kapat
-        closeAllModals();
-    
-    // Lazy loading: Dua verilerini yükle
-    try {
-        await loadDuaData();
-    } catch (error) {
-        showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    
-    if (!duaData || duaData.length === 0) {
-        showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    hideAllModes();
-    // Main menu'yu de gizle
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.duaMode) {
-        elements.duaMode.style.display = 'block';
-        elements.duaMode.style.zIndex = '';
-        
-        // Navigasyon bar'ı gizle (okuma modu başladığında)
-        hideBottomNavBar();
-    }
-    // Soru sayısını başlat (ilk gösterim 1. soru)
-    duaQuestionCount = 1;
-    // Rastgele dua ile başla - array length check
-    if (!duaData || duaData.length === 0) {
-        showCustomAlert('Dua verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-        currentDuaIndex = Math.floor(Math.random() * duaData.length);
-        showDua(false); // İlk gösterimde soru sayısını artırma
-    });
-};
-
-// Ayet Oku modu
-elements.ayetOkuBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('ayet-oku', async () => {
-        // Önce tüm modalları kapat
-        closeAllModals();
-    
-    // Lazy loading: Ayet verilerini yükle
-    try {
-        await loadAyetData();
-    } catch (error) {
-        showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    
-    if (!ayetOkuData || ayetOkuData.length === 0) {
-        showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    hideAllModes();
-    // Main menu'yu de gizle
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.ayetMode) {
-        elements.ayetMode.style.display = 'block';
-        elements.ayetMode.style.zIndex = '';
-        
-        // Navigasyon bar'ı gizle (okuma modu başladığında)
-        hideBottomNavBar();
-    }
-    // Soru sayısını başlat (ilk gösterim 1. soru)
-    ayetQuestionCount = 1;
-    // Rastgele ayet ile başla - array length check
-    if (!ayetOkuData || ayetOkuData.length === 0) {
-        showCustomAlert('Ayet verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-        currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
-        showAyet(false); // İlk gösterimde soru sayısını artırma
-    });
-};
-
-// Hadis Oku modu
-elements.hadisOkuBtn.onclick = async () => {
-    // Tutorial göster (ilk kez oynanıyorsa)
-    showGameTutorial('hadis-oku', async () => {
-        // Önce tüm modalları kapat
-        closeAllModals();
-    
-    // Lazy loading: Hadis verilerini yükle
-    try {
-        await loadHadisData();
-    } catch (error) {
-        showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    
-    if (!hadisData || hadisData.length === 0) {
-        showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    hideAllModes();
-    // Main menu'yu de gizle
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.hadisMode) {
-        elements.hadisMode.style.display = 'block';
-        elements.hadisMode.style.zIndex = '';
-        
-        // Navigasyon bar'ı gizle (okuma modu başladığında)
-        hideBottomNavBar();
-    }
-    // Soru sayısını başlat (ilk gösterim 1. soru)
-    hadisQuestionCount = 1;
-    // Rastgele hadis ile başla - array length check
-    if (!hadisData || hadisData.length === 0) {
-        showCustomAlert('Hadis verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-        currentHadisIndex = Math.floor(Math.random() * hadisData.length);
-        showHadis(false); // İlk gösterimde soru sayısını artırma
-    });
-};
-
-// Geri butonları
-elements.backToMenuBtn.onclick = () => {
-    goToMainMenu(); // Ana menüye dönüş fonksiyonunu kullan
-};
-
-if (elements.backFromGameBtn) {
-elements.backFromGameBtn.onclick = async () => {
-        forceLog('=== GERI BUTONU TIKLANDI (KELIME CEVIR) ===');
-        try {
-            forceLog('[1] Ses durduruluyor...');
-    stopCurrentAudio();
-    
-            forceLog('[2] Timer durduruluyor...');
-            stopTimer();
-            
-            forceLog('[3] Skor kontrol:', 'Score=' + sessionScore, 'Dogru=' + sessionCorrect, 'Yanlis=' + sessionWrong);
-            
-            if (sessionScore > 0 || sessionCorrect > 0 || sessionWrong > 0) {
-                forceLog('[4] Puan VAR - Modal gosteriliyor...');
-        const confirmed = await showCustomConfirm(sessionCorrect, sessionWrong, sessionScore);
-                forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
-        
-                if (!confirmed) {
-                    forceLog('[6] IPTAL - Cikis yapilmiyor');
-                    return;
-                }
-                
-                forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
-                
-                // Session değerlerini daily değerlere ekle (modal onaylandığında)
-                // addSessionPoints ve addSessionWrong zaten güncelliyor ama emin olmak için tekrar kontrol et
-                if (sessionCorrect > 0) {
-                    const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-                    // Eğer sessionCorrect henüz eklenmemişse ekle (güvenlik için)
-                    const newDailyCorrect = Math.max(currentDailyCorrect, sessionCorrect);
-                    if (newDailyCorrect !== currentDailyCorrect) {
-                        localStorage.setItem('dailyCorrect', newDailyCorrect.toString());
-                        forceLog(`[7.1] dailyCorrect güncellendi: ${currentDailyCorrect} -> ${newDailyCorrect}`);
-                    }
-                }
-                
-                if (sessionWrong > 0) {
-                    const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
-                    // Eğer sessionWrong henüz eklenmemişse ekle (güvenlik için)
-                    const newDailyWrong = Math.max(currentDailyWrong, sessionWrong);
-                    if (newDailyWrong !== currentDailyWrong) {
-                        localStorage.setItem('dailyWrong', newDailyWrong.toString());
-                        forceLog(`[7.2] dailyWrong güncellendi: ${currentDailyWrong} -> ${newDailyWrong}`);
-                    }
-                }
-                
-                // Günlük istatistikleri kaydet (modal onaylandığında)
-                if (typeof saveDailyStats === 'function') {
-                    forceLog('[7.3] saveDailyStats çağrılıyor...');
-                    saveDailyStats();
-                    forceLog('[7.4] saveDailyStats tamamlandı');
-                } else {
-                    forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
-                }
-                
-                // ============ PERFECT LESSON BONUS (TEST MODU) ============
-                // TEST: Perfect Lesson kontrolü - Tüm soruları doğru cevapladıysa bonus ver
-                const PERFECT_LESSON_TEST_MODE = true; // Test modu aktif
-                const MIN_QUESTIONS_FOR_PERFECT = 3; // En az 3 soru cevaplanmalı
-                
-                if (PERFECT_LESSON_TEST_MODE && 
-                    sessionWrong === 0 && 
-                    sessionCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
-                    sessionScore > 0) {
-                    
-                    // Perfect Lesson bonusu hesapla (%50 ekstra)
-                    const perfectBonus = Math.floor(sessionScore * 0.5);
-                    
-                    if (perfectBonus > 0) {
-                        // Bonus hasene ekle
-                        totalPoints += perfectBonus;
-                        dailyTasks.todayStats.toplamPuan += perfectBonus;
-                        addDailyXP(perfectBonus);
-                        
-                        // Liderlik tablosunu güncelle
-                        if (typeof updateLeaderboardScores === 'function') {
-                            updateLeaderboardScores(perfectBonus);
-                        }
-                        
-                        // Perfect Lesson bildirimi göster
-                        setTimeout(() => {
-                            if (typeof showSuccessMessage === 'function') {
-                                showSuccessMessage(
-                                    `⭐ MÜKEMMEL DERS! ⭐\n` +
-                                    `Tüm soruları doğru cevapladın!\n` +
-                                    `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
-                                    5000
-                                );
-                            }
-                            
-                            // Özel Perfect Lesson animasyonu
-                            if (typeof triggerConfetti === 'function') {
-                                triggerConfetti();
-                            }
-                            
-                            // Perfect Lesson sesi
-                            if (typeof playSound === 'function') {
-                                playSound('success');
-                            }
-                        }, 500);
-                        
-                        forceLog(`⭐ PERFECT LESSON BONUS: +${perfectBonus} Hasene (Test Modu)`);
-                    }
-                }
-                // ============ PERFECT LESSON BONUS SONU ============
-                
-                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
-                addToGlobalPoints(sessionScore, sessionCorrect);
-            } else {
-                forceLog('[4] Puan YOK - Direkt cikis');
-        }
-        
-            forceLog('[8] State\'ler sifirlaniyor...');
-        sessionScore = 0;
-        sessionCorrect = 0;
-        sessionWrong = 0;
-        comboCount = 0;
-            questionCount = 0;
-            score = 0;
-            correct = 0;
-            wrong = 0;
-            lives = 0;
-            timeLeft = 0;
-            
-            updateUI();
-            // updateLoadingProgress() kaldırıldı - geri butonunda gerekli değil
-            
-            forceLog('[9] Ekranlar gizleniyor...');
-    if (elements.gameScreen) elements.gameScreen.style.display = 'none';
-    if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-    if (elements.mainMenu) {
-        elements.mainMenu.removeAttribute('style');
-        elements.mainMenu.style.display = 'block';
-    }
-    if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-    
-    // Navigasyon bar'ı göster (ana ekrana dönünce)
-    showBottomNavBar();
-    
-            forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
-        } catch (error) {
-            log.error('HATA - Geri butonu:', error);
-            log.error('HATA - Stack:', error.stack);
-            hideAllModes();
-            if (elements.mainMenu) {
-                elements.mainMenu.style.display = 'block';
-            }
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
-        }
-    };
+// Zorluk seviyesini senkronize et (tek bir event listener ile)
+// DOMContentLoaded veya load event'inde çalıştır
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncDifficultyFromHTML, { once: true });
 } else {
-    log.warn('⚠️ backFromGameBtn elementi bulunamadı!');
+    // DOM zaten yüklüyse hemen çalıştır
+    syncDifficultyFromHTML();
 }
 
-if (elements.backFromAyetBtn) {
-    elements.backFromAyetBtn.onclick = () => {
-        stopCurrentAudio(); // Mevcut ses varsa durdur
-        hideAllModes();
-        if (elements.mainMenu) {
-            elements.mainMenu.removeAttribute('style');
-            elements.mainMenu.style.display = 'block';
-        }
-        if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-    };
-}
-
-if (elements.backFromDuaBtn) {
-        elements.backFromDuaBtn.onclick = () => {
-        log.debug('⬅️ Dua geri butonuna tıklandı');
-        stopCurrentAudio(); // Mevcut ses varsa durdur
-        hideAllModes();
-        if (elements.mainMenu) {
-            elements.mainMenu.removeAttribute('style');
-            elements.mainMenu.style.display = 'block';
-        }
-        if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-        
-        log.debug('✅ Ana menüye döndü');
-    };
-}
-
-if (elements.backFromHadisBtn) {
-    elements.backFromHadisBtn.onclick = () => {
-        stopCurrentAudio(); // Mevcut ses varsa durdur
-        hideAllModes();
-        if (elements.mainMenu) {
-            elements.mainMenu.removeAttribute('style');
-            elements.mainMenu.style.display = 'block';
-        }
-        if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-    };
-}
-
-if (elements.backFromBoslukBtn) {
-elements.backFromBoslukBtn.onclick = async () => {
-        forceLog('=== GERI BUTONU TIKLANDI (BOSLUK DOLDUR) ===');
-        try {
-            forceLog('[1] Ses durduruluyor...');
-    stopCurrentAudio();
-    
-            forceLog('[2] Timer durduruluyor...');
-            stopTimer();
-            
-            forceLog('[3] Skor kontrol:', 'Score=' + boslukScore, 'Dogru=' + boslukCorrect, 'Yanlis=' + boslukWrong);
-            
-            if (boslukScore > 0 || boslukCorrect > 0 || boslukWrong > 0) {
-                forceLog('[4] Puan VAR - Modal gosteriliyor...');
-        const confirmed = await showCustomConfirm(boslukCorrect, boslukWrong, boslukScore);
-                forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
-        
-                if (!confirmed) {
-                    forceLog('[6] IPTAL - Cikis yapilmiyor');
-                    return;
-                }
-                
-                forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
-                
-                // Boşluk Doldur session değerlerini daily değerlere ekle
-                if (boslukCorrect > 0) {
-                    const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-                    localStorage.setItem('dailyCorrect', (currentDailyCorrect + boslukCorrect).toString());
-                    forceLog(`[7.1] dailyCorrect güncellendi (bosluk): ${currentDailyCorrect} + ${boslukCorrect} = ${currentDailyCorrect + boslukCorrect}`);
-                }
-                
-                if (boslukWrong > 0) {
-                    const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
-                    localStorage.setItem('dailyWrong', (currentDailyWrong + boslukWrong).toString());
-                    forceLog(`[7.2] dailyWrong güncellendi (bosluk): ${currentDailyWrong} + ${boslukWrong} = ${currentDailyWrong + boslukWrong}`);
-                }
-                
-                // Günlük istatistikleri kaydet (modal onaylandığında)
-                if (typeof saveDailyStats === 'function') {
-                    forceLog('[7.3] saveDailyStats çağrılıyor...');
-                    saveDailyStats();
-                    forceLog('[7.4] saveDailyStats tamamlandı');
-                } else {
-                    forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
-                }
-        if (boslukCorrect > 0) {
-            // NOT: boslukDoldur zaten her doğru cevapta updateTaskProgress('boslukDoldur', 1) ile artırılıyor (satır 10411)
-            // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-            // updateTaskProgress('boslukDoldur', boslukCorrect);
-            // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor
-            // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-            // updateTaskProgress('toplamDogru', boslukCorrect);
-                }
-                
-                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
-                // NOT: Boşluk Doldur için session değerlerini güncelle (perfect streak kontrolü için)
-                sessionScore = boslukScore;
-                sessionCorrect = boslukCorrect;
-                sessionWrong = boslukWrong;
-                addToGlobalPoints(sessionScore, sessionCorrect);
-            } else {
-                forceLog('[4] Puan YOK - Direkt cikis');
-        }
-        
-            forceLog('[8] State\'ler sifirlaniyor...');
-        boslukScore = 0;
-        boslukCorrect = 0;
-        boslukWrong = 0;
-            boslukQuestionCount = 0;
-        sessionScore = 0;
-        sessionCorrect = 0;
-        sessionWrong = 0;
-        comboCount = 0;
-    
-            updateBoslukUI();
-            
-            forceLog('[9] Ekranlar gizleniyor...');
-    hideAllModes();
-    if (elements.mainMenu) {
-        elements.mainMenu.removeAttribute('style');
-        elements.mainMenu.style.display = 'block';
-    }
-    if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-    
-    // Navigasyon bar'ı göster (ana ekrana dönünce)
-    showBottomNavBar();
-    
-            forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
-        } catch (error) {
-            log.error('HATA - Bosluk geri butonu:', error);
-            log.error('HATA - Stack:', error.stack);
-            hideAllModes();
-            if (elements.mainMenu) {
-                elements.mainMenu.style.display = 'block';
-            }
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
-        }
-    };
-} else {
-    log.warn('⚠️ backFromBoslukBtn elementi bulunamadı!');
-}
-
-if (elements.backFromDinleBtn) {
-elements.backFromDinleBtn.onclick = async () => {
-        forceLog('=== GERI BUTONU TIKLANDI (DINLE) ===');
-        try {
-            forceLog('[1] Ses durduruluyor...');
-    stopCurrentAudio();
-    
-            forceLog('[2] Timer durduruluyor...');
-            stopTimer();
-            
-            forceLog('[3] Skor kontrol:', 'Score=' + dinleScore, 'Dogru=' + dinleCorrect, 'Yanlis=' + dinleWrong);
-            
-            if (dinleScore > 0 || dinleCorrect > 0 || dinleWrong > 0) {
-                forceLog('[4] Puan VAR - Modal gosteriliyor...');
-        const confirmed = await showCustomConfirm(dinleCorrect, dinleWrong, dinleScore);
-                forceLog('[5] Modal sonucu:', confirmed ? 'ONAYLANDI' : 'IPTAL EDILDI');
-        
-                if (!confirmed) {
-                    forceLog('[6] IPTAL - Cikis yapilmiyor');
-                    return;
-                }
-                
-                forceLog('[7] ONAYLANDI - Istatistikler kaydediliyor...');
-                
-                // Dinle Bul session değerlerini daily değerlere ekle
-                if (dinleCorrect > 0) {
-                    const currentDailyCorrect = parseInt(localStorage.getItem('dailyCorrect')) || 0;
-                    localStorage.setItem('dailyCorrect', (currentDailyCorrect + dinleCorrect).toString());
-                    forceLog(`[7.1] dailyCorrect güncellendi (dinle): ${currentDailyCorrect} + ${dinleCorrect} = ${currentDailyCorrect + dinleCorrect}`);
-                }
-                
-                if (dinleWrong > 0) {
-                    const currentDailyWrong = parseInt(localStorage.getItem('dailyWrong')) || 0;
-                    localStorage.setItem('dailyWrong', (currentDailyWrong + dinleWrong).toString());
-                    forceLog(`[7.2] dailyWrong güncellendi (dinle): ${currentDailyWrong} + ${dinleWrong} = ${currentDailyWrong + dinleWrong}`);
-                }
-                
-                // Günlük istatistikleri kaydet (modal onaylandığında)
-                if (typeof saveDailyStats === 'function') {
-                    forceLog('[7.3] saveDailyStats çağrılıyor...');
-                    saveDailyStats();
-                    forceLog('[7.4] saveDailyStats tamamlandı');
-                } else {
-                    forceLog('[7.3] ⚠️ saveDailyStats fonksiyonu bulunamadı!');
-                }
-        if (dinleCorrect > 0) {
-            // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-            // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-            // updateTaskProgress('dinleBul', dinleCorrect);
-            // NOT: toplamDogru zaten addSessionPoints'te gerçek zamanlı olarak ekleniyor
-            // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-            // updateTaskProgress('toplamDogru', dinleCorrect);
-                }
-                
-                // Session puanlarını global'e aktar (perfect streak kontrolü için - oyunu bitirmeden çıkıldığında da sayılmalı)
-                // NOT: Dinle Bul için session değerlerini güncelle (perfect streak kontrolü için)
-                sessionScore = dinleScore;
-                sessionCorrect = dinleCorrect;
-                sessionWrong = dinleWrong;
-                addToGlobalPoints(sessionScore, sessionCorrect);
-            } else {
-                forceLog('[4] Puan YOK - Direkt cikis');
-        }
-        
-            forceLog('[8] State\'ler sifirlaniyor...');
-        dinleScore = 0;
-        dinleCorrect = 0;
-        dinleWrong = 0;
-            dinleQuestionCount = 0;
-        sessionScore = 0;
-        sessionCorrect = 0;
-        sessionWrong = 0;
-        comboCount = 0;
-    
-            updateDinleUI();
-            
-            forceLog('[9] Ekranlar gizleniyor...');
-    hideAllModes();
-    if (elements.mainMenu) {
-        elements.mainMenu.removeAttribute('style');
-        elements.mainMenu.style.display = 'block';
-    }
-    if (elements.settingsBtn) {
-        elements.settingsBtn.style.display = 'none';
-            }
-    
-    // Navigasyon bar'ı göster (ana ekrana dönünce)
-    showBottomNavBar();
-    
-            forceLog('[10] TAMAMLANDI - Ana menuye donuldu!');
-        } catch (error) {
-            log.error('HATA - Dinle geri butonu:', error);
-            log.error('HATA - Stack:', error.stack);
-            hideAllModes();
-            if (elements.mainMenu) {
-                elements.mainMenu.style.display = 'block';
-            }
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
-        }
-    };
-} else {
-    log.warn('⚠️ backFromDinleBtn elementi bulunamadı!');
-}
-
-// ============ MOD SEÇİCİYİ BAŞLAT (Sadece Kelime Çevir için) ============
-function initModeSelector() {
-    // Sadece Kelime Çevir oyun modlarını oluştur
-    Object.keys(CONFIG.gameModes).forEach(modeKey => {
-        const mode = CONFIG.gameModes[modeKey];
-        const btn = document.createElement('button');
-        btn.className = 'mode-btn';
-        if (modeKey === currentMode) btn.classList.add('active');
-        btn.innerHTML = `<strong>${mode.name}</strong> <small>${mode.description}</small>`;
-        btn.onclick = () => selectMode(modeKey);
-        elements.modeButtons.appendChild(btn);
+// Kelime Çevir alt mod seçimi
+document.querySelectorAll('.submode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const subMode = btn.dataset.submode;
+        startKelimeCevirGame(subMode);
     });
+});
+
+// İpucu butonu
+const hintBtn = document.getElementById('hint-btn');
+if (hintBtn) {
+    hintBtn.addEventListener('click', handleHint);
 }
 
-// ============ MOD SEÇ ============
-function selectMode(modeKey) {
-    currentMode = modeKey;
-    // "Zorluk" modu seçildiğinde otomatik olarak zorluk seviyesini 'zor' yap
-    if (modeKey === 'zorluk') {
-        currentDifficulty = 'zor';
-        log.debug('🔥 Zorluk modu seçildi, zorluk seviyesi "zor" olarak ayarlandı');
-    }
-    debouncedSaveStats(); // Debounced kaydetme // Mod değiştiğinde kaydet!
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.closest('.mode-btn').classList.add('active');
-}
-
-// ============ OYUNU BAŞLAT ============
-if (elements.startBtn) {
-elements.startBtn.onclick = () => {
-    const mode = CONFIG.gameModes[currentMode];
-    
-    // Mode kontrolü
-    if (!mode) {
-        log.error('❌ Oyun modu bulunamadı:', currentMode);
-        if (typeof showCustomAlert === 'function') {
-            showCustomAlert('Oyun modu bulunamadı. Lütfen tekrar deneyin.', 'error');
-        } else {
-            alert('⚠️ Oyun modu bulunamadı. Lütfen tekrar deneyin.');
-        }
-        return;
-    }
-    
-    // Review Mode kontrolü - Zorlanılan kelime var mı?
-    if (mode.reviewMode === true) {
-        const strugglingWords = getStrugglingWords();
-        log.debug(`🔍 Review Mode kontrolü: ${strugglingWords.length} zorlanılan kelime bulundu`);
+// Bottom navigation
+document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const page = btn.dataset.page;
         
-        if (strugglingWords.length === 0) {
-            // Zorlanılan kelime yoksa uyarı göster
-            if (typeof showCustomAlert === 'function') {
-                showCustomAlert(
-                    '📚 Tekrar Modu',
-                    'Henüz zorlanılan kelime yok!\n\nTekrar modu, yanlış cevapladığın veya zorlandığın kelimeleri daha sık gösterir.\n\nÖnce normal modda oynayıp bazı kelimeleri öğren, sonra tekrar modunu kullanabilirsin.',
-                    'info'
-                );
-            } else {
-                alert('⚠️ Henüz zorlanılan kelime yok! Önce normal modda oynayıp bazı kelimeleri öğren.');
-            }
-            return; // Oyunu başlatma
-        } else {
-            log.debug(`🔄 Review Mode başlatılıyor - ${strugglingWords.length} zorlanılan kelime bulundu`);
-        }
-    }
-    
-    // Ayarları uygula
-    lives = mode.lives;
-    
-    // Kalplerin görünürlüğünü kontrol et
-    // Sadece: (Mod: "hayat") VEYA (Mod: "zorluk" VE zorluk: "zor")
-    const duolingoHearts = document.getElementById('duolingoHearts');
-    const shouldShowHearts = (currentMode === 'hayat') || (currentMode === 'zorluk' && currentDifficulty === 'zor');
-    
-    if (duolingoHearts) {
-        if (shouldShowHearts && lives > 0) {
-            duolingoHearts.style.display = 'flex';
-            // Kalpleri başlangıç değerine ayarla
-            const heartSpans = duolingoHearts.querySelectorAll('span');
-            heartSpans.forEach((heart, index) => {
-                if (index < lives) {
-                    heart.style.opacity = '1';
-                } else {
-                    heart.style.opacity = '0.3';
-                }
-            });
-        } else {
-            duolingoHearts.style.display = 'none';
-        }
-    }
-    
-    if (lives > 0) {
-        if (elements.livesDisplay) elements.livesDisplay.style.display = 'block';
-        if (elements.lives) elements.lives.textContent = lives;
-    } else {
-        if (elements.livesDisplay) elements.livesDisplay.style.display = 'none';
-    }
-
-    if (mode.timeLimit > 0) {
-        if (elements.timerDisplay) elements.timerDisplay.style.display = 'block';
-    } else {
-        if (elements.timerDisplay) elements.timerDisplay.style.display = 'none';
-    }
-
-    if (mode.showHint) {
-        if (elements.hintBtn) elements.hintBtn.style.display = 'block';
-    } else {
-        if (elements.hintBtn) elements.hintBtn.style.display = 'none';
-    }
-
-    if (elements.currentMode) elements.currentMode.textContent = mode.name;
-
-    // Session puanlarını sıfırla (global puanları koru)
-    sessionScore = 0;
-    sessionCorrect = 0;
-    sessionWrong = 0;
-    comboCount = 0;
-    questionCount = 0;
-    
-    // Oyun başlangıç zamanını kaydet (gerçek süre takibi için)
-    if (gameState && gameState.session) {
-        gameState.session.startTime = Date.now();
-    }
-    
-    // Combo indicator'ı gizle
-    hideCombo();
-    
-    // Geriye uyumluluk için eski değişkenleri de sıfırla
-    score = 0;
-    correct = 0;
-    wrong = 0;
-    
-    // Cevap pozisyon geçmişini sıfırla (yeni oyun başladığında)
-    recentAnswerPositions = [];
-
-    updateUI();
-
-    // Ekranları değiştir - Sadece Kelime Çevir oyunu başlat
-    if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-    // Main menu'yu da gizle (eğer hala açıksa)
-    if (elements.mainMenu) elements.mainMenu.style.display = 'none';
-    if (elements.gameScreen) elements.gameScreen.style.display = 'block';
-    
-    // Navigasyon bar'ı gizle (oyun başladığında)
-    hideBottomNavBar();
-    
-        // 🎮 Gesture sistemini başlat
-        /* gestures removed per cleanup: swipe gestures intentionally disabled
-            Kept commented init call so code can be re-enabled in future if needed. */
-        // initGameGestures();
-    
-    // ⚡ Speed animation ile yeni soruyu yükle
-    if (elements.gameScreen) {
-    addSpeedAnimation(elements.gameScreen, 'slide-up');
-    }
-    
-    loadQuestion();
-};
-}
-
-// ============ AYARLARA DÖN ============
-if (elements.settingsBtn) {
-    elements.settingsBtn.onclick = () => {
-        stopTimer();
-        elements.gameScreen.style.display = 'none';
-        elements.modeSelector.style.display = 'block';
-    };
-}
-
-// ============ SORU YÜKLEME (Kelime Çevir) ============
-function loadQuestion() {
-    // Önceki ses varsa durdur
-    stopCurrentAudio();
-    
-    // İpucu kullanımını sıfırla (yeni soru için)
-    hintUsed = false;
-    if (elements.hintBtn) {
-        elements.hintBtn.disabled = false;
-    }
-    
-    log.debug('📚 === KELİME ÇEVİR SORU YÜKLENİYOR (AKILLI SEÇİM) ===');
-    log.debug(`📊 Mevcut soru sayısı: ${questionCount}`);
-    log.debug(`🎯 Mevcut mod: ${currentMode}`);
-    log.debug(`🎯 Zorluk: ${currentDifficulty}`);
-    
-    const mode = CONFIG.gameModes[currentMode];
-    log.debug(`📋 Mod detayları:`, mode);
-    
-    // Soru sayısı kontrolü - oyun bitirme
-    if (questionCount >= mode.questionsPerLevel) {
-        log.game(`🏁 === KELİME ÇEVİR OYUNU BİTTİ ===`);
-        log.game(`✅ ${mode.questionsPerLevel} soru tamamlandı!`);
-        log.game(`📊 Final session score: ${sessionScore}`);
+        // Aktif butonu güncelle
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
         
-        // NOT: kelimeCevir zaten her doğru cevapta updateTaskProgress('kelimeCevir', 1) ile artırılıyor (satır 8333)
-        // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-        // updateTaskProgress('kelimeCevir', sessionCorrect);
-        
-        // Session puanlarını global'e aktar
-        log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
-        addToGlobalPoints(sessionScore, sessionCorrect);
-        
-        // Oyun sonu modal'ını göster
-        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
-        showCustomConfirm(sessionCorrect, sessionWrong, sessionScore).then((confirmed) => {
-            if (!confirmed) {
-                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
-            }
-            
-            // Modal kapandıktan sonra ana menüye dön
-            log.debug(`🔄 Ana menüye dönülüyor...`);
-            elements.gameScreen.style.display = 'none';
-            elements.modeSelector.style.display = 'none';
-            elements.mainMenu.style.display = 'block';
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
-            
-            log.game(`✅ Kelime Çevir oyunu bitti ve ana menüye dönüldü!`);
-        });
-        return;
-    }
-
-    // Can kontrolü
-    if (mode.lives > 0 && lives <= 0) {
-        log.game(`💀 Can bitti! Oyun sona eriyor...`);
-        gameOver('Can bitti!');
-        return;
-    }
-
-    log.debug(`🔍 Zorluk filtreleme başlıyor...`);
-    log.debug(`🎯 Seçili zorluk: ${currentDifficulty}`);
-
-    // Zorluk filtreleme
-    const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-    log.debug(`📋 Zorluk aralığı: ${diffLevel.minDiff}-${diffLevel.maxDiff}`);
-    log.debug(`📦 Toplam kelime sayısı: ${kelimeBulData.length}`);
-
-    let filteredData = kelimeBulData.filter(w => 
-        w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
-    );
-    log.debug(`✅ Zorluk filtresi sonrası: ${filteredData.length} kelime`);
-
-    // Hızlı mod için özel sure filtreleme (78-114. sureler)
-    if (currentMode === 'hizli') {
-        log.debug(`⚡ Hızlı mod aktif - Sure filtreleme: 78-114`);
-        const beforeCount = filteredData.length;
-        filteredData = filteredData.filter(w => {
-            if (!w.id) return false;
-            // ID formatı: "78:12:3" (sure:ayet:kelime)
-            const idParts = w.id.split(':');
-            if (idParts.length < 1) return false;
-            const sureNum = parseInt(idParts[0], 10);
-            // 78 <= sure <= 114 kontrolü
-            return !isNaN(sureNum) && sureNum >= 78 && sureNum <= 114;
-        });
-        log.debug(`✅ Hızlı mod sure filtresi sonrası: ${beforeCount} -> ${filteredData.length} kelime`);
-        
-        // Eğer filtreleme sonrası kelime kalmadıysa, uyarı ver
-        if (filteredData.length === 0) {
-            log.warn('⚠️ Hızlı mod için 78-114. sureler arasında kelime bulunamadı! Tüm kelimeler kullanılacak.');
-            filteredData = kelimeBulData.filter(w => 
-                w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
-            );
-        }
-    }
-
-    // Mod özel zorluk kontrolü
-    if (mode.minDifficulty) {
-        log.debug(`📋 Mod minimum zorluk kontrolü: >= ${mode.minDifficulty}`);
-        filteredData = filteredData.filter(w => w.difficulty >= mode.minDifficulty);
-        log.debug(`✅ Mod filtresi sonrası: ${filteredData.length} kelime`);
-    }
-
-    if (filteredData.length === 0) {
-        filteredData = kelimeBulData;
-    }
-
-    // AKILLI KELİME SEÇİMİ - Zorlanılan kelimeleri daha sık göster
-    log.debug('🧠 Akıllı kelime seçimi başlıyor...');
-    currentQuestion = selectIntelligentWord(filteredData);
-
-    // SEÇİLEN KELİME DETAYLARI
-    log.debug("===== SEÇİLEN KELİME =====");
-    log.debug("Kelime:", currentQuestion.kelime);
-    log.debug("Anlam:", currentQuestion.anlam);
-    log.debug("Zorluk:", currentQuestion.difficulty);
-    log.debug("ID:", currentQuestion.id);
-    log.debug("Zorluk aralığı:", diffLevel.minDiff + "-" + diffLevel.maxDiff);
-    const isInRange = currentQuestion.difficulty >= diffLevel.minDiff && currentQuestion.difficulty <= diffLevel.maxDiff;
-    log.debug("Aralıkta mı:", isInRange ? "EVET" : "HAYIR");
-    log.debug("========================");
-
-    // UI güncelle
-    elements.arabicWord.textContent = currentQuestion.kelime;
-    elements.sureInfo.textContent = `ID: ${currentQuestion.id} | Zorluk: ${currentQuestion.difficulty} | Aralık: ${diffLevel.minDiff}-${diffLevel.maxDiff}`;
-
-    // Seçenekler oluştur
-    const wrongAnswers = getWrongAnswers(3);
-    const allOptions = [
-        { text: currentQuestion.anlam, correct: true },
-        ...wrongAnswers.map(w => ({ text: w.anlam, correct: false }))
-    ];
-
-    // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
-    smartShuffle(allOptions);
-
-    // Seçenekleri göster - Duolingo Tarzı
-    elements.options.innerHTML = '';
-    allOptions.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'duolingo-option';
-        // Türkçe kelimeler için özel class ekle (Arapça değilse)
-        if (!isArabic(opt.text)) {
-            btn.classList.add('turkish-option');
-        }
-        btn.textContent = opt.text;
-        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
-        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
-        
-        // Touch event tracking (scroll/tap ayrımı için)
-        let touchStart = { x: 0, y: 0, time: 0 };
-        let isScrolling = false;
-        
-        // Masaüstü için onclick handler
-        btn.onclick = () => {
-            if (!btn.classList.contains('disabled')) {
-                checkAnswer(btn, opt.correct);
-            }
-        };
-        
-        // Mobil için touch event'leri
-        btn.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            touchStart = {
-                x: touch.clientX,
-                y: touch.clientY,
-                time: Date.now()
-            };
-            isScrolling = false;
-        }, { passive: true });
-        
-        btn.addEventListener('touchmove', (e) => {
-            if (touchStart.x !== 0 || touchStart.y !== 0) {
-                const touch = e.touches[0];
-                const deltaX = Math.abs(touch.clientX - touchStart.x);
-                const deltaY = Math.abs(touch.clientY - touchStart.y);
-                // 10px'den fazla hareket varsa scroll'dur
-                if (deltaX > 10 || deltaY > 10) {
-                    isScrolling = true;
-                }
-            }
-        }, { passive: true });
-        
-        btn.addEventListener('touchend', (e) => {
-            // Scroll yapıldıysa tıklamayı engelle
-            if (isScrolling) {
-                touchStart = { x: 0, y: 0, time: 0 };
-                isScrolling = false;
-                return;
-            }
-            
-            // Scroll değilse, tap olarak kabul et
-            const touch = e.changedTouches[0];
-            const deltaTime = Date.now() - touchStart.time;
-            const deltaX = Math.abs(touch.clientX - touchStart.x);
-            const deltaY = Math.abs(touch.clientY - touchStart.y);
-            
-            // Kısa süre (300ms) ve küçük hareket (10px) = tap
-            if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!btn.classList.contains('disabled')) {
-                    checkAnswer(btn, opt.correct);
-                }
-            }
-            
-            touchStart = { x: 0, y: 0, time: 0 };
-            isScrolling = false;
-        }, { passive: false });
-        
-        elements.options.appendChild(btn);
-    });
-    
-    // Duolingo tarzı soru numarasını güncelle
-    const duolingoQuestionNumber = document.getElementById('duolingoQuestionNumber');
-    if (duolingoQuestionNumber) {
-        duolingoQuestionNumber.textContent = `Sual ${questionCount + 1} / ${mode.questionsPerLevel}`;
-    }
-    
-    // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
-    
-    // Kalplerin görünürlüğünü kontrol et (her soru yüklendiğinde)
-    const duolingoHearts = document.getElementById('duolingoHearts');
-    const shouldShowHearts = (currentMode === 'hayat') || (currentMode === 'zorluk' && currentDifficulty === 'zor');
-    if (duolingoHearts) {
-        if (shouldShowHearts && mode.lives > 0) {
-            duolingoHearts.style.display = 'flex';
-            // Kalpleri güncelle
-            const heartSpans = duolingoHearts.querySelectorAll('span');
-            heartSpans.forEach((heart, index) => {
-                if (index < lives) {
-                    heart.style.opacity = '1';
-                } else {
-                    heart.style.opacity = '0.3';
-                }
-            });
-        } else {
-            duolingoHearts.style.display = 'none';
-        }
-    }
-
-    // Sıfırla
-    elements.feedback.textContent = '';
-    elements.feedback.className = 'feedback';
-    elements.nextBtn.style.display = 'none';
-    elements.hintBtn.disabled = false;
-    
-    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
-    const allBtns = document.querySelectorAll('.duolingo-option, .option');
-    allBtns.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove('disabled', 'correct', 'wrong');
-        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
-        btn.style.opacity = '';
-        btn.style.pointerEvents = '';
-    });
-
-    // İlerleme güncelle
-    updateProgress();
-
-    // Süreyi başlat
-    if (mode.timeLimit > 0) {
-        startTimer(mode.timeLimit);
-    }
-
-    // Arapça hareke renklerini uygula
-    setTimeout(() => {
-        updateArabicTextColoring();
-    }, 100);
-}
-
-// ============ YANLIŞ CEVAPLAR ============
-function getWrongAnswers(count) {
-    const wrong = [];
-    const filtered = kelimeBulData.filter(w => w.id !== currentQuestion.id);
-    
-    while (wrong.length < count && filtered.length > 0) {
-        const idx = Math.floor(Math.random() * filtered.length);
-        const word = filtered[idx];
-        
-        if (!wrong.find(w => w.anlam === word.anlam)) {
-            wrong.push(word);
-        }
-        filtered.splice(idx, 1);
-    }
-    
-    return wrong;
-}
-
-// ============ KARIŞTIR ============
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-// ============ AKILLI CEVAP POZİSYONU SEÇİMİ ============
-// Kullanıcının tahmin etmesini zorlaştırmak için akıllı pozisyon seçimi
-function getSmartAnswerPosition(totalOptions = 4) {
-    // Son pozisyonları kontrol et
-    const positionCounts = [0, 0, 0, 0]; // Her pozisyonun son 10 sorudaki görünme sayısı
-    
-    recentAnswerPositions.forEach(pos => {
-        if (pos >= 0 && pos < totalOptions) {
-            positionCounts[pos]++;
+        if (page === 'main-menu') {
+            goToMainMenu();
+        } else if (page === 'stats') {
+            showStatsModal();
+        } else if (page === 'badges') {
+            showBadgesModal();
+        } else if (page === 'calendar') {
+            showCalendarModal();
+        } else if (page === 'tasks') {
+            showDailyTasksModal();
         }
     });
-    
-    // En az kullanılan pozisyonları bul
-    const minCount = Math.min(...positionCounts);
-    const leastUsedPositions = positionCounts
-        .map((count, index) => ({ count, index }))
-        .filter(item => item.count === minCount)
-        .map(item => item.index);
-    
-    // Son pozisyonu kontrol et - üst üste aynı pozisyonda gelmesin
-    const lastPosition = recentAnswerPositions.length > 0 ? recentAnswerPositions[recentAnswerPositions.length - 1] : -1;
-    const availablePositions = leastUsedPositions.filter(pos => pos !== lastPosition);
-    
-    // Eğer son pozisyon hariç en az kullanılan pozisyon varsa, onu kullan
-    let selectedPosition;
-    if (availablePositions.length > 0) {
-        selectedPosition = availablePositions[Math.floor(Math.random() * availablePositions.length)];
-    } else if (leastUsedPositions.length > 0) {
-        // Son pozisyon hariç seçenek yoksa, en az kullanılanlardan rastgele seç
-        selectedPosition = leastUsedPositions[Math.floor(Math.random() * leastUsedPositions.length)];
-    } else {
-        // Fallback: tamamen rastgele
-        selectedPosition = Math.floor(Math.random() * totalOptions);
-    }
-    
-    // Pozisyon geçmişine ekle
-    recentAnswerPositions.push(selectedPosition);
-    if (recentAnswerPositions.length > MAX_POSITION_HISTORY) {
-        recentAnswerPositions.shift(); // En eski pozisyonu çıkar
-    }
-    
-    return selectedPosition;
+});
+
+// Günlük vird ayarları butonu
+const dailyGoalSettingsBtn = document.getElementById('daily-goal-settings-btn');
+if (dailyGoalSettingsBtn) {
+    dailyGoalSettingsBtn.addEventListener('click', showDailyGoalSettings);
 }
 
-// Akıllı karıştırma - doğru cevabı belirli pozisyona yerleştir
-function smartShuffle(options) {
-    // Doğru cevabı bul
-    const correctIndex = options.findIndex(opt => opt.correct === true);
-    if (correctIndex === -1) {
-        // Doğru cevap bulunamadıysa normal karıştır
-        shuffle(options);
-        return;
-    }
-    
-    // Doğru cevabı çıkar
-    const correctAnswer = options.splice(correctIndex, 1)[0];
-    
-    // Yanlış cevapları karıştır
-    shuffle(options);
-    
-    // Akıllı pozisyon seç
-    const targetPosition = getSmartAnswerPosition(options.length + 1);
-    
-    // Doğru cevabı hedef pozisyona yerleştir
-    options.splice(targetPosition, 0, correctAnswer);
-}
-
-// ============ CEVAP KONTROL ============
-function checkAnswer(button, isCorrect) {
-    log.game(`🚨 === KELİME ÇEVİR CEVAP KONTROLÜ ===`);
-    log.game(`👆 Tıklanan buton: "${button.textContent}"`);
-    log.game(`✅/❌ isCorrect parametresi: ${isCorrect}`);
-    log.game(`📊 Mevcut soru: #${questionCount + 1}`);
-    log.game(`📊 Önce - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
-    log.game(`📊 Önce - kelime çevir: score=${score}, correct=${correct}, wrong=${wrong}`);
-    
-    stopTimer();
-    
-    // Tüm butonları kapat - Duolingo tarzı
-    const allBtns = document.querySelectorAll('.duolingo-option, .option');
-    log.game(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-    allBtns.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('disabled');
+// Günlük hedef seviye butonları
+document.querySelectorAll('.goal-level-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const level = btn.dataset.level;
+        setDailyGoalLevel(level);
     });
+});
 
-    const mode = CONFIG.gameModes[currentMode];
-    const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-    log.game(`🎯 Mod: ${currentMode}, Zorluk: ${currentDifficulty}`);
-
-    // KELİME İSTATİSTİKLERİNİ GÜNCELLE
-    // Alt modu da dahil et (klasik, zor, kolay)
-    const gameModeWithDifficulty = currentMode && currentDifficulty 
-        ? `kelimeCevir-${currentMode}-${currentDifficulty}` 
-        : 'kelimeCevir';
-    log.game(`📊 Kelime istatistiği güncelleniyor: ${currentQuestion.kelime} (ID: ${currentQuestion.id}, Mod: ${gameModeWithDifficulty})`);
-    updateWordStats(currentQuestion.id, isCorrect, gameModeWithDifficulty);
-
-    if (isCorrect) {
-        log.game(`✅ === SAHİH CEVAP İŞLEMİ ===`);
-        button.classList.add('correct');
-        if (elements.feedback) {
-        elements.feedback.textContent = '✅ Mâşâallah!';
-        elements.feedback.className = 'feedback correct';
-        }
-        
-        // 🎆 SUCCESS ANIMATIONS & FEEDBACK
-        triggerSuccessBurst(button);
-        triggerHaptic('success');
-        if (elements.feedback) {
-        addSpeedAnimation(elements.feedback, 'bounce-in');
-        }
-        
-        // Combo sistemi için confetti
-        if (comboCount >= 2) {
-            triggerConfetti();
-            triggerHaptic('combo');
-        }
-        
-        const points = currentQuestion.difficulty * diffLevel.pointsMultiplier;
-        log.game(`💰 Puan hesaplama: ${currentQuestion.difficulty} × ${diffLevel.pointsMultiplier} = ${points} puan`);
-        log.game(`📊 addSessionPoints(${points}) çağrılıyor...`);
-        addSessionPoints(points); // Session puanına ekle
-        
-        // Daily task progress - her doğru cevap için
-        updateTaskProgress('kelimeCevir', 1);
-        
-        // Streak ilerlemesini güncelle - her doğru cevapta
-        if (typeof updateDailyProgress === 'function') {
-            updateDailyProgress(1);
-        }
-        
-        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
-        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
-        
-        log.game(`✅ Doğru cevap işlemi tamamlandı!`);
-        
-        updateUI();
-    } else {
-        log.game(`❌ === HATA CEVAP İŞLEMİ ===`);
-        button.classList.add('wrong');
-        if (elements.feedback) {
-        elements.feedback.textContent = `❌ Hatalı! Sahih: ${currentQuestion.anlam}`;
-        elements.feedback.className = 'feedback wrong';
-        }
-        
-        // 📱 ERROR FEEDBACK
-        triggerHaptic('error');
-        if (elements.feedback) {
-        addSpeedAnimation(elements.feedback, 'zoom-in');
-        }
-        
-        log.game(`📊 addSessionWrong() çağrılıyor...`);
-        addSessionWrong(); // Session yanlış sayısını artır
-        
-        const wrongPenalty = window.CONSTANTS?.POINTS?.WRONG_PENALTY || CONFIG.wrongAnswerPenalty || 5; // Fallback: 5
-        log.game(`💸 Puan cezası uygulanıyor: ${wrongPenalty} puan`);
-        log.game(`📊 Eski sessionScore: ${sessionScore}`);
-        // Puan cezası - sessionScore'dan düş (UI'da görünür olması için)
-        sessionScore = Math.max(0, sessionScore - wrongPenalty);
-        // Geriye uyumluluk için eski score değişkenini de güncelle
-        score = sessionScore;
-        log.game(`📊 Yeni sessionScore: ${sessionScore}`);
-        
-        // Can kaybı
-        if (mode.lives > 0) {
-            log.game(`💀 Can kaybı: ${lives} - 1 = ${lives - 1}`);
-            lives--;
-            if (elements.lives) {
-            elements.lives.textContent = lives;
-            }
-            // Duolingo tarzı kalpleri güncelle (sadece görünürse)
-            const duolingoHearts = document.getElementById('duolingoHearts');
-            if (duolingoHearts && duolingoHearts.style.display !== 'none') {
-                const heartSpans = duolingoHearts.querySelectorAll('span');
-                heartSpans.forEach((heart, index) => {
-                    if (index < lives) {
-                        heart.style.opacity = '1';
-                    } else {
-                        heart.style.opacity = '0.3';
-                    }
-                });
-            }
-            
-            if (lives <= 0) {
-                setTimeout(() => gameOver('Canlarınız bitti!'), 1500);
-            }
-        }
-
-        updateUI();
-
-        // Doğru cevabı göster
-        allBtns.forEach(btn => {
-            if (btn.textContent.includes(currentQuestion.anlam)) {
-                btn.classList.add('correct');
-            }
-        });
-    }
-
-    questionCount++;
-    // Show the next button (Kelime)
-    try {
-        if (elements && elements.nextBtn) {
-            elements.nextBtn.style.display = 'block';
-            elements.nextBtn.style.visibility = 'visible';
-            elements.nextBtn.removeAttribute('hidden');
-            elements.nextBtn.removeAttribute('aria-hidden'); // Görünür buton için aria-hidden kaldırılmalı
-
-            // 🔥 Animasyonu ekle
-elements.nextBtn.classList.add("next-appear");
-            // Ensure it's visible on small viewports by scrolling it into view
-            setTimeout(() => {
-                try {
-                    elements.nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                } catch (e) {
-                    log.warn('scrollIntoView failed:', e);
-                }
-            }, 60);
-        } else {
-            log.warn('elements.nextBtn is not available to show');
-        }
-    } catch (err) {
-        log.error('Error while showing nextBtn for Kelime:', err);
-    }
-}
-
-// ============ SES ÇALMA ============
-if (elements.audioBtn) {
-    // Masaüstü için onclick
-elements.audioBtn.onclick = () => {
-    if (currentQuestion && currentQuestion.ses_dosyasi) {
-        playAudio(currentQuestion.ses_dosyasi, elements.audioBtn);
-    }
-};
-    // Mobil için touchend
-    elements.audioBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (currentQuestion && currentQuestion.ses_dosyasi) {
-            playAudio(currentQuestion.ses_dosyasi, elements.audioBtn);
-        }
-    }, { passive: false });
-}
-
-// ============ SONRAKİ SORU ============
-if (elements.nextBtn) {
-    // Masaüstü için onclick
-elements.nextBtn.onclick = () => {
-    // ⚡ Speed animation ve haptic feedback
-    addSpeedAnimation(elements.gameScreen, 'fade-in');
-    triggerHaptic('light');
-    
-    // Butonu hemen gizle
-        if (elements.nextBtn) {
-    elements.nextBtn.style.display = 'none';
-    elements.nextBtn.style.visibility = 'hidden';
-    // display: none olduğunda aria-hidden gerekmez, zaten erişilebilirlik ağacından çıkar
-    elements.nextBtn.classList.remove("next-appear");
-        }
-    
-    loadQuestion();
-};
-    // Mobil için touchend
-    elements.nextBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // ⚡ Speed animation ve haptic feedback
-        addSpeedAnimation(elements.gameScreen, 'fade-in');
-        triggerHaptic('light');
-        
-        // Butonu hemen gizle
-        if (elements.nextBtn) {
-            elements.nextBtn.style.display = 'none';
-            elements.nextBtn.style.visibility = 'hidden';
-            elements.nextBtn.classList.remove("next-appear");
-        }
-        
-        loadQuestion();
-    }, { passive: false });
-}
-
-// ============ İLERLEME GÜNCELLE ============
-function updateProgress() {
-    const mode = CONFIG.gameModes[currentMode];
-    const progress = (questionCount / mode.questionsPerLevel) * 100;
-    if (elements.progressBar) {
-        elements.progressBar.style.width = `${progress}%`;
-    }
-}
-
-// ============ UI GÜNCELLE ============
-function updateUI() {
-    // Alt bar: Sadece session (oyun içi) puanları göster
-    if (elements.score) elements.score.textContent = sessionScore;
-    if (elements.correct) elements.correct.textContent = sessionCorrect;
-    if (elements.wrong) elements.wrong.textContent = sessionWrong;
-    // level elementi artık yok (Mertebe kaldırıldı), bu yüzden güncelleme yapılmıyor
-    
-    // Header score güncelle (yeni tasarım için)
-    const headerScore = document.getElementById('headerScore');
-    if (headerScore) {
-        headerScore.textContent = `⭐ ${starPoints}`;
-    }
-}
-
-// ============ SÜRE YÖNETİMİ ============
-function startTimer(seconds) {
-    stopTimer();
-    timeLeft = seconds;
-    
-    // Timer elementini kontrol et
-    if (elements.timer) {
-        elements.timer.textContent = timeLeft;
-    }
-    
-    timer = setInterval(() => {
-        timeLeft--;
-        
-        // Timer elementini sadece varsa güncelle
-        if (elements.timer) {
-            elements.timer.textContent = timeLeft;
-        }
-        
-        if (timeLeft <= 0) {
-            stopTimer();
-            gameOver('Süre doldu!');
-        }
-    }, 1000);
-}
-
-function stopTimer() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
-    }
-}
-
-// ============ İPUCU ============
-if (elements.hintBtn) {
-    // hintUsed artık genel scope'ta tanımlı (yukarıda)
-    
-    const handleHint = () => {
-        // İpucu zaten kullanıldıysa veya buton disabled ise çalışma
-        if (hintUsed || (elements.hintBtn && elements.hintBtn.disabled)) {
-            log.debug('⚠️ İpucu zaten kullanıldı veya buton devre dışı');
-            return;
-        }
-        
-        // currentQuestion kontrolü
-        if (!currentQuestion || !currentQuestion.anlam) {
-            log.warn('⚠️ İpucu: currentQuestion bulunamadı!');
-            return;
-        }
-        
-        // Bir yanlış cevabı kaldır - Duolingo tarzı butonlar için
-        // Sadece game-screen içindeki butonları ara
-        const gameScreen = document.getElementById('gameScreen');
-        if (!gameScreen) {
-            log.warn('⚠️ İpucu: gameScreen bulunamadı!');
-            return;
-        }
-        
-        const allBtns = gameScreen.querySelectorAll('.duolingo-option, .option');
-        
-        // Yanlış cevapları bul - data-correct attribute'unu kullan (daha güvenilir)
-        const wrongBtns = Array.from(allBtns).filter(btn => {
-            if (btn.disabled) return false;
-            // data-correct attribute'u varsa onu kullan (en güvenilir yöntem)
-            const isCorrect = btn.getAttribute('data-correct') === 'true';
-            if (isCorrect) return false; // Doğru cevabı atla
-            
-            // Fallback: Eğer data-correct yoksa, eski yöntemi kullan
-            const btnText = (btn.textContent || btn.innerText || '').trim();
-            const correctAnswer = (currentQuestion.anlam || '').trim();
-            return btnText !== correctAnswer && !btnText.includes(correctAnswer);
-        });
-    
-        if (wrongBtns.length > 0) {
-            const randomWrong = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
-            randomWrong.style.opacity = '0.3';
-            randomWrong.disabled = true;
-            randomWrong.classList.add('disabled');
-            
-            // İpucu puan cezası - Hasene puanından düş
-            const hintPenalty = 10;
-            sessionScore = Math.max(0, sessionScore - hintPenalty);
-            totalPoints = Math.max(0, totalPoints - hintPenalty);
-            
-            log.game(`💡 İpucu kullanıldı! -${hintPenalty} Hasene`);
-            log.game(`📊 Yeni puanlar: sessionScore=${sessionScore}, totalPoints=${totalPoints}`);
-            
-            // UI güncelle
-            updateUI();
-            updateStatsBar();
-            debouncedSaveStats(); // Debounced kaydetme // Hasene değişikliğini kaydet
-            
-            // İpucu kullanıldı olarak işaretle ve butonu devre dışı bırak
-            hintUsed = true;
-            if (elements.hintBtn) {
-                elements.hintBtn.disabled = true;
-            }
-        } else {
-            log.warn('⚠️ İpucu: Yanlış buton bulunamadı!');
-        }
-    };
-    // Masaüstü için onclick
-    elements.hintBtn.onclick = handleHint;
-    // Mobil için touchend
-    elements.hintBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleHint();
-    }, { passive: false });
-}
-
-// ============ SEVİYE ATLAMA ============
-function showLevelUpModal(newLevel) {
-    elements.newLevel.textContent = newLevel;
-    
-    // Modal için ek bilgileri güncelle
-    const modalTotalPoints = document.getElementById('modalTotalPoints');
-    const modalNextLevelPoints = document.getElementById('modalNextLevelPoints');
-    
-    if (modalTotalPoints && modalNextLevelPoints) {
-        modalTotalPoints.textContent = totalPoints.toLocaleString();
-        modalNextLevelPoints.textContent = getNextLevelRequiredPoints(newLevel).toLocaleString();
-    }
-    
-    // Seviye atlama sesi çal
-    playSound('levelup');
-    
-    // Konfeti efekti başlat!
-    createConfetti();
-    
-    elements.modal.style.display = 'flex';
-}
-
-function createConfetti() {
-    const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
-    const confettiCount = 50;
-    
-    for (let i = 0; i < confettiCount; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.style.cssText = `
-                position: fixed;
-                width: 10px;
-                height: 10px;
-                background: ${colors[Math.floor(Math.random() * colors.length)]};
-                left: ${Math.random() * 100}%;
-                top: -10px;
-                opacity: 1;
-                transform: rotate(${Math.random() * 360}deg);
-                z-index: 10000;
-                pointer-events: none;
-                border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
-            `;
-            
-            document.body.appendChild(confetti);
-            
-            const fall = confetti.animate([
-                { 
-                    transform: `translateY(0) rotate(${Math.random() * 360}deg)`,
-                    opacity: 1
-                },
-                { 
-                    transform: `translateY(${window.innerHeight + 20}px) rotate(${Math.random() * 360 + 720}deg)`,
-                    opacity: 0
-                }
-            ], {
-                duration: 2000 + Math.random() * 1000,
-                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-            });
-            
-            fall.onfinish = () => confetti.remove();
-        }, i * 30);
-    }
-}
-
-// NOTE: eski levelUp fonksiyonu kaldırıldı (unused)
-
-// ============ OYUN BİTTİ ============
-function gameOver(reason) {
-    stopTimer();
-    
-    // Session puanlarını global'e aktar
-    addToGlobalPoints(sessionScore, sessionCorrect);
-    
-    if (elements.gameOverTitle) elements.gameOverTitle.textContent = '😢 Oyun Bitti';
-    if (elements.gameOverText) elements.gameOverText.textContent = reason;
-    if (elements.finalScore) elements.finalScore.textContent = `Bu Oyun: ${sessionScore} puan\nToplam: ${totalPoints} puan`;
-    if (elements.gameOverModal) elements.gameOverModal.style.display = 'block';
-}
-
-// ============ YENİDEN BAŞLAT ============
-elements.restartBtn.onclick = () => {
-    if (elements.gameOverModal) elements.gameOverModal.style.display = 'none';
-    if (elements.gameScreen) elements.gameScreen.style.display = 'none';
-    if (elements.modeSelector) elements.modeSelector.style.display = 'none';
-    if (elements.mainMenu) elements.mainMenu.style.display = 'block';
-    if (elements.settingsBtn) elements.settingsBtn.style.display = 'none';
-};
-
-// ============ MODAL KAPAT ============
-elements.modalBtn.onclick = () => {
-    if (elements.modal) elements.modal.style.display = 'none';
-    // Sadece modal'ı kapat - seviye yükselme bilgilendirmesi için gereksiz işlem yapma
-};
-
-// ============ DİNLE VE BUL MODU ============
-let currentDinleQuestion = null;
-let dinleQuestionCount = 0;
-let speechAttemptCount = 0; // Ses tanıma deneme sayacı (her soru için max 2)
-const DINLE_MAX_QUESTIONS = 10;
-
-// ============ SES TANIMA SİSTEMİ ============
-let recognition = null;
-let isListening = false;
-let microphoneStream = null;
-let recognitionInitialized = false;
-let isStopping = false; // Durdurma işlemi devam ediyor mu?
-
-// Mikrofon stream'ini güvenli şekilde temizle
-function cleanupMicrophoneStream() {
-    if (microphoneStream) {
-        try {
-            microphoneStream.getTracks().forEach(track => {
-                if (track.readyState === 'live' || track.readyState === 'ended') {
-                    track.stop();
-                    track.enabled = false;
-                }
-            });
-            microphoneStream = null;
-            log.debug('✅ Mikrofon stream temizlendi');
-        } catch (e) {
-            log.debug('Stream temizlenirken hata:', e);
-            microphoneStream = null; // Hata olsa bile null yap
-        }
-    }
-}
-
-// Recognition'ı güvenli şekilde durdur
-async function stopRecognitionSafely() {
-    if (recognition && isListening && !isStopping) {
-        isStopping = true;
-        try {
-            recognition.stop();
-            isListening = false;
-            // Recognition'ın tamamen durması için bekle
-            await new Promise(resolve => setTimeout(resolve, 300));
-            log.debug('✅ Recognition güvenli şekilde durduruldu');
-        } catch (e) {
-            log.debug('Recognition durdurulurken hata:', e);
-            isListening = false;
-        } finally {
-            isStopping = false;
-        }
-    } else if (recognition && !isListening) {
-        // Zaten durmuş, sadece flag'i kontrol et
-        isListening = false;
-    }
-}
-
-// Recognition nesnesini tamamen temizle
-function cleanupRecognition() {
-    if (recognition) {
-        try {
-            // Tüm event listener'ları kaldır
-            recognition.onstart = null;
-            recognition.onresult = null;
-            recognition.onerror = null;
-            recognition.onend = null;
-            
-            // Eğer aktifse durdur
-            if (isListening) {
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    // Zaten durmuş olabilir
-                }
-            }
-            
-            recognition = null;
-            recognitionInitialized = false;
-            isListening = false;
-            log.debug('✅ Recognition nesnesi temizlendi');
-        } catch (e) {
-            log.debug('Recognition temizlenirken hata:', e);
-            recognition = null;
-            recognitionInitialized = false;
-            isListening = false;
-        }
-    }
-}
-
-// Ses tanımayı durdur (global erişim için)
-window.stopSpeechRecognition = async function() {
-    // Önce recognition'ı durdur
-    await stopRecognitionSafely();
-    
-    // Mikrofon stream'ini temizle
-    cleanupMicrophoneStream();
-    
-    // UI'ı sıfırla
-    const micBtn = document.getElementById('dinleMicBtn');
-    const statusEl = document.getElementById('speechStatus');
-    
-    if (micBtn) {
-        micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-        micBtn.style.transform = 'scale(1)';
-        micBtn.style.boxShadow = '';
-        micBtn.style.animation = '';
-        micBtn.disabled = false;
-    }
-    
-    if (statusEl && !statusEl.textContent.includes('❌')) {
-        statusEl.textContent = '';
-        statusEl.style.color = '#666';
-    }
-    
-    log.debug('🛑 Ses tanıma durduruldu ve temizlendi');
-};
-
-// Mikrofon iznini kontrol et (stream açmadan)
-async function checkMicrophonePermission() {
-    try {
-        // Permissions API desteği var mı? (Chrome/Edge için)
-        if (navigator.permissions && navigator.permissions.query) {
-            try {
-                // Chrome/Edge için 'microphone' kullan
-                const permission = await navigator.permissions.query({ name: 'microphone' });
-                log.debug('Mikrofon izin durumu (Permissions API):', permission.state);
-                return permission.state;
-            } catch (permError) {
-                // Permissions API'de 'microphone' desteklenmiyorsa veya hata varsa
-                log.debug('Permissions API mikrofon desteği yok veya hata:', permError);
-                // Stream açmadan 'prompt' döndür (kullanıcı izin vermemiş olabilir)
-                return 'prompt';
-            }
-        }
-        
-        // Permissions API yoksa, stream açmadan 'prompt' döndür
-        // getUserMedia ile test etmek yerine direkt 'prompt' döndür
-        // Çünkü stream açmak gereksiz yere izin isteyebilir
-        log.debug('Permissions API yok, varsayılan olarak prompt döndürülüyor');
-        return 'prompt';
-    } catch (error) {
-        log.error('Mikrofon izin kontrolü hatası:', error);
-        return 'unknown';
-    }
-}
-
-// Mobil cihaz tespiti
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
-}
-
-// Web Speech API desteğini kontrol et ve başlat
-function initSpeechRecognition() {
-    const isMobile = isMobileDevice();
-    
-    // HTTPS kontrolü (mobil cihazlarda daha esnek)
-    const isSecureContext = location.protocol === 'https:' || 
-                           location.hostname === 'localhost' || 
-                           location.hostname === '127.0.0.1' ||
-                           location.hostname === '0.0.0.0' ||
-                           window.isSecureContext;
-    
-    if (!isSecureContext) {
-        log.warn('Ses tanıma için HTTPS gerekli');
-        const micBtn = document.getElementById('dinleMicBtn');
-        const statusEl = document.getElementById('speechStatus');
-        if (micBtn) {
-            micBtn.style.display = 'none';
-        }
-        if (statusEl) {
-            if (isMobile) {
-                statusEl.textContent = '⚠️ Ses tanıma için güvenli bağlantı gerekli. Lütfen HTTPS üzerinden erişin veya uygulamayı ana ekrana ekleyin.';
-            } else {
-                statusEl.textContent = '⚠️ Ses tanıma için HTTPS gerekli';
-            }
-            statusEl.style.color = '#f39c12';
-        }
-        return false;
-    }
-    
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        log.warn('Ses tanıma API desteği yok');
-        const micBtn = document.getElementById('dinleMicBtn');
-        const statusEl = document.getElementById('speechStatus');
-        if (micBtn) {
-            micBtn.style.display = 'none';
-        }
-        if (statusEl) {
-            if (isMobile) {
-                statusEl.textContent = '⚠️ Bu tarayıcı ses tanımayı desteklemiyor. Chrome veya Safari kullanmayı deneyin.';
-            } else {
-                statusEl.textContent = '⚠️ Bu tarayıcı ses tanımayı desteklemiyor. Chrome veya Edge kullanmayı deneyin.';
-            }
-            statusEl.style.color = '#f39c12';
-        }
-        return false;
-    }
-    
-    // Yeni SpeechRecognition nesnesi oluştur
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    // Eski recognition nesnesini tamamen temizle
-    if (recognition) {
-        cleanupRecognition();
-    }
-    
-    // Yeni recognition nesnesi oluştur
-    recognition = new SpeechRecognition();
-    
-    // Dinle ve Bul modu Arapça telaffuz beklediğinden varsayılan dil Arapça (Suudi Arabistan)
-    const speechLang = localStorage.getItem('speechRecognitionLang') || 'ar-SA';
-    recognition.lang = speechLang;
-    recognition.continuous = false;  // Tek seferlik tanıma
-    recognition.interimResults = false;  // Ara sonuçları gösterme
-    recognition.maxAlternatives = 3;  // En fazla 3 alternatif sonuç
-    recognition.serviceURI = '';  // Varsayılan servisi kullan
-    
-    recognition.onstart = () => {
-        isListening = true;
-        const statusEl = document.getElementById('speechStatus');
-        const micBtn = document.getElementById('dinleMicBtn');
-        
-        if (statusEl) {
-            statusEl.textContent = '🎤 Dinleniyor...';
-            statusEl.style.color = '#667eea';
-            // HTML içeriğini temizle (eğer varsa)
-            statusEl.innerHTML = '🎤 Dinleniyor...';
-        }
-        
-        if (micBtn) {
-            // Duolingo tarzı: Mikrofon butonu animasyonu (pulse efekti)
-            micBtn.style.background = 'linear-gradient(135deg, #f44336 0%, #e91e63 100%)';
-            micBtn.style.transform = 'scale(1.15)';
-            micBtn.style.boxShadow = '0 0 20px rgba(244, 67, 54, 0.6)';
-            micBtn.style.animation = 'pulse 1.5s ease-in-out infinite';
-            micBtn.disabled = false; // Butonu aktif tut
-        }
-        
-        // Haptic feedback
-        if (typeof triggerHaptic === 'function') {
-            triggerHaptic('light');
-        }
-        
-        log.debug('✅ Ses tanıma başlatıldı - dinleniyor...');
-    };
-    
-    recognition.onresult = (event) => {
-        const results = event.results;
-        let recognizedText = '';
-        let bestConfidence = 0;
-        
-        // En iyi sonucu al (en yüksek güvenilirlik skoruna sahip sonucu)
-        for (let i = 0; i < results.length; i++) {
-            if (results[i].length > 0) {
-                const result = results[i][0];
-                const confidence = result.confidence || 0;
-                // En yüksek güvenilirliğe sahip sonucu seç
-                if (confidence > bestConfidence || recognizedText === '') {
-                    recognizedText = result.transcript.trim();
-                    bestConfidence = confidence;
-                    log.debug('📝 Ses tanıma sonucu:', recognizedText, 'Güvenilirlik:', confidence.toFixed(2));
-                }
-            }
-        }
-        
-        // Sonucu işle
-        if (recognizedText && currentDinleQuestion) {
-            // Duolingo tarzı: Hemen eşleştir
-            matchSpeechToAnswer(recognizedText);
-        } else if (!recognizedText) {
-            // Sonuç alınamadı
-            const statusEl = document.getElementById('speechStatus');
-            if (statusEl) {
-                statusEl.textContent = '⚠️ Konuşma algılanamadı. Lütfen tekrar deneyin.';
-                statusEl.style.color = '#f39c12';
-            }
-            log.debug('⚠️ Ses tanıma sonucu boş');
-        }
-        
-        // Recognition otomatik olarak durur (continuous: false), ama manuel durdurma da yap
-        isListening = false;
-    };
-    
-    recognition.onerror = (event) => {
-        isListening = false;
-        const statusEl = document.getElementById('speechStatus');
-        const micBtn = document.getElementById('dinleMicBtn');
-        
-        // Stream'i temizle (hata durumunda)
-        cleanupMicrophoneStream();
-        
-        let errorMsg = 'Ses tanıma hatası';
-        let helpText = '';
-        let showHelpModal = false;
-        
-        // Hata kodlarına göre mesajları belirle
-        switch (event.error) {
-            case 'no-speech':
-                errorMsg = 'Konuşma algılanamadı';
-                helpText = 'Daha yüksek sesle ve net konuşmayı deneyin. Mikrofonunuzun açık olduğundan emin olun.';
-                break;
-            case 'audio-capture':
-                errorMsg = 'Mikrofon bulunamadı veya erişilemedi';
-                helpText = 'Mikrofonun bağlı olduğundan emin olun. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.';
-                showHelpModal = true;
-                break;
-            case 'not-allowed':
-                errorMsg = 'Mikrofon izni reddedildi';
-                helpText = 'Tarayıcı ayarlarından mikrofon izni verin. Adres çubuğundaki 🔒 simgesine tıklayın ve mikrofon iznini "İzin ver" yapın.';
-                showHelpModal = true;
-                break;
-            case 'aborted':
-                // Kullanıcı manuel durdurmuş, mesaj gösterme
-                errorMsg = '';
-                helpText = '';
-                break;
-            case 'network':
-                errorMsg = 'Bağlantı hatası';
-                helpText = 'Ses tanıma servisine bağlanılamıyor. İnternet bağlantınızı kontrol edin veya birkaç saniye sonra tekrar deneyin.';
-                showHelpModal = true;
-                break;
-            default:
-                errorMsg = `Ses tanıma hatası (${event.error || 'Bilinmeyen'})`;
-                helpText = 'Lütfen sayfayı yenileyip tekrar deneyin.';
-                break;
-        }
-        
-        // UI'ı güncelle
-        if (statusEl && errorMsg) {
-            statusEl.innerHTML = '❌ ' + errorMsg + (helpText ? '<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">' + helpText + '</small>' : '');
-            statusEl.style.color = '#f44336';
-            
-            // Network, audio-capture, no-speech veya not-allowed hatası için tekrar dene butonu ekle
-            if (event.error === 'network' || event.error === 'audio-capture' || event.error === 'no-speech' || event.error === 'not-allowed') {
-                // Önceki butonları kaldır
-                const oldBtns = statusEl.querySelectorAll('button');
-                oldBtns.forEach(btn => btn.remove());
-                
-                const retryBtn = document.createElement('button');
-                retryBtn.textContent = '🔄 Tekrar Dene';
-                retryBtn.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-size: 0.85em; cursor: pointer; font-weight: 600; touch-action: manipulation;';
-                retryBtn.onclick = async () => {
-                    // not-allowed hatası için önce izin kontrolü yap
-                    if (event.error === 'not-allowed') {
-                        statusEl.innerHTML = '🔍 Mikrofon izni kontrol ediliyor...';
-                        statusEl.style.color = '#f39c12';
-                        
-                        // İzin kontrolü yap
-                        try {
-                            const permission = await checkMicrophonePermission();
-                            if (permission === 'denied') {
-                                statusEl.innerHTML = '❌ Mikrofon izni hala reddedildi<br><small style="font-size: 0.75em; margin-top: 4px; display: block;">Lütfen tarayıcı ayarlarından mikrofon iznini verin.</small>';
-                                statusEl.style.color = '#f44336';
-                                showMicrophonePermissionHelp();
-                                return;
-                            }
-                        } catch (permError) {
-                            log.debug('İzin kontrolü hatası:', permError);
-                        }
-                    }
-                    
-                    statusEl.innerHTML = '🔄 Tekrar deneniyor...';
-                    statusEl.style.color = '#f39c12';
-                    setTimeout(() => {
-                        if (window.startSpeechRecognition) {
-                            window.startSpeechRecognition();
-                        }
-                    }, 500);
-                };
-                statusEl.appendChild(retryBtn);
-            }
-        }
-        
-        // Butonu sıfırla
-        if (micBtn) {
-            micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            micBtn.style.transform = 'scale(1)';
-            micBtn.style.boxShadow = '';
-            micBtn.style.animation = '';
-            micBtn.disabled = false;
-        }
-        
-        // Sadece aborted hatası dışındaki hataları logla (aborted normal bir durum)
-        if (event.error !== 'aborted') {
-            log.error('❌ Ses tanıma hatası:', event.error, event);
-        } else {
-            log.debug('🛑 Ses tanıma kullanıcı tarafından durduruldu (aborted)');
-        }
-        
-        // Haptic feedback
-        if (typeof triggerHaptic === 'function' && event.error !== 'aborted') {
-            triggerHaptic('error');
-        }
-        
-        // Yardım modallarını göster (gerekirse)
-        if (showHelpModal) {
-            setTimeout(() => {
-                if (event.error === 'not-allowed') {
-                    showMicrophonePermissionHelp();
-                } else if (event.error === 'audio-capture') {
-                    showBluetoothMicrophoneHelp();
-                } else if (event.error === 'network') {
-                    showNetworkErrorHelp();
-                }
-            }, 1500);
-        }
-    };
-    
-    recognition.onend = () => {
-        isListening = false;
-        const micBtn = document.getElementById('dinleMicBtn');
-        const statusEl = document.getElementById('speechStatus');
-        
-        // UI'ı sıfırla
-        if (micBtn) {
-            micBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            micBtn.style.transform = 'scale(1)';
-            micBtn.style.boxShadow = '';
-            micBtn.style.animation = '';
-        }
-        
-        // Status mesajını sadece hata durumunda değiştir, normal bitişte temizle
-        if (statusEl) {
-            const currentText = statusEl.textContent || '';
-            if (!currentText.includes('❌') && !currentText.includes('⚠️') && !currentText.includes('Eşleşmedi')) {
-                // Başarılı veya normal bitişte temizle
-                if (!currentText.includes('✅')) {
-                    statusEl.textContent = '';
-                }
-            }
-        }
-        
-        // Stream'i temizle (Bluetooth mikrofon için) - sadece masaüstünde
-        // Mobilde stream kullanılmıyor, bu yüzden temizleme gerekmez
-        const isMobile = isMobileDevice();
-        if (!isMobile) {
-            cleanupMicrophoneStream();
-        }
-        
-        log.debug('🛑 Ses tanıma durduruldu (onend)');
-    };
-    
-    // Recognition başarıyla başlatıldı işaretini set et
-    recognitionInitialized = true;
-    
-    // Başarılı başlatma - status mesajını temizle (kullanıcı butona basana kadar mesaj gösterme)
-    const statusEl = document.getElementById('speechStatus');
-    if (statusEl) {
-        statusEl.textContent = '';
-        statusEl.style.color = '#666';
-    }
-    
-    log.debug('✅ Ses tanıma sistemi hazır ve yapılandırıldı');
-    return true;
-}
-
-// Bluetooth mikrofon yardımı göster
-function showBluetoothMicrophoneHelp() {
-    const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
-<strong style="color: #667eea; font-size: 1.1em;">🎧 Bluetooth Mikrofon Sorunu</strong><br><br>
-
-<strong style="color: #333;">1️⃣ Sistem Ayarları:</strong><br>
-• <strong>Windows:</strong> Ayarlar > Sistem > Ses > Giriş > Bluetooth kulaklığınızı seçin<br>
-• <strong>Mac:</strong> Sistem Tercihleri > Ses > Giriş > Bluetooth kulaklığınızı seçin<br>
-• <strong>Android:</strong> Ayarlar > Bağlantılar > Bluetooth > Kulaklık ayarları > Mikrofon izni<br>
-• <strong>iOS:</strong> Ayarlar > Bluetooth > Kulaklık > Mikrofon izni<br><br>
-
-<strong style="color: #333;">2️⃣ Tarayıcı Ayarları:</strong><br>
-• Chrome/Edge: Adres çubuğundaki 🔒 simgesine tıklayın<br>
-• "Mikrofon" iznini <strong>"İzin ver"</strong> yapın<br>
-• Sayfayı yenileyin (F5)<br><br>
-
-<strong style="color: #333;">3️⃣ Bluetooth Bağlantısı:</strong><br>
-• Bluetooth kulaklığın tam olarak bağlı olduğundan emin olun<br>
-• Kulaklığı çıkarıp tekrar takmayı deneyin<br>
-• Bluetooth'u kapatıp açmayı deneyin<br><br>
-
-<strong style="color: #333;">4️⃣ Alternatif Çözüm:</strong><br>
-• Bilgisayarın dahili mikrofonunu kullanmayı deneyin<br>
-• Farklı bir Bluetooth kulaklık deneyin<br>
-• Manuel olarak cevap seçeneklerinden birini seçebilirsiniz<br><br>
-
-<small style="color: #666;">💡 <strong>Not:</strong> Bazı Bluetooth kulaklıklar sadece ses çıkışı için tasarlanmıştır ve mikrofon özelliği olmayabilir.</small>
-</div>`;
-    showCustomAlert(helpMsg, 'warning', '🎧 Bluetooth Mikrofon');
-}
-
-// Network hatası yardımı göster
-function showNetworkErrorHelp() {
-    const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
-<strong style="color: #667eea; font-size: 1.1em;">🌐 Bağlantı Hatası Çözümleri</strong><br><br>
-
-<strong style="color: #333;">1️⃣ İnternet Bağlantısını Kontrol Edin:</strong><br>
-• WiFi veya mobil veri bağlantınızın aktif olduğundan emin olun<br>
-• Başka bir web sitesine bağlanmayı deneyin<br>
-• Modemi yeniden başlatmayı deneyin<br><br>
-
-<strong style="color: #333;">2️⃣ Tarayıcı Ayarları:</strong><br>
-• Sayfayı yenileyin (F5 veya Cmd+R)<br>
-• Tarayıcı önbelleğini temizleyin<br>
-• Farklı bir tarayıcı deneyin (Chrome, Edge, Firefox)<br><br>
-
-<strong style="color: #333;">3️⃣ Güvenlik Duvarı / VPN:</strong><br>
-• VPN kullanıyorsanız kapatmayı deneyin<br>
-• Güvenlik duvarının ses tanıma servisini engellemediğinden emin olun<br><br>
-
-<strong style="color: #333;">4️⃣ Alternatif Çözüm:</strong><br>
-• Birkaç saniye bekleyip tekrar deneyin<br>
-• Ses tanıma servisi geçici olarak kullanılamıyor olabilir<br>
-• Manuel olarak cevap seçeneklerinden birini seçebilirsiniz<br><br>
-
-<small style="color: #666;">💡 <strong>Not:</strong> Web Speech API, Google'ın ses tanıma servisini kullanır ve aktif internet bağlantısı gerektirir.</small>
-</div>`;
-    showCustomAlert(helpMsg, 'warning', '🌐 Bağlantı Sorunu');
-}
-
-// Mikrofon izin yardımı göster
-function showMicrophonePermissionHelp() {
-    const helpMsg = `<div style="text-align: left; line-height: 1.6; font-size: 0.9em; padding: 10px 0;">
-<strong style="color: #667eea; font-size: 1.1em;">🎤 Mikrofon İzni Nasıl Verilir?</strong><br><br>
-
-<strong style="color: #333;">🌐 Chrome/Edge:</strong><br>
-1️⃣ Adres çubuğundaki <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🔒</span> veya <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🎤</span> simgesine tıklayın<br>
-2️⃣ "Mikrofon" seçeneğini <strong>"İzin ver"</strong> yapın<br>
-3️⃣ Sayfayı yenileyin (F5)<br><br>
-
-<strong style="color: #333;">🍎 Safari:</strong><br>
-1️⃣ <strong>Safari</strong> > <strong>Ayarlar</strong> > <strong>Web Siteleri</strong> > <strong>Mikrofon</strong><br>
-2️⃣ Bu site için <strong>"İzin ver"</strong> seçin<br>
-3️⃣ Sayfayı yenileyin (Cmd+R)<br><br>
-
-<strong style="color: #333;">🦊 Firefox:</strong><br>
-1️⃣ Adres çubuğundaki <span style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">🔒</span> simgesine tıklayın<br>
-2️⃣ "İzinler" bölümünde <strong>"Mikrofon"</strong>u <strong>"İzin ver"</strong> yapın<br>
-3️⃣ Sayfayı yenileyin (F5)<br><br>
-
-<small style="color: #666;">💡 <strong>Not:</strong> İzin verdikten sonra sayfayı yenilemeyi unutmayın!</small>
-</div>`;
-    showCustomAlert(helpMsg, 'info', '🎤 Mikrofon İzni Gerekli');
-}
-
-// Ses tanımayı başlat (global erişim için)
-window.startSpeechRecognition = async function() {
-    // Eğer zaten durduruluyorsa bekle
-    if (isStopping) {
-        log.debug('⏳ Recognition durduruluyor, bekleniyor...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    
-    // Önce mevcut ses tanımayı durdur (eğer aktifse)
-    if (isListening || recognition) {
-        await window.stopSpeechRecognition();
-        // Durdurma işleminin tamamlanması için yeterli bekleme
-        await new Promise(resolve => setTimeout(resolve, 400));
-    }
-    
-    // Validation checks
-    if (!currentDinleQuestion) {
-        const statusEl = document.getElementById('speechStatus');
-        if (statusEl) {
-            statusEl.textContent = '⚠️ Önce bir soru yüklenmeli!';
-            statusEl.style.color = '#f39c12';
-        }
-        showCustomAlert('Önce bir soru yüklenmeli!', 'warning');
-        return;
-    }
-    
-    // Seçeneklerin yüklenip yüklenmediğini kontrol et
-    const allBtns = elements.dinleOptions?.querySelectorAll('.duolingo-option, .option');
-    if (!allBtns || allBtns.length === 0) {
-        const statusEl = document.getElementById('speechStatus');
-        if (statusEl) {
-            statusEl.textContent = '⚠️ Seçenekler henüz yüklenmedi. Lütfen bekleyin...';
-            statusEl.style.color = '#f39c12';
-        }
-        showCustomAlert('Seçenekler henüz yüklenmedi. Lütfen bekleyin...', 'warning');
-        return;
-    }
-    
-    // Recognition nesnesini kontrol et ve başlat
-    if (!recognition || !recognitionInitialized) {
-        if (!initSpeechRecognition()) {
-            const statusEl = document.getElementById('speechStatus');
-            if (statusEl) {
-                statusEl.textContent = '❌ Ses tanıma başlatılamadı';
-                statusEl.style.color = '#f44336';
-            }
-            showCustomAlert('Ses tanıma özelliği bu tarayıcıda desteklenmiyor.', 'error');
-            return;
-        }
-    }
-    
-    // İzin kontrolü ve mikrofon hazırlama
-    const statusEl = document.getElementById('speechStatus');
-    const isMobile = isMobileDevice();
-    
-    if (statusEl) {
-        statusEl.textContent = '🔍 Mikrofon hazırlanıyor...';
-        statusEl.style.color = '#f39c12';
-    }
-    
-    // İzin kontrolü (mobilde daha az önemli, direkt deneme yapabiliriz)
-    if (!isMobile) {
-        try {
-            const permission = await checkMicrophonePermission();
-            if (permission === 'denied') {
-                if (statusEl) {
-                    statusEl.textContent = '❌ Mikrofon izni reddedildi';
-                    statusEl.style.color = '#f44336';
-                }
-                showMicrophonePermissionHelp();
-                return;
-            } else if (permission === 'not-found') {
-                if (statusEl) {
-                    statusEl.textContent = '❌ Mikrofon bulunamadı';
-                    statusEl.style.color = '#f44336';
-                }
-                showBluetoothMicrophoneHelp();
-                return;
-            }
-        } catch (permError) {
-            log.warn('İzin kontrolü hatası, devam ediliyor:', permError);
-        }
-    }
-    
-    // Masaüstünde getUserMedia ile mikrofonu aktif hale getir (Bluetooth desteği için)
-    if (!isMobile && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-            if (statusEl) {
-                statusEl.textContent = '🎤 Mikrofon bağlanıyor...';
-                statusEl.style.color = '#f39c12';
-            }
-            
-            // Önceki stream varsa kapat
-            cleanupMicrophoneStream();
-            
-            // Mikrofonu aktif hale getir (Bluetooth dahil tüm mikrofonlar için)
-            microphoneStream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    sampleRate: 44100
-                } 
-            });
-            
-            const audioTracks = microphoneStream.getAudioTracks();
-            if (audioTracks.length > 0) {
-                const trackInfo = audioTracks.map(t => ({
-                    label: t.label || 'Bilinmeyen',
-                    enabled: t.enabled,
-                    readyState: t.readyState
-                }));
-                
-                log.debug('✅ Mikrofon stream aktif:', trackInfo);
-                
-                // Kullanıcıya hangi mikrofonun kullanıldığını göster
-                const micLabel = audioTracks[0]?.label || 'Bilinmeyen mikrofon';
-                const isBluetooth = micLabel.toLowerCase().includes('bluetooth') || 
-                                   micLabel.toLowerCase().includes('bt') ||
-                                   micLabel.toLowerCase().includes('wireless');
-                
-                if (statusEl) {
-                    const micDisplayName = micLabel.length > 30 ? micLabel.substring(0, 30) + '...' : micLabel;
-                    if (isBluetooth) {
-                        statusEl.innerHTML = `✅ Bluetooth mikrofon hazır<br><small style="font-size: 0.75em; color: #666;">${micDisplayName}</small>`;
-                    } else {
-                        statusEl.innerHTML = `✅ Mikrofon hazır<br><small style="font-size: 0.75em; color: #666;">${micDisplayName}</small>`;
-                    }
-                    statusEl.style.color = '#4caf50';
-                }
-                
-                // Mikrofonun tam olarak hazır olması için yeterli gecikme
-                // Bluetooth mikrofonlar için daha uzun süre gerekebilir
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        } catch (mediaError) {
-            log.error('❌ Mikrofon erişim hatası:', mediaError);
-            if (statusEl) {
-                statusEl.textContent = '❌ Mikrofon erişilemedi';
-                statusEl.style.color = '#f44336';
-            }
-            
-            if (mediaError.name === 'NotAllowedError' || mediaError.name === 'PermissionDeniedError') {
-                showMicrophonePermissionHelp();
-            } else if (mediaError.name === 'NotFoundError' || mediaError.name === 'DevicesNotFoundError') {
-                showBluetoothMicrophoneHelp();
-            } else {
-                showCustomAlert(`Mikrofon erişilemedi: ${mediaError.message || mediaError.name}. Bluetooth kulaklık kullanıyorsanız, sistem ayarlarından mikrofonu seçtiğinizden emin olun.`, 'error');
-            }
-            return;
-        }
-    }
-    
-    // Speech Recognition'ı başlat
-    try {
-        if (statusEl) {
-            statusEl.textContent = '🎤 Dinleniyor...';
-            statusEl.style.color = '#667eea';
-        }
-        
-        // Recognition zaten başlatılmışsa önce durdur
-        if (isListening) {
-            await stopRecognitionSafely();
-        }
-        
-        // Yeni başlat (eğer hala durmuşsa)
-        if (!isListening && !isStopping) {
-            try {
-                recognition.start();
-                log.debug('✅ Speech Recognition başlatıldı');
-            } catch (startError) {
-                // Eğer "already started" hatası alırsak, zaten başlamış demektir
-                if (startError.message && startError.message.includes('already started')) {
-                    log.debug('⚠️ Recognition zaten başlatılmış');
-                    isListening = true;
-                } else {
-                    throw startError; // Diğer hataları yukarı fırlat
-                }
-            }
-        } else {
-            log.debug('⚠️ Recognition başlatılamadı: isListening=' + isListening + ', isStopping=' + isStopping);
-        }
-    } catch (error) {
-        log.error('❌ Ses tanıma başlatma hatası:', error);
-        
-        // Stream'i temizle
-        cleanupMicrophoneStream();
-        
-        // Hata mesajlarını göster
-        if (error.name === 'NotAllowedError' || error.message?.includes('not allowed')) {
-            if (statusEl) {
-                statusEl.textContent = '❌ Mikrofon izni verilmedi';
-                statusEl.style.color = '#f44336';
-            }
-            showMicrophonePermissionHelp();
-        } else if (error.name === 'NotFoundError' || error.message?.includes('not found')) {
-            if (statusEl) {
-                statusEl.textContent = '❌ Mikrofon bulunamadı';
-                statusEl.style.color = '#f44336';
-            }
-            showBluetoothMicrophoneHelp();
-        } else if (error.name === 'NetworkError' || error.message?.includes('network')) {
-            if (statusEl) {
-                statusEl.textContent = '❌ Bağlantı hatası';
-                statusEl.style.color = '#f44336';
-            }
-            showNetworkErrorHelp();
-        } else {
-            if (statusEl) {
-                statusEl.textContent = `❌ Hata: ${error.message || error.name || 'Bilinmeyen hata'}`;
-                statusEl.style.color = '#f44336';
-            }
-            showCustomAlert(`Ses tanıma başlatılamadı: ${error.message || error.name || 'Bilinmeyen hata'}. Lütfen tekrar deneyin.`, 'error');
-        }
-    }
-};
-
-// Duolingo tarzı benzerlik hesaplama (basit Levenshtein)
-function calculateSimilarity(str1, str2) {
-    if (str1 === str2) return 100;
-    if (str1.length === 0 || str2.length === 0) return 0;
-    
-    const longer = str1.length > str2.length ? str1 : str2;
-    const shorter = str1.length > str2.length ? str2 : str1;
-    
-    // Basit karakter eşleşme skoru
-    let matches = 0;
-    for (let i = 0; i < shorter.length; i++) {
-        if (longer.includes(shorter[i])) {
-            matches++;
-        }
-    }
-    
-    return (matches / longer.length) * 100;
-}
-
-// Arapça metin normalizasyonu (boşlukları, özel karakterleri temizle)
-function normalizeArabicText(text) {
-    if (!text) return '';
-    // Unicode normalizasyonu (Arapça karakterler için)
-    let normalized = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    // Tüm boşlukları temizle (normal boşluk, non-breaking space, vb.)
-    normalized = normalized.replace(/\s+/g, '').trim();
-    // Arapça için toLowerCase gerekmez, ama yine de yapalım (güvenlik için)
-    // Arapça karakterler zaten küçük/büyük harf ayrımı yapmaz
-    return normalized;
-}
-
-// Konuşulan metni cevaplarla eşleştir
-function matchSpeechToAnswer(spokenText) {
-    const statusEl = document.getElementById('speechStatus');
-    // Seçenekler .duolingo-option class'ı ile oluşturuluyor
-    const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
-    
-    if (!allBtns || allBtns.length === 0) {
-        if (statusEl) {
-            statusEl.textContent = '❌ Seçenekler bulunamadı. Lütfen önce bir soru yükleyin.';
-            statusEl.style.color = '#f44336';
-        }
-        log.error('❌ Seçenekler bulunamadı! elements.dinleOptions:', elements.dinleOptions);
-        log.error('❌ DinleOptions içeriği:', elements.dinleOptions?.innerHTML);
-        return;
-    }
-    
-    // Deneme sayacını artır
-    speechAttemptCount++;
-    const maxAttempts = 2;
-    
-    // DEBUG: Orijinal konuşulan metni logla
-    log.debug('🎤 Orijinal konuşulan metin:', spokenText);
-    log.debug('🎤 Konuşulan metin uzunluğu:', spokenText.length);
-    log.debug('🎤 Konuşulan metin karakterleri:', Array.from(spokenText).map(c => c.charCodeAt(0)));
-    
-    // Konuşulan metni normalize et (Arapça için özel normalizasyon)
-    const normalizedSpoken = normalizeArabicText(spokenText);
-    log.debug('🔍 Normalize edilmiş konuşulan metin:', normalizedSpoken);
-    
-    if (statusEl) {
-        statusEl.textContent = '🔍 "' + spokenText + '" aranıyor...';
-        statusEl.style.color = '#f39c12';
-    }
-    
-    // Doğru cevabı bul (sadece kontrol için, göstermeyeceğiz)
-    const correctWord = currentDinleQuestion.kelime;
-    const correctWordNormalized = normalizeArabicText(correctWord);
-    log.debug('✅ Doğru cevap (orijinal):', correctWord);
-    log.debug('✅ Doğru cevap (normalize):', correctWordNormalized);
-    
-    // Duolingo tarzı akıllı eşleştirme algoritması
-    let matchedButton = null;
-    let bestMatch = null;
-    let bestScore = 0;
-    
-    // DEBUG: Tüm buton metinlerini logla
-    log.debug('📋 Toplam buton sayısı:', allBtns.length);
-    
-    allBtns.forEach((btn, index) => {
-        // Buton metnini al (HTML içeriğinden temizle)
-        let btnText = btn.textContent.trim();
-        // Eğer HTML içeriği varsa (Arapça için), sadece metni al
-        if (btn.innerHTML && btn.innerHTML.includes('<span')) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = btn.innerHTML;
-            btnText = tempDiv.textContent.trim();
-        }
-        
-        // DEBUG: Her buton için log
-        log.debug(`📋 Buton ${index + 1} (orijinal):`, btnText);
-        log.debug(`📋 Buton ${index + 1} uzunluğu:`, btnText.length);
-        
-        // Arapça için özel normalizasyon
-        const btnTextNormalized = normalizeArabicText(btnText);
-        log.debug(`📋 Buton ${index + 1} (normalize):`, btnTextNormalized);
-        
-        // DEBUG: Eşleştirme denemeleri
-        const exactMatch = btnTextNormalized === normalizedSpoken;
-        log.debug(`📋 Buton ${index + 1} tam eşleşme:`, exactMatch);
-        
-        // 1. Tam eşleşme (en yüksek öncelik)
-        if (exactMatch) {
-            log.debug(`✅ TAM EŞLEŞME BULUNDU! Buton ${index + 1}: "${btnText}"`);
-            bestScore = 100;
-            bestMatch = btn;
-            return; // En iyi eşleşme bulundu, devam etme
-        }
-        
-        // 2. Baş harf eşleşmesi (Arapça için çok önemli - ilk 1-2 karakter)
-        if (normalizedSpoken.length >= 1 && btnTextNormalized.length >= 1) {
-            // İlk karakter eşleşiyorsa
-            const firstCharMatch = normalizedSpoken[0] === btnTextNormalized[0];
-            // İlk 2 karakter eşleşiyorsa (eğer varsa)
-            const firstTwoCharsMatch = normalizedSpoken.length >= 2 && btnTextNormalized.length >= 2 &&
-                                     normalizedSpoken.substring(0, 2) === btnTextNormalized.substring(0, 2);
-            
-            if (firstTwoCharsMatch) {
-                // İlk 2 karakter eşleşiyorsa yüksek skor ver
-                const similarity = 85; // İlk 2 karakter eşleşmesi için %85 skor
-                log.debug(`✅ İLK 2 KARAKTER EŞLEŞTİ! Buton ${index + 1}: "${btnText}" (${similarity}%)`);
-                if (similarity > bestScore) {
-                    bestScore = similarity;
-                    bestMatch = btn;
-                }
-            } else if (firstCharMatch) {
-                // Sadece ilk karakter eşleşiyorsa orta skor ver
-                const similarity = 60; // İlk karakter eşleşmesi için %60 skor
-                log.debug(`✅ İLK KARAKTER EŞLEŞTİ! Buton ${index + 1}: "${btnText}" (${similarity}%)`);
-                if (similarity > bestScore) {
-                    bestScore = similarity;
-                    bestMatch = btn;
-                }
-            }
-        }
-        
-        // 3. Kısmi eşleşme (içeriyor mu?)
-        const containsMatch = normalizedSpoken.includes(btnTextNormalized) || btnTextNormalized.includes(normalizedSpoken);
-        if (containsMatch) {
-            // Benzerlik skoru hesapla (Duolingo tarzı)
-            const longer = Math.max(btnTextNormalized.length, normalizedSpoken.length);
-            const shorter = Math.min(btnTextNormalized.length, normalizedSpoken.length);
-            // Division by zero check (if both strings are empty)
-            const similarity = longer > 0 ? (shorter / longer) * 100 : 0;
-            log.debug(`📋 Buton ${index + 1} kısmi eşleşme skoru:`, similarity.toFixed(2) + '%');
-            
-            if (similarity > bestScore) {
-                bestScore = similarity;
-                bestMatch = btn;
-            }
-        }
-        
-        // 4. Levenshtein benzeri basit karşılaştırma (Arapça karakterler için)
-        const charSimilarity = calculateSimilarity(btnTextNormalized, normalizedSpoken);
-        log.debug(`📋 Buton ${index + 1} karakter benzerliği:`, charSimilarity.toFixed(2) + '%');
-        // Eşik değerini %40'a düşürdük (baş harf kontrolü zaten var)
-        if (charSimilarity > bestScore && charSimilarity > 40) { // %40'den fazla benzerlik
-            log.debug(`✅ YÜKSEK BENZERLİK BULUNDU! Buton ${index + 1}: "${btnText}" (${charSimilarity.toFixed(2)}%)`);
-            bestScore = charSimilarity;
-            bestMatch = btn;
-        }
-    });
-    
-    log.debug('🏆 En iyi eşleşme skoru:', bestScore.toFixed(2) + '%');
-    log.debug('🏆 En iyi eşleşme butonu:', bestMatch ? bestMatch.textContent.trim() : 'YOK');
-    
-    matchedButton = bestMatch;
-    
-    // DEBUG: Eşleşme sonucu
-    if (matchedButton) {
-        log.debug('✅ EŞLEŞME BULUNDU! Buton:', matchedButton.textContent.trim());
-        log.debug('✅ Eşleşme skoru:', bestScore.toFixed(2) + '%');
-    } else {
-        log.warn('❌ HİÇBİR EŞLEŞME BULUNAMADI!');
-        log.warn('❌ Konuşulan metin:', normalizedSpoken);
-        log.warn('❌ Tüm buton metinleri:', Array.from(allBtns).map(btn => {
-            let text = btn.textContent.trim();
-            if (btn.innerHTML && btn.innerHTML.includes('<span')) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = btn.innerHTML;
-                text = tempDiv.textContent.trim();
-            }
-            return normalizeArabicText(text);
-        }));
-    }
-    
-    if (matchedButton) {
-        // Duolingo tarzı: Butonu vurgula (görsel geri bildirim)
-        matchedButton.style.transform = 'scale(1.05)';
-        matchedButton.style.boxShadow = '0 4px 12px rgba(76, 175, 80, 0.4)';
-        
-        // Butonun metnini al (doğru cevap kontrolü için)
-        let matchedBtnText = matchedButton.textContent.trim();
-        if (matchedButton.innerHTML && matchedButton.innerHTML.includes('<span')) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = matchedButton.innerHTML;
-            matchedBtnText = tempDiv.textContent.trim();
-        }
-        
-        // Doğru cevap mı kontrol et
-        const isCorrect = matchedBtnText.trim() === correctWord.trim();
-        
-        // Eşleşme bulundu - deneme sayacını sıfırla (başarılı deneme)
-        speechAttemptCount = 0;
-        
-        if (statusEl) {
-            statusEl.textContent = '✅ "' + spokenText + '" eşleşti!';
-            statusEl.style.color = '#4caf50';
-        }
-        
-        // Ses tanımayı durdur (eşleşme bulunduğunda)
-        if (isListening && recognition) {
-            try {
-                isListening = false;
-                recognition.stop();
-            } catch (e) {
-                log.debug('Recognition durdurulurken hata (match):', e);
-            }
-        }
-        
-        // Duolingo gibi: Doğrudan checkDinleAnswer fonksiyonunu çağır (click() yerine)
-        // Kısa bir gecikme ile (görsel geri bildirim için)
-        setTimeout(() => {
-            if (matchedButton && !matchedButton.classList.contains('disabled')) {
-                checkDinleAnswer(matchedButton, isCorrect);
-            }
-        }, 200);
-        
-        // Animasyonu geri al
-        setTimeout(() => {
-            if (matchedButton) {
-                matchedButton.style.transform = '';
-                matchedButton.style.boxShadow = '';
-            }
-        }, 500);
-    } else {
-        // Eşleşme bulunamadı
-        triggerHaptic('error');
-        
-        // 2 deneme hakkı kontrolü
-        if (speechAttemptCount < maxAttempts) {
-            // Daha deneme hakkı var - kullanıcıya seçenek sun
-            if (statusEl) {
-                statusEl.innerHTML = `
-                    <div style="margin-bottom: 8px; color: #f39c12;">❌ Eşleşmedi (${speechAttemptCount}/${maxAttempts})</div>
-                    <button onclick="if(window.startSpeechRecognition) window.startSpeechRecognition();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85em; font-weight: 600; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; min-width: 100px; min-height: 36px; margin-right: 8px;">
-                        🔄 Tekrar Dene
-                    </button>
-                    <small style="display: block; margin-top: 8px; color: #666; font-size: 0.8em;">veya manuel olarak seçin</small>
-                `;
-                statusEl.style.color = '#f39c12';
-            }
-        } else {
-            // 2 deneme de başarısız - kullanıcıya bilgi ver, manuel seçim yapabilsin
-            if (statusEl) {
-                statusEl.textContent = '❌ 2 deneme hakkı bitti. Lütfen manuel olarak seçin.';
-                statusEl.style.color = '#f44336';
-            }
-            
-            // Ses tanımayı durdur (eğer aktifse)
-            if (isListening && recognition) {
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    log.debug('Ses tanıma durdurulamadı');
-                }
-            }
-            
-            log.debug('🛑 2 deneme hakkı bitti, kullanıcı manuel seçim yapabilir');
-        }
-    }
-}
-
-function loadDinleQuestion() {
-    // Önceki ses varsa durdur
-    stopCurrentAudio();
-    
-    // Ses tanıma deneme sayacını sıfırla (her yeni soru için)
-    speechAttemptCount = 0;
-    
-    // Ses tanıma status mesajını temizle (önceki sorudan kalan mesajları kaldır)
-    const statusEl = document.getElementById('speechStatus');
-    if (statusEl) {
-        statusEl.textContent = '';
-        statusEl.style.color = '#666';
-    }
-    
-    // Ses tanımayı durdur ve temizle (eğer aktifse)
-    window.stopSpeechRecognition();
-    
-    log.debug(`🎪 === SORU YÜKLENİYOR ===`);
-    log.debug(`📊 Mevcut soru sayısı: ${dinleQuestionCount}/${DINLE_MAX_QUESTIONS}`);
-    log.debug(`📊 Oyun durumu: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}`);
-    
-    // 10 soru kontrolü
-    if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-        log.game(`🏁 === OYUN BİTİŞİ TETİKLENDİ ===`);
-        log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-        log.game(`📊 Final oyun skorları: dinleScore=${dinleScore}, dinleCorrect=${dinleCorrect}, dinleWrong=${dinleWrong}`);
-        log.game(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-        
-        // NOT: dinleBul zaten her doğru cevapta updateTaskProgress('dinleBul', 1) ile artırılıyor (satır 10025)
-        // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-        // updateTaskProgress('dinleBul', sessionCorrect);
-        
-        log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
-        // Session puanlarını global'e aktar
-        addToGlobalPoints(sessionScore, sessionCorrect);
-        
-        log.debug(`🔄 Ana menüye dönülüyor...`);
-        // Direkt ana menüye dön
-        elements.dinleMode.style.display = 'none';
-        elements.mainMenu.style.display = 'block';
-        
-        // Navigasyon bar'ı göster (ana ekrana dönünce)
-        showBottomNavBar();
-        
-        log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
-        // Sıfırla
-        dinleScore = 0;
-        dinleCorrect = 0;
-        dinleWrong = 0;
-        dinleQuestionCount = 0;
-        updateDinleUI();
-        log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
-        return;
-    }
-
-    log.debug(`🔍 Zorluk filtreleme başlıyor...`);
-    log.debug(`🎯 Seçili zorluk: ${currentDifficulty}`);
-    // Zorluk filtreleme (Kelime Çevir ile aynı)
-    const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-    log.debug(`📋 Zorluk aralığı: ${diffLevel.minDiff}-${diffLevel.maxDiff}`);
-    log.debug(`📦 Toplam kelime sayısı: ${kelimeBulData.length}`);
-    
-    let filteredData = kelimeBulData.filter(w => 
-        w.difficulty >= diffLevel.minDiff && w.difficulty <= diffLevel.maxDiff
-    );
-    log.debug(`✅ Filtrelenmiş kelime sayısı: ${filteredData.length}`);
-
-    if (filteredData.length === 0) {
-        log.debug(`⚠️ Filtrelenmiş veri boş! Tüm kelimeler kullanılacak.`);
-        filteredData = kelimeBulData;
-    }
-
-    log.debug(`🧠 Akıllı kelime seçimi (Dinle Modu) başlıyor...`);
-    currentDinleQuestion = selectIntelligentWord(filteredData);
-    
-    // 🔍 SEÇİLEN KELİME DETAYLARI (DİNLE MODU)
-    log.debug("===== DINLE MODU KELİME =====");
-    log.debug(`� Kelime: ${currentDinleQuestion.kelime}`);
-    log.debug("Anlam:", currentDinleQuestion.anlam);
-    log.debug("Zorluk:", currentDinleQuestion.difficulty);
-    log.debug("ID:", currentDinleQuestion.id);
-    log.debug("Zorluk aralığı:", diffLevel.minDiff + "-" + diffLevel.maxDiff);
-    const isInRange = currentDinleQuestion.difficulty >= diffLevel.minDiff && currentDinleQuestion.difficulty <= diffLevel.maxDiff;
-    log.debug("Aralıkta mı:", isInRange ? "EVET" : "HAYIR");
-    log.debug("Puan:", currentDinleQuestion.difficulty * 2);
-    log.debug("==========================");
-
-    log.debug(`🎨 UI güncelleniyor...`);
-    // UI güncelle
-    elements.dinleSureInfo.textContent = `ID: ${currentDinleQuestion.id} | Zorluk: ${currentDinleQuestion.difficulty} | Aralık: ${diffLevel.minDiff}-${diffLevel.maxDiff}`;
-    log.debug(`✅ Kelime ID: ${currentDinleQuestion.id}`);
-
-    log.debug(`🔀 Seçenekler oluşturuluyor... (4 Arapça kelime)`);
-    // Seçenekler oluştur (4 Arapça kelime) - aynı zorluktan
-    // Array length check - prevent error if array is empty
-    if (!filteredData || filteredData.length === 0) {
-        log.error('❌ Filtrelenmiş veri bulunamadı!');
-        showCustomAlert('Kelime verileri yüklenemedi! Lütfen sayfayı yenileyin.', 'error');
-        return;
-    }
-    const wrongAnswers = [];
-    let attempts = 0;
-    while (wrongAnswers.length < 3 && attempts < 50) {
-        attempts++;
-        const random = filteredData[Math.floor(Math.random() * filteredData.length)];
-        if (random.kelime !== currentDinleQuestion.kelime && 
-            !wrongAnswers.find(w => w.kelime === random.kelime)) {
-            wrongAnswers.push(random);
-            log.debug(`✅ Yanlış cevap #${wrongAnswers.length}: "${random.kelime}" (zorluk: ${random.difficulty})`);
-        }
-    }
-    log.debug(`📊 Yanlış cevap oluşturma: ${attempts} deneme, ${wrongAnswers.length}/3 başarılı`);
-
-    const allOptions = [
-        { text: currentDinleQuestion.kelime, correct: true },
-        ...wrongAnswers.map(w => ({ text: w.kelime, correct: false }))
-    ];
-    log.debug(`🎯 Doğru cevap: "${currentDinleQuestion.kelime}" (index: 0)`);
-    log.debug(`❌ Yanlış cevaplar: ${wrongAnswers.map(w => `"${w.kelime}"`).join(', ')}`);
-
-    // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
-    smartShuffle(allOptions);
-
-    // Seçenekleri göster - Duolingo Tarzı
-    elements.dinleOptions.innerHTML = '';
-    allOptions.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'duolingo-option';
-        // Arapça ise özel sınıf ekle ve düzgün formatlama
-        if (isArabic(opt.text)) {
-            btn.classList.add('arabic-option');
-            btn.innerHTML = `<span style="direction: rtl;">${opt.text}</span>`;
-        } else {
-            btn.textContent = opt.text;
-        }
-        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
-        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
-        
-        // Touch event tracking (scroll/tap ayrımı için)
-        let touchStart = { x: 0, y: 0, time: 0 };
-        let isScrolling = false;
-        
-        // Masaüstü için onclick handler
-        btn.onclick = () => {
-            if (!btn.classList.contains('disabled')) {
-                checkDinleAnswer(btn, opt.correct);
-            }
-        };
-        
-        // Mobil için touch event'leri
-        btn.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            touchStart = {
-                x: touch.clientX,
-                y: touch.clientY,
-                time: Date.now()
-            };
-            isScrolling = false;
-        }, { passive: true });
-        
-        btn.addEventListener('touchmove', (e) => {
-            if (touchStart.x !== 0 || touchStart.y !== 0) {
-                const touch = e.touches[0];
-                const deltaX = Math.abs(touch.clientX - touchStart.x);
-                const deltaY = Math.abs(touch.clientY - touchStart.y);
-                // 10px'den fazla hareket varsa scroll'dur
-                if (deltaX > 10 || deltaY > 10) {
-                    isScrolling = true;
-                }
-            }
-        }, { passive: true });
-        
-        btn.addEventListener('touchend', (e) => {
-            // Scroll yapıldıysa tıklamayı engelle
-            if (isScrolling) {
-                touchStart = { x: 0, y: 0, time: 0 };
-                isScrolling = false;
-                return;
-            }
-            
-            // Scroll değilse, tap olarak kabul et
-            const touch = e.changedTouches[0];
-            const deltaTime = Date.now() - touchStart.time;
-            const deltaX = Math.abs(touch.clientX - touchStart.x);
-            const deltaY = Math.abs(touch.clientY - touchStart.y);
-            
-            // Kısa süre (300ms) ve küçük hareket (10px) = tap
-            if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!btn.classList.contains('disabled')) {
-                    checkDinleAnswer(btn, opt.correct);
-                }
-            }
-            
-            touchStart = { x: 0, y: 0, time: 0 };
-            isScrolling = false;
-        }, { passive: false });
-        
-        elements.dinleOptions.appendChild(btn);
-    });
-
-    // Duolingo tarzı soru numarasını güncelle
-    const dinleQuestionNumber = document.getElementById('dinleQuestionNumber');
-    if (dinleQuestionNumber) {
-        dinleQuestionNumber.textContent = `Sual ${dinleQuestionCount + 1} / ${DINLE_MAX_QUESTIONS}`;
-    }
-    
-    // Duolingo tarzı ilerleme çubuğunu güncelle
-    // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
-
-    if (elements.dinleFeedback) {
-    elements.dinleFeedback.textContent = '';
-    elements.dinleFeedback.className = 'feedback';
-    }
-    if (elements.dinleNextBtn) {
-    elements.dinleNextBtn.style.display = 'none';
-    }
-    
-    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
-    const allBtns = document.querySelectorAll('.dinle-mode .duolingo-option, .dinle-mode .option');
-    allBtns.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove('disabled', 'correct', 'wrong');
-        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
-        btn.style.opacity = '';
-        btn.style.pointerEvents = '';
-    });
-    
-    // Mikrofon butonunu her zaman aktif et (kullanıcı istediği zaman kullanabilsin)
-    const micBtn = document.getElementById('dinleMicBtn');
-    if (micBtn) {
-        micBtn.style.opacity = '1';
-        micBtn.style.pointerEvents = 'auto';
-    }
-
-    // Otomatik ses çal
-    if (currentDinleQuestion.ses_dosyasi) {
-        playAudio(currentDinleQuestion.ses_dosyasi, elements.dinleAudioBtn);
-    }
-
-    // Arapça hareke renklerini uygula
-    setTimeout(() => {
-        updateArabicTextColoring();
-    }, 100);
-}
-
-function checkDinleAnswer(button, isCorrect) {
-    log.debug(`🚨 === CEVAP KONTROLÜ BAŞLIYOR ===`);
-    log.debug(`👆 Tıklanan buton: "${button.textContent}"`);
-    log.debug(`✅/❌ isCorrect parametresi: ${isCorrect}`);
-    log.debug(`📊 Mevcut soru: #${dinleQuestionCount + 1}/${DINLE_MAX_QUESTIONS}`);
-    log.debug(`� Önce - session score: ${sessionScore}, session correct: ${sessionCorrect}, session wrong: ${sessionWrong}`);
-    log.debug(`📊 Önce - dinle score: ${dinleScore}, dinle correct: ${dinleCorrect}, dinle wrong: ${dinleWrong}`);
-    
-    // KELİME İSTATİSTİKLERİNİ GÜNCELLE (Dinle Modu)
-    log.debug(`📊 Kelime istatistiği güncelleniyor (Dinle): ${currentDinleQuestion.kelime} (ID: ${currentDinleQuestion.id})`);
-    updateWordStats(currentDinleQuestion.id, isCorrect, 'dinleBul');
-    
-    const allBtns = elements.dinleOptions.querySelectorAll('.duolingo-option, .option');
-    log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-    allBtns.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('disabled');
-    });
-
-    if (isCorrect) {
-        log.debug(`✅ === SAHİH CEVAP İŞLEMİ ===`);
-        button.classList.add('correct');
-        if (elements.dinleFeedback) {
-        elements.dinleFeedback.textContent = '✅ Mâşâallah!';
-        elements.dinleFeedback.className = 'feedback correct';
-        }
-        
-        // Haptic feedback - doğru cevap
-        triggerHaptic('success');
-        
-        const points = currentDinleQuestion.difficulty * 2;
-        log.debug(`💰 Puan hesaplama: ${currentDinleQuestion.difficulty} × 2 = ${points} puan`);
-        
-        log.debug(`📊 Dinle score güncelleniyor: ${dinleScore} + ${points} = ${dinleScore + points}`);
-        dinleScore += points; // Local oyun puanı
-        
-        log.debug(`📊 Dinle correct güncelleniyor: ${dinleCorrect} + 1 = ${dinleCorrect + 1}`);
-        dinleCorrect++;
-        
-        log.debug(`📊 addSessionPoints(${points}) çağrılıyor...`);
-        addSessionPoints(points); // Session puanına ekle
-        
-        // Header score güncelle (yıldız gösterimi)
-        const dinleHeaderScore = document.getElementById('dinleHeaderScore');
-        if (dinleHeaderScore) {
-            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-        const currentStarPoints = Math.floor(totalPoints / starThreshold);
-            dinleHeaderScore.textContent = `⭐ ${currentStarPoints}`;
-        }
-        
-        // Daily task progress - her doğru cevap için
-        updateTaskProgress('dinleBul', 1);
-        
-        // Streak ilerlemesini güncelle - her doğru cevapta
-        if (typeof updateDailyProgress === 'function') {
-            updateDailyProgress(1);
-        }
-        
-        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
-        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
-        
-        log.debug(`✅ Doğru cevap işlemi tamamlandı!`);
-        log.debug(`📊 Sonra - session score: ${sessionScore}, session correct: ${sessionCorrect}`);
-    } else {
-        log.debug(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
-        button.classList.add('wrong');
-        if (elements.dinleFeedback) {
-        elements.dinleFeedback.textContent = `❌ Hatalı! Doğru: ${currentDinleQuestion.kelime} (${currentDinleQuestion.anlam})`;
-        elements.dinleFeedback.className = 'feedback wrong';
-        }
-        
-        // Haptic feedback - yanlış cevap
-        triggerHaptic('error');
-        
-        log.debug(`📊 Dinle wrong güncelleniyor: ${dinleWrong} + 1 = ${dinleWrong + 1}`);
-        dinleWrong++;
-        
-        log.debug(`📊 addSessionWrong() çağrılıyor...`);
-        addSessionWrong(); // Session yanlış sayısını artır
-        log.debug(`❌ ÖNEMLI: Yanlış cevap için puan EKLENMEDİ!`);
-        log.debug(`📊 Session score değişmedi: ${sessionScore}`);
-
-        log.debug(`🔍 Doğru cevabı gösteriliyor...`);
-        // Doğru cevabı göster
-        let correctButtonFound = false;
-        allBtns.forEach(btn => {
-            if (btn.textContent.includes(currentDinleQuestion.kelime)) {
-                btn.classList.add('correct');
-                correctButtonFound = true;
-                log.debug(`✅ Doğru buton bulundu ve işaretlendi: "${btn.textContent}"`);
-            }
-        });
-        if (!correctButtonFound) {
-            log.warn(`⚠️ Doğru buton bulunamadı!`);
-        }
-    }
-
-    log.debug(`📊 Soru sayacı artırılıyor: ${dinleQuestionCount} + 1 = ${dinleQuestionCount + 1}`);
-    dinleQuestionCount++; // Soru sayacını artır
-    log.debug(`📊 FINAL - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
-    log.debug(`📊 FINAL - dinle: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}, questionCount=${dinleQuestionCount}`);
-
-    // 10. sorudan sonra oyunu otomatik bitir (ekstra 11. soruya geçme)
-    if (dinleQuestionCount >= DINLE_MAX_QUESTIONS) {
-        log.game(`🏁 === OYUN BİTİŞİ (CEVAP SONRASI) ===`);
-        log.game(`✅ ${DINLE_MAX_QUESTIONS} soru tamamlandı!`);
-        log.game(`📊 Final oyun skorları: dinleScore=${dinleScore}, dinleCorrect=${dinleCorrect}, dinleWrong=${dinleWrong}`);
-        log.game(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-
-        // Session puanlarını global'e aktar
-        addToGlobalPoints(sessionScore, sessionCorrect);
-
-        // Oyun sonu modal'ını göster
-        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
-        showCustomConfirm(dinleCorrect, dinleWrong, dinleScore).then((confirmed) => {
-            if (!confirmed) {
-                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
-            }
-            
-            // Modal kapandıktan sonra ana menüye dön
-            if (elements.dinleMode) elements.dinleMode.style.display = 'none';
-            if (elements.mainMenu) elements.mainMenu.style.display = 'block';
-            showBottomNavBar();
-
-            // Oyun değişkenlerini sıfırla
-            dinleScore = 0;
-            dinleCorrect = 0;
-            dinleWrong = 0;
-            dinleQuestionCount = 0;
-            updateDinleUI();
-
-            log.game(`✅ Oyun bitti ve ana menüye dönüldü!`);
-        });
-        return;
-    }
-
-    log.debug(`🚨 === CEVAP KONTROLÜ BİTTİ ===`);
-    log.debug(`🎨 UI güncelleniyor ve Next butonu gösteriliyor...`);
-    updateDinleUI();
-    // Show the Dinle 'Next' button
-    if (elements.dinleNextBtn) {
-        elements.dinleNextBtn.style.display = 'block';
-        // 🔥 Animasyonu ekle
-        elements.dinleNextBtn.classList.add("next-appear");
-    }
-    log.debug(`✅ Cevap işlemi tamamen tamamlandı!`);
-}
-
-function updateDinleUI() {
-    log.debug(`🎨 DinleUI güncelleniyor...`);
-    log.debug(`📊 Gösterilecek değerler: score=${dinleScore}, correct=${dinleCorrect}, wrong=${dinleWrong}`);
-    if (elements.dinleScore) elements.dinleScore.textContent = dinleScore;
-    if (elements.dinleCorrect) elements.dinleCorrect.textContent = dinleCorrect;
-    if (elements.dinleWrong) elements.dinleWrong.textContent = dinleWrong;
-    log.debug(`✅ DinleUI güncellendi!`);
-}
-
-// ============ BOŞLUK DOLDUR MODU ============
-let currentBoslukQuestion = null;
-let missingWord = '';
-let missingIndex = -1;
-let boslukQuestionCount = 0;
-const BOSLUK_MAX_QUESTIONS = 10;
-
-function loadBoslukQuestion() {
-    // Önceki ses varsa durdur
-    stopCurrentAudio();
-    
-    if (boslukQuestionCount >= BOSLUK_MAX_QUESTIONS) {
-        log.game(`🏁 === BOŞLUK DOLDUR OYUNU BİTTİ ===`);
-        log.game(`✅ ${BOSLUK_MAX_QUESTIONS} soru tamamlandı!`);
-        log.game(`📊 Final oyun skorları: boslukScore=${boslukScore}, boslukCorrect=${boslukCorrect}, boslukWrong=${boslukWrong}`);
-        log.game(`📊 Final session skorları: sessionScore=${sessionScore}, sessionCorrect=${sessionCorrect}, sessionWrong=${sessionWrong}`);
-        
-        // NOT: boslukDoldur zaten her doğru cevapta updateTaskProgress('boslukDoldur', 1) ile artırılıyor (satır 10411)
-        // Burada tekrar eklemeye gerek yok, çift sayımı önlemek için kaldırıldı
-        // updateTaskProgress('boslukDoldur', sessionCorrect);
-        
-        log.game(`💰 Session puanları global'e aktarılıyor: ${sessionScore} puan`);
-        // Session puanlarını global'e aktar
-        addToGlobalPoints(sessionScore, sessionCorrect);
-        
-        // ============ PERFECT LESSON BONUS (BOŞLUK DOLDUR) ============
-        const PERFECT_LESSON_TEST_MODE = true;
-        const MIN_QUESTIONS_FOR_PERFECT = 3;
-        
-        if (PERFECT_LESSON_TEST_MODE && 
-            boslukWrong === 0 && 
-            boslukCorrect >= MIN_QUESTIONS_FOR_PERFECT && 
-            boslukScore > 0) {
-            
-            const perfectBonus = Math.floor(boslukScore * 0.5);
-            
-            if (perfectBonus > 0) {
-                totalPoints += perfectBonus;
-                dailyTasks.todayStats.toplamPuan += perfectBonus;
-                addDailyXP(perfectBonus);
-                
-                if (typeof updateLeaderboardScores === 'function') {
-                    updateLeaderboardScores(perfectBonus);
-                }
-                
-                setTimeout(() => {
-                    if (typeof showSuccessMessage === 'function') {
-                        showSuccessMessage(
-                            `⭐ MÜKEMMEL DERS! ⭐\n` +
-                            `Tüm soruları doğru cevapladın!\n` +
-                            `+${perfectBonus.toLocaleString('tr-TR')} Bonus Hasene!`,
-                            5000
-                        );
-                    }
-                    
-                    if (typeof triggerConfetti === 'function') {
-                        triggerConfetti();
-                    }
-                    
-                    if (typeof playSound === 'function') {
-                        playSound('success');
-                    }
-                }, 500);
-                
-                log.game(`⭐ PERFECT LESSON BONUS (Boşluk Doldur): +${perfectBonus} Hasene`);
-            }
-        }
-        // ============ PERFECT LESSON BONUS SONU ============
-
-        // Oyun sonu modal'ını göster
-        log.debug(`📊 Oyun sonu modal'ı gösteriliyor...`);
-        showCustomConfirm(boslukCorrect, boslukWrong, boslukScore).then((confirmed) => {
-            if (!confirmed) {
-                log.debug(`❌ Modal iptal edildi, ana menüye dönülüyor...`);
-            }
-            
-            // Modal kapandıktan sonra ana menüye dön
-            log.debug(`🔄 Ana menüye dönülüyor...`);
-            elements.boslukMode.style.display = 'none';
-            elements.mainMenu.style.display = 'block';
-            
-            // Navigasyon bar'ı göster (ana ekrana dönünce)
-            showBottomNavBar();
-            
-            log.debug(`🧹 Oyun değişkenleri temizleniyor...`);
-            // Sıfırla
-            boslukScore = 0;
-            boslukCorrect = 0;
-            boslukWrong = 0;
-            boslukQuestionCount = 0;
-            updateBoslukUI();
-            log.game(`✅ Boşluk Doldur oyunu bitti ve ana menüye dönüldü!`);
-        });
-        return;
-    }
-
-    log.debug(`🔍 Ayet filtreleme başlıyor...`);
-    log.debug(`🎯 Seçili zorluk: ${currentDifficulty}`);
-    
-    // Rastgele ayet seç (ayet_metni olan ayetleri filtrele)
-    let validAyets = ayetOkuData.filter(a => a.ayet_metni && a.ayet_metni.trim());
-    log.debug(`📦 Toplam ayet sayısı: ${ayetOkuData.length}`);
-    log.debug(`✅ Geçerli ayet sayısı: ${validAyets.length}`);
-    
-    // Zorluk seviyesine göre filtrele (kelime sayısına göre)
-    const diffLevel = CONFIG.difficultyLevels[currentDifficulty];
-    log.debug(`📋 Zorluk aralığı: ${diffLevel.minDiff}-${diffLevel.maxDiff} (kelime sayısı)`);
-    
-    // Ayetleri kelime sayısına göre filtrele
-    validAyets = validAyets.filter(ayet => {
-        const words = ayet.ayet_metni.split(' ').filter(w => w && w.trim());
-        const wordCount = words.length;
-        // Kelime sayısını zorluk aralığına göre filtrele
-        return wordCount >= diffLevel.minDiff && wordCount <= diffLevel.maxDiff;
-    });
-    
-    log.debug(`✅ Zorluk filtresi sonrası: ${validAyets.length} ayet`);
-    
-    // Eğer filtrelenmiş ayet yoksa, tüm geçerli ayetleri kullan
-    if (validAyets.length === 0) {
-        log.warn('⚠️ Zorluk filtresine uygun ayet bulunamadı, tüm ayetler kullanılacak');
-        validAyets = ayetOkuData.filter(a => a.ayet_metni && a.ayet_metni.trim());
-    }
-    
-    if (validAyets.length === 0) {
-        log.error('❌ Geçerli ayet bulunamadı!');
-        return;
-    }
-    
-    log.debug(`🎲 Rastgele ayet seçiliyor...`);
-    const randomIndex = Math.floor(Math.random() * validAyets.length);
-    const ayet = validAyets[randomIndex];
-    log.debug(`✅ Seçilen ayet index: ${randomIndex}/${validAyets.length}`);
-    
-    log.debug(`📝 === SORU #${boslukQuestionCount + 1} ===`);
-    log.debug(`📖 Sure: ${ayet.sure_adı || 'Bilinmiyor'}`);
-    log.debug(`🔢 Ayet Kimliği: ${ayet.ayet_kimligi || 'Bilinmiyor'}`);
-    log.debug(`📝 Ayet Metni: "${ayet.ayet_metni}"`);
-    
-    // Ayet metnini kelimelere böl
-    const words = ayet.ayet_metni.split(' ').filter(w => w && w.trim());
-    log.debug(`🔤 Kelime sayısı: ${words.length}`);
-    log.debug(`🔤 Kelimeler:`, words);
-    
-    if (words.length < 4) {
-        // Çok kısa ayetler için tekrar dene
-        loadBoslukQuestion();
-        return;
-    }
-
-    // Rastgele bir kelimeyi gizle
-    missingIndex = Math.floor(Math.random() * words.length);
-    missingWord = words[missingIndex];
-
-    // Boşluk ile değiştir
-    const displayText = words.map((w, i) => i === missingIndex ? '______' : w).join(' ');
-
-    currentBoslukQuestion = ayet;
-
-    // UI güncelle
-    elements.boslukAyetText.textContent = displayText;
-
-    // Seçenekler oluştur (boşluğa gelecek kelime)
-    const wrongWords = [];
-    let attempts = 0;
-    while (wrongWords.length < 3 && attempts < 100) {
-        attempts++;
-        const randomAyet = validAyets[Math.floor(Math.random() * validAyets.length)];
-        if (!randomAyet.ayet_metni) continue;
-        
-        const randomWords = randomAyet.ayet_metni.split(' ').filter(w => w && w.trim());
-        if (randomWords.length === 0) continue;
-        
-        const randomWord = randomWords[Math.floor(Math.random() * randomWords.length)];
-        if (randomWord && randomWord !== missingWord && !wrongWords.includes(randomWord)) {
-            wrongWords.push(randomWord);
-        }
-    }
-    
-    // Eğer yeterli yanlış cevap bulunamadıysa, eksik olanları doldur
-    while (wrongWords.length < 3) {
-        wrongWords.push('...');
-    }
-
-    const allOptions = [
-        { text: missingWord, correct: true },
-        ...wrongWords.map(w => ({ text: w, correct: false }))
-    ];
-
-    // Akıllı karıştır (tahmin edilmesini zorlaştırmak için)
-    smartShuffle(allOptions);
-
-    // Seçenekleri göster - Duolingo Tarzı
-    elements.boslukOptions.innerHTML = '';
-    allOptions.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'duolingo-option';
-        // Doğru cevap flag'ini data attribute olarak kaydet (ipucu için)
-        btn.setAttribute('data-correct', opt.correct ? 'true' : 'false');
-        // Boşluk Doldur'da her zaman Arapça format kullan (ayet parçaları)
-        if (opt.text === '...' || opt.text.trim() === '') {
-            // Boş seçenekler için normal format
-            btn.textContent = opt.text;
-        } else {
-            // Arapça kelimeler için özel format
-            btn.classList.add('arabic-option');
-            btn.innerHTML = `<span style="direction: rtl;">${opt.text}</span>`;
-        }
-        
-        // Touch event tracking (scroll/tap ayrımı için)
-        let touchStart = { x: 0, y: 0, time: 0 };
-        let isScrolling = false;
-        
-        // Masaüstü için onclick handler
-        btn.onclick = () => {
-            if (!btn.classList.contains('disabled')) {
-                checkBoslukAnswer(btn, opt.correct);
-            }
-        };
-        
-        // Mobil için touch event'leri
-        btn.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            touchStart = {
-                x: touch.clientX,
-                y: touch.clientY,
-                time: Date.now()
-            };
-            isScrolling = false;
-        }, { passive: true });
-        
-        btn.addEventListener('touchmove', (e) => {
-            if (touchStart.x !== 0 || touchStart.y !== 0) {
-                const touch = e.touches[0];
-                const deltaX = Math.abs(touch.clientX - touchStart.x);
-                const deltaY = Math.abs(touch.clientY - touchStart.y);
-                // 10px'den fazla hareket varsa scroll'dur
-                if (deltaX > 10 || deltaY > 10) {
-                    isScrolling = true;
-                }
-            }
-        }, { passive: true });
-        
-        btn.addEventListener('touchend', (e) => {
-            // Scroll yapıldıysa tıklamayı engelle
-            if (isScrolling) {
-                touchStart = { x: 0, y: 0, time: 0 };
-                isScrolling = false;
-                return;
-            }
-            
-            // Scroll değilse, tap olarak kabul et
-            const touch = e.changedTouches[0];
-            const deltaTime = Date.now() - touchStart.time;
-            const deltaX = Math.abs(touch.clientX - touchStart.x);
-            const deltaY = Math.abs(touch.clientY - touchStart.y);
-            
-            // Kısa süre (300ms) ve küçük hareket (10px) = tap
-            if (deltaTime < 300 && deltaX < 10 && deltaY < 10) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!btn.classList.contains('disabled')) {
-                    checkBoslukAnswer(btn, opt.correct);
-                }
-            }
-            
-            touchStart = { x: 0, y: 0, time: 0 };
-            isScrolling = false;
-        }, { passive: false });
-        
-        elements.boslukOptions.appendChild(btn);
-    });
-
-    // Duolingo tarzı soru numarasını güncelle
-    const boslukQuestionNumber = document.getElementById('boslukQuestionNumber');
-    if (boslukQuestionNumber) {
-        boslukQuestionNumber.textContent = `Sual ${boslukQuestionCount + 1} / ${BOSLUK_MAX_QUESTIONS}`;
-    }
-    
-    // Duolingo tarzı ilerleme çubuğunu güncelle
-    // İlerleme çubuğu kaldırıldı - soru sayısı gösterimi yeterli
-    
-    // Sure info güncelle
-    if (elements.boslukSureInfo && currentBoslukQuestion) {
-        elements.boslukSureInfo.textContent = `${currentBoslukQuestion.sure_adı || ''} ${currentBoslukQuestion.ayet_kimligi || ''}`;
-        elements.boslukSureInfo.style.display = 'block';
-    }
-
-    if (elements.boslukFeedback) {
-    elements.boslukFeedback.textContent = '';
-    elements.boslukFeedback.className = 'feedback';
-    }
-    if (elements.boslukNextBtn) {
-    elements.boslukNextBtn.style.display = 'none';
-    }
-    
-    // Tüm butonları aktif et (opacity ve disabled durumlarını da sıfırla)
-    const allBtns = document.querySelectorAll('.bosluk-mode .duolingo-option, .bosluk-mode .option');
-    allBtns.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove('disabled', 'correct', 'wrong');
-        // Önceki sorudan kalan opacity değerini sıfırla (ipucu kullanımından kalan)
-        btn.style.opacity = '';
-        btn.style.pointerEvents = '';
-    });
-
-    // Otomatik ses çal
-    if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
-        playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
-    }
-}
-
-if (elements.boslukAudioBtn) {
-    // Masaüstü için onclick
-    elements.boslukAudioBtn.onclick = () => {
-        if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
-            playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
-        }
-    };
-    // Mobil için touchend
-    elements.boslukAudioBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (currentBoslukQuestion && currentBoslukQuestion.ayet_ses_dosyasi) {
-            playAudio(currentBoslukQuestion.ayet_ses_dosyasi, elements.boslukAudioBtn);
-        }
-    }, { passive: false });
-}
-
-function checkBoslukAnswer(button, isCorrect) {
-    log.debug(`🚨 === BOŞLUK DOLDUR CEVAP KONTROLÜ ===`);
-    log.debug(`👆 Tıklanan buton: "${button.textContent}"`);
-    log.debug(`✅/❌ isCorrect parametresi: ${isCorrect}`);
-    log.debug(`📊 Mevcut soru: #${boslukQuestionCount + 1}/${BOSLUK_MAX_QUESTIONS}`);
-    log.debug(`📊 Eksik kelime: "${missingWord}"`);
-    log.debug(`📊 Önce - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
-    log.debug(`📊 Önce - boşluk: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
-    
-    // KELİME İSTATİSTİKLERİNİ GÜNCELLE (Boşluk Doldur Modu)
-    // Ayet kimliği ve kelime index'i kullanarak kelime ID'si oluştur
-    if (currentBoslukQuestion && missingWord && missingIndex !== -1) {
-        // Ayet kimliğinden sure ve ayet numarasını çıkar (örn: "2:255" -> "2:255")
-        const ayetId = currentBoslukQuestion.ayet_kimligi || currentBoslukQuestion.id || '0:0';
-        // Kelime ID formatı: "sure:ayet:kelimeIndex" (örn: "2:255:5")
-        const wordId = `${ayetId}:${missingIndex}`;
-        log.debug(`📊 Boşluk Doldur - Kelime istatistiği güncelleniyor: ${missingWord} (ID: ${wordId})`);
-        
-        // Alt modu da dahil et
-        const gameModeWithDifficulty = currentMode && currentDifficulty 
-            ? `boslukDoldur-${currentMode}-${currentDifficulty}` 
-            : 'boslukDoldur';
-        updateWordStats(wordId, isCorrect, gameModeWithDifficulty);
-    }
-    
-    const allBtns = elements.boslukOptions.querySelectorAll('.duolingo-option, .option');
-    log.debug(`🔒 ${allBtns.length} buton devre dışı bırakılıyor...`);
-    allBtns.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('disabled');
-    });
-
-    if (isCorrect) {
-        log.debug(`✅ === DOĞRU CEVAP İŞLEMİ ===`);
-        button.classList.add('correct');
-        if (elements.boslukFeedback) {
-        elements.boslukFeedback.textContent = '✅ Mâşâallah!';
-        elements.boslukFeedback.className = 'feedback correct';
-        }
-        
-        // Haptic feedback - doğru cevap
-        triggerHaptic('success');
-        
-        log.debug(`💰 Boşluk Doldur sabit puan: 10 puan ekleniyor`);
-        log.debug(`📊 Boşluk score güncelleniyor: ${boslukScore} + 10 = ${boslukScore + 10}`);
-        const pointsPerCorrect = window.CONSTANTS?.POINTS?.PER_CORRECT || 10; // Fallback: 10
-        boslukScore += pointsPerCorrect; // Local oyun puanı
-        boslukCorrect++;
-        
-        log.debug(`📊 addSessionPoints(${pointsPerCorrect}) çağrılıyor...`);
-        addSessionPoints(pointsPerCorrect); // Session puanına ekle
-        
-        // Header score güncelle (yıldız gösterimi)
-        const boslukHeaderScore = document.getElementById('boslukHeaderScore');
-        if (boslukHeaderScore) {
-            const starThreshold = window.CONSTANTS?.POINTS?.STAR_THRESHOLD || 100; // Fallback: 100
-        const currentStarPoints = Math.floor(totalPoints / starThreshold);
-            boslukHeaderScore.textContent = `⭐ ${currentStarPoints}`;
-        }
-        
-        // Daily task progress - her doğru cevap için
-        updateTaskProgress('boslukDoldur', 1);
-        
-        // Streak ilerlemesini güncelle - her doğru cevapta
-        if (typeof updateDailyProgress === 'function') {
-            updateDailyProgress(1);
-        }
-        
-        // Perfect streak kontrolü oyun bitiminde yapılacak (her doğru cevapta değil)
-        // Bu kontrol oyun bitiminde addToGlobalPoints içinde yapılmalı
-        
-        log.debug(`✅ Doğru cevap işlemi tamamlandı!`);
-
-        // Tam ayeti doğru kelimeyi altın sarısı ile vurgulayarak göster
-        showAnswerWithGoldenHighlight();
-    } else {
-        log.debug(`❌ === YANLIŞ CEVAP İŞLEMİ ===`);
-        button.classList.add('wrong');
-        if (elements.boslukFeedback) {
-        elements.boslukFeedback.textContent = `❌ Hatalı! Doğru kelime: ${missingWord}`;
-        elements.boslukFeedback.className = 'feedback wrong';
-        }
-        
-        // Haptic feedback - yanlış cevap
-        triggerHaptic('error');
-        
-        log.debug(`📊 Boşluk wrong güncelleniyor: ${boslukWrong} + 1 = ${boslukWrong + 1}`);
-        boslukWrong++;
-        
-        log.debug(`📊 addSessionWrong() çağrılıyor...`);
-        addSessionWrong(); // Session yanlış sayısını artır
-        log.debug(`❌ ÖNEMLI: Yanlış cevap için puan EKLENMEDİ!`);
-
-        log.debug(`🔍 Doğru cevabı gösteriliyor...`);
-        // Doğru cevabı göster
-        let correctButtonFound = false;
-        allBtns.forEach(btn => {
-            if (btn.textContent.includes(missingWord)) {
-                btn.classList.add('correct');
-                correctButtonFound = true;
-                log.debug(`✅ Doğru buton bulundu: "${btn.textContent}"`);
-            }
-        });
-        if (!correctButtonFound) {
-            log.debug(`⚠️ Doğru buton bulunamadı! Aranan: "${missingWord}"`);
-        }
-
-        // Tam ayeti doğru kelimeyi altın sarısı ile vurgulayarak göster
-        showAnswerWithGoldenHighlight();
-    }
-
-    log.debug(`📊 Soru sayacı artırılıyor: ${boslukQuestionCount} + 1 = ${boslukQuestionCount + 1}`);
-    boslukQuestionCount++; // Soru sayacını artır
-    log.debug(`📊 FINAL - session: score=${sessionScore}, correct=${sessionCorrect}, wrong=${sessionWrong}`);
-    log.debug(`📊 FINAL - boşluk: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}, questionCount=${boslukQuestionCount}`);
-    log.debug(`🚨 === BOŞLUK DOLDUR CEVAP KONTROLÜ BİTTİ ===`);
-    updateBoslukUI();
-    // Show the Bosluk 'Next' button
-    if (elements.boslukNextBtn) {
-    elements.boslukNextBtn.style.display = 'block';
-        elements.boslukNextBtn.classList.add("next-appear");
-    }
-}
-
-if (elements.boslukNextBtn) {
-    // Masaüstü için onclick
-    elements.boslukNextBtn.onclick = () => {
-        // Butonu hemen gizle
-        if (elements.boslukNextBtn) {
-            elements.boslukNextBtn.style.display = 'none';
-            elements.boslukNextBtn.classList.remove("next-appear");
-        }
-        
-        loadBoslukQuestion();
-    };
-    // Mobil için touchend
-    elements.boslukNextBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Butonu hemen gizle
-        if (elements.boslukNextBtn) {
-            elements.boslukNextBtn.style.display = 'none';
-            elements.boslukNextBtn.classList.remove("next-appear");
-        }
-        
-        loadBoslukQuestion();
-    }, { passive: false });
-}
-
-function updateBoslukUI() {
-    log.debug(`🎨 BoslukUI güncelleniyor...`);
-    log.debug(`📊 Gösterilecek değerler: score=${boslukScore}, correct=${boslukCorrect}, wrong=${boslukWrong}`);
-    if (elements.boslukScore) elements.boslukScore.textContent = boslukScore;
-    if (elements.boslukCorrect) elements.boslukCorrect.textContent = boslukCorrect;
-    if (elements.boslukWrong) elements.boslukWrong.textContent = boslukWrong;
-    log.debug(`✅ BoslukUI güncellendi!`);
-}
-
-function showAnswerWithGoldenHighlight() {
-    // Doğru kelimeyi belirgin renkte vurgulayarak tam ayeti göster
-    const fullText = currentBoslukQuestion.ayet_metni;
-    
-    log.debug(`🔍 Vurgulanacak kelime: "${missingWord}"`);
-    log.debug(`📄 Tam metin uzunluğu: ${fullText.length}`);
-    log.debug(`📄 Tam metin (ilk 50 karakter): "${fullText.substring(0, 50)}"`);
-    
-    // Arapça metinlerde direkt string replacement kullan (en güvenilir yöntem)
-    // Kelimeyi bul ve tüm eşleşmeleri değiştir
-    const highlightStyle = `style="color: #FF6B35 !important; font-weight: 700 !important; font-size: 1.15em !important; text-shadow: 0 2px 8px rgba(255, 107, 53, 0.6) !important; background: linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(255, 193, 7, 0.25) 100%) !important; padding: 3px 6px !important; border-radius: 6px !important; border: 2px solid rgba(255, 107, 53, 0.4) !important; display: inline-block !important; font-family: 'KFGQPC Uthmanic Script HAFS Regular', 'Amiri', serif !important; transform: scale(1.05) !important; transition: all 0.3s ease !important;"`;
-    
-    // Direkt string replacement - tüm eşleşmeleri değiştir
-    const highlightedWord = `<span class="golden-highlight" ${highlightStyle}>${missingWord}</span>`;
-    const finalText = fullText.split(missingWord).join(highlightedWord);
-    
-    log.debug(`✅ Vurgulama yapıldı. Yeni metin uzunluğu: ${finalText.length}`);
-    log.debug(`📄 Vurgulanmış metin (ilk 100 karakter): "${finalText.substring(0, 100)}"`);
-    
-    // innerHTML ile set et
-    elements.boslukAyetText.innerHTML = finalText;
-    
-    // Ekstra güvenlik için direct style da uygula
-    setTimeout(() => {
-        const goldenSpans = elements.boslukAyetText.querySelectorAll('.golden-highlight');
-        log.debug(`🔍 Bulunan span sayısı: ${goldenSpans.length}`);
-        
-        goldenSpans.forEach((span, index) => {
-            span.style.color = '#FF6B35';
-            span.style.fontWeight = '700';
-            span.style.fontSize = '1.15em';
-            span.style.textShadow = '0 2px 8px rgba(255, 107, 53, 0.6)';
-            span.style.background = 'linear-gradient(135deg, rgba(255, 107, 53, 0.25) 0%, rgba(255, 193, 7, 0.25) 100%)';
-            span.style.padding = '3px 6px';
-            span.style.borderRadius = '6px';
-            span.style.border = '2px solid rgba(255, 107, 53, 0.4)';
-            span.style.display = 'inline-block';
-            span.style.transform = 'scale(1.05)';
-            span.style.transition = 'all 0.3s ease';
-            
-            log.debug(`✨ Span #${index + 1} stil uygulandı. İçerik: "${span.textContent}"`);
-        });
-        
-        if (goldenSpans.length === 0) {
-            log.error(`❌ Hiç span bulunamadı! Kelime eşleşmedi: "${missingWord}"`);
-            log.error(`📄 Metin içinde kelime var mı kontrol: ${fullText.includes(missingWord)}`);
-        } else {
-            log.debug(`✅ ${goldenSpans.length} vurgulu span bulundu ve stil uygulandı!`);
-        }
-    }, 100);
-}
-
-// ============ DUA ET MODU ============
-function showDua(shouldIncrement = false) {
-    const dua = duaData[currentDuaIndex];
-    if (!dua) return;
-
-    elements.duaSureInfo.textContent = `Ayet: ${dua.ayet || ''}`;
-    elements.duaArabic.textContent = dua.dua || '';
-    elements.duaTranslation.textContent = dua.tercume || '';
-
-    elements.prevDuaBtn.disabled = currentDuaIndex === 0;
-    elements.nextDuaBtn.disabled = currentDuaIndex === duaData.length - 1;
-    
-    // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
-    if (shouldIncrement) {
-        duaQuestionCount++;
-    }
-    // Soru sayacı kaldırıldı - bu modlar günlük görev için
-}
-
-elements.prevDuaBtn.onclick = () => {
-    log.debug('⬅️ Önceki dua butonuna tıklandı');
-    if (currentDuaIndex > 0) {
-        log.debug('📍 Önceki duaya geçiliyor:', currentDuaIndex, '->', currentDuaIndex - 1);
-        stopCurrentAudio(); // Mevcut ses varsa durdur
-        currentDuaIndex--;
-        showDua(false); // Soru sayısını artırma
-        log.debug('✅ Önceki dua gösterildi');
-        // Navigasyon - görev sayılmaz
-    }
-};
-
-elements.nextDuaBtn.onclick = () => {
-    log.debug('➡️ Sonraki dua butonuna tıklandı');
-    if (currentDuaIndex < duaData.length - 1) {
-        log.debug('📍 Sonraki duaya geçiliyor:', currentDuaIndex, '->', currentDuaIndex + 1);
-        stopCurrentAudio(); // Mevcut ses varsa durdur
-        currentDuaIndex++;
-        showDua(true); // Soru sayısını artır
-        log.debug('✅ Sonraki dua gösterildi');
-        // Navigasyon - görev sayılmaz
-    }
-};
-
-elements.duaAudioBtn.onclick = () => {
-    log.debug('🔊 Dua audio butonuna tıklandı');
-    const dua = duaData[currentDuaIndex];
-    log.debug('📊 Mevcut dua bilgileri:', {
-        index: currentDuaIndex,
-        hasUrl: !!(dua && dua.ses_url),
-        url: dua?.ses_url,
-        start: dua?.start,
-        title: dua?.dua_adi
-    });
-    
-    if (dua && dua.ses_url) {
-        // Önceki sesi durdur
-        stopCurrentAudio();
-        
-        // Butonu devre dışı bırak
-        elements.duaAudioBtn.disabled = true;
-        log.debug('🔒 Audio butonu devre dışı bırakıldı');
-        
-        try {
-            currentAudio = new Audio(dua.ses_url);
-            
-            // Başlangıç zamanı varsa ayarla (yüklenmeden önce)
-            if (dua.start) {
-                currentAudio.currentTime = dua.start;
-            }
-            
-            // Direkt çalmayı dene
-            currentAudio.play().then(() => {
-                log.debug('🎵 Dua sesi başlatıldı - URL:', dua.ses_url);
-                log.debug('🎵 Audio object durumu:', {
-                    currentTime: currentAudio.currentTime,
-                    duration: currentAudio.duration,
-                    paused: currentAudio.paused,
-                    readyState: currentAudio.readyState,
-                    volume: currentAudio.volume
-                });
-                elements.duaAudioBtn.disabled = false; // Butonu tekrar aktif et
-            }).catch(err => {
-                log.error('❌ Ses çalma hatası:', err);
-                elements.duaAudioBtn.disabled = false;
-                currentAudio = null;
-            });
-            
-            // Ses yüklenme durumu
-            currentAudio.onloadstart = () => {
-                log.debug('📥 Ses yüklenmeye başladı');
-            };
-
-            currentAudio.oncanplay = () => {
-                log.debug('✅ Ses çalmaya hazır');
-            };
-
-            currentAudio.onplay = () => {
-                log.debug('▶️ Ses çalmaya başladı');
-            };
-
-            currentAudio.onpause = () => {
-                log.debug('⏸️ Ses duraklatıldı');
-            };
-
-            currentAudio.ontimeupdate = () => {
-                // Null check - eğer currentAudio silinmişse event'i durdur
-                if (!currentAudio) return;
-                
-                // Her 5 saniyede bir log (çok fazla log'u önlemek için)
-                if (currentAudio.currentTime > 0 && Math.floor(currentAudio.currentTime) % 5 === 0) {
-                    log.debug('⏱️ Ses oynatma zamanı:', currentAudio.currentTime.toFixed(2) + 's / ' + (currentAudio.duration || 0).toFixed(2) + 's');
-                }
-            };
-            
-            // Ses bittiğinde
-            currentAudio.onended = () => {
-                log.debug('🏁 Ses bitti');
-                elements.duaAudioBtn.disabled = false;
-                updateTaskProgress('duaOgre', 1);
-                currentAudio = null;
-            };
-            
-            // Hata durumunda
-            currentAudio.onerror = (err) => {
-                log.error('❌ Ses dosyası hatası:', err);
-                log.error('❌ Hata detayları:', {
-                    code: currentAudio.error?.code,
-                    message: currentAudio.error?.message
-                });
-                elements.duaAudioBtn.disabled = false;
-                currentAudio = null;
-            };
-            
-        } catch (err) {
-            log.error('Audio oluşturma hatası:', err);
-            elements.duaAudioBtn.disabled = false;
-            currentAudio = null;
-        }
-    }
-};
-
-// ============ AYET OKU MODU (RASTGELE) ============
-function showAyet(shouldIncrement = false) {
-    // Rastgele ayet seç
-    currentAyetIndex = Math.floor(Math.random() * ayetOkuData.length);
-    const ayet = ayetOkuData[currentAyetIndex];
-    if (!ayet) return;
-    
-    elements.ayetSureInfo.textContent = `${ayet.sure_adı || 'Sûre'} - ${ayet.ayet_kimligi || ''}`;
-    elements.ayetArabic.textContent = ayet.ayet_metni || '';
-    elements.ayetTranslation.textContent = ayet.meal || '';
-    
-    // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
-    if (shouldIncrement) {
-        ayetQuestionCount++;
-    }
-    // Soru sayacı kaldırıldı - bu modlar günlük görev için
-}
-
-elements.prevAyetBtn.onclick = () => {
-    log.debug('⬅️ Önceki ayet butonuna tıklandı');
-    stopCurrentAudio(); // Mevcut ses varsa durdur
-    showAyet(false); // Rastgele önceki ayet, soru sayısını artırma
-    log.debug('✅ Önceki ayet gösterildi');
-    // Navigasyon - görev sayılmaz
-};
-
-elements.nextAyetBtn.onclick = () => {
-    log.debug('➡️ Sonraki ayet butonuna tıklandı');
-    stopCurrentAudio(); // Mevcut ses varsa durdur
-    showAyet(true); // Rastgele sonraki ayet, soru sayısını artır
-    log.debug('✅ Sonraki ayet gösterildi');
-    // Navigasyon - görev sayılmaz
-};
-
-elements.ayetAudioBtn.onclick = () => {
-    log.debug('🔊 Ayet audio butonuna tıklandı');
-    const ayet = ayetOkuData[currentAyetIndex];
-    log.debug('📊 Mevcut ayet bilgileri:', {
-        index: currentAyetIndex,
-        hasUrl: !!(ayet && ayet.ayet_ses_dosyasi),
-        url: ayet?.ayet_ses_dosyasi,
-        sure: ayet?.sure_adı,
-        ayetKimligi: ayet?.ayet_kimligi
-    });
-    
-    if (ayet && ayet.ayet_ses_dosyasi) {
-        // Önceki sesi durdur
-        stopCurrentAudio();
-        
-        // Butonu devre dışı bırak
-        elements.ayetAudioBtn.disabled = true;
-        log.debug('🔒 Audio butonu devre dışı bırakıldı');
-        
-        try {
-            // URL doğrulama
-            if (!ayet.ayet_ses_dosyasi || (!ayet.ayet_ses_dosyasi.startsWith('http://') && !ayet.ayet_ses_dosyasi.startsWith('https://'))) {
-                log.error('❌ Geçersiz ses URL formatı:', ayet.ayet_ses_dosyasi);
-                elements.ayetAudioBtn.disabled = false;
-                return;
-            }
-            
-            currentAudio = new Audio(ayet.ayet_ses_dosyasi);
-            
-            // Ses yüklendiğinde çal
-            currentAudio.addEventListener('loadeddata', () => {
-            currentAudio.play().then(() => {
-                log.debug('🎵 Ayet sesi başlatıldı - URL:', ayet.ayet_ses_dosyasi);
-                log.debug('🎵 Audio object durumu:', {
-                    currentTime: currentAudio.currentTime,
-                    duration: currentAudio.duration,
-                    paused: currentAudio.paused,
-                    readyState: currentAudio.readyState,
-                    volume: currentAudio.volume
-                });
-                    elements.ayetAudioBtn.disabled = false;
-            }).catch(err => {
-                log.error('❌ Ses çalma hatası:', err);
-                    log.error('❌ Ses URL:', ayet.ayet_ses_dosyasi);
-                elements.ayetAudioBtn.disabled = false;
-                currentAudio = null;
-                });
-            });
-            
-            // Hata durumunda
-            currentAudio.onerror = (e) => {
-                log.error('❌ Ses dosyası yüklenemedi:', ayet.ayet_ses_dosyasi);
-                log.error('❌ Hata kodu:', currentAudio.error?.code);
-                log.error('❌ Hata mesajı:', currentAudio.error?.message);
-                log.error('❌ Hata tipi:', currentAudio.error?.name);
-                
-                // Tanzil.net URL'lerini everyayah.com'a çevir (fallback)
-                if (ayet.ayet_ses_dosyasi && ayet.ayet_ses_dosyasi.includes('tanzil.net')) {
-                    const ayetNo = ayet.ayet_kimligi?.split(':')[1] || '';
-                    const sureNo = ayet.ayet_kimligi?.split(':')[0] || '';
-                    const fallbackUrl = `https://everyayah.com/data/Alafasy_128kbps/${String(sureNo).padStart(3, '0')}${String(ayetNo).padStart(3, '0')}.mp3`;
-                    log.error('🔄 Fallback URL deneniyor:', fallbackUrl);
-                    
-                    // Fallback URL'i dene
-                    const fallbackAudio = new Audio(fallbackUrl);
-                    fallbackAudio.addEventListener('loadeddata', () => {
-                        fallbackAudio.play().then(() => {
-                            log.debug('✅ Fallback ses başarıyla çalındı');
-                            currentAudio = fallbackAudio;
-                        }).catch(err => {
-                            log.error('❌ Fallback ses de çalınamadı:', err);
-                            elements.ayetAudioBtn.disabled = false;
-                        });
-                    });
-                    fallbackAudio.onerror = () => {
-                        log.error('❌ Fallback ses de yüklenemedi');
-                        elements.ayetAudioBtn.disabled = false;
-                    };
-                    fallbackAudio.load();
-                } else {
-                    elements.ayetAudioBtn.disabled = false;
-                    currentAudio = null;
-                }
-            };
-            
-            // Ses dosyasını yükle
-            currentAudio.load();
-            
-            // Ses yüklenme durumu
-            currentAudio.onloadstart = () => {
-                log.debug('📥 Ses yüklenmeye başladı');
-            };
-
-            currentAudio.oncanplay = () => {
-                log.debug('✅ Ses çalmaya hazır');
-            };
-
-            currentAudio.onplay = () => {
-                log.debug('▶️ Ses çalmaya başladı');
-            };
-
-            currentAudio.onpause = () => {
-                log.debug('⏸️ Ses duraklatıldı');
-            };
-
-            currentAudio.ontimeupdate = () => {
-                // Null check - eğer currentAudio silinmişse event'i durdur
-                if (!currentAudio) return;
-                
-                // Her 5 saniyede bir log (çok fazla log'u önlemek için)
-                if (currentAudio.currentTime > 0 && Math.floor(currentAudio.currentTime) % 5 === 0) {
-                    log.debug('⏱️ Ses oynatma zamanı:', currentAudio.currentTime.toFixed(2) + 's / ' + (currentAudio.duration || 0).toFixed(2) + 's');
-                }
-            };
-            
-            // Ses bittiğinde
-            currentAudio.onended = () => {
-                log.debug('🏁 Ayet sesi bitti');
-                elements.ayetAudioBtn.disabled = false;
-                updateTaskProgress('ayetOku', 1); // Görev sayılsın
-                currentAudio = null;
-            };
-            
-            // Hata durumunda
-            currentAudio.onerror = (err) => {
-                log.error('❌ Ses dosyası hatası:', err);
-                log.error('❌ Hata detayları:', {
-                    code: currentAudio.error?.code,
-                    message: currentAudio.error?.message
-                });
-                elements.ayetAudioBtn.disabled = false;
-                currentAudio = null;
-            };
-            
-        } catch (err) {
-            log.error('Audio oluşturma hatası:', err);
-            elements.ayetAudioBtn.disabled = false;
-            currentAudio = null;
-        }
-    }
-};
-
-// ============ HADİS OKU MODU (RASTGELE) ============
-function showHadis(shouldIncrement = false) {
-    // Rastgele hadis seç
-    currentHadisIndex = Math.floor(Math.random() * hadisData.length);
-    const hadis = hadisData[currentHadisIndex];
-    if (!hadis) return;
-
-    elements.hadisCategory.textContent = hadis.section || '';
-    elements.hadisTitle.textContent = hadis.chapterName || '';
-    elements.hadisHeader.textContent = hadis.header || '';
-    elements.hadisText.textContent = hadis.text || '';
-    elements.hadisRef.textContent = hadis.refno || '';
-    
-    // Soru sayısını güncelle (sadece sonraki butonuna tıklandığında)
-    if (shouldIncrement) {
-        hadisQuestionCount++;
-    }
-    // Soru sayacı kaldırıldı - bu modlar günlük görev için
-}
-
-elements.prevHadisBtn.onclick = () => {
-    stopCurrentAudio(); // Mevcut ses varsa durdur
-    showHadis(false); // Rastgele önceki hadis, soru sayısını artırma
-    // Daily task progress - hadis okuma (önceki butonunda da sayılabilir)
-    updateTaskProgress('hadisOku', 1);
-};
-
-elements.nextHadisBtn.onclick = () => {
-    stopCurrentAudio(); // Mevcut ses varsa durdur
-    showHadis(true); // Rastgele sonraki hadis, soru sayısını artır
-    // Daily task progress - hadis okuma
-    updateTaskProgress('hadisOku', 1);
-};
-
-// ============ OYUNU BAŞLAT ============
-// Performance: Async initialization
-setTimeout(async () => {
-    try {
-        await loadData();
-        updateStatsBar(); // İstatistik barını initialize et
-        log.debug('✅ Oyun veriler yüklendi ve hazır');
-    } catch (error) {
-        log.error('❌ Oyun yükleme hatası:', error);
-    }
-}, 100); // DOM hazır olduktan sonra async başlat
-    // Global debug fonksiyonu - console'dan çağırılabilir
-    window.debugStats = function() {
-        log.debug('🔧 DEBUG - Mevcut Oyun İstatistikleri:');
-        log.debug('Total Points:', typeof totalPoints !== 'undefined' ? totalPoints : 'Henüz yüklenmedi');
-        log.debug('Star Points:', typeof starPoints !== 'undefined' ? starPoints : 'Henüz yüklenmedi');
-        log.debug('Level:', typeof level !== 'undefined' ? level : 'Henüz yüklenmedi');
-        log.debug('Session Score:', typeof sessionScore !== 'undefined' ? sessionScore : 'Henüz yüklenmedi');
-    };
-
-    // 🔍 SENKRONİZASYON TESTİ - Kapsamlı kontrol
-    window.testSenkronizasyon = function() {
-        log.debug('\n═══════════════════════════════════════');
-        log.debug('🔍 BAŞARI & PUAN SİSTEMİ SENKRONİZASYON TESTİ');
-        log.debug('═══════════════════════════════════════\n');
-
-        // 1. MEVCUT DURUM
-        log.debug('📊 1. MEVCUT DURUM:');
-        log.debug('   totalPoints:', totalPoints);
-        log.debug('   sessionScore:', sessionScore);
-        log.debug('   level:', level);
-        log.debug('   starPoints:', starPoints);
-        log.debug('   badges:', JSON.stringify(badges));
-        log.debug('   comboCount:', comboCount);
-
-        // 2. ROZET HESAPLAMA KONTROLÜ
-        log.debug('\n🏅 2. ROZET SİSTEMİ KONTROLÜ:');
-        const expectedBadges = {
-            bronze: Math.floor(totalPoints / 2000),
-            silver: Math.floor(totalPoints / 8500),
-            gold: Math.floor(totalPoints / 25500),
-            diamond: Math.floor(totalPoints / 85000)
-        };
-        log.debug('   Beklenen:', JSON.stringify(expectedBadges));
-        log.debug('   Mevcut:', JSON.stringify(badges));
-
-        const badgeMatch = JSON.stringify(expectedBadges) === JSON.stringify(badges);
-        log.debug('   Senkronizasyon:', badgeMatch ? '✅ UYUMLU' : '❌ UYUMSUZ');
-
-        if (!badgeMatch) {
-            log.debug('   ⚠️ Rozet sayıları tutarsız! updateBadgeSystem() çağrılıyor...');
-            updateBadgeSystem();
-            log.debug('   Düzeltilmiş:', JSON.stringify(badges));
-        }
-
-        // 3. BAŞARIM KONTROLÜ
-        log.debug('\n🏆 3. BAŞARIM SİSTEMİ KONTROLÜ:');
-        const unlockedAch = storage.getSafe('unlockedAchievements', [], { type: 'array' });
-        log.debug('   Açılan başarımlar:', unlockedAch.length, 'adet');
-        log.debug('   Liste:', unlockedAch.join(', '));
-
-        // XP tabanlı başarımları kontrol et
-        const xpAchievements = [
-            { id: 'xp_500', threshold: 500, name: 'İlk Adım' },
-            { id: 'xp_2000', threshold: 2000, name: 'Mübtedi Yolcu' },
-            { id: 'xp_4000', threshold: 4000, name: 'Hızlı Talebe' },
-            { id: 'xp_8500', threshold: 8500, name: 'Gümüş Ustası' },
-            { id: 'xp_17000', threshold: 17000, name: 'İkinci Gümüş' },
-            { id: 'xp_25500', threshold: 25500, name: 'Altın Ustası' },
-            { id: 'xp_51000', threshold: 51000, name: 'İkinci Altın' },
-            { id: 'xp_85000', threshold: 85000, name: 'Elmas Ustası' },
-            { id: 'xp_170000', threshold: 170000, name: 'Ustalar Ustası' }
-        ];
-
-        let expectedAchievements = [];
-        xpAchievements.forEach(ach => {
-            if (totalPoints >= ach.threshold) {
-                expectedAchievements.push(ach.id);
-                const hasAch = unlockedAch.includes(ach.id);
-                log.debug(`   ${hasAch ? '✅' : '❌'} ${ach.name} (${ach.threshold} XP): ${hasAch ? 'Açık' : 'KAPALI!'}`);
-            }
-        });
-
-        const missingAchievements = expectedAchievements.filter(id => !unlockedAch.includes(id));
-        if (missingAchievements.length > 0) {
-            log.debug('   ⚠️ Eksik başarımlar:', missingAchievements.join(', '));
-            log.debug('   💡 checkAchievements() çağrılıyor...');
-            if (typeof checkAchievements === 'function') {
-                checkAchievements();
-            } else {
-                log.debug('   ⚠️ checkAchievements henüz yüklenmedi, atlanıyor...');
-            }
-        }
-
-        // 4. VERİ KALICILIĞI KONTROLÜ
-        log.debug('\n💾 4. VERİ KALICILIĞI KONTROLÜ:');
-        const lsPoints = localStorage.getItem('hasene_totalPoints');
-        const lsBadges = localStorage.getItem('hasene_badges');
-        log.debug('   localStorage totalPoints:', lsPoints);
-        log.debug('   localStorage badges:', lsBadges);
-        log.debug('   Memory totalPoints:', totalPoints);
-        log.debug('   Memory badges:', JSON.stringify(badges));
-
-        const lsMatch = parseInt(lsPoints) === totalPoints;
-        log.debug('   Points senkronizasyon:', lsMatch ? '✅ UYUMLU' : '❌ UYUMSUZ');
-
-        if (!lsMatch) {
-            log.debug('   ⚠️ localStorage güncel değil! saveStats() çağrılıyor...');
-            debouncedSaveStats(); // Debounced kaydetme
-        }
-
-        // 5. GÜNLÜK GÖREV KONTROLÜ
-        log.debug('\n📅 5. GÜNLÜK GÖREV KONTROLÜ:');
-        log.debug('   Bugünkü toplam puan:', dailyTasks.todayStats.toplamPuan);
-        log.debug('   Günlük hedef:', dailyTasks.hedefler.toplamPuan);
-        const dailyHasene = parseInt(localStorage.getItem('dailyHasene')) || 0;
-        const defaultGoal = window.CONSTANTS?.DAILY_GOAL?.DEFAULT || 2700; // Fallback: 2700
-        const goalHasene = parseInt(localStorage.getItem('dailyGoalHasene')) || defaultGoal;
-        log.debug('   Daily Hasene:', dailyHasene, '/', goalHasene);
-        log.debug('   Günlük hedef tamamlandı mı?', dailyHasene >= goalHasene ? '✅ EVET' : '❌ HAYIR');
-
-        // 6. SEVIYE HESAPLAMA KONTROLÜ
-        log.debug('\n⬆️ 6. SEVİYE SİSTEMİ KONTROLÜ:');
-        const calculatedLevel = calculateLevel(totalPoints);
-        log.debug('   Hesaplanan seviye:', calculatedLevel);
-        log.debug('   Mevcut seviye:', level);
-        log.debug('   Seviye senkronizasyon:', calculatedLevel === level ? '✅ UYUMLU' : '❌ UYUMSUZ');
-
-        if (calculatedLevel !== level) {
-            log.debug('   ⚠️ Seviye tutarsız! Düzeltiliyor...');
-            level = calculatedLevel;
-            updateStatsBar();
-        }
-
-        // 7. ÖZET RAPOR
-        log.debug('\n═══════════════════════════════════════');
-        log.debug('📊 ÖZET RAPOR:');
-        log.debug('═══════════════════════════════════════');
-        const allOK = badgeMatch && lsMatch && (calculatedLevel === level);
-        log.debug('Genel Durum:', allOK ? '✅ TÜM SİSTEMLER SENKRONİZE' : '⚠️ BAZI SORUNLAR VAR');
-        log.debug('Rozet Sistemi:', badgeMatch ? '✅' : '❌');
-        log.debug('Veri Kalıcılığı:', lsMatch ? '✅' : '❌');
-        log.debug('Seviye Sistemi:', (calculatedLevel === level) ? '✅' : '❌');
-        log.debug('═══════════════════════════════════════\n');
-
-        return allOK;
-    };
-    
-    // Test puan ekleme fonksiyonu
-    window.testAddPoints = function(points) {
-        log.stats(`\n🎯 TEST: ${points} puan ekleniyor...`);
-        log.stats('Önceki totalPoints:', totalPoints);
-        addSessionPoints(points);
-        log.stats('Sonraki totalPoints:', totalPoints);
-        log.stats('✅ Puan eklendi. testSenkronizasyon() çalıştırılıyor...\n');
-        setTimeout(() => testSenkronizasyon(), 500);
-    };
-    
-    // Hızlı test senaryoları
-    window.testSenaryo1 = function() {
-        log.stats('\n🧪 SENARYO 1: Yeni kullanıcı (0 → 2500 XP)');
-        resetPoints();
-        testAddPoints(2500);
-    };
-    
-    window.testSenaryo2 = function() {
-        log.stats('\n🧪 SENARYO 2: Combo bonusu (3x doğru cevap)');
-        resetPoints();
-        const pointsPerCorrect = window.CONSTANTS?.POINTS?.PER_CORRECT || 10; // Fallback: 10
-        addSessionPoints(pointsPerCorrect);
-        addSessionPoints(pointsPerCorrect);
-        addSessionPoints(pointsPerCorrect); // 3. cevap combo bonusu tetikler
-        setTimeout(() => testSenkronizasyon(), 500);
-    };
-    
-    window.testSenaryo3 = function() {
-        log.stats('\n🧪 SENARYO 3: Rozet seviye atlama (25000 → 26000 XP)');
-        totalPoints = 25000;
-        updateBadgeSystem();
-        debouncedSaveStats(); // Debounced kaydetme
-        testAddPoints(1000); // Altın rozet kazanılmalı
-    };
-    
-    window.testSenaryo4 = function() {
-        log.stats('\n🧪 SENARYO 4: Sayfa yenileme simülasyonu');
-        log.stats('1. Mevcut durum kaydediliyor...');
-        debouncedSaveStats(); // Debounced kaydetme
-        log.stats('2. Veri değişkenleri sıfırlanıyor (sayfa yenileme sim.)...');
-        const savedPoints = totalPoints;
-        totalPoints = 0;
-        level = 1;
-        badges = { bronze: 0, silver: 0, gold: 0, diamond: 0 };
-        log.stats('3. Veriler yeniden yükleniyor...');
-        loadStats().then(() => {
-            log.stats('4. Senkronizasyon kontrol ediliyor...');
-            setTimeout(() => {
-                log.stats('Kaydedilen XP:', savedPoints);
-                log.stats('Yüklenen XP:', totalPoints);
-                testSenkronizasyon();
-            }, 500);
-        });
-    };
-
-    // Seviye geçiş test fonksiyonu - console'dan çağırılabilir
-    window.testLevelUp = function(targetPoints) {
-        log.stats('🎯 Seviye geçiş testi başlatılıyor...');
-        log.stats('Mevcut puan:', totalPoints);
-        log.stats('Hedef puan:', targetPoints);
-        
-        // Hedef puana sıçrama
-        const oldLevel = calculateLevel(totalPoints);
-        const difference = targetPoints - totalPoints;
-        totalPoints = targetPoints;
-        
-        // Bugünkü puana da farkı ekle (test amaçlı)
-        dailyTasks.todayStats.toplamPuan += difference;
-        
-        const newLevel = calculateLevel(totalPoints);
-        
-        log.debug('Eski seviye:', oldLevel);
-        log.debug('Yeni seviye:', newLevel);
-        
-        // Seviye atlama kontrolü
-        if (newLevel > oldLevel) {
-            level = newLevel;
-            log.game('✅ Seviye atlandı! Modal gösteriliyor...');
-            showLevelUpModal(newLevel);
-        } else {
-            log.stats('❌ Seviye atlanmadı.');
-        }
-        
-        updateStatsBar();
-        debouncedSaveStats(); // Debounced kaydetme // Değişiklikleri kaydet
-    };
-
-    // Hızlı seviye test fonksiyonları
-    window.testLevel2 = () => testLevelUp(1000);   // Seviye 2'ye çık
-    window.testLevel3 = () => testLevelUp(2500);   // Seviye 3'e çık
-    window.testLevel5 = () => testLevelUp(8500);   // Mertebe 5'e çık
-    window.testLevel10 = () => testLevelUp(46000); // Mertebe 10'a çık
-    window.resetPoints = () => { 
-        totalPoints = 0; 
-        level = 1; 
-        updateStatsBar(); 
-        debouncedSaveStats(); // Debounced kaydetme 
-        log.stats('🔄 Puanlar sıfırlandı'); 
-    };
-    window.resetAllStats = resetAllStats;
-
-    // Modal fonksiyonlarını global hale getir
-    window.showBadgesModal = showBadgesModal;
-    window.closeBadgesModal = closeBadgesModal;
-    
-    // Kritik fonksiyonları global hale getir (safety-checks için)
-    // saveStats artık debouncedSaveStats kullanıyor, geriye uyumluluk için alias ekle
-    window.saveStats = debouncedSaveStats;
-    window.debouncedSaveStats = debouncedSaveStats;
-    window.saveStatsImmediate = saveStatsImmediate;
-    window.loadStats = loadStats;
-    window.updateUI = updateUI;
-    window.updateStatsBar = updateStatsBar;
-    window.addSessionPoints = addSessionPoints;
-    
-    // Kritik değişkenleri global hale getir (safety-checks için)
-    window.totalPoints = totalPoints;
-    window.streakData = streakData;
-    window.dailyTasks = dailyTasks;
-    
-    // SON ADIM: Kaydedilmiş verileri yükle
-    try {
-        // VERI SİSTEMİ BAŞLATMA (üçüncü taraf çerez sorunu için)
-        log.debug('🚀 Veri sistemi başlatılıyor...');
-        
-        // IndexedDB başlat (çerez engellemelerinden etkilenmez)
-        initIndexedDB().then(async () => {
-            log.debug('✅ IndexedDB hazır!');
-            await loadStats(); // Verileri yükle (IndexedDB öncelikli) - AWAIT EKLENDİ!
-            updateStatsBar();
-            log.debug('💾 Veriler yüklendi:', totalPoints, 'puan');
-        }).catch(async (error) => {
-            log.error('❌ IndexedDB hatası, localStorage kullanılıyor:', error);
-            await loadStats(); // Fallback olarak localStorage - AWAIT EKLENDİ!
-            updateStatsBar();
-        });
-    } catch (error) {
-        showCustomAlert(`Veri yükleme hatası: ${error.message}`, 'error');
-        log.error('❌ Veri yükleme hatası:', error);
-    }
-    
-    // ============ MODAL BUTONLARINA EVENT LISTENER EKLE ============
-    if (dailyTasksBtn) dailyTasksBtn.onclick = showDailyTasksModal;
-    if (statsBtn) statsBtn.onclick = showStatsModal;
-    if (calendarBtn) calendarBtn.onclick = showCalendarModal;
-    if (xpInfoBtn) xpInfoBtn.onclick = showXPInfoModal;
-    
-    // Modal kapatma butonları
-    const closeBadgesBtn = document.getElementById('closeBadgesBtn');
-    const closeCalendarBtn = document.getElementById('closeCalendarBtn');
-    const closeDailyTasksBtn = document.getElementById('closeDailyTasksBtn');
-    const closeStatsBtn = document.getElementById('closeStatsBtn');
-    const closeDailyGoalBtn = document.getElementById('closeDailyGoalBtn');
-    const closeXPInfoBtn = document.getElementById('closeXPInfoBtn');
-    
-    if (closeBadgesBtn) closeBadgesBtn.onclick = closeBadgesModal;
-    if (closeCalendarBtn) closeCalendarBtn.onclick = closeCalendarModal;
-    if (closeDailyTasksBtn) closeDailyTasksBtn.onclick = closeDailyTasksModal;
-    if (closeStatsBtn) closeStatsBtn.onclick = closeStatsModal;
-    
-    // Daily Goal Modal butonları
-    if (closeDailyGoalBtn) {
-        closeDailyGoalBtn.onclick = function(e) {
-            e.stopPropagation();
-            closeDailyGoalModal();
-        };
-        // Touch event için de ekle
-        closeDailyGoalBtn.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeDailyGoalModal();
-        }, { passive: false });
-    }
-    
-    // Hedef seçim butonları
-    const dailyGoalEasyBtn = document.getElementById('dailyGoalEasyBtn');
-    const dailyGoalNormalBtn = document.getElementById('dailyGoalNormalBtn');
-    const dailyGoalSeriousBtn = document.getElementById('dailyGoalSeriousBtn');
-    
-    if (dailyGoalEasyBtn) {
-        dailyGoalEasyBtn.onclick = function(e) {
-            e.stopPropagation();
-            setDailyGoal('easy');
-        };
-        dailyGoalEasyBtn.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            setDailyGoal('easy');
-        }, { passive: false });
-    }
-    
-    if (dailyGoalNormalBtn) {
-        dailyGoalNormalBtn.onclick = function(e) {
-            e.stopPropagation();
-            setDailyGoal('normal');
-        };
-        dailyGoalNormalBtn.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            setDailyGoal('normal');
-        }, { passive: false });
-    }
-    
-    if (dailyGoalSeriousBtn) {
-        dailyGoalSeriousBtn.onclick = function(e) {
-            e.stopPropagation();
-            setDailyGoal('serious');
-        };
-        dailyGoalSeriousBtn.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            setDailyGoal('serious');
-        }, { passive: false });
-    }
-    if (closeXPInfoBtn) closeXPInfoBtn.onclick = closeXPInfoModal;
-    
-    // Not: Touch event'ler initStatsModalTouchEvents, initBadgesModalTouchEvents,
-    // initCalendarModalTouchEvents fonksiyonları tarafından yönetiliyor
-    
-    // ============ MODAL SWIPE GESTURES ============
-    // Modal'lara swipe down ile kapatma özelliği ekle
-    const modals = ['badgesModal', 'statsModal', 'calendarModal', 'dailyTasksModal'];
-    modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal && CONFIG.swipeGesturesEnabled) {
-            initSwipeGestures(modal, {
-                onSwipeDown: () => {
-                    // Swipe down ile modal'ı kapat
-                    if (modalId === 'badgesModal') closeBadgesModal();
-                    else if (modalId === 'statsModal') closeStatsModal();
-                    else if (modalId === 'calendarModal') closeCalendarModal();
-                    else if (modalId === 'dailyTasksModal') closeDailyTasksModal();
-                }
-            });
-        }
-    });
-    
-    // ============ BUTON HAPTIC FEEDBACK ============
-    // Ana butonlara haptic feedback ekle
-    const mainButtons = document.querySelectorAll('.flutter-btn, .game-card, .nav-btn, .back-btn');
-    mainButtons.forEach(btn => {
-        if (CONFIG.hapticEnabled) {
-            btn.addEventListener('click', () => {
-                triggerHaptic('light');
-            }, { passive: true });
-        }
-    });
-    
-    // ============ MODE SWIPE GESTURES ============
-    // Ayet Oku, Dua Et, Hadis Oku modlarına swipe jestleri ekle
-    if (CONFIG.swipeGesturesEnabled) {
-        // Ayet Oku modu - swipe left/right ile önceki/sonraki ayet
-        const ayetMode = document.getElementById('ayetMode');
-        if (ayetMode) {
-            initSwipeGestures(ayetMode, {
-                onSwipeLeft: () => {
-                    // Swipe left = sonraki ayet
-                    const nextBtn = document.getElementById('nextAyetBtn');
-                    if (nextBtn && !nextBtn.disabled) {
-                        nextBtn.click();
-                    }
-                },
-                onSwipeRight: () => {
-                    // Swipe right = önceki ayet
-                    const prevBtn = document.getElementById('prevAyetBtn');
-                    if (prevBtn && !prevBtn.disabled) {
-                        prevBtn.click();
-                    }
-                }
-            });
-        }
-        
-        // Dua Et modu - swipe left/right ile önceki/sonraki dua
-        const duaMode = document.getElementById('duaMode');
-        if (duaMode) {
-            initSwipeGestures(duaMode, {
-                onSwipeLeft: () => {
-                    // Swipe left = sonraki dua
-                    const nextBtn = document.getElementById('nextDuaBtn');
-                    if (nextBtn && !nextBtn.disabled) {
-                        nextBtn.click();
-                    }
-                },
-                onSwipeRight: () => {
-                    // Swipe right = önceki dua
-                    const prevBtn = document.getElementById('prevDuaBtn');
-                    if (prevBtn && !prevBtn.disabled) {
-                        prevBtn.click();
-                    }
-                }
-            });
-        }
-        
-        // Hadis Oku modu - swipe left/right ile önceki/sonraki hadis
-        const hadisMode = document.getElementById('hadisMode');
-        if (hadisMode) {
-            initSwipeGestures(hadisMode, {
-                onSwipeLeft: () => {
-                    // Swipe left = sonraki hadis
-                    const nextBtn = document.getElementById('nextHadisBtn');
-                    if (nextBtn && !nextBtn.disabled) {
-                        nextBtn.click();
-                    }
-                },
-                onSwipeRight: () => {
-                    // Swipe right = önceki hadis
-                    const prevBtn = document.getElementById('prevHadisBtn');
-                    if (prevBtn && !prevBtn.disabled) {
-                        prevBtn.click();
-                    }
-                }
-            });
-        }
-    }
-
-}); // DOMContentLoaded event listener sonu
-
-// ============ VERİ DURUMU GÖSTERİCİ ============
-/**
- * Veri durumunu gösteren modal açar
- * Günlük/haftalık görevler, streak, ve diğer verilerin durumunu kontrol eder
- */
-async function showDataStatus() {
-    try {
-        // ============ GÜVENLİ FONKSİYON ÇAĞRILARI ============
-        // getLocalDateString fonksiyonu kontrolü
-        let today = '';
-        try {
-            if (typeof getLocalDateString === 'function') {
-                today = getLocalDateString();
-            } else if (typeof window.getLocalDateString === 'function') {
-                today = window.getLocalDateString();
-            } else {
-                // Fallback: Manuel hesaplama
-                const d = new Date();
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                today = `${year}-${month}-${day}`;
-            }
-        } catch (e) {
-            // Fallback: Manuel hesaplama
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            today = `${year}-${month}-${day}`;
-        }
-        
-        // Hafta başlangıç tarihini hesapla (getWeekStartDate fonksiyonu yoksa)
-        let weekStart = '';
-        try {
-            if (typeof getWeekStartDate === 'function') {
-                weekStart = getWeekStartDate();
-            } else if (typeof window.getWeekStartDate === 'function') {
-                weekStart = window.getWeekStartDate();
-            } else {
-                // Manuel hesaplama
-                const d = new Date();
-                d.setHours(0, 0, 0, 0);
-                const day = d.getDay(); // 0=Pazar, 1=Pazartesi, ..., 6=Cumartesi
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'ye ayarla
-                const weekStartDate = new Date(d.setDate(diff));
-                if (typeof getLocalDateString === 'function') {
-                    weekStart = getLocalDateString(weekStartDate);
-                } else {
-                    const year = weekStartDate.getFullYear();
-                    const month = String(weekStartDate.getMonth() + 1).padStart(2, '0');
-                    const dayStr = String(weekStartDate.getDate()).padStart(2, '0');
-                    weekStart = `${year}-${month}-${dayStr}`;
-                }
-            }
-        } catch (e) {
-            // Fallback: Manuel hesaplama
-            const d = new Date();
-            d.setHours(0, 0, 0, 0);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            const weekStartDate = new Date(d.setDate(diff));
-            const year = weekStartDate.getFullYear();
-            const month = String(weekStartDate.getMonth() + 1).padStart(2, '0');
-            const dayStr = String(weekStartDate.getDate()).padStart(2, '0');
-            weekStart = `${year}-${month}-${dayStr}`;
-        }
-        
-        // ============ INDEXEDDB VERİ KONTROLÜ ============
-        // IndexedDB'de veriler farklı key'lerde saklanıyor: hasene_totalPoints, hasene_dailyTasks, hasene_weeklyTasks, hasene_streak
-        let indexedDBData = null;
-        let indexedDBStreak = null;
-        let indexedDBDailyTasks = null;
-        let indexedDBWeeklyTasks = null;
-        
-        try {
-            const loadFunc = typeof loadFromIndexedDB === 'function' 
-                ? loadFromIndexedDB 
-                : (typeof window.loadFromIndexedDB === 'function' ? window.loadFromIndexedDB : null);
-            
-            if (loadFunc) {
-                // IndexedDB'de veriler farklı key'lerde saklanıyor
-                indexedDBData = await loadFunc('hasene_totalPoints').catch(() => null);
-                indexedDBStreak = await loadFunc('hasene_streak').catch(() => null);
-                indexedDBDailyTasks = await loadFunc('hasene_dailyTasks').catch(() => null);
-                indexedDBWeeklyTasks = await loadFunc('hasene_weeklyTasks').catch(() => null);
-            }
-        } catch (e) {
-            // IndexedDB hatası - sessizce devam et
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('⚠️ IndexedDB okuma hatası (görmezden geliniyor):', e);
-            }
-        }
-        
-        // IndexedDB'de herhangi bir veri var mı?
-        const hasIndexedDBData = !!(indexedDBData || indexedDBStreak || indexedDBDailyTasks || indexedDBWeeklyTasks);
-        
-        // ============ LOCALSTORAGE VERİ KONTROLÜ ============
-        // ÖNCE: Sıfırlama flag'ini kontrol et - eğer flag varsa, veri yok demektir
-        const statsJustReset = localStorage.getItem('hasene_statsJustReset') === 'true';
-        
-        let dailyTasksData = null;
-        let weeklyTasksData = null;
-        let streakDataStorage = null;
-        let totalPointsData = null;
-        let badgesData = null;
-        
-        // KRİTİK: Sıfırlama flag'i varsa, localStorage'dan HİÇBİR VERİ OKUMA
-        // Flag varsa, localStorage'da veri olsa bile "veri yok" olarak göster
-        if (statsJustReset) {
-            // Flag varsa, tüm veriler null olarak kalacak
-            // Bu sayede hasAnyLocalStorageData false olacak
-            log.debug('🔄 Sıfırlama flag\'i aktif, localStorage verileri okunmayacak');
-        } else {
-            // Flag yoksa localStorage'dan veri oku
-            try {
-                dailyTasksData = localStorage.getItem('hasene_dailyTasks');
-                weeklyTasksData = localStorage.getItem('hasene_weeklyTasks');
-                // NOT: Veriler 'hasene_streak' olarak kaydediliyor, 'hasene_streakData' değil!
-                streakDataStorage = localStorage.getItem('hasene_streak') || localStorage.getItem('hasene_streakData');
-                totalPointsData = localStorage.getItem('hasene_totalPoints');
-                badgesData = localStorage.getItem('hasene_badges');
-                
-                // KRİTİK: Boş string, 'null', 'undefined', '{}', '[]' gibi değerleri null olarak kabul et
-                if (dailyTasksData === 'null' || dailyTasksData === 'undefined' || dailyTasksData === '{}' || dailyTasksData === '[]' || dailyTasksData === '') {
-                    dailyTasksData = null;
-                }
-                if (weeklyTasksData === 'null' || weeklyTasksData === 'undefined' || weeklyTasksData === '{}' || weeklyTasksData === '[]' || weeklyTasksData === '') {
-                    weeklyTasksData = null;
-                }
-                if (streakDataStorage === 'null' || streakDataStorage === 'undefined' || streakDataStorage === '{}' || streakDataStorage === '[]' || streakDataStorage === '') {
-                    streakDataStorage = null;
-                }
-                if (totalPointsData === 'null' || totalPointsData === 'undefined' || totalPointsData === '' || totalPointsData === '0') {
-                    totalPointsData = null;
-                }
-                if (badgesData === 'null' || badgesData === 'undefined' || badgesData === '{}' || badgesData === '[]' || badgesData === '') {
-                    badgesData = null;
-                }
-            } catch (e) {
-                // localStorage hatası - sessizce devam et
-                if (typeof log !== 'undefined' && log.debug) {
-                    log.debug('⚠️ localStorage okuma hatası (görmezden geliniyor):', e);
-                }
-            }
-        }
-        
-        // Veri var mı kontrolü (sadece gerçek oyun verilerini kontrol et, flag'leri hariç tut)
-        // KRİTİK: Sıfırlama flag'i varsa, localStorage'da veri yok demektir (hasAnyLocalStorageData = false)
-        // Ayrıca, boş objeler/array'ler ve '0' değerleri de "veri yok" olarak kabul edilir
-        // NOT: Flag varsa, hasAnyLocalStorageData her zaman false olmalı (yukarıda zaten null yapıldı)
-        let hasAnyLocalStorageData = false;
-        if (!statsJustReset) {
-            // Flag yoksa, gerçek veri kontrolü yap
-            hasAnyLocalStorageData = !!(
-                (dailyTasksData && dailyTasksData !== '{}' && dailyTasksData !== '[]') ||
-                (weeklyTasksData && weeklyTasksData !== '{}' && weeklyTasksData !== '[]') ||
-                (streakDataStorage && streakDataStorage !== '{}' && streakDataStorage !== '[]') ||
-                (totalPointsData && totalPointsData !== '0' && totalPointsData !== '') ||
-                (badgesData && badgesData !== '{}' && badgesData !== '[]')
-            );
-        }
-        
-        // ============ MEVCUT VERİLERİ AL ============
-        // ÖNCE localStorage/IndexedDB'den veri oku, yoksa global değişkenlerden oku
-        // Sıfırlama sonrası localStorage/IndexedDB'de veri yoksa global değişkenlerden okuma
-        let currentDailyTasks = {};
-        let currentWeeklyTasks = {};
-        let currentStreakData = {};
-        
-        // localStorage'dan veri oku (öncelikli)
-        if (dailyTasksData) {
-            try {
-                currentDailyTasks = JSON.parse(dailyTasksData);
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else if (indexedDBDailyTasks) {
-            try {
-                currentDailyTasks = typeof indexedDBDailyTasks === 'string' ? JSON.parse(indexedDBDailyTasks) : indexedDBDailyTasks;
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else {
-            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
-            // NOT: Sıfırlama sonrası global değişkenler boş olmalı, bu yüzden bu kısım çalışmayacak
-            if (typeof dailyTasks !== 'undefined' && dailyTasks && dailyTasks.lastTaskDate) {
-                currentDailyTasks = dailyTasks;
-            } else if (typeof window.dailyTasks !== 'undefined' && window.dailyTasks && window.dailyTasks.lastTaskDate) {
-                currentDailyTasks = window.dailyTasks;
-            }
-        }
-        
-        // Haftalık görevler
-        if (weeklyTasksData) {
-            try {
-                currentWeeklyTasks = JSON.parse(weeklyTasksData);
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else if (indexedDBWeeklyTasks) {
-            try {
-                currentWeeklyTasks = typeof indexedDBWeeklyTasks === 'string' ? JSON.parse(indexedDBWeeklyTasks) : indexedDBWeeklyTasks;
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else {
-            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
-            if (typeof weeklyTasks !== 'undefined' && weeklyTasks && weeklyTasks.lastWeekStart) {
-                currentWeeklyTasks = weeklyTasks;
-            } else if (typeof window.weeklyTasks !== 'undefined' && window.weeklyTasks && window.weeklyTasks.lastWeekStart) {
-                currentWeeklyTasks = window.weeklyTasks;
-            }
-        }
-        
-        // Streak verileri
-        if (streakDataStorage) {
-            try {
-                currentStreakData = JSON.parse(streakDataStorage);
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else if (indexedDBStreak) {
-            try {
-                currentStreakData = typeof indexedDBStreak === 'string' ? JSON.parse(indexedDBStreak) : indexedDBStreak;
-            } catch(e) {
-                // Parse hatası - boş obje kullan
-            }
-        } else {
-            // localStorage/IndexedDB'de veri yok - global değişkenlerden oku (sadece veri varsa)
-            if (typeof streakData !== 'undefined' && streakData && (streakData.currentStreak > 0 || streakData.lastPlayDate)) {
-                currentStreakData = streakData;
-            } else if (typeof window.streakData !== 'undefined' && window.streakData && (window.streakData.currentStreak > 0 || window.streakData.lastPlayDate)) {
-                currentStreakData = window.streakData;
-            }
-        }
-        
-        // Veri durumu bilgilerini hazırla (güvenli şekilde - tüm değerler kontrol ediliyor)
-        const dataStatus = {
-            indexedDB: {
-                exists: hasIndexedDBData,
-                hasData: hasIndexedDBData,
-                gameStats: !!indexedDBData,
-                streak: !!indexedDBStreak,
-                dailyTasks: !!indexedDBDailyTasks,
-                weeklyTasks: !!indexedDBWeeklyTasks
-            },
-            localStorage: {
-                exists: hasAnyLocalStorageData,
-                hasData: hasAnyLocalStorageData,
-                dailyTasks: !!dailyTasksData,
-                weeklyTasks: !!weeklyTasksData,
-                streakData: !!streakDataStorage,
-                totalPoints: !!totalPointsData,
-                badges: !!badgesData
-            },
-            dailyTasks: {
-                exists: !!currentDailyTasks,
-                lastTaskDate: (currentDailyTasks && currentDailyTasks.lastTaskDate) ? String(currentDailyTasks.lastTaskDate) : 'Yok',
-                todayStats: (currentDailyTasks && currentDailyTasks.todayStats) ? currentDailyTasks.todayStats : null,
-                completedTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.completedTasks)) ? currentDailyTasks.completedTasks.length : 0,
-                totalTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.tasks)) ? currentDailyTasks.tasks.length : 0,
-                bonusTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.bonusTasks)) ? currentDailyTasks.bonusTasks.length : 0,
-                completedBonusTasks: (currentDailyTasks && Array.isArray(currentDailyTasks.bonusTasks) && Array.isArray(currentDailyTasks.completedTasks)) 
-                    ? currentDailyTasks.bonusTasks.filter(t => t && t.id && currentDailyTasks.completedTasks.includes(t.id)).length 
-                    : 0,
-                isToday: (currentDailyTasks && currentDailyTasks.lastTaskDate) ? currentDailyTasks.lastTaskDate === today : false
-            },
-            weeklyTasks: {
-                exists: !!currentWeeklyTasks,
-                lastWeekStart: (currentWeeklyTasks && currentWeeklyTasks.lastWeekStart) ? String(currentWeeklyTasks.lastWeekStart) : 'Yok',
-                weekStats: (currentWeeklyTasks && currentWeeklyTasks.weekStats) ? currentWeeklyTasks.weekStats : null,
-                completedTasks: (currentWeeklyTasks && Array.isArray(currentWeeklyTasks.completedTasks)) ? currentWeeklyTasks.completedTasks.length : 0,
-                totalTasks: (currentWeeklyTasks && Array.isArray(currentWeeklyTasks.tasks)) ? currentWeeklyTasks.tasks.length : 0,
-                isCurrentWeek: (currentWeeklyTasks && currentWeeklyTasks.lastWeekStart) ? currentWeeklyTasks.lastWeekStart === weekStart : false
-            },
-            streak: {
-                exists: !!currentStreakData,
-                currentStreak: (currentStreakData && typeof currentStreakData.currentStreak === 'number') ? currentStreakData.currentStreak : 0,
-                bestStreak: (currentStreakData && typeof currentStreakData.bestStreak === 'number') ? currentStreakData.bestStreak : 0,
-                lastPlayDate: (currentStreakData && currentStreakData.lastPlayDate) ? String(currentStreakData.lastPlayDate) : 'Yok',
-                totalPlayDays: (currentStreakData && typeof currentStreakData.totalPlayDays === 'number') ? currentStreakData.totalPlayDays : 0,
-                todayProgress: (currentStreakData && typeof currentStreakData.todayProgress === 'number') ? currentStreakData.todayProgress : 0,
-                dailyGoal: (currentStreakData && typeof currentStreakData.dailyGoal === 'number') ? currentStreakData.dailyGoal : 5,
-                isToday: (currentStreakData && currentStreakData.lastPlayDate) 
-                    ? (currentStreakData.lastPlayDate === today || ((typeof currentStreakData.todayProgress === 'number' && currentStreakData.todayProgress > 0)))
-                    : false,
-                isGoalCompleted: (currentStreakData && typeof currentStreakData.todayProgress === 'number' && typeof currentStreakData.dailyGoal === 'number')
-                    ? currentStreakData.todayProgress >= currentStreakData.dailyGoal
-                    : false
-            },
-            today: today || '',
-            weekStart: weekStart || ''
-        };
-        
-        // Modal HTML'i oluştur
-        const modalHTML = `
-            <div class="modal" id="dataStatusModal" onclick="event.stopPropagation(); closeDataStatusModal();" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center; padding: 20px;">
-                <div class="modal-content" onclick="event.stopPropagation();" style="background: white; border-radius: 16px; padding: 20px; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px;">
-                        <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #667eea;">🔍 Veri Durumu</h3>
-                        <button onclick="closeDataStatusModal();" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">×</button>
-                    </div>
-                    
-                    <div style="font-size: 0.9em; color: #666; margin-bottom: 20px;">
-                        <div style="margin-bottom: 8px;"><strong>Bugün:</strong> ${dataStatus.today}</div>
-                        <div style="margin-bottom: 8px;"><strong>Hafta Başlangıcı:</strong> ${dataStatus.weekStart}</div>
-                    </div>
-                    
-                    <!-- IndexedDB Durumu -->
-                    <div style="background: ${dataStatus.indexedDB.hasData ? '#d4edda' : '#f8d7da'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.indexedDB.hasData ? '#28a745' : '#dc3545'};">
-                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.indexedDB.hasData ? '#155724' : '#721c24'};">
-                            ${dataStatus.indexedDB.hasData ? '✅' : '❌'} IndexedDB
-                        </div>
-                        <div style="font-size: 0.85em; color: ${dataStatus.indexedDB.hasData ? '#155724' : '#721c24'};">
-                            ${dataStatus.indexedDB.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
-                            ${dataStatus.indexedDB.hasData ? '<div style="margin-top: 4px; font-size: 0.8em;">Günlük: ' + (dataStatus.indexedDB.dailyTasks ? '✅' : '❌') + ' | Haftalık: ' + (dataStatus.indexedDB.weeklyTasks ? '✅' : '❌') + ' | Streak: ' + (dataStatus.indexedDB.streak ? '✅' : '❌') + '</div>' : ''}
-                        </div>
-                    </div>
-                    
-                    <!-- localStorage Durumu -->
-                    <div style="background: ${dataStatus.localStorage.hasData ? '#d4edda' : '#f8d7da'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.localStorage.hasData ? '#28a745' : '#dc3545'};">
-                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.localStorage.hasData ? '#155724' : '#721c24'};">
-                            ${dataStatus.localStorage.hasData ? '✅' : '❌'} localStorage
-                        </div>
-                        <div style="font-size: 0.85em; color: ${dataStatus.localStorage.hasData ? '#155724' : '#721c24'};">
-                            ${dataStatus.localStorage.hasData ? 'Veri mevcut' : 'Veri bulunamadı'}
-                            ${dataStatus.localStorage.hasData ? '<div style="margin-top: 4px; font-size: 0.8em;">Günlük: ' + (dataStatus.localStorage.dailyTasks ? '✅' : '❌') + ' | Haftalık: ' + (dataStatus.localStorage.weeklyTasks ? '✅' : '❌') + ' | Streak: ' + (dataStatus.localStorage.streakData ? '✅' : '❌') + '</div>' : ''}
-                        </div>
-                    </div>
-                    
-                    <!-- Günlük Görevler -->
-                    <div style="background: ${dataStatus.dailyTasks.isToday ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.dailyTasks.isToday ? '#28a745' : '#ffc107'};">
-                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.dailyTasks.isToday ? '#155724' : '#856404'};">
-                            ${dataStatus.dailyTasks.isToday ? '✅' : '⚠️'} Günlük Görevler
-                        </div>
-                        <div style="font-size: 0.85em; color: ${dataStatus.dailyTasks.isToday ? '#155724' : '#856404'};">
-                            <div>Son Tarih: <strong>${dataStatus.dailyTasks.lastTaskDate}</strong></div>
-                            <div>Tamamlanan: <strong>${dataStatus.dailyTasks.completedTasks}</strong> / ${dataStatus.dailyTasks.totalTasks + dataStatus.dailyTasks.bonusTasks}</div>
-                            <div>Temel Görevler: <strong>${dataStatus.dailyTasks.totalTasks}</strong> | Fazilet Vazifeleri: <strong>${dataStatus.dailyTasks.bonusTasks}</strong></div>
-                            <div>Fazilet Tamamlanan: <strong>${dataStatus.dailyTasks.completedBonusTasks}</strong> / ${dataStatus.dailyTasks.bonusTasks}</div>
-                            ${dataStatus.dailyTasks.todayStats ? `<div>Bugünkü Puan: <strong>${dataStatus.dailyTasks.todayStats.toplamPuan || 0}</strong></div>` : ''}
-                            ${!dataStatus.dailyTasks.isToday ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugünkü görevler değil!</strong></div>' : ''}
-                        </div>
-                    </div>
-                    
-                    <!-- Haftalık Görevler -->
-                    <div style="background: ${dataStatus.weeklyTasks.isCurrentWeek ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.weeklyTasks.isCurrentWeek ? '#28a745' : '#ffc107'};">
-                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.weeklyTasks.isCurrentWeek ? '#155724' : '#856404'};">
-                            ${dataStatus.weeklyTasks.isCurrentWeek ? '✅' : '⚠️'} Haftalık Görevler
-                        </div>
-                        <div style="font-size: 0.85em; color: ${dataStatus.weeklyTasks.isCurrentWeek ? '#155724' : '#856404'};">
-                            <div>Son Hafta: <strong>${dataStatus.weeklyTasks.lastWeekStart}</strong></div>
-                            <div>Tamamlanan: <strong>${dataStatus.weeklyTasks.completedTasks}</strong> / ${dataStatus.weeklyTasks.totalTasks}</div>
-                            ${dataStatus.weeklyTasks.weekStats ? `<div>Haftalık Puan: <strong>${dataStatus.weeklyTasks.weekStats.toplamPuan || 0}</strong></div>` : ''}
-                            ${!dataStatus.weeklyTasks.isCurrentWeek ? '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bu haftanın görevleri değil!</strong></div>' : ''}
-                        </div>
-                    </div>
-                    
-                    <!-- Streak -->
-                    <div style="background: ${dataStatus.streak.isToday ? '#d4edda' : '#fff3cd'}; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${dataStatus.streak.isToday ? '#28a745' : '#ffc107'};">
-                        <div style="font-weight: 600; margin-bottom: 6px; color: ${dataStatus.streak.isToday ? '#155724' : '#856404'};">
-                            ${dataStatus.streak.isToday ? '✅' : '⚠️'} Streak
-                        </div>
-                        <div style="font-size: 0.85em; color: ${dataStatus.streak.isToday ? '#155724' : '#856404'};">
-                            <div>Mevcut Streak: <strong>${dataStatus.streak.currentStreak}</strong> gün</div>
-                            <div>En İyi Streak: <strong>${dataStatus.streak.bestStreak}</strong> gün</div>
-                            <div>Toplam Oyun Günü: <strong>${dataStatus.streak.totalPlayDays}</strong></div>
-                            <div>Son Oyun Tarihi: <strong>${dataStatus.streak.lastPlayDate}</strong></div>
-                            <div>Bugünkü İlerleme: <strong>${dataStatus.streak.todayProgress}</strong> / ${dataStatus.streak.dailyGoal} (Günlük Hedef)</div>
-                            ${dataStatus.streak.isGoalCompleted ? '<div style="margin-top: 4px; color: #155724;"><strong>✅ Günlük hedef tamamlandı!</strong></div>' : dataStatus.streak.todayProgress > 0 ? '<div style="margin-top: 4px; color: #856404;"><strong>⏳ Günlük hedef henüz tamamlanmadı</strong></div>' : '<div style="margin-top: 4px; color: #856404;"><strong>⚠️ Bugün oynanmamış!</strong></div>'}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
-                        <button onclick="closeDataStatusModal();" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer;">Tamam</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Modal'ı ekle (güvenli şekilde)
-        try {
-            const existingModal = document.getElementById('dataStatusModal');
-            if (existingModal && existingModal.parentNode) {
-                existingModal.parentNode.removeChild(existingModal);
-            }
-        } catch (e) {
-            // Modal temizleme hatası - görmezden gel
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('⚠️ Modal temizleme hatası (görmezden geliniyor):', e);
-            }
-        }
-        
-        // Modal HTML'ini güvenli şekilde ekle
-        if (document.body) {
-            try {
-                document.body.insertAdjacentHTML('beforeend', modalHTML);
-            } catch (e) {
-                // HTML ekleme hatası
-                if (typeof log !== 'undefined' && log.error) {
-                    log.error('❌ Modal HTML ekleme hatası:', e);
-                }
-                throw new Error('Modal HTML eklenemedi: ' + (e.message || String(e)));
-            }
-        } else {
-            throw new Error('document.body bulunamadı');
-        }
-        
-        // Body scroll'u engelle
-        try {
-            if (document.body) {
-                document.body.style.overflow = 'hidden';
-            }
-        } catch (e) {
-            // Scroll engelleme hatası - görmezden gel
-            if (typeof log !== 'undefined' && log.debug) {
-                log.debug('⚠️ Scroll engelleme hatası (görmezden geliniyor):', e);
-            }
-        }
-        
-        // Global close fonksiyonu (güvenli şekilde)
-        window.closeDataStatusModal = function() {
-            try {
-                const modal = document.getElementById('dataStatusModal');
-                if (modal) {
-                    modal.style.display = 'none';
-                    if (document.body) {
-                        document.body.style.overflow = '';
-                    }
-                    setTimeout(() => {
-                        try {
-                            if (modal.parentNode) {
-                                modal.parentNode.removeChild(modal);
-                            }
-                        } catch (e) {
-                            // Modal silme hatası - görmezden gel
-                            if (typeof log !== 'undefined' && log.debug) {
-                                log.debug('⚠️ Modal silme hatası (görmezden geliniyor):', e);
-                            }
-                        }
-                    }, 300);
-                }
-            } catch (e) {
-                // Close fonksiyonu hatası - görmezden gel
-                if (typeof log !== 'undefined' && log.error) {
-                    log.error('❌ closeDataStatusModal hatası:', e);
-                }
-            } finally {
-                // Her durumda temizle
-                try {
-                    delete window.closeDataStatusModal;
-                } catch (e) {
-                    // Silme hatası - görmezden gel
-                }
-            }
-        };
-        
-    } catch (error) {
-        // Hata yakalama - tüm hataları güvenli şekilde işle
-        const errorMessage = error && error.message ? error.message : String(error);
-        
-        // Log hatası
-        if (typeof log !== 'undefined' && log.error) {
-            log.error('❌ Veri durumu gösterilirken hata:', error);
-        } else {
-            console.error('❌ Veri durumu gösterilirken hata:', error);
-        }
-        
-        // Kullanıcıya hata mesajı göster
-        if (typeof showCustomAlert === 'function') {
-            showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
-        } else if (typeof window.showCustomAlert === 'function') {
-            window.showCustomAlert('Hata', 'Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
-        } else {
-            // Son çare: alert kullan
-            alert('Veri durumu gösterilirken bir hata oluştu: ' + errorMessage);
-        }
-    }
-}
-
-// Global erişim için
+// Export functions
 if (typeof window !== 'undefined') {
+    window.startGame = startGame;
+    window.endGame = endGame;
+    window.restartGame = restartGame;
+    window.saveCurrentGameProgress = saveCurrentGameProgress;
+    window.showStatsModal = showStatsModal;
+    window.showBadgesModal = showBadgesModal;
+    window.showCalendarModal = showCalendarModal;
+    window.showDailyTasksModal = showDailyTasksModal;
+    window.showDailyGoalSettings = showDailyGoalSettings;
     window.showDataStatus = showDataStatus;
+    window.showCustomConfirm = showCustomConfirm;
+    window.showLevelUpModal = showLevelUpModal;
+    window.claimDailyRewards = claimDailyRewards;
+    window.claimWeeklyRewards = claimWeeklyRewards;
+    window.setCustomGoal = setCustomGoal;
+    window.resetAllStats = resetAllStats;
+    window.showDetailedStats = () => {
+        if (typeof showDetailedStatsModal === 'function') {
+            showDetailedStatsModal();
+        } else {
+            // Fallback: Basit bir modal göster
+            showErrorMessage('Detaylı istatistikler yükleniyor...');
+            setTimeout(() => {
+                if (typeof showDetailedStatsModal === 'function') {
+                    showDetailedStatsModal();
+                }
+            }, 100);
+        }
+    };
 }
 
-// ============ YENİ LOADING SCREEN BLOĞU SİLİNDİ ============

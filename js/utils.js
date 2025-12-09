@@ -1,54 +1,323 @@
-// ============ YARDIMCI FONKSİYONLAR ============
+// ============================================
+// UTILS - Yardımcı Fonksiyonlar
+// ============================================
+
 /**
- * Yerel tarih formatı (YYYY-MM-DD) - UTC yerine yerel saat dilimi kullanır
- * @param {Date} [date=new Date()] - Formatlanacak tarih (varsayılan: bugün)
- * @returns {string} YYYY-MM-DD formatında tarih string'i
- * @example
- * getLocalDateString(new Date('2024-01-15')) // '2024-01-15'
- * getLocalDateString() // Bugünün tarihi
+ * YYYY-MM-DD formatında bugünün tarihini döndürür
  */
 function getLocalDateString(date = new Date()) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    // Yerel saat dilimini kullan
+    const localDate = new Date(date);
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
-// ============ DEBOUNCE & THROTTLE UTILITIES ============
 /**
- * Debounce utility - Fonksiyon çağrılarını geciktirir
- * @param {Function} func - Geciktirilecek fonksiyon
- * @param {number} wait - Bekleme süresi (ms)
- * @param {boolean} immediate - İlk çağrıda hemen çalıştır mı?
- * @returns {Function} Debounced fonksiyon
- * @example
- * const debouncedSearch = debounce(handleSearch, 300);
- * searchInput.addEventListener('input', debouncedSearch);
+ * Sayıyı binlik ayırıcı ile formatlar (1,234)
  */
-function debounce(func, wait = 300, immediate = false) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            timeout = null;
-            if (!immediate) func(...args);
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/**
+ * Modal'ı kapatır
+ */
+// Açık modal takibi
+let currentOpenModal = null;
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        
+        // badge-detail-modal kapatıldığında badges-modal açık kalmalı
+        if (modalId === 'badge-detail-modal' && currentOpenModal === 'badges-modal') {
+            // badges-modal zaten açık, sadece badge-detail-modal'ı kapat
+            return;
+        }
+        
+        // Body scroll'unu tekrar etkinleştir (sadece tüm modaller kapandığında)
+        if (currentOpenModal === modalId) {
+            currentOpenModal = null;
+            // Başka açık modal var mı kontrol et
+            const anyModalOpen = Array.from(document.querySelectorAll('.modal')).some(m => 
+                m.style.display === 'flex' || (m.style.display !== 'none' && m.id !== modalId)
+            );
+            if (!anyModalOpen) {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
+            }
+        }
+    }
+}
+
+/**
+ * Modal'ı açar
+ */
+function openModal(modalId) {
+    // badge-detail-modal badges-modal açıkken açılabilir (üst üste modal desteği)
+    const canStackModal = modalId === 'badge-detail-modal' && currentOpenModal === 'badges-modal';
+    
+    // Eğer başka bir modal açıksa ve üst üste modal desteği yoksa önce onu kapat
+    if (currentOpenModal && currentOpenModal !== modalId && !canStackModal) {
+        closeModal(currentOpenModal);
+    }
+    
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Üst üste modal desteği varsa currentOpenModal'ı değiştirme
+        if (!canStackModal) {
+            currentOpenModal = modalId;
+        }
+        
+        // Mobilde body scroll'unu engelle (sadece modal içinde kaydırma)
+        if (window.innerWidth <= 600) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        }
+    }
+}
+
+/**
+ * Ana menüye döner
+ */
+function goToMainMenu(saveProgress = false) {
+    // Çalan sesi durdur
+    if (typeof window.stopCurrentAudio === 'function') {
+        window.stopCurrentAudio();
+    }
+    
+    // Tüm açık modalları kapat
+    document.querySelectorAll('.modal').forEach(modal => {
+        if (modal.style.display !== 'none') {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Body scroll'unu tekrar etkinleştir
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    
+    // Açık modal kaydını temizle
+    if (typeof currentOpenModal !== 'undefined') {
+        currentOpenModal = null;
+    }
+    
+    // Oyun devam ediyorsa ve kayıt isteniyorsa
+    if (saveProgress && typeof window.currentGame !== 'undefined' && window.currentGame !== null) {
+        // Mevcut kazanımları kaydet
+        if (typeof window.saveCurrentGameProgress === 'function') {
+            window.saveCurrentGameProgress();
+        }
+    }
+    
+    // Tüm oyun ekranlarını gizle
+    document.querySelectorAll('.game-screen, .reading-screen').forEach(screen => {
+        screen.style.display = 'none';
+    });
+    
+    // Ana menüyü göster
+    const mainMenu = document.getElementById('main-menu');
+    if (mainMenu) {
+        mainMenu.style.display = 'block';
+    }
+    
+    // Bottom nav'ı aktif et
+    document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Oyun durumunu sıfırla
+    if (typeof window.currentGame !== 'undefined') {
+        window.currentGame = null;
+        if (typeof window.currentGameMode !== 'undefined') {
+            window.currentGameMode = null;
+        }
+        if (typeof window.currentSubMode !== 'undefined') {
+            window.currentSubMode = null;
+        }
+    }
+    
+    const mainMenuBtn = document.querySelector('.bottom-nav .nav-btn[data-page="main-menu"]');
+    if (mainMenuBtn) {
+        mainMenuBtn.classList.add('active');
+    }
+}
+
+/**
+ * Hafta başlangıç tarihini döndürür (Pazartesi)
+ */
+function getWeekStartDate(date = new Date()) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+/**
+ * Hafta bitiş tarihini döndürür (Pazar)
+ */
+function getWeekEndDate(date = new Date()) {
+    const start = getWeekStartDate(date);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+    return end;
+}
+
+/**
+ * Hafta başlangıç tarihini string olarak döndürür
+ */
+function getWeekStartDateString(date = new Date()) {
+    return getLocalDateString(getWeekStartDate(date));
+}
+
+/**
+ * Hafta bitiş tarihini string olarak döndürür
+ */
+function getWeekEndDateString(date = new Date()) {
+    return getLocalDateString(getWeekEndDate(date));
+}
+
+/**
+ * İki tarih arasındaki gün farkını döndürür
+ */
+/**
+ * Tarihe belirtilen gün sayısını ekler
+ */
+function addDays(dateString, days) {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + days);
+    return getLocalDateString(date);
+}
+
+function getDaysDifference(date1, date2) {
+    const oneDay = 24 * 60 * 60 * 1000;
+    const firstDate = new Date(date1);
+    const secondDate = new Date(date2);
+    firstDate.setHours(0, 0, 0, 0);
+    secondDate.setHours(0, 0, 0, 0);
+    return Math.round((secondDate - firstDate) / oneDay);
+}
+
+/**
+ * Array'den rastgele eleman seçer
+ */
+function getRandomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+/**
+ * Array'den rastgele N eleman seçer (tekrar etmeden)
+ */
+function getRandomItems(array, count) {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+}
+
+/**
+ * Array'i karıştırır (Fisher-Yates shuffle)
+ */
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+/**
+ * Doğru cevabı eşit dağılımla yerleştirir
+ * @param {Array} options - Tüm seçenekler (doğru + yanlış)
+ * @param {*} correctAnswer - Doğru cevap
+ * @param {Array} positionCounts - Her pozisyonun kullanım sayısı [0,0,0,0]
+ * @returns {Object} {options: Array, correctIndex: number}
+ */
+function shuffleWithEqualDistribution(options, correctAnswer, positionCounts) {
+    // Doğru cevabın mevcut pozisyonunu bul
+    const currentCorrectIndex = options.indexOf(correctAnswer);
+    
+    // En az kullanılan pozisyonları bul
+    const minCount = Math.min(...positionCounts);
+    const leastUsedPositions = positionCounts
+        .map((count, index) => ({ count, index }))
+        .filter(item => item.count === minCount)
+        .map(item => item.index);
+    
+    // Eğer doğru cevap zaten en az kullanılan pozisyonlardan birindeyse, olduğu gibi bırak
+    if (leastUsedPositions.includes(currentCorrectIndex)) {
+        // Diğer seçenekleri karıştır
+        const otherOptions = options.filter((opt, idx) => idx !== currentCorrectIndex);
+        const shuffledOthers = shuffleArray(otherOptions);
+        
+        // Doğru cevabı yerinde bırak, diğerlerini karıştır
+        const result = [...options];
+        let otherIndex = 0;
+        for (let i = 0; i < result.length; i++) {
+            if (i !== currentCorrectIndex) {
+                result[i] = shuffledOthers[otherIndex++];
+            }
+        }
+        
+        return {
+            options: result,
+            correctIndex: currentCorrectIndex
         };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func(...args);
+    }
+    
+    // Doğru cevabı en az kullanılan pozisyonlardan birine taşı
+    const targetPosition = leastUsedPositions[Math.floor(Math.random() * leastUsedPositions.length)];
+    
+    // Yeni düzenleme oluştur
+    const result = [...options];
+    const temp = result[currentCorrectIndex];
+    result[currentCorrectIndex] = result[targetPosition];
+    result[targetPosition] = temp;
+    
+    // Diğer seçenekleri de karıştır (doğru cevap hariç)
+    const otherIndices = [0, 1, 2, 3].filter(i => i !== targetPosition);
+    const otherOptions = otherIndices.map(i => result[i]);
+    const shuffledOthers = shuffleArray(otherOptions);
+    
+    otherIndices.forEach((originalIndex, shuffleIndex) => {
+        result[originalIndex] = shuffledOthers[shuffleIndex];
+    });
+    
+    return {
+        options: result,
+        correctIndex: targetPosition
     };
 }
 
 /**
- * Throttle utility - Fonksiyon çağrılarını sınırlar
- * @param {Function} func - Sınırlanacak fonksiyon
- * @param {number} limit - Minimum çağrı aralığı (ms)
- * @returns {Function} Throttled fonksiyon
- * @example
- * const throttledScroll = throttle(handleScroll, 100);
- * window.addEventListener('scroll', throttledScroll);
+ * Debounce fonksiyonu
  */
-function throttle(func, limit = 100) {
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Throttle fonksiyonu
+ */
+function throttle(func, limit) {
     let inThrottle;
     return function(...args) {
         if (!inThrottle) {
@@ -59,383 +328,342 @@ function throttle(func, limit = 100) {
     };
 }
 
-// ============ MOBİL DENEYİM - HAPTIC FEEDBACK ============
 /**
- * Mobil cihazlarda haptic feedback (titreme) sağlar
- * @param {('light'|'medium'|'heavy'|'success'|'error'|'warning')} [type='light'] - Titreme tipi
- * @returns {void}
- * @example
- * hapticFeedback('success') // Başarılı işlem için titreşim
+ * Custom alert gösterir
  */
-function hapticFeedback(type = 'light') {
-    if (!CONFIG.hapticEnabled || !navigator.vibrate) return;
+function showCustomAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `custom-alert alert-${type}`;
+    alertDiv.textContent = message;
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 1rem 2rem;
+        background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#667eea'};
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideDown 0.3s ease;
+    `;
     
-    // Constants'tan pattern'leri al, yoksa varsayılanları kullan
-    const patterns = window.CONSTANTS?.HAPTIC?.PATTERNS || {
-        light: 10,
-        medium: 20,
-        heavy: 50,
-        success: [20, 50, 20],
-        error: [50, 100, 50],
-        warning: [30, 50, 30]
-    };
+    document.body.appendChild(alertDiv);
     
-    const pattern = patterns[type] || patterns.light;
-    navigator.vibrate(pattern);
+    setTimeout(() => {
+        alertDiv.style.animation = 'slideUp 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(alertDiv);
+        }, 300);
+    }, 3000);
 }
 
-// ============ MOBİL DENEYİM - SWIPE GESTURES ============
 /**
- * Mobil cihazlarda swipe (kaydırma) jestlerini başlatır
- * @param {HTMLElement} element - Jest dinlenecek DOM elementi
- * @param {Object} callbacks - Jest callback'leri
- * @param {Function} [callbacks.onSwipeUp] - Yukarı kaydırma callback'i
- * @param {Function} [callbacks.onSwipeDown] - Aşağı kaydırma callback'i
- * @param {Function} [callbacks.onSwipeLeft] - Sola kaydırma callback'i
- * @param {Function} [callbacks.onSwipeRight] - Sağa kaydırma callback'i
- * @returns {void}
- * @example
- * initSwipeGestures(document.getElementById('card'), {
- *   onSwipeRight: () => console.log('Sağa kaydırıldı')
- * })
+ * Başarı mesajı gösterir
  */
-function initSwipeGestures(element, callbacks) {
-    if (!CONFIG.swipeGesturesEnabled || !element) return;
-    
-    // Constants'tan değerleri al
-    const minSwipeDistance = window.CONSTANTS?.SWIPE?.MIN_DISTANCE || 50;
-    const maxVerticalDistance = window.CONSTANTS?.SWIPE?.MAX_VERTICAL_DISTANCE || 100;
-    
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    let isScrolling = false;
-    
-    element.addEventListener('touchstart', (e) => {
-        const touch = e.touches[0];
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        isScrolling = false;
-    }, { passive: true });
-    
-    element.addEventListener('touchmove', (e) => {
-        const touch = e.touches[0];
-        const deltaY = Math.abs(touch.clientY - touchStartY);
-        // Eğer dikey hareket fazlaysa, bu bir scroll'dur
-        if (deltaY > maxVerticalDistance) {
-            isScrolling = true;
-        }
-    }, { passive: true });
-    
-    element.addEventListener('touchend', (e) => {
-        if (isScrolling) return;
-        
-        const touch = e.changedTouches[0];
-        touchEndX = touch.clientX;
-        touchEndY = touch.clientY;
-        
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-        const absDeltaX = Math.abs(deltaX);
-        const absDeltaY = Math.abs(deltaY);
-        
-        // Dikey swipe (yukarı/aşağı)
-        if (absDeltaY > absDeltaX && absDeltaY > minSwipeDistance) {
-            if (deltaY > 0 && callbacks.onSwipeDown) {
-                // Swipe down (aşağı kaydırma)
-                callbacks.onSwipeDown();
-                hapticFeedback('light');
-            } else if (deltaY < 0 && callbacks.onSwipeUp) {
-                // Swipe up (yukarı kaydırma)
-                callbacks.onSwipeUp();
-                hapticFeedback('light');
-            }
-        }
-        // Yatay swipe (sağa/sola)
-        else if (absDeltaX > absDeltaY && absDeltaX > minSwipeDistance) {
-            if (deltaX > 0 && callbacks.onSwipeRight) {
-                // Swipe right (sağa kaydırma)
-                callbacks.onSwipeRight();
-                hapticFeedback('light');
-            } else if (deltaX < 0 && callbacks.onSwipeLeft) {
-                // Swipe left (sola kaydırma)
-                callbacks.onSwipeLeft();
-                hapticFeedback('light');
-            }
-        }
-    }, { passive: true });
+function showSuccessMessage(message) {
+    showCustomAlert(message, 'success');
 }
 
-// ============ SECURITY - HTML SANITIZATION ============
 /**
- * XSS koruması için HTML özel karakterlerini escape eder
- * @param {string} input - Sanitize edilecek string
- * @returns {string} Escape edilmiş HTML string'i
- * @example
- * sanitizeHTML('<script>alert("xss")</script>') // '&lt;script&gt;alert("xss")&lt;/script&gt;'
+ * Hata mesajı gösterir
  */
-function sanitizeHTML(input) {
-    // XSS koruması için HTML özel karakterlerini escape et
-    if (typeof input !== 'string') return '';
+function showErrorMessage(message) {
+    showCustomAlert(message, 'error');
+}
+
+/**
+ * Ses çalar (Web Audio API veya HTML5 Audio)
+ */
+function playSound(soundName) {
+    // Ses efektleri için placeholder
+    // Gerçek implementasyon ses dosyaları eklendiğinde yapılacak
+}
+
+/**
+ * HTML'i sanitize eder (XSS koruması)
+ */
+function sanitizeHTML(str) {
     const div = document.createElement('div');
-    div.textContent = input;
+    div.textContent = str;
     return div.innerHTML;
 }
 
 /**
- * innerHTML kullanımı için güvenli wrapper
- * @param {HTMLElement} element - HTML set edilecek element
- * @param {string} html - Set edilecek HTML içeriği
- * @param {boolean} [isStaticTrusted=false] - Statik ve güvenilir içerik mi?
- * @returns {void}
- * @example
- * safeSetHTML(document.getElementById('content'), userInput) // Otomatik sanitize
- * safeSetHTML(document.getElementById('content'), '<div>Static</div>', true) // Sanitize yok
+ * LocalStorage'dan güvenli şekilde veri okur
  */
-function safeSetHTML(element, html, isStaticTrusted = false) {
-    // innerHTML kullanımı için güvenli wrapper
-    if (!element) return;
-    if (isStaticTrusted) {
-        // Statik, güvenilir HTML için direkt set (template literals)
-        element.innerHTML = html;
-    } else {
-        // User input veya dinamik içerik için sanitize
-        element.innerHTML = sanitizeHTML(html);
-    }
-}
-
-// ============ LOADING INDICATOR ============
-/**
- * Loading göstergesi gösterir
- * @param {string} [message='Yükleniyor...'] - Gösterilecek mesaj
- * @returns {void}
- */
-function showLoading(message = 'Yükleniyor...') {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) {
-        spinner.style.display = 'flex';
-        const textEl = spinner.querySelector('div > div:last-child');
-        if (textEl) textEl.textContent = message;
-    }
-}
-
-/**
- * Loading göstergesini gizler
- * @returns {void}
- */
-function hideLoading() {
-    const spinner = document.getElementById('loadingSpinner');
-    if (spinner) spinner.style.display = 'none';
-}
-
-/**
- * Async fonksiyonu loading state ile çalıştırır
- * @param {Function} asyncFn - Çalıştırılacak async fonksiyon
- * @param {string} [loadingMessage='Yükleniyor...'] - Loading mesajı
- * @returns {Promise<*>} Fonksiyonun sonucu
- * @example
- * await withLoading(async () => {
- *   const data = await fetchData();
- *   return data;
- * }, 'Veriler yükleniyor...');
- */
-async function withLoading(asyncFn, loadingMessage = 'Yükleniyor...') {
+function safeGetItem(key, defaultValue = null) {
     try {
-        showLoading(loadingMessage);
-        const result = await asyncFn();
-        return result;
-    } finally {
-        hideLoading();
-    }
-}
-
-// ============ SECURITY - LOCALSTORAGE ENCRYPTION ============
-/**
- * Veriyi Base64 ile encode eder (basit şifreleme)
- * ⚠️ NOT: Bu sadece obfuscation içindir, gerçek şifreleme değildir
- * @param {*} data - Şifrelenecek veri (herhangi bir tip)
- * @returns {string} Base64 encoded string
- * @example
- * encryptData({ user: 'test', score: 100 }) // Base64 string
- */
-function encryptData(data) {
-    // Basit Base64 encoding (production'da daha güçlü encryption kullanılabilir)
-    try {
-        const jsonStr = JSON.stringify(data);
-        return btoa(unescape(encodeURIComponent(jsonStr)));
-    } catch(e) {
-        log.error('Encryption error:', e);
-        return data;
+        const item = localStorage.getItem(key);
+        if (item === null) return defaultValue;
+        return JSON.parse(item);
+    } catch (e) {
+        console.error('Error reading from localStorage:', e);
+        return defaultValue;
     }
 }
 
 /**
- * Base64 encoded veriyi decode eder
- * @param {string} encrypted - Base64 encoded string
- * @returns {*} Orijinal veri
- * @example
- * decryptData('eyJ1c2VyIjoidGVzdCJ9') // { user: 'test' }
+ * LocalStorage'a güvenli şekilde veri yazar
  */
-function decryptData(encrypted) {
-    // Base64 decoding
+function safeSetItem(key, value) {
     try {
-        const jsonStr = decodeURIComponent(escape(atob(encrypted)));
-        return JSON.parse(jsonStr);
-    } catch(e) {
-        log.error('Decryption error:', e);
-        // Eğer decrypt edilemezse, belki encrypt edilmemiş eski veri
-        try {
-            return JSON.parse(encrypted);
-        } catch(e2) {
-            return encrypted;
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (e) {
+        console.error('Error writing to localStorage:', e);
+        return false;
+    }
+}
+
+/**
+ * Zorluk seviyesine göre kelime filtreler
+ * JSON'da difficulty değerleri 5-21 arasında (çoğunlukla 6-16)
+ * Analiz sonucu: Kolay (5-8): 27.57%, Orta (9-12): 53.38%, Zor (13-21): 19.05%
+ * Daha dengeli dağılım için:
+ * Kolay: 5-8, Orta: 9-12, Zor: 13-21
+ */
+function filterByDifficulty(words, difficulty) {
+    if (difficulty === 'easy') {
+        // Kolay: difficulty 5-8 arası (4091 kelime, %27.57)
+        return words.filter(w => {
+            const diff = w.difficulty ?? 10; // Varsayılan orta seviye
+            return diff >= 5 && diff <= 8;
+        });
+    } else if (difficulty === 'medium') {
+        // Orta: difficulty 9-12 arası (8079 kelime, %54.48)
+        return words.filter(w => {
+            const diff = w.difficulty ?? 10; // Varsayılan orta seviye
+            return diff >= 9 && diff <= 12;
+        });
+    } else if (difficulty === 'hard') {
+        // Zor: difficulty 13-21 arası (2667 kelime, %17.98)
+        return words.filter(w => {
+            const diff = w.difficulty ?? 10; // Varsayılan orta seviye
+            return diff >= 13 && diff <= 21;
+        });
+    }
+    return words;
+}
+
+/**
+ * 30. cüz ayetlerini filtreler (sure 78-114)
+ */
+function filterJuz30(words) {
+    return words.filter(w => {
+        const sureNum = parseInt(w.id.split(':')[0]);
+        return sureNum >= 78 && sureNum <= 114;
+    });
+}
+
+
+// CSS Animasyonları için style ekle
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from {
+            transform: translateX(-50%) translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     }
-}
-
-/**
- * localStorage'a şifreli veri kaydeder
- * @param {string} key - Storage key
- * @param {*} value - Kaydedilecek veri
- * @returns {void}
- * @example
- * secureSetItem('userData', { name: 'John', score: 100 })
- */
-function secureSetItem(key, value) {
-    // localStorage'a şifreli kaydet
-    const encrypted = encryptData(value);
-    localStorage.setItem(key, encrypted);
-}
-
-/**
- * localStorage'dan şifreli veri okur
- * @param {string} key - Storage key
- * @returns {*} Okunan veri veya null
- * @example
- * const userData = secureGetItem('userData') // { name: 'John', score: 100 }
- */
-function secureGetItem(key) {
-    // localStorage'dan şifreli oku
-    const encrypted = localStorage.getItem(key);
-    if (!encrypted) return null;
-    return decryptData(encrypted);
-}
-
-// ============ CUSTOM ALERT SYSTEM (Professional UI) ============
-/**
- * Özel alert modal gösterir
- * @param {string} message - Gösterilecek mesaj
- * @param {('success'|'error'|'warning'|'info')} [type='info'] - Alert tipi
- * @param {string|null} [title=null] - Alert başlığı
- * @returns {void}
- */
-function showCustomAlert(message, type = 'info', title = null) {
-    const modal = document.getElementById('customAlertModal');
-    const iconEl = document.getElementById('customAlertIcon');
-    const titleEl = document.getElementById('customAlertTitle');
-    const messageEl = document.getElementById('customAlertMessage');
-    const okBtn = document.getElementById('customAlertOKBtn');
     
-    // Null check - eğer elementler yüklenmemişse console'a uyarı ver ve çık
-    if (!modal || !iconEl || !titleEl || !messageEl || !okBtn) {
-        if (typeof log !== 'undefined') log.warn('⚠️ Custom alert modal elementi bulunamadı! Eski alert sistemine geri dönülüyor...');
-        // Fallback to standard alert
-        alert(title ? `${title}\n\n${message}` : message);
-        return;
-    }
-    
-    // Type-based styling
-    const types = {
-        success: { icon: '🎉', title: 'Başarılı!', color: '#4caf50' },
-        error: { icon: '❌', title: 'Hata!', color: '#f44336' },
-        warning: { icon: '⚠️', title: 'Uyarı!', color: '#ff9800' },
-        info: { icon: 'ℹ️', title: 'Bilgi', color: '#2196f3' }
-    };
-    
-    const config = types[type] || types.info;
-    iconEl.textContent = config.icon;
-    titleEl.textContent = title || config.title;
-    titleEl.style.color = config.color;
-    
-    // HTML içeriği varsa innerHTML kullan, yoksa textContent
-    if (typeof message === 'string' && message.includes('<') && message.includes('>')) {
-        safeSetHTML(messageEl, message, true);
-    } else {
-        messageEl.textContent = message || '';
-    }
-    
-    // Show modal
-    modal.style.display = 'flex';
-    
-    // OK button handler
-    const handleOK = () => {
-        modal.style.display = 'none';
-        okBtn.removeEventListener('click', handleOK);
-    };
-    
-    okBtn.addEventListener('click', handleOK);
-    
-    // ESC key to close
-    const handleEsc = (e) => {
-        if (e.key === 'Escape') {
-            modal.style.display = 'none';
-            okBtn.removeEventListener('click', handleOK);
-            document.removeEventListener('keydown', handleEsc);
+    @keyframes slideUp {
+        from {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
-    };
-    document.addEventListener('keydown', handleEsc);
+        to {
+            transform: translateX(-50%) translateY(-20px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+/**
+ * Oyun bilgilendirme modalını gösterir
+ * @param {string} gameMode - Oyun modu ('kelime-cevir', 'dinle-bul', 'bosluk-doldur')
+ */
+function showGameInfoModal(gameMode) {
+    // Modal'ı aç
+    openModal('game-info-modal');
+    
+    // Oyun moduna göre içeriği güncelle
+    updateGameInfoContent(gameMode);
+    
+    // Tab event listener'larını ekle
+    setupGameInfoTabs();
 }
 
-// Modal'ı kapat (global erişim için)
 /**
- * Custom alert modal'ı kapatır
- * @returns {void}
+ * Oyun moduna göre bilgilendirme içeriğini günceller
+ * @param {string} gameMode - Oyun modu
  */
-function closeCustomAlert() {
-    const modal = document.getElementById('customAlertModal');
-    if (modal) {
-        modal.style.display = 'none';
+function updateGameInfoContent(gameMode) {
+    const howToPlayContent = document.getElementById('how-to-play-content');
+    if (!howToPlayContent) return;
+    
+    let content = '';
+    
+    switch(gameMode) {
+        case 'kelime-cevir':
+            content = `
+                <p>Arapça kelimenin Türkçe meâl karşılığını bulun.</p>
+                <ul>
+                    <li>4 seçenekten birini seçin</li>
+                    <li>Doğru cevap için kelimenin zorluk seviyesine göre Hasene kazanın (5-21 Hasene)</li>
+                    <li>Kolay kelimeler daha az, zor kelimeler daha fazla Hasene verir</li>
+                    <li>10 soru tamamlayın</li>
+                    <li>Perfect bonus için tüm soruları doğru cevaplayın</li>
+                    <li>İpucu butonunu kullanarak yanlış bir seçeneği devre dışı bırakabilirsiniz (her soruda 1 kez)</li>
+                    <li>Ses butonunu kullanarak kelimeyi dinleyebilirsiniz</li>
+                    <li>Oyunu istediğiniz zaman "Geri" butonu ile çıkabilirsiniz</li>
+                </ul>
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">
+                    💡 <strong>İpucu:</strong> Oyunu yarım bıraksanız bile kazandığınız puanlar kaydedilir. 
+                    Ancak oyun sayısı sadece 10 soruyu tamamladığınızda artar. 
+                    Detaylı bilgi için "İstatistikler" tab'ına bakın.
+                </p>
+            `;
+            break;
+        case 'dinle-bul':
+            content = `
+                <p>Dinlediğiniz Arapça kelimenin Türkçe meâl karşılığını bulun.</p>
+                <ul>
+                    <li>🎧 Ses butonuna tıklayarak kelimeyi dinleyin</li>
+                    <li>4 seçenekten doğru olanı seçin</li>
+                    <li>Doğru cevap için kelimenin zorluk seviyesine göre Hasene kazanın (5-21 Hasene)</li>
+                    <li>Kolay kelimeler daha az, zor kelimeler daha fazla Hasene verir</li>
+                    <li>10 soru tamamlayın</li>
+                    <li>Perfect bonus için tüm soruları doğru cevaplayın</li>
+                    <li>Oyunu istediğiniz zaman "Geri" butonu ile çıkabilirsiniz</li>
+                </ul>
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">
+                    💡 <strong>İpucu:</strong> Oyunu yarım bıraksanız bile kazandığınız puanlar kaydedilir. 
+                    Ancak oyun sayısı sadece 10 soruyu tamamladığınızda artar. 
+                    Detaylı bilgi için "İstatistikler" tab'ına bakın.
+                </p>
+            `;
+            break;
+        case 'bosluk-doldur':
+            content = `
+                <p>Ayetteki eksik kelimeyi tamamlayın.</p>
+                <ul>
+                    <li>Ayetin Arapça metnini okuyun</li>
+                    <li>Boşlukta hangi kelime olması gerektiğini bulun</li>
+                    <li>4 seçenekten doğru olanı seçin</li>
+                    <li>Doğru cevap için ayetin zorluk seviyesine göre Hasene kazanın:</li>
+                    <li style="padding-left: 2rem;">• Kısa ayetler (1-6 kelime): 10 Hasene</li>
+                    <li style="padding-left: 2rem;">• Orta ayetler (7-12 kelime): 15 Hasene</li>
+                    <li style="padding-left: 2rem;">• Uzun ayetler (13+ kelime): 20 Hasene</li>
+                    <li>10 soru tamamlayın</li>
+                    <li>Perfect bonus için tüm soruları doğru cevaplayın</li>
+                    <li>Ses butonunu kullanarak ayeti dinleyebilirsiniz</li>
+                    <li>Oyunu istediğiniz zaman "Geri" butonu ile çıkabilirsiniz</li>
+                </ul>
+                <p style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);">
+                    💡 <strong>İpucu:</strong> Oyunu yarım bıraksanız bile kazandığınız puanlar kaydedilir. 
+                    Ancak oyun sayısı sadece 10 soruyu tamamladığınızda artar. 
+                    Detaylı bilgi için "İstatistikler" tab'ına bakın.
+                </p>
+            `;
+            break;
+        default:
+            content = `
+                <p>Arapça kelimenin Türkçe meâl karşılığını bulun.</p>
+                <ul>
+                    <li>4 seçenekten birini seçin</li>
+                    <li>Doğru cevap için kelimenin zorluk seviyesine göre Hasene kazanın (5-21 Hasene)</li>
+                    <li>10 soru tamamlayın</li>
+                    <li>Perfect bonus için tüm soruları doğru cevaplayın</li>
+                </ul>
+            `;
+    }
+    
+    howToPlayContent.innerHTML = content;
+}
+
+/**
+ * Bilgilendirme modalındaki tab'ları ayarlar
+ */
+function setupGameInfoTabs() {
+    // Mevcut event listener'ları temizle
+    document.querySelectorAll('.info-tab-btn').forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+    });
+    
+    // Yeni event listener'ları ekle
+    document.querySelectorAll('.info-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            switchInfoTab(tabName);
+        });
+    });
+}
+
+/**
+ * Bilgilendirme modalında tab değiştirir
+ * @param {string} tabName - Tab adı
+ */
+function switchInfoTab(tabName) {
+    // Tüm tab butonlarını pasif yap
+    document.querySelectorAll('.info-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Tüm tab içeriklerini gizle
+    document.querySelectorAll('.info-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Seçilen tab'ı aktif yap
+    const activeBtn = document.querySelector(`.info-tab-btn[data-tab="${tabName}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    // Seçilen tab içeriğini göster
+    const activeContent = document.getElementById(`${tabName}-tab`);
+    if (activeContent) {
+        activeContent.classList.add('active');
     }
 }
 
-// Global erişim için (tarayıcıda)
+// Export
 if (typeof window !== 'undefined') {
-    window.closeCustomAlert = closeCustomAlert;
+    window.getLocalDateString = getLocalDateString;
+    window.addDays = addDays;
+    window.formatNumber = formatNumber;
+    window.closeModal = closeModal;
+    window.openModal = openModal;
+    window.goToMainMenu = goToMainMenu;
+    window.getWeekStartDate = getWeekStartDate;
+    window.getWeekEndDate = getWeekEndDate;
+    window.getWeekStartDateString = getWeekStartDateString;
+    window.getWeekEndDateString = getWeekEndDateString;
+    window.getDaysDifference = getDaysDifference;
+    window.getRandomItem = getRandomItem;
+    window.getRandomItems = getRandomItems;
+    window.shuffleArray = shuffleArray;
     window.debounce = debounce;
     window.throttle = throttle;
-    window.withLoading = withLoading;
-    window.getLocalDateString = getLocalDateString;
-    window.sanitizeHTML = sanitizeHTML;
-    window.encryptData = encryptData;
-    window.decryptData = decryptData;
-    window.secureSetItem = secureSetItem;
-    window.secureGetItem = secureGetItem;
-    window.safeSetHTML = safeSetHTML;
-    window.hapticFeedback = hapticFeedback;
-    window.initSwipeGestures = initSwipeGestures;
-    window.showLoading = showLoading;
-    window.hideLoading = hideLoading;
     window.showCustomAlert = showCustomAlert;
+    window.showSuccessMessage = showSuccessMessage;
+    window.showErrorMessage = showErrorMessage;
+    window.playSound = playSound;
+    window.sanitizeHTML = sanitizeHTML;
+    window.safeGetItem = safeGetItem;
+    window.safeSetItem = safeSetItem;
+    window.filterByDifficulty = filterByDifficulty;
+    window.filterJuz30 = filterJuz30;
+    window.shuffleWithEqualDistribution = shuffleWithEqualDistribution;
+    window.showGameInfoModal = showGameInfoModal;
+    window.switchInfoTab = switchInfoTab;
 }
 
-// Test ortamı için export (Node.js/Vitest'te çalışır)
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        getLocalDateString,
-        sanitizeHTML,
-        encryptData,
-        decryptData,
-        secureSetItem,
-        secureGetItem,
-        safeSetHTML,
-        hapticFeedback,
-        initSwipeGestures,
-        showLoading,
-        hideLoading,
-        withLoading,
-        showCustomAlert,
-        closeCustomAlert,
-        debounce,
-        throttle
-    };
-}

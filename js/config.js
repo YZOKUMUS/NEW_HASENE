@@ -1,35 +1,101 @@
-// ============ PRODUCTION CONFIG - DEBUG SISTEMI ============
+// ============================================
+// CONFIG - Yapılandırma ve Debug Ayarları
+// ============================================
+
 const CONFIG = {
-    debug: false,              // Ana debug modu (production'da false)
-    debugStats: false,          // İstatistik debug'ları (filterWordStats, updateWordStatistics)
-    debugElements: false,       // DOM element kontrolleri
-    debugAudio: false,          // Ses sistemi debug'ları
-    debugGameFlow: false,       // Oyun akışı debug'ları
-    debugTest: false,           // Test fonksiyonları (testReviewWords, testStreakScenarios)
-    showCriticalErrors: true,   // Kritik hataları her zaman göster
-    showWarnings: false,        // Uyarıları göster (false = sadece kritik hatalar)
-    hapticEnabled: true,        // Haptic feedback (titreme) aktif mi
-    swipeGesturesEnabled: true  // Swipe jestleri aktif mi
+    // Debug Mode
+    DEBUG: false,
+    
+    // Logging
+    LOG_LEVEL: 'info', // 'debug', 'info', 'warn', 'error'
+    GAME_DEBUG: true, // Oyun adımları için detaylı log (test için)
+    
+    // Performance
+    DEBOUNCE_DELAY: 500, // ms
+    LAZY_LOAD_DELAY: 100, // ms
+    
+    // Game Settings
+    QUESTIONS_PER_GAME: 10,
+    TIME_LIMIT_PER_QUESTION: 0, // Zaman limiti kaldırıldı
+    LIVES_COUNT: 3, // for 3lives mode
+    
+    // Points
+    POINTS_CORRECT: 10,
+    POINTS_WRONG: 0, // Yanlış cevap için puan kaybı yok
+    COMBO_BONUS: 5, // every 3 correct answers
+    PERFECT_LESSON_BONUS_PERCENT: 0.5, // 50% of session score
+    
+    // Daily Goal Defaults
+    DAILY_GOAL_DEFAULT: 2700,
+    DAILY_GOAL_LEVELS: {
+        easy: 1300,
+        normal: 2700,
+        hard: 5400,
+        serious: 6000
+    },
+    
+    // Streak
+    DAILY_GOAL_CORRECT: 5, // minimum correct answers to maintain streak
+    
+    // Storage
+    STORAGE_PREFIX: 'hasene_',
+    INDEXEDDB_NAME: 'HaseneGameDB',
+    INDEXEDDB_VERSION: 1,
+    
+    // API/Data
+    DATA_PATH: './data/',
+    
+    // Notifications
+    NOTIFICATIONS_ENABLED: true,
+    DAILY_REMINDER_TIME: '09:00',
+    TASK_REMINDER_TIME: '22:00'
 };
 
-// Helper fonksiyon - güvenli console.log
-// Keep a reference to the original console.log so we can gate raw calls
-const __orig_console_log = console.log.bind(console);
+// Debug logging function
+function debugLog(...args) {
+    if (CONFIG.DEBUG || CONFIG.LOG_LEVEL === 'debug') {
+        console.log('[DEBUG]', ...args);
+    }
+}
 
-const log = {
-    // Use the original console for wrapper logs so each wrapper flag works independently
-    debug: (...args) => { if (CONFIG.debug) __orig_console_log(...args); },
-    stats: (...args) => { if (CONFIG.debugStats) __orig_console_log(...args); },
-    elements: (...args) => { if (CONFIG.debugElements) __orig_console_log(...args); },
-    audio: (...args) => { if (CONFIG.debugAudio) __orig_console_log(...args); },
-    game: (...args) => { if (CONFIG.debugGameFlow) __orig_console_log(...args); },
-    error: (...args) => { if (CONFIG.showCriticalErrors) console.error(...args); },
-    warn: (...args) => { if (CONFIG.showWarnings) console.warn(...args); }  // Uyarılar artık varsayılan olarak kapalı
-};
+function infoLog(...args) {
+    if (['debug', 'info'].includes(CONFIG.LOG_LEVEL)) {
+        console.log('[INFO]', ...args);
+    }
+}
 
-// Gate any remaining raw console.log calls via CONFIG.debug (global toggle).
-// This lets us avoid replacing hundreds of console.log occurrences while keeping
-// a single control to enable verbose logs during debugging.
-console.log = (...args) => { if (typeof CONFIG !== 'undefined' && CONFIG.debug) __orig_console_log(...args); };
-const forceLog = (...args) => __orig_console_log(...args);
+// Oyun adımları için özel log fonksiyonu
+function gameLog(step, data = {}) {
+    if (CONFIG.GAME_DEBUG || CONFIG.DEBUG) {
+        const timestamp = new Date().toLocaleTimeString('tr-TR');
+        console.log(`[GAME ${timestamp}] ${step}`, data);
+    }
+}
+
+function warnLog(...args) {
+    if (['debug', 'info', 'warn'].includes(CONFIG.LOG_LEVEL)) {
+        console.warn('[WARN]', ...args);
+    }
+}
+
+function errorLog(...args) {
+    console.error('[ERROR]', ...args);
+}
+
+// Export for use in other files
+if (typeof window !== 'undefined') {
+    window.CONFIG = CONFIG;
+    window.debugLog = debugLog;
+    window.infoLog = infoLog;
+    window.warnLog = warnLog;
+    window.errorLog = errorLog;
+    window.gameLog = gameLog;
+    
+    // Debug modunu açıp kapatmak için global fonksiyon
+    window.toggleGameDebug = function() {
+        CONFIG.GAME_DEBUG = !CONFIG.GAME_DEBUG;
+        console.log(`[DEBUG] Oyun log modu: ${CONFIG.GAME_DEBUG ? 'AÇIK' : 'KAPALI'}`);
+        return CONFIG.GAME_DEBUG;
+    };
+}
 

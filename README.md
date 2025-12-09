@@ -1,194 +1,132 @@
-# 🕌 Hasene - Arapça Öğrenme Oyunu
+# 🕌 Hasene Arapça Dersi
 
-Arapça öğrenmeyi eğlenceli hale getiren interaktif eğitim oyunu. Kuran kelimelerini öğren, rozet topla, günlük görevleri tamamla.
+Kuran-ı Kerim kelimelerini eğlenceli bir şekilde öğrenerek hem bilginizi artırın hem de **Hasene** kazanın.
 
-## 🎮 Özellikler
+## 🎮 Oyun Modları
 
-### Oyun Modları
-- 📚 **Kelime Çevir**: Arapça kelimelerin Türkçe anlamlarını bul
-- 🎧 **Dinle & Bul**: Dinleyerek doğru kelimeyi bul
-- 📝 **Boşluk Doldur**: Ayetlerdeki boşlukları tamamla
-- 📖 **Ayet Oku**: Kuran ayetlerini oku ve öğren
-- 🤲 **Dua Et**: Duaları ezberle ve öğren
-- 📜 **Hadis Oku**: Hadisleri oku ve öğren
+1. **Kelime Çevir** - Arapça kelimelerin Türkçe meâl karşılığını bul
+2. **Dinle Bul** - Dinlediğin kelimeyi seçeneklerden bul
+3. **Boşluk Doldur** - Ayetlerdeki boşlukları doldur
+4. **Ayet Oku** - Ayetleri oku ve dinle
+5. **Dua Et** - Duaları oku ve dinle
+6. **Hadis Oku** - Hadisleri oku
 
-### Sistemler
-- 💰 **Hasene Puan Sistemi**: Her doğru cevap için Hasene kazan
-- ⭐ **Yıldız Sistemi**: 100 Hasene = 1 Yıldız
-- 🏆 **Mertebe Sistemi**: Mübtedi, Müterakki, Mütecaviz, Mütebahhir
-- 🥇 **Rozet Sistemi**: Başarılarınız için rozetler kazanın (Bronz, Gümüş, Altın, Elmas)
-- 📊 **Detaylı İstatistikler**: Performans takibi, kelime istatistikleri, analitik
-- 📅 **Günlük Görevler**: Her gün yeni hedefler ve ödüller
-- 🎯 **Günlük Hedef**: Günlük Hasene hedefi belirle ve tamamla
-- 🔥 **Seri Takibi**: Günlük oyun serilerinizi koruyun
-- 🏅 **Liderlik Tablosu**: Haftalık ve aylık sıralamalar
-- 📈 **Kelime İstatistikleri**: Öğrenilen, zorlanılan kelimeleri takip et
-- 🧠 **Akıllı Öğrenme**: Zorlandığın kelimeleri daha sık göster
-- 📱 **PWA Desteği**: Mobil cihazlara yüklenebilir, offline çalışır
+## ✨ Özellikler
 
-## 🚀 Kullanım
+- 📚 6 Farklı Oyun Modu
+- 💰 Hasene Puan Sistemi (tüm bonuslar dahil)
+- 🏆 41 Kronolojik Rozet (Asr-ı Saadet)
+- 🎖️ 44 Başarım (mantıklı sıralama)
+- 📅 Günlük ve Haftalık Görevler
+- 🔥 Seri (Streak) Takibi
+- 📊 Detaylı İstatistikler (günlük, haftalık, aylık)
+- 🎯 Günlük Vird Sistemi
+- 📱 Tam Responsive Tasarım (mobil, tablet, desktop)
+- 💾 Offline Çalışma (PWA)
+- 🎨 Modern ve Kullanıcı Dostu Arayüz
+- 📖 Rozet Detay Modalı (tarihsel bilgiler, Arapça terimler)
 
-Proje GitHub Pages üzerinde yayınlanmaktadır:
-**https://yzokumus.github.io/NEW_HASENE/**
+## 🚀 Kurulum
 
-### Mobil Kullanım
-1. Tarayıcıdan siteyi aç
-2. "Ana Ekrana Ekle" veya "Yükle" seçeneğini kullan
-3. Uygulama ana ekranına eklenecek
-
-## 🛠️ Geliştirme
-
-### Gereksinimler
-- Node.js 18+ (test ve dokümantasyon için)
-- Modern web tarayıcısı (Chrome, Firefox, Safari, Edge)
-
-### Kurulum
-
+1. Projeyi klonlayın:
 ```bash
-# Bağımlılıkları yükle
-npm install
-
-# Testleri çalıştır
-npm test
-
-# Testleri watch modunda çalıştır
-npm run test:watch
-
-# Test coverage raporu
-npm run test:coverage
-
-# Dokümantasyon oluştur
-npm run docs
-
-# Dokümantasyonu tarayıcıda görüntüle
-npm run docs:serve
+git clone https://github.com/YZOKUMUS/DENEME_HASENE.git
 ```
 
-### Proje Yapısı
+2. Proje klasörüne gidin:
+```bash
+cd DENEME_HASENE
+```
+
+3. Bir web sunucusu ile çalıştırın (örneğin VS Code Live Server veya Python http.server)
+
+## 📁 Proje Yapısı
 
 ```
+deneme_hasene/
 ├── index.html          # Ana HTML dosyası
 ├── style.css           # Stil dosyası
+├── manifest.json       # PWA manifest
 ├── sw.js              # Service Worker
-├── manifest.json      # PWA manifest
-├── js/                # JavaScript modülleri
-│   ├── config.js      # Yapılandırma ve debug sistemi
-│   ├── utils.js       # Yardımcı fonksiyonlar
+├── js/
 │   ├── game-core.js   # Ana oyun mantığı
-│   ├── error-handler.js # Hata yönetimi
-│   ├── safety-checks.js # Güvenlik kontrolleri
-│   └── ...            # Diğer modüller
-├── data/              # JSON veri dosyaları
-├── assets/            # Görseller ve fontlar
-├── tests/             # Test dosyaları
-│   ├── setup.js       # Test setup
-│   ├── utils.test.js  # Utils testleri
+│   ├── constants.js   # Sabitler ve rozet tanımları
+│   ├── config.js      # Yapılandırma
+│   ├── utils.js       # Yardımcı fonksiyonlar
 │   └── ...
-└── docs/              # JSDoc dokümantasyonu (oluşturulur)
+├── data/
+│   ├── kelimebul.json # Kelime verileri
+│   ├── ayetoku.json   # Ayet verileri
+│   ├── duaet.json     # Dua verileri
+│   └── hadisoku.json  # Hadis verileri
+└── assets/            # Görseller ve ikonlar
 ```
 
-### Kod Standartları
+## 🎯 Zorluk Seviyeleri
 
-- **Vanilla JavaScript**: Framework kullanılmadan saf JavaScript
-- **Modüler Yapı**: Her özellik ayrı dosyada
-- **JSDoc Dokümantasyonu**: Tüm public fonksiyonlar dokümante edilmiş
-- **Test Coverage**: Kritik fonksiyonlar test edilmiş
-- **Güvenlik**: CSP header'ları, XSS koruması, veri sanitization
+- 🌱 **Kolay**: 5-8 difficulty
+- ⚖️ **Orta**: 9-12 difficulty
+- 🔥 **Zor**: 13-21 difficulty
 
-### Güvenlik
+## 📊 Puan Sistemi
 
-- ✅ **CSP (Content Security Policy)**: XSS koruması için aktif
-- ✅ **HTML Sanitization**: Kullanıcı girdileri sanitize edilir
-- ✅ **LocalStorage Encryption**: Hassas veriler Base64 ile encode edilir
-- ⚠️ **Not**: Mevcut encryption sadece obfuscation içindir, gerçek şifreleme değildir
+### Temel Puanlar
+- **Doğru cevap**: 10 Hasene
+- **Her 3 doğru cevapta**: +5 Hasene (Combo Bonus)
+- **Mükemmel ders** (0 yanlış): %50 ekstra bonus
 
-### Test Yazma
+### Bonuslar
+- **Günlük Görev Ödülleri**: Her görev için bonus Hasene
+- **Haftalık Görev Ödülleri**: Haftalık görevler için bonus Hasene
+- **Günlük Vird Bonusu**: Günlük hedefi tamamlayınca bonus Hasene
 
-Yeni bir fonksiyon için test yazmak:
+Tüm bonuslar detaylı istatistiklere kaydedilir (günlük, haftalık, aylık).
 
-```javascript
-// tests/my-function.test.js
-import { describe, it, expect } from 'vitest';
-import { myFunction } from '../js/my-module.js';
+## 🏆 Rozetler ve Başarımlar
 
-describe('myFunction', () => {
-    it('should work correctly', () => {
-        const result = myFunction('input');
-        expect(result).toBe('expected');
-    });
-});
-```
+### Rozetler (Asr-ı Saadet)
+41 kronolojik rozet sistemi - Peygamberimizin doğumundan Dört Halife dönemi sonuna kadar:
+- **Mekke Dönemi** (13 rozet): Doğum'dan İkinci Akabe Biatı'na kadar
+- **Medine Dönemi** (14 rozet): Hicret'ten Vefat'a kadar
+- **İlk İki Halife** (8 rozet): Hz. Ebu Bekir ve Hz. Ömer dönemi
+- **Hz. Osman** (3 rozet): Üçüncü halife dönemi
+- **Hz. Ali** (3 rozet): Dördüncü halife dönemi
 
-### Dokümantasyon Yazma
+Her rozet tıklanabilir ve detaylı tarihsel bilgi gösterir (Miladi/Hicri tarih, Arapça terimler, önemi).
 
-JSDoc formatında dokümantasyon:
+### Başarımlar
+44 başarım mantıklı sırayla gösterilir:
+- **İlk Adımlar**: Tek oturumda tamamlanabilir (İlk Kelime, Bismillah, vb.)
+- **Başlangıç**: Kısa sürede tamamlanabilir
+- **İlerleme**: Orta zorluk
+- **Ustalık**: Zor
+- **Master**: Çok zor
+- **Efsane**: En zor (Kurra Hafız: 1,000,000 Hasene)
 
-```javascript
-/**
- * Fonksiyon açıklaması
- * @param {string} param1 - Parametre açıklaması
- * @param {number} [param2=0] - Opsiyonel parametre
- * @returns {boolean} Dönüş değeri açıklaması
- * @example
- * myFunction('test', 123) // true
- */
-function myFunction(param1, param2 = 0) {
-    // ...
-}
-```
+Sıralama: Kolaydan zora, hızlıdan yavaşa doğru mantıklı ilerleme.
 
-## 📦 Teknolojiler
+## 📅 Takvim Sistemi
 
-- **Vanilla JavaScript**: Framework kullanılmadan saf JavaScript
-- **Progressive Web App (PWA)**: Mobil uygulama deneyimi
-- **Service Worker**: Offline çalışma ve cache yönetimi
-- **LocalStorage**: Veri saklama
-- **IndexedDB**: Büyük veri saklama (opsiyonel)
-- **Vitest**: Test framework
-- **JSDoc**: API dokümantasyonu
+Duolingo tarzı takvim:
+- Ayın tüm günleri gösterilir
+- Oynanan günler yeşil
+- Seri günler turuncu/sarı
+- Oynanmayan günler gri
 
-## ⚖️ Telif ve Marka Notu
+## 🔧 Teknolojiler
 
-- Bu proje, **herhangi bir kurum veya ticari marka ile bağlantılı değildir**; tamamen bağımsız olarak geliştirilmiştir.
-- Arayüz ve renk seçimleri, genel olarak modern eğitim oyunlarından ilham alan **özgün bir tasarım**dır; belirli bir markanın kopyası veya klonu değildir.
+- Vanilla JavaScript
+- HTML5
+- CSS3
+- IndexedDB (veri saklama)
+- Service Worker (PWA)
+- LocalStorage (yedek veri)
 
-## 🎯 Hasene Sistemi
+## 📝 Lisans
 
-- **100 Hasene = 1 Yıldız**
-- **2,000 Hasene = Mübtedi (🥉)**
-- **8,500 Hasene = Müterakki (🥈)** (~1 saat oyun)
-- **25,500 Hasene = Mütecaviz (🥇)** (~3 gün)
-- **85,000 Hasene = Mütebahhir (💎)** (~10 gün)
+Bu proje eğitim amaçlıdır.
 
-## 🔒 Güvenlik Notları
+## 👤 Geliştirici
 
-### CSP (Content Security Policy)
-- `script-src`'den `unsafe-inline` kaldırıldı (XSS koruması)
-- `style-src`'de `unsafe-inline` bırakıldı (Google Fonts ve dinamik stiller için gerekli)
-- Gelecekte nonce kullanımı eklenebilir
+YZOKUMUS
 
-### Veri Şifreleme
-- LocalStorage'da hassas veriler Base64 ile encode edilir
-- ⚠️ **Uyarı**: Mevcut encryption sadece obfuscation içindir
-- Production'da gerçek şifreleme (AES-256) kullanılabilir
-
-## 📄 Lisans
-
-ISC
-
-## 🤝 Katkıda Bulunma
-
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-## 📝 Changelog
-
-### v1.0.0
-- ✅ Test altyapısı eklendi (Vitest)
-- ✅ JSDoc dokümantasyonu eklendi
-- ✅ CSP iyileştirmeleri (unsafe-inline kaldırıldı)
-- ✅ README geliştirme bölümü eklendi
-- ✅ Güvenlik dokümantasyonu eklendi

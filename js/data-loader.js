@@ -1,451 +1,263 @@
-// ============ VERİ YÜKLEME - LAZY LOADING ============
-// JSON dosyaları sadece ihtiyaç duyulduğunda yüklenir (performans optimizasyonu)
+// ============================================
+// DATA LOADER - Lazy Loading ve Veri Yönetimi
+// ============================================
 
-let kelimeBulData = null;  // kelimebul.json - Kelime Çevir ve Dinle ve Bul için
-let ayetOkuData = null;    // ayetoku.json - Boşluk Doldur ve Ayet Oku için
-let duaData = null;        // duaet.json - Dua Et için
-let hadisData = null;      // hadisoku.json - Hadis Oku için
+// Veri cache'leri
+let kelimeData = null;
+let ayetData = null;
+let duaData = null;
+let hadisData = null;
 
-// Yükleme durumları (cache kontrolü için)
-const dataLoadStatus = {
-    kelimeBul: { loaded: false, loading: false },
-    ayetOku: { loaded: false, loading: false },
-    dua: { loaded: false, loading: false },
-    hadis: { loaded: false, loading: false }
+// Yükleme durumları
+const loadingStates = {
+    kelime: false,
+    ayet: false,
+    dua: false,
+    hadis: false
 };
 
-// ============ JSON PARSER WEB WORKER ============
-// Büyük JSON dosyalarını background'da parse eder (UI donmasını önler)
-let jsonWorker = null;
+// IndexedDB cache key'leri
+const CACHE_KEYS = {
+    kelime: 'kelime_data_cache',
+    ayet: 'ayet_data_cache',
+    dua: 'dua_data_cache',
+    hadis: 'hadis_data_cache'
+};
 
-function getJSONWorker() {
-    if (!jsonWorker && typeof Worker !== 'undefined') {
-        try {
-            jsonWorker = new Worker('js/json-parser-worker.js');
-        } catch (e) {
-            if (typeof log !== 'undefined') log.warn('Web Worker desteklenmiyor, normal parse kullanılacak:', e);
-            return null;
+/**
+ * JSON dosyasını yükler (IndexedDB cache ile)
+ */
+async function loadJSONFile(filePath, cacheKey) {
+    try {
+        // Önce IndexedDB'den kontrol et
+        if (typeof loadFromIndexedDB === 'function' && cacheKey) {
+            const cached = await loadFromIndexedDB(cacheKey);
+            if (cached && Array.isArray(cached) && cached.length > 0) {
+                infoLog(`${cacheKey} IndexedDB'den yüklendi:`, cached.length, 'item');
+                // Arka planda güncelle
+                fetch(filePath)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (typeof saveToIndexedDB === 'function') {
+                            saveToIndexedDB(cacheKey, data);
+                        }
+                    })
+                    .catch(() => {
+                        // Hata olsa bile devam et
+                    });
+                return cached;
+            }
         }
-    }
-    return jsonWorker;
-}
-
-async function parseJSONInWorker(jsonString) {
-    const worker = getJSONWorker();
-    
-    // Worker desteklenmiyorsa normal parse kullan
-    if (!worker) {
-        return JSON.parse(jsonString);
-    }
-    
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            worker.terminate();
-            jsonWorker = null;
-            reject(new Error('JSON parse timeout'));
-        }, 30000); // 30 saniye timeout
         
-        worker.onmessage = (e) => {
-            clearTimeout(timeout);
-            if (e.data.success) {
-                resolve(e.data.data);
-            } else {
-                reject(new Error(e.data.error || 'JSON parse hatası'));
+        // IndexedDB'de yoksa network'ten yükle
+        const response = await fetch(filePath, {
+            cache: 'default',
+            headers: {
+                'Cache-Control': 'max-age=3600'
             }
-        };
+        });
         
-        worker.onerror = (e) => {
-            clearTimeout(timeout);
-            reject(new Error('Worker hatası: ' + e.message));
-        };
-        
-        worker.postMessage({ type: 'parse', data: jsonString });
-    });
-}
-
-// ============ NETWORK - FETCH WITH RETRY ============
-async function fetchWithRetry(url, retries = null, delay = null, useWorker = false) {
-    // Constants'tan değerleri al
-    const maxRetries = retries || window.CONSTANTS?.ERROR?.MAX_RETRIES || 3;
-    const retryDelay = delay || window.CONSTANTS?.ERROR?.RETRY_DELAY || 1000;
-    
-    // JSON yükleme hatalarında otomatik retry
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            // Büyük dosyalar için Web Worker kullan (hadisoku.json > 3MB)
-            const text = await response.text();
-            const fileSize = new Blob([text]).size;
-            const shouldUseWorker = useWorker || fileSize > 2 * 1024 * 1024; // 2MB üzeri
-            
-            if (shouldUseWorker && typeof Worker !== 'undefined') {
-                log.debug(`📡 Büyük dosya tespit edildi (${(fileSize / 1024 / 1024).toFixed(2)} MB), Web Worker kullanılıyor...`);
-                return await parseJSONInWorker(text);
-            } else {
-                return JSON.parse(text);
-            }
-        } catch (error) {
-            log.debug(`📡 Fetch attempt ${i + 1}/${maxRetries} failed for ${url}`);
-            if (i === maxRetries - 1) {
-                // Son deneme de başarısız
-                throw new Error(`Failed to load ${url} after ${maxRetries} attempts: ${error.message}`);
-            }
-            // Retry öncesi bekle (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, retryDelay * (i + 1)));
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        
+        // IndexedDB'ye kaydet
+        if (typeof saveToIndexedDB === 'function' && cacheKey && data) {
+            saveToIndexedDB(cacheKey, data).catch(() => {
+                // Hata olsa bile devam et
+            });
+        }
+        
+        return data;
+    } catch (error) {
+        errorLog('JSON yükleme hatası:', error);
+        // Hata durumunda IndexedDB'den tekrar dene
+        if (typeof loadFromIndexedDB === 'function' && cacheKey) {
+            const cached = await loadFromIndexedDB(cacheKey);
+            if (cached) {
+                infoLog(`${cacheKey} hata durumunda IndexedDB'den yüklendi`);
+                return cached;
+            }
+        }
+        throw error;
     }
 }
 
-// ============ LAZY LOAD FUNCTIONS ============
-
-// Kelime verilerini yükle (Kelime Çevir ve Dinle ve Bul için)
+/**
+ * Kelime verilerini yükler (lazy loading)
+ */
 async function loadKelimeData() {
-    if (dataLoadStatus.kelimeBul.loaded) {
-        return kelimeBulData; // Zaten yüklü, cache'den dön
+    if (kelimeData) {
+        return kelimeData;
     }
     
-    if (dataLoadStatus.kelimeBul.loading) {
-        // Yükleniyor, bekle
-        while (dataLoadStatus.kelimeBul.loading) {
+    if (loadingStates.kelime) {
+        // Zaten yükleniyor, bekle
+        while (loadingStates.kelime) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
-        return kelimeBulData;
+        return kelimeData;
     }
     
+    loadingStates.kelime = true;
     try {
-        dataLoadStatus.kelimeBul.loading = true;
-        
-        // Önce IndexedDB cache'den kontrol et
-        if (typeof getCachedJSON === 'function') {
-            const cached = await getCachedJSON('data/kelimebul.json');
-            if (cached) {
-                kelimeBulData = cached;
-                dataLoadStatus.kelimeBul.loaded = true;
-                dataLoadStatus.kelimeBul.loading = false;
-                log.debug('✅ Kelime verileri IndexedDB cache\'den yüklendi');
-                return kelimeBulData;
-            }
-        }
-        
-        showLoading('Kelime verileri yükleniyor...');
-        kelimeBulData = await fetchWithRetry('data/kelimebul.json');
-        
-        // IndexedDB'ye cache'le
-        if (typeof setCachedJSON === 'function' && kelimeBulData) {
-            await setCachedJSON('data/kelimebul.json', kelimeBulData);
-        }
-        
-        dataLoadStatus.kelimeBul.loaded = true;
-        setTimeout(() => hideLoading(), 300);
-        return kelimeBulData;
+        infoLog('Kelime verileri yükleniyor...');
+        kelimeData = await loadJSONFile(CONFIG.DATA_PATH + 'kelimebul.json', CACHE_KEYS.kelime);
+        infoLog('Kelime verileri yüklendi:', kelimeData.length, 'kelime');
+        return kelimeData;
     } catch (error) {
-        dataLoadStatus.kelimeBul.loading = false;
-        hideLoading();
-        
-        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
-        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
-            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
-            if (typeof getCachedJSON === 'function') {
-                try {
-                    const cached = await getCachedJSON('data/kelimebul.json');
-                    if (cached) {
-                        kelimeBulData = cached;
-                        dataLoadStatus.kelimeBul.loaded = true;
-                        log.debug('✅ Kelime verileri cache\'den yüklendi (sunucu hatası sonrası)');
-                        return kelimeBulData;
-                    }
-                } catch (cacheError) {
-                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
-                }
-            }
-        }
-        
-        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
-        if (kelimeBulData && kelimeBulData.length > 0) {
-            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
-            dataLoadStatus.kelimeBul.loaded = true;
-            return kelimeBulData;
-        }
-        
-        // Son çare: hata göster
-        log.error('Kelime verileri yükleme hatası:', error);
-        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
-        if (!kelimeBulData || kelimeBulData.length === 0) {
-            showError(error, () => loadKelimeData());
-        }
-        throw error;
+        errorLog('Kelime verileri yüklenemedi:', error);
+        return [];
+    } finally {
+        loadingStates.kelime = false;
     }
 }
 
-// Ayet verilerini yükle (Boşluk Doldur ve Ayet Oku için)
+/**
+ * Ayet verilerini yükler (lazy loading)
+ */
 async function loadAyetData() {
-    if (dataLoadStatus.ayetOku.loaded) {
-        return ayetOkuData; // Zaten yüklü, cache'den dön
+    if (ayetData) {
+        return ayetData;
     }
     
-    if (dataLoadStatus.ayetOku.loading) {
-        // Yükleniyor, bekle
-        while (dataLoadStatus.ayetOku.loading) {
+    if (loadingStates.ayet) {
+        while (loadingStates.ayet) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
-        return ayetOkuData;
+        return ayetData;
     }
     
+    loadingStates.ayet = true;
     try {
-        dataLoadStatus.ayetOku.loading = true;
-        
-        // Önce IndexedDB cache'den kontrol et
-        if (typeof getCachedJSON === 'function') {
-            const cached = await getCachedJSON('data/ayetoku.json');
-            if (cached) {
-                ayetOkuData = cached;
-                dataLoadStatus.ayetOku.loaded = true;
-                dataLoadStatus.ayetOku.loading = false;
-                log.debug('✅ Ayet verileri IndexedDB cache\'den yüklendi');
-                return ayetOkuData;
-            }
-        }
-        
-        showLoading('Ayet verileri yükleniyor...');
-        ayetOkuData = await fetchWithRetry('data/ayetoku.json');
-        
-        // IndexedDB'ye cache'le
-        if (typeof setCachedJSON === 'function' && ayetOkuData) {
-            await setCachedJSON('data/ayetoku.json', ayetOkuData);
-        }
-        
-        dataLoadStatus.ayetOku.loaded = true;
-        setTimeout(() => hideLoading(), 300);
-        return ayetOkuData;
+        infoLog('Ayet verileri yükleniyor...');
+        ayetData = await loadJSONFile(CONFIG.DATA_PATH + 'ayetoku.json', CACHE_KEYS.ayet);
+        infoLog('Ayet verileri yüklendi:', ayetData.length, 'ayet');
+        return ayetData;
     } catch (error) {
-        dataLoadStatus.ayetOku.loading = false;
-        hideLoading();
-        
-        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
-        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
-            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
-            if (typeof getCachedJSON === 'function') {
-                try {
-                    const cached = await getCachedJSON('data/ayetoku.json');
-                    if (cached) {
-                        ayetOkuData = cached;
-                        dataLoadStatus.ayetOku.loaded = true;
-                        log.debug('✅ Ayet verileri cache\'den yüklendi (sunucu hatası sonrası)');
-                        return ayetOkuData;
-                    }
-                } catch (cacheError) {
-                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
-                }
-            }
-        }
-        
-        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
-        if (ayetOkuData && ayetOkuData.length > 0) {
-            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
-            dataLoadStatus.ayetOku.loaded = true;
-            return ayetOkuData;
-        }
-        
-        // Son çare: hata göster
-        log.error('Ayet verileri yükleme hatası:', error);
-        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
-        if (!ayetOkuData || ayetOkuData.length === 0) {
-            showError(error, () => loadAyetData());
-        }
-        throw error;
+        errorLog('Ayet verileri yüklenemedi:', error);
+        return [];
+    } finally {
+        loadingStates.ayet = false;
     }
 }
 
-// Dua verilerini yükle (Dua Et için)
+/**
+ * Dua verilerini yükler (lazy loading)
+ */
 async function loadDuaData() {
-    if (dataLoadStatus.dua.loaded) {
-        return duaData; // Zaten yüklü, cache'den dön
+    if (duaData) {
+        return duaData;
     }
     
-    if (dataLoadStatus.dua.loading) {
-        // Yükleniyor, bekle
-        while (dataLoadStatus.dua.loading) {
+    if (loadingStates.dua) {
+        while (loadingStates.dua) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         return duaData;
     }
     
+    loadingStates.dua = true;
     try {
-        dataLoadStatus.dua.loading = true;
-        
-        // Önce IndexedDB cache'den kontrol et
-        if (typeof getCachedJSON === 'function') {
-            const cached = await getCachedJSON('data/duaet.json');
-            if (cached) {
-                duaData = cached;
-                dataLoadStatus.dua.loaded = true;
-                dataLoadStatus.dua.loading = false;
-                log.debug('✅ Dua verileri IndexedDB cache\'den yüklendi');
-                return duaData;
-            }
-        }
-        
-        showLoading('Dua verileri yükleniyor...');
-        duaData = await fetchWithRetry('data/duaet.json');
-        
-        // IndexedDB'ye cache'le
-        if (typeof setCachedJSON === 'function' && duaData) {
-            await setCachedJSON('data/duaet.json', duaData);
-        }
-        
-        dataLoadStatus.dua.loaded = true;
-        setTimeout(() => hideLoading(), 300);
+        infoLog('Dua verileri yükleniyor...');
+        duaData = await loadJSONFile(CONFIG.DATA_PATH + 'duaet.json', CACHE_KEYS.dua);
+        infoLog('Dua verileri yüklendi:', duaData.length, 'dua');
         return duaData;
     } catch (error) {
-        dataLoadStatus.dua.loading = false;
-        hideLoading();
-        
-        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
-        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
-            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
-            if (typeof getCachedJSON === 'function') {
-                try {
-                    const cached = await getCachedJSON('data/duaet.json');
-                    if (cached) {
-                        duaData = cached;
-                        dataLoadStatus.dua.loaded = true;
-                        log.debug('✅ Dua verileri cache\'den yüklendi (sunucu hatası sonrası)');
-                        return duaData;
-                    }
-                } catch (cacheError) {
-                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
-                }
-            }
-        }
-        
-        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
-        if (duaData && duaData.length > 0) {
-            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
-            dataLoadStatus.dua.loaded = true;
-            return duaData;
-        }
-        
-        // Son çare: hata göster
-        log.error('Dua verileri yükleme hatası:', error);
-        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
-        if (!duaData || duaData.length === 0) {
-            showError(error, () => loadDuaData());
-        }
-        throw error;
+        errorLog('Dua verileri yüklenemedi:', error);
+        return [];
+    } finally {
+        loadingStates.dua = false;
     }
 }
 
-// Hadis verilerini yükle (Hadis Oku için)
+/**
+ * Hadis verilerini yükler (lazy loading)
+ */
 async function loadHadisData() {
-    if (dataLoadStatus.hadis.loaded) {
-        return hadisData; // Zaten yüklü, cache'den dön
+    if (hadisData) {
+        return hadisData;
     }
     
-    if (dataLoadStatus.hadis.loading) {
-        // Yükleniyor, bekle
-        while (dataLoadStatus.hadis.loading) {
+    if (loadingStates.hadis) {
+        while (loadingStates.hadis) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         return hadisData;
     }
     
+    loadingStates.hadis = true;
     try {
-        dataLoadStatus.hadis.loading = true;
-        
-        // Önce IndexedDB cache'den kontrol et
-        if (typeof getCachedJSON === 'function') {
-            const cached = await getCachedJSON('data/hadisoku.json');
-            if (cached) {
-                hadisData = cached;
-                dataLoadStatus.hadis.loaded = true;
-                dataLoadStatus.hadis.loading = false;
-                log.debug('✅ Hadis verileri IndexedDB cache\'den yüklendi');
-                return hadisData;
-            }
-        }
-        
-        showLoading('Hadis verileri yükleniyor...');
-        // hadisoku.json çok büyük (3.97 MB), Web Worker kullan
-        hadisData = await fetchWithRetry('data/hadisoku.json', 3, 1000, true);
-        
-        // IndexedDB'ye cache'le
-        if (typeof setCachedJSON === 'function' && hadisData) {
-            await setCachedJSON('data/hadisoku.json', hadisData);
-        }
-        
-        dataLoadStatus.hadis.loaded = true;
-        setTimeout(() => hideLoading(), 300);
+        infoLog('Hadis verileri yükleniyor...');
+        hadisData = await loadJSONFile(CONFIG.DATA_PATH + 'hadisoku.json', CACHE_KEYS.hadis);
+        infoLog('Hadis verileri yüklendi:', hadisData.length, 'hadis');
         return hadisData;
     } catch (error) {
-        dataLoadStatus.hadis.loading = false;
-        hideLoading();
-        
-        // Bağlantı hatası durumunda cache'den tekrar dene (sessizce)
-        if (error.message && (error.message.includes('CONNECTION_REFUSED') || error.message.includes('Failed to fetch'))) {
-            log.debug('⚠️ Sunucu bağlantı hatası, cache\'den tekrar deneniyor...');
-            if (typeof getCachedJSON === 'function') {
-                try {
-                    const cached = await getCachedJSON('data/hadisoku.json');
-                    if (cached) {
-                        hadisData = cached;
-                        dataLoadStatus.hadis.loaded = true;
-                        log.debug('✅ Hadis verileri cache\'den yüklendi (sunucu hatası sonrası)');
-                        return hadisData;
-                    }
-                } catch (cacheError) {
-                    log.debug('⚠️ Cache\'den yükleme de başarısız:', cacheError);
-                }
-            }
-        }
-        
-        // Cache'de de yoksa ve veri zaten yüklüyse, mevcut veriyi kullan
-        if (hadisData && hadisData.length > 0) {
-            log.debug('⚠️ Yükleme hatası ama mevcut veri kullanılıyor');
-            dataLoadStatus.hadis.loaded = true;
-            return hadisData;
-        }
-        
-        // Son çare: hata göster
-        log.error('Hadis verileri yükleme hatası:', error);
-        // Sadece kritik hatalarda göster (cache ve mevcut veri yoksa)
-        if (!hadisData || hadisData.length === 0) {
-            showError(error, () => loadHadisData());
-        }
-        throw error;
+        errorLog('Hadis verileri yüklenemedi:', error);
+        return [];
+    } finally {
+        loadingStates.hadis = false;
     }
 }
 
-// Tüm verileri yükle (başlangıçta gerekirse - opsiyonel)
-async function loadAllData() {
+/**
+ * Tüm verileri önceden yükler (preload) - arka planda
+ */
+async function preloadAllData() {
+    infoLog('Tüm veriler önceden yükleniyor...');
     try {
-        showLoading('Veriler yükleniyor...');
-        const results = await Promise.all([
-            loadKelimeData(),
-            loadAyetData(),
-            loadDuaData(),
-            loadHadisData()
+        // Paralel yükleme, hata olsa bile devam et
+        await Promise.allSettled([
+            loadKelimeData().catch(err => errorLog('Kelime yükleme hatası:', err)),
+            loadAyetData().catch(err => errorLog('Ayet yükleme hatası:', err)),
+            loadDuaData().catch(err => errorLog('Dua yükleme hatası:', err)),
+            loadHadisData().catch(err => errorLog('Hadis yükleme hatası:', err))
         ]);
-        hideLoading();
-        
-        // Console'da test için sonuç döndür
-        const status = {
-            kelimeBul: { loaded: !!results[0], count: results[0]?.length || 0 },
-            ayetOku: { loaded: !!results[1], count: results[1]?.length || 0 },
-            dua: { loaded: !!results[2], count: results[2]?.length || 0 },
-            hadis: { loaded: !!results[3], count: results[3]?.length || 0 }
-        };
-        
-        log.debug('✅ Tüm veriler başarıyla yüklendi:', status);
-        if (typeof log !== 'undefined' && CONFIG && CONFIG.debug) log.debug('✅ Tüm veriler başarıyla yüklendi:', status);
-        
-        return status;
+        infoLog('Tüm veriler yüklendi');
     } catch (error) {
-        hideLoading();
-        log.error('Veri yükleme hatası:', error);
-        if (typeof log !== 'undefined') log.error('❌ Veri yükleme hatası:', error);
-        throw error;
+        errorLog('Veri ön yükleme hatası:', error);
     }
 }
+
+/**
+ * Arka planda verileri önceden yükler (non-blocking)
+ */
+function preloadAllDataBackground() {
+    // Sayfa yüklendikten sonra arka planda yükle
+    if (document.readyState === 'complete') {
+        preloadAllData();
+    } else {
+        window.addEventListener('load', () => {
+            // 1 saniye bekle, sonra arka planda yükle
+            setTimeout(() => {
+                preloadAllData();
+            }, 1000);
+        });
+    }
+}
+
+/**
+ * Veri cache'lerini temizler
+ */
+function clearDataCache() {
+    kelimeData = null;
+    ayetData = null;
+    duaData = null;
+    hadisData = null;
+    infoLog('Veri cache temizlendi');
+}
+
+// Export
+if (typeof window !== 'undefined') {
+    window.loadKelimeData = loadKelimeData;
+    window.loadAyetData = loadAyetData;
+    window.loadDuaData = loadDuaData;
+    window.loadHadisData = loadHadisData;
+    window.preloadAllData = preloadAllData;
+    window.preloadAllDataBackground = preloadAllDataBackground;
+    window.clearDataCache = clearDataCache;
+}
+
 

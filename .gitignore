@@ -3,35 +3,35 @@ node_modules/
 package-lock.json
 yarn.lock
 
-# Test coverage
-coverage/
-.nyc_output/
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Documentation
-# docs/ - Artık dokümantasyon klasörü kullanılıyor, ignore edilmemeli
-out/
-
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Logs
 *.log
 npm-debug.log*
 
-# Environment
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Environment variables
 .env
 .env.local
 
-# ESLint
-.eslintcache
+# Build files
+dist/
+build/
 
-# Prettier
-.prettierignore
+# Test files
+coverage/
+
