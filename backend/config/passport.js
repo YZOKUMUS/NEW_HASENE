@@ -15,8 +15,11 @@ passport.use(
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
-          // Update last login
+          // Update last login and picture
           user.lastLogin = new Date();
+          if (profile.photos && profile.photos[0]) {
+            user.picture = profile.photos[0].value;
+          }
           await user.save();
           return done(null, user);
         } else {
