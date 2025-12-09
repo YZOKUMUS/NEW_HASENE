@@ -7,7 +7,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const connectDB = require('./config/database');
-const passport = require('./config/passport');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -18,6 +17,9 @@ const app = express();
 
 // Connect to MongoDB
 connectDB();
+
+// Initialize Passport (lazy load to avoid build-time env var access)
+const passport = require('./config/passport');
 
 // Middleware
 app.use(cors({
@@ -42,7 +44,7 @@ app.use(
   })
 );
 
-// Initialize Passport
+// Initialize Passport (moved after connectDB to ensure env vars are available)
 app.use(passport.initialize());
 app.use(passport.session());
 
