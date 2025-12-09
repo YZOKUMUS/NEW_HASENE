@@ -86,7 +86,44 @@ router.get('/me', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Debug: Log user data
+    console.log('GET /me - User data:', {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+      hasPicture: !!user.picture
+    });
+
     res.json(user);
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Update user picture (for existing users without picture)
+router.post('/update-picture', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Trigger OAuth flow to update picture
+    // This requires re-authentication
+    res.json({ 
+      message: 'Please logout and login again to update picture',
+      needsReauth: true 
+    });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
   }

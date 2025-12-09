@@ -21,14 +21,31 @@ async function initAuthUI() {
     if (token && typeof getCurrentUser === 'function') {
         try {
             const user = await getCurrentUser();
+            console.log('Auth UI - User data:', user);
+            console.log('Auth UI - User picture:', user?.picture);
             if (user) {
                 // Kullanıcı giriş yapmış
                 if (loginBtn) loginBtn.style.display = 'none';
                 if (userProfile) {
                     userProfile.style.display = 'block';
-                    if (userAvatar && user.picture) {
-                        userAvatar.src = user.picture;
-                        userAvatar.alt = user.name;
+                    if (userAvatar) {
+                        if (user.picture) {
+                            console.log('Setting avatar src to:', user.picture);
+                            userAvatar.src = user.picture;
+                            userAvatar.alt = user.name || 'User';
+                            userAvatar.style.display = 'block';
+                            // Error handler for image loading
+                            userAvatar.onerror = function() {
+                                console.error('Failed to load avatar image:', user.picture);
+                                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzQyODVGNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+PC90ZXh0Pjwvc3ZnPg==';
+                            };
+                        } else {
+                            console.log('No picture in user object');
+                            // Picture yoksa default avatar göster
+                            userAvatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzQyODVGNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+PC90ZXh0Pjwvc3ZnPg==';
+                            userAvatar.alt = user.name || 'User';
+                            userAvatar.style.display = 'block';
+                        }
                     }
                     if (userName) {
                         userName.textContent = user.name || user.email;
